@@ -1,0 +1,38 @@
+.wrapper {
+  max-width: 1368px;
+}
+
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  margin-right: 8px;
+}
+
+.feed-icon {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  margin-left: -18px !important;
+}
+
+.counter {
+  max-width: 100px;
+}
+
+.nav-item {
+  padding: .375rem .75rem;
+}
+
+.nav-item, .feed-item {
+  border-radius: 4px;
+}
+
+.nav-item:hover, .feed-item:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+.nav-item:active, .feed-item:active {
+  background-color: #007bff;
+  color: white;
+}
