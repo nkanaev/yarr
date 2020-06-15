@@ -31,12 +31,10 @@ new Vue({
         {'id': '789', 'title': 'Marques Brownlee: ‘Reflecting on the Color of My Skin’', 'status': 'read', 'feed_id': 2, 'date': 1592250298},
       ],
       'entrySelected': null,
+      'entrySelectedDetails': {},
     }
   },
   computed: {
-    feedsById: function() {
-      return this.feeds.reduce(function(acc, feed) { acc[feed.id] = feed; return acc }, {})
-    },
     foldersWithFeeds: function() {
       var feedsByFolders = this.feeds.reduce(function(folders, feed) {
         if (!folders[feed.folder_id])
@@ -52,12 +50,21 @@ new Vue({
       folders.push({id: null, feeds: feedsByFolders[null]})
       return folders
     },
+    feedsById: function() {
+      return this.feeds.reduce(function(acc, feed) { acc[feed.id] = feed; return acc }, {})
+    },
+    entriesById: function() {
+      return this.entries.reduce(function(acc, entry) { acc[entry.id] = entry; return acc }, {})
+    },
   },
   watch: {
     'feedSelected': function(newVal, oldVal) {
       var parts = newVal.split(':', 2)
       var type = parts[0]
       var guid = parts[1]
+    },
+    'entrySelected': function(newVal, oldVal) {
+      this.entrySelectedDetails = this.entriesById[newVal]
     },
   },
   methods: {

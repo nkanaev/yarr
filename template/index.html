@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="wrapper d-flex vh-100" id="app" v-cloak>
-        <div class="vh-100 overflow-auto border-right" style="width: 300px;">
+        <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="mx-2 my-2">
                 <div class="mb-4">
                     <label class="nav-select d-block mb-1" v-for="filter in filters">
@@ -48,7 +48,7 @@
                 </div>
             </div>
         </div>
-        <div class="vh-100 overflow-auto border-right" style="width: 300px;">
+        <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="my-2 mx-2">
                 <label class="nav-select mb-1" v-for="entry in entries" :class="{'text-muted': entry.status === 'read'}">
                     <input type="radio" name="entry" :value="entry.id" v-model="entrySelected">
@@ -62,14 +62,26 @@
                                 <small class="">{{formatDate(entry.date)}}</small>
                             </div>
                             <span class="font-weight-bold">
-                                Police confiscates illegal Antimatter from scientists
+                                {{entry.title}}
                             </span>
                         </div>
                     </div>
                 </label>
             </div>
         </div>
-        <div class="m-3">three</div>
+        <div class="vh-100 overflow-auto w-100">
+            <div v-if="entrySelected" class="mx-3 my-2">
+                <h3>{{entrySelectedDetails.title}}</h3>
+                <div class="text-muted">
+                    <div>{{ feedsById[entrySelectedDetails.feed_id].title }}</div>
+                    <time>{{ formatDate(entrySelectedDetails.date) }}</time>
+                </div>
+                <hr>
+                <div>
+                    content goes here
+                </div>
+            </div>
+        </div>
     </div>
     <script src="./static/javascripts/vue.min.js"></script>
     <script src="./static/javascripts/app.js"></script>
