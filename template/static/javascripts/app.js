@@ -19,15 +19,24 @@ new Vue({
       ],
       'feeds': [
         {'id': '1', 'title': 'news.ycombinator.com', 'folder_id': 1},
-        {'id': '2', 'title': '/r/programming', 'folder_id': 1},
+        {'id': '2', 'title': 'daringfireball', 'folder_id': 1},
         {'id': '3', 'title': 'BBC', 'folder_id': 2},
         {'id': '4', 'title': 'The Guardian', 'folder_id': 2},
         {'id': '5', 'title': 'Random Stuff', 'folder_id': null},
       ],
       'feedSelected': null,
+      'entries': [
+        {'id': '123', 'title': 'Apple Pulls Pocket Casts and Castro From Chinese App Store', 'status': 'unread', 'feed_id': 2, 'date': 1592250298},
+        {'id': '456', 'title': 'On Apple Announcing the ARM Mac Transition at WWDC This Month', 'status': 'starred', 'feed_id': 2, 'date': 1592250298},
+        {'id': '789', 'title': 'Marques Brownlee: ‘Reflecting on the Color of My Skin’', 'status': 'read', 'feed_id': 2, 'date': 1592250298},
+      ],
+      'entrySelected': null,
     }
   },
   computed: {
+    feedsById: function() {
+      return this.feeds.reduce(function(acc, feed) { acc[feed.id] = feed; return acc }, {})
+    },
     foldersWithFeeds: function() {
       var feedsByFolders = this.feeds.reduce(function(folders, feed) {
         if (!folders[feed.folder_id])
@@ -44,9 +53,20 @@ new Vue({
       return folders
     },
   },
+  watch: {
+    'feedSelected': function(newVal, oldVal) {
+      var parts = newVal.split(':', 2)
+      var type = parts[0]
+      var guid = parts[1]
+    },
+  },
   methods: {
     toggleFolderExpanded: function(folder) {
       folder.is_expanded = !folder.is_expanded
-    }
+    },
+    formatDate: function(timestamp_s) {
+      var d = new Date(timestamp_s * 1000)
+      return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear()
+    },
   }
 })

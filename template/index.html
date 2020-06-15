@@ -23,7 +23,7 @@
                 <div>
                     <div v-for="folder in foldersWithFeeds">
                         <label class="nav-select d-block mb-1">
-                            <input type="radio" name="feed" :value="'folder-'+folder.id" v-model="feedSelected">
+                            <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
                             <div class="nav-item d-flex align-items-center w-100" v-if="folder.id">
                                 <img src="./static/images/chevron-right.svg"
                                      class="nav-icon"
@@ -36,7 +36,7 @@
                         <div v-show="!folder.id || folder.is_expanded" :class="{'pl-3': folder.id}">
                             <label class="nav-select d-block mb-1"
                                    v-for="feed in folder.feeds">
-                                <input type="radio" name="feed" :value="'feed-'+feed.id" v-model="feedSelected">
+                                <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                                 <div class="nav-item d-flex align-items-center w-100">
                                     <img src="./static/images/rss.svg" alt="" class="nav-icon">
                                     <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
@@ -49,19 +49,24 @@
             </div>
         </div>
         <div class="vh-100 overflow-auto border-right" style="width: 300px;">
-            <div class="mt-2 mb-3 mx-2">
-                <div class="p-2 feed-item">
-                    <div class="d-flex flex-column ml-4">
-                        <div style="line-height: 1" class="d-flex">
-                            <img src="./static/images/circle.svg" alt="" class="nav-icon ml-n4 mr-2">
-                            <small class="flex-fill text-truncate">NY Times</small>
-                            <small class="">12 Jun 2020</small>
+            <div class="my-2 mx-2">
+                <label class="nav-select mb-1" v-for="entry in entries" :class="{'text-muted': entry.status === 'read'}">
+                    <input type="radio" name="entry" :value="entry.id" v-model="entrySelected">
+                    <div class="nav-item p-2">
+                        <div class="d-flex flex-column ml-4">
+                            <div style="line-height: 1" class="d-flex">
+                                <img src="./static/images/circle-full.svg" class="nav-icon ml-n4 mr-2" v-if="entry.status === 'unread'">
+                                <img src="./static/images/circle.svg" class="nav-icon ml-n4 mr-2" v-if="entry.status === 'read'">
+                                <img src="./static/images/star.svg" class="nav-icon ml-n4 mr-2" v-if="entry.status === 'starred'">
+                                <small class="flex-fill text-truncate">{{feedsById[entry.feed_id].title}}</small>
+                                <small class="">{{formatDate(entry.date)}}</small>
+                            </div>
+                            <span class="font-weight-bold">
+                                Police confiscates illegal Antimatter from scientists
+                            </span>
                         </div>
-                        <span class="font-weight-bold">
-                            Police confiscates illegal Antimatter from scientists
-                        </span>
                     </div>
-                </div>
+                </label>
             </div>
         </div>
         <div class="m-3">three</div>
