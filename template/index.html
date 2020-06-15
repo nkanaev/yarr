@@ -5,50 +5,44 @@
     <title></title>
     <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css">
     <link rel="stylesheet" href="./static/stylesheets/app.css">
-    <script src="./static/javascripts/vue.min.js"></script>
-    <script src="./static/javascripts/app.js"></script>
 </head>
 <body>
-    <div class="wrapper d-flex vh-100">
+    <div class="wrapper d-flex vh-100" id="app" v-cloak>
         <div class="vh-100 overflow-auto border-right" style="width: 300px;">
             <div class="mx-2 my-2">
                 <div class="mb-4">
-                    <div class="nav-item d-flex align-items-center w-100">
-                        <img src="./static/images/circle-full.svg" alt="" class="nav-icon">
-                        <span class="flex-fill text-left text-truncate">All</span>
-                        <span class="counter text-right"></span>
-                    </div>
-                    <div class="nav-item d-flex align-items-center w-100">
-                        <img src="./static/images/circle.svg" alt="" class="nav-icon">
-                        <span class="flex-fill text-left text-truncate">Unread</span>
-                        <span class="counter text-right"></span>
-                    </div>
-                    <div class="nav-item d-flex align-items-center w-100">
-                        <img src="./static/images/star.svg" alt="" class="nav-icon">
-                        <span class="flex-fill text-left text-truncate">Starred</span>
-                        <span class="counter text-right">50</span>
-                    </div>
-                </div>
-                <div>
-                    <div class="folder">
+                    <label class="nav-select d-block mb-1" v-for="filter in filters">
+                        <input type="radio" name="filter" :value="filter.value" v-model="filterSelected">
                         <div class="nav-item d-flex align-items-center w-100">
-                            <img src="./static/images/chevron-down.svg" alt="" class="nav-icon">
-                            <span class="flex-fill text-left text-truncate">News</span>
+                            <img :src="'./static/images/' + filter.icon + '.svg'" alt="" class="nav-icon">
+                            <span class="flex-fill text-left text-truncate">{{filter.title}}</span>
                             <span class="counter text-right"></span>
                         </div>
-                        <div>
-                            <div class="nav-item d-flex align-items-center w-100">
-                                <img src="" alt="" class="nav-icon">
-                                <span class="flex-fill text-left text-truncate">news.ycombinator.com</span>
+                    </label>
+                </div>
+                <div>
+                    <div v-for="folder in foldersWithFeeds">
+                        <label class="nav-select d-block mb-1">
+                            <input type="radio" name="feed" :value="'folder-'+folder.id" v-model="feedSelected">
+                            <div class="nav-item d-flex align-items-center w-100" v-if="folder.id">
+                                <img src="./static/images/chevron-right.svg"
+                                     class="nav-icon"
+                                     :class="{expanded: folder.is_expanded}"
+                                     @click.prevent="toggleFolderExpanded(folder)">
+                                <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
                                 <span class="counter text-right"></span>
                             </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="nav-item d-flex align-items-center w-100">
-                            <img src="" alt="" class="nav-icon">
-                            <span class="flex-fill text-left text-truncate">news.ycombinator.com</span>
-                            <span class="counter text-right">30</span>
+                        </label>
+                        <div v-show="!folder.id || folder.is_expanded" :class="{'pl-3': folder.id}">
+                            <label class="nav-select d-block mb-1"
+                                   v-for="feed in folder.feeds">
+                                <input type="radio" name="feed" :value="'feed-'+feed.id" v-model="feedSelected">
+                                <div class="nav-item d-flex align-items-center w-100">
+                                    <img src="./static/images/rss.svg" alt="" class="nav-icon">
+                                    <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
+                                    <span class="counter text-right"></span>
+                                </div>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -72,5 +66,7 @@
         </div>
         <div class="m-3">three</div>
     </div>
+    <script src="./static/javascripts/vue.min.js"></script>
+    <script src="./static/javascripts/app.js"></script>
 </body>
 </html>

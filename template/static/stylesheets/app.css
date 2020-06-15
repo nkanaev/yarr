@@ -1,12 +1,16 @@
+[v-cloak] {
+  display: none !important;
+}
+
 .wrapper {
   max-width: 1368px;
 }
 
 .nav-icon {
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  margin-right: 8px;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  margin-right: 7px;
 }
 
 .feed-icon {
@@ -28,11 +32,27 @@
   border-radius: 4px;
 }
 
+.nav-select {
+  position: relative;
+}
+
+.nav-select input {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+  top: 0; left: 0;
+}
+
 .nav-item:hover, .feed-item:hover {
   background-color: #f8f9fa;
   cursor: pointer;
 }
-.nav-item:active, .feed-item:active {
+
+.feed-item:active, .nav-select input:checked + .nav-item {
   background-color: #007bff;
   color: white;
+}
+
+.expanded {
+  transform: rotate(90deg);
 }
