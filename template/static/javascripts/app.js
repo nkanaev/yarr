@@ -59,6 +59,7 @@ new Vue({
   },
   watch: {
     'feedSelected': function(newVal, oldVal) {
+      if (newVal === null) return
       var parts = newVal.split(':', 2)
       var type = parts[0]
       var guid = parts[1]

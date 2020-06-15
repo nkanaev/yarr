@@ -10,7 +10,7 @@
     <div class="wrapper d-flex vh-100" id="app" v-cloak>
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="mx-2 my-2">
-                <div class="mb-4">
+                <div class="mb-5">
                     <label class="nav-select d-block mb-1" v-for="filter in filters">
                         <input type="radio" name="filter" :value="filter.value" v-model="filterSelected">
                         <div class="nav-item d-flex align-items-center w-100">
@@ -21,6 +21,14 @@
                     </label>
                 </div>
                 <div>
+                    <label class="nav-select d-block mb-1">
+                        <input type="radio" name="feed" :value="null" v-model="feedSelected">
+                        <div class="nav-item d-flex align-items-center w-100">
+                            <img src="./static/images/layers.svg" alt="" class="nav-icon">
+                            <span class="flex-fill text-left text-truncate">All Feeds</span>
+                            <span class="counter text-right"></span>
+                        </div>
+                    </label>
                     <div v-for="folder in foldersWithFeeds">
                         <label class="nav-select d-block mb-1">
                             <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
@@ -61,9 +69,7 @@
                                 <small class="flex-fill text-truncate">{{feedsById[entry.feed_id].title}}</small>
                                 <small class="">{{formatDate(entry.date)}}</small>
                             </div>
-                            <span class="font-weight-bold">
-                                {{entry.title}}
-                            </span>
+                            <span>{{entry.title}}</span>
                         </div>
                     </div>
                 </label>
