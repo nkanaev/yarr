@@ -15,4 +15,9 @@ func main() {
 	storage.RenameFolder(folder.Id, "bar")
 	storage.ToggleFolderExpanded(folder.Id, false)
 	*/
+	/*
+	feed := storage.CreateFeed(
+		"title", "description", "link", "feedlink", "icon", 1)
+	storage.RenameFeed(feed.Id, "newtitle")
+	*/
 }

@@ -58,3 +58,10 @@ func New() (*Storage, error) {
 	}
 	return &Storage{db: db}, nil
 }
+
+func intOrNil(id int64) interface{} {
+	if id == 0 {
+		return nil
+	}
+	return id
+}
