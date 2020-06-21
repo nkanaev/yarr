@@ -58,29 +58,29 @@
         </div>
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="my-2 mx-2">
-                <label class="nav-select mb-1" v-for="entry in entries" :class="{'text-muted': entry.status === 'read'}">
-                    <input type="radio" name="entry" :value="entry.id" v-model="entrySelected">
+                <label class="nav-select mb-1" v-for="item in items" :class="{'text-muted': item.status === 'read'}">
+                    <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="nav-item p-2">
                         <div class="d-flex flex-column ml-4">
                             <div style="line-height: 1" class="d-flex">
-                                <img src="./static/images/circle-full.svg" class="nav-icon ml-n4 mr-2" v-if="entry.status === 'unread'">
-                                <img src="./static/images/circle.svg" class="nav-icon ml-n4 mr-2" v-if="entry.status === 'read'">
-                                <img src="./static/images/star.svg" class="nav-icon ml-n4 mr-2" v-if="entry.status === 'starred'">
-                                <small class="flex-fill text-truncate">{{feedsById[entry.feed_id].title}}</small>
-                                <small class="">{{formatDate(entry.date)}}</small>
+                                <img src="./static/images/circle-full.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'unread'">
+                                <img src="./static/images/circle.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'read'">
+                                <img src="./static/images/star.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'starred'">
+                                <small class="flex-fill text-truncate">{{feedsById[item.feed_id].title}}</small>
+                                <small class="">{{formatDate(item.date)}}</small>
                             </div>
-                            <span>{{entry.title}}</span>
+                            <span>{{item.title}}</span>
                         </div>
                     </div>
                 </label>
             </div>
         </div>
         <div class="vh-100 overflow-auto w-100">
-            <div v-if="entrySelected" class="mx-3 my-2">
-                <h3>{{entrySelectedDetails.title}}</h3>
+            <div v-if="itemSelected" class="mx-3 my-2">
+                <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
-                    <div>{{ feedsById[entrySelectedDetails.feed_id].title }}</div>
-                    <time>{{ formatDate(entrySelectedDetails.date) }}</time>
+                    <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
+                    <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
                 <div>

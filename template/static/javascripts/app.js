@@ -25,13 +25,12 @@ new Vue({
         {'id': '5', 'title': 'Random Stuff', 'folder_id': null},
       ],
       'feedSelected': null,
-      'entries': [
+      'items': [
         {'id': '123', 'title': 'Apple Pulls Pocket Casts and Castro From Chinese App Store', 'status': 'unread', 'feed_id': 2, 'date': 1592250298},
         {'id': '456', 'title': 'On Apple Announcing the ARM Mac Transition at WWDC This Month', 'status': 'starred', 'feed_id': 2, 'date': 1592250298},
         {'id': '789', 'title': 'Marques Brownlee: ‘Reflecting on the Color of My Skin’', 'status': 'read', 'feed_id': 2, 'date': 1592250298},
       ],
-      'entrySelected': null,
-      'entrySelectedDetails': {},
+      'itemSelected': null,
     }
   },
   computed: {
@@ -53,8 +52,8 @@ new Vue({
     feedsById: function() {
       return this.feeds.reduce(function(acc, feed) { acc[feed.id] = feed; return acc }, {})
     },
-    entriesById: function() {
-      return this.entries.reduce(function(acc, entry) { acc[entry.id] = entry; return acc }, {})
+    itemsById: function() {
+      return this.items.reduce(function(acc, item) { acc[item.id] = item; return acc }, {})
     },
   },
   watch: {
@@ -64,8 +63,8 @@ new Vue({
       var type = parts[0]
       var guid = parts[1]
     },
-    'entrySelected': function(newVal, oldVal) {
-      this.entrySelectedDetails = this.entriesById[newVal]
+    'itemSelected': function(newVal, oldVal) {
+      this.itemSelectedDetails = this.itemsById[newVal]
     },
   },
   methods: {
