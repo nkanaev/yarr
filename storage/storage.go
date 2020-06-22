@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"os"
+	"log"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -44,6 +46,7 @@ create index if not exists idx_item_status  on items(status);
 
 type Storage struct {
 	db *sql.DB
+	log *log.Logger
 }
 
 func New() (*Storage, error) {
@@ -56,7 +59,8 @@ func New() (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Storage{db: db}, nil
+	logger := log.New(os.Stdout, "storage: ", log.Ldate | log.Ltime | log.Lshortfile)
+	return &Storage{db: db, log: logger}, nil
 }
 
 func intOrNil(id int64) interface{} {
