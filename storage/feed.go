@@ -49,3 +49,33 @@ func (s *Storage) UpdateFeedFolder(feedId int64, newFolderId int64) bool {
 	_, err := s.db.Exec(`update feeds set folder_id = ? where id = ?`, intOrNil(newFolderId), feedId)
 	return err == nil
 }
+
+func (s *Storage) ListFeeds() []Feed {
+	result := make([]Feed, 0, 0)
+	rows, err := s.db.Query(`
+		select id, folder_id, title, description, link, feed_link, icon
+		from feeds
+	`)
+	if err != nil {
+		s.log.Print(err)
+		return result
+	}
+	for rows.Next() {
+		var f Feed
+		err = rows.Scan(
+			&f.Id,
+			&f.FolderId,
+			&f.Title,
+			&f.Description,
+			&f.Link,
+			&f.FeedLink,
+			&f.Icon,
+		)
+		if err != nil {
+			s.log.Print(err)
+			return result
+		}
+		result = append(result, f)
+	}
+	return result
+}

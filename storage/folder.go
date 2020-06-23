@@ -1,6 +1,8 @@
 package storage
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Folder struct {
 	Id int64
@@ -39,4 +41,26 @@ func (s *Storage) RenameFolder(folderId int64, newTitle string) bool {
 func (s *Storage) ToggleFolderExpanded(folderId int64, isExpanded bool) bool {
 	_, err := s.db.Exec(`update folders set is_expanded = ? where id = ?`, isExpanded, folderId)
 	return err == nil
+}
+
+func (s *Storage) ListFolders() []Folder {
+	result := make([]Folder, 0, 0)
+	rows, err := s.db.Query(`
+		select id, title, is_expanded
+		from folders
+	`)
+	if err != nil {
+		s.log.Print(err)
+		return result
+	}
+	for rows.Next() {
+		var f Folder
+		err = rows.Scan(&f.Id, &f.Title, &f.IsExpanded)
+		if err != nil {
+			s.log.Print(err)
+			return result
+		}
+		result = append(result, f)
+	}
+	return result
 }

@@ -12,14 +12,16 @@ func main() {
 	}
 	log.Print(store)
 	/*
-	folder := storage.CreateFolder("foo")
-	storage.RenameFolder(folder.Id, "bar")
-	storage.ToggleFolderExpanded(folder.Id, false)
+	folder := store.CreateFolder("foo")
+	store.RenameFolder(folder.Id, "bar")
+	store.ToggleFolderExpanded(folder.Id, false)
+	log.Print(store.ListFolders())
 	*/
 	/*
-	feed := storage.CreateFeed(
+	feed := store.CreateFeed(
 		"title", "description", "link", "feedlink", "icon", 1)
-	storage.RenameFeed(feed.Id, "newtitle")
+	store.RenameFeed(feed.Id, "newtitle")
+	log.Print(store.ListFeeds())
 	*/
 	/*
 	items := make([]storage.Item, 3, 3)
