@@ -23,7 +23,7 @@ func main() {
 	store.RenameFeed(feed.Id, "newtitle")
 	log.Print(store.ListFeeds())
 	*/
-	/*
+	/*;
 	items := make([]storage.Item, 3, 3)
 	items = append(items, storage.Item{
 		Id: "id",
@@ -65,5 +65,6 @@ func main() {
 		Image: "image",
 	})
 	log.Print(store.CreateItems(items))
+	log.Print(store.ListItems())
 	*/
 }
