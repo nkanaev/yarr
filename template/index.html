@@ -13,7 +13,7 @@
                 <div class="mb-5">
                     <label class="nav-select d-block mb-1" v-for="filter in filters">
                         <input type="radio" name="filter" :value="filter.value" v-model="filterSelected">
-                        <div class="nav-item d-flex align-items-center w-100">
+                        <div class="menu-item d-flex align-items-center w-100">
                             <img :src="'./static/images/' + filter.icon + '.svg'" alt="" class="nav-icon">
                             <span class="flex-fill text-left text-truncate">{{filter.title}}</span>
                             <span class="counter text-right"></span>
@@ -23,7 +23,7 @@
                 <div>
                     <label class="nav-select d-block mb-1">
                         <input type="radio" name="feed" :value="null" v-model="feedSelected">
-                        <div class="nav-item d-flex align-items-center w-100">
+                        <div class="menu-item d-flex align-items-center w-100">
                             <img src="./static/images/layers.svg" alt="" class="nav-icon">
                             <span class="flex-fill text-left text-truncate">All Feeds</span>
                             <span class="counter text-right"></span>
@@ -32,7 +32,7 @@
                     <div v-for="folder in foldersWithFeeds">
                         <label class="nav-select d-block mb-1">
                             <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
-                            <div class="nav-item d-flex align-items-center w-100" v-if="folder.id">
+                            <div class="menu-item d-flex align-items-center w-100" v-if="folder.id">
                                 <img src="./static/images/chevron-right.svg"
                                      class="nav-icon"
                                      :class="{expanded: folder.is_expanded}"
@@ -45,7 +45,7 @@
                             <label class="nav-select d-block mb-1"
                                    v-for="feed in folder.feeds">
                                 <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
-                                <div class="nav-item d-flex align-items-center w-100">
+                                <div class="menu-item d-flex align-items-center w-100">
                                     <img src="./static/images/rss.svg" alt="" class="nav-icon">
                                     <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                     <span class="counter text-right"></span>
@@ -55,12 +55,15 @@
                     </div>
                 </div>
             </div>
+            <button class="btn btn-link" @click="settingsShow = true">
+                <img src="./static/images/settings.svg" alt="">
+            </button>
         </div>
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="my-2 mx-2">
                 <label class="nav-select mb-1" v-for="item in items" :class="{'text-muted': item.status === 'read'}">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
-                    <div class="nav-item p-2">
+                    <div class="menu-item p-2">
                         <div class="d-flex flex-column ml-4">
                             <div style="line-height: 1" class="d-flex">
                                 <img src="./static/images/circle-full.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'unread'">
@@ -85,6 +88,42 @@
                 <hr>
                 <div>
                     content goes here
+                </div>
+            </div>
+        </div>
+        <div class="modal" :class="{show: settingsShow, 'd-block': settingsShow}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="card-header px-0">
+                        <ul class="nav nav-tabs card-header-tabs mx-0 px-3">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" :class="{active: settings=='new'}" @click.prevent="settings='new'">New Feed</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" :class="{active: settings=='manage'}" @click.prevent="settings='manage'">Manage Feeds</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="modal-body" v-if="settings=='new'">
+                        <label for="feed-url">URL</label>
+                        <input id="feed-url" type="text" class="form-control">
+                        <label for="feed-folder" class="mt-3">Folder</label>
+                        <select class="form-control" id="feed-folder">
+                            <option value=""></option>
+                            <option :value="folder.id" v-for="folder in folders">{{ folder.title }}</option>
+                        </select>
+                        <button class="btn btn-block btn-outline-secondary mt-3" type="button">Add</button>
+                    </div>
+                    <div class="modal-body" v-if="settings=='manage'">
+                        manage ui
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="close mr--3"
+                                @click="settingsShow = false">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

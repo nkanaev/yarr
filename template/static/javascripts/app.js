@@ -7,7 +7,7 @@ var FILTERS = [
 ]
 
 
-new Vue({
+var vm = new Vue({
   el: '#app',
   data: function() {
     return {
@@ -31,6 +31,8 @@ new Vue({
         {'id': '789', 'title': 'Marques Brownlee: ‘Reflecting on the Color of My Skin’', 'status': 'read', 'feed_id': 2, 'date': 1592250298},
       ],
       'itemSelected': null,
+      'settingsShow': false,
+      'settings': 'new'
     }
   },
   computed: {
@@ -66,6 +68,18 @@ new Vue({
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedDetails = this.itemsById[newVal]
     },
+    'settingsShow': function(newVal) {
+      if (newVal === true) {
+        var vm = this
+        var backdrop = document.createElement('div')
+        backdrop.classList.add('modal-backdrop', 'fade', 'show')
+        document.body.classList.add('modal-open')
+        document.body.appendChild(backdrop)
+      } else {
+        document.body.classList.remove('modal-open')
+        document.body.querySelector('.modal-backdrop').remove()
+      }
+    },
   },
   methods: {
     toggleFolderExpanded: function(folder) {
@@ -77,3 +91,4 @@ new Vue({
     },
   }
 })
+vm.settingsShow = true

@@ -25,11 +25,11 @@
   max-width: 100px;
 }
 
-.nav-item {
+.menu-item {
   padding: .375rem .75rem;
 }
 
-.nav-item, .feed-item {
+.menu-item, .feed-item {
   border-radius: 4px;
 }
 
@@ -44,12 +44,12 @@
   top: 0; left: 0;
 }
 
-.nav-item:hover, .feed-item:hover {
+.menu-item:hover, .feed-item:hover {
   background-color: #f8f9fa;
   cursor: pointer;
 }
 
-.feed-item:active, .nav-select input:checked + .nav-item {
+.feed-item:active, .nav-select input:checked + .menu-item {
   background-color: #007bff;
   color: white;
 }
