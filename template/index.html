@@ -95,34 +95,74 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="card-header px-0">
+                        <button type="button"
+                                class="close mr-3"
+                                @click="settingsShow = false">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                         <ul class="nav nav-tabs card-header-tabs mx-0 px-3">
                             <li class="nav-item">
-                                <a class="nav-link" href="#" :class="{active: settings=='new'}" @click.prevent="settings='new'">New Feed</a>
+                                <a class="nav-link" href="#" :class="{active: settings=='create'}" @click.prevent="settings='create'">New Feed</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#" :class="{active: settings=='manage'}" @click.prevent="settings='manage'">Manage Feeds</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" :class="{active: settings=='import'}" @click.prevent="settings='import'">Import/Export</a>
+                            </li>
                         </ul>
                     </div>
-                    <div class="modal-body" v-if="settings=='new'">
-                        <label for="feed-url">URL</label>
-                        <input id="feed-url" type="text" class="form-control">
-                        <label for="feed-folder" class="mt-3">Folder</label>
-                        <select class="form-control" id="feed-folder">
-                            <option value=""></option>
-                            <option :value="folder.id" v-for="folder in folders">{{ folder.title }}</option>
-                        </select>
-                        <button class="btn btn-block btn-outline-secondary mt-3" type="button">Add</button>
-                    </div>
-                    <div class="modal-body" v-if="settings=='manage'">
-                        manage ui
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button"
-                                class="close mr--3"
-                                @click="settingsShow = false">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                    <div class="modal-body">
+                        <div v-if="settings=='create'">
+                            <label for="feed-url">URL</label>
+                            <input id="feed-url" type="text" class="form-control">
+                            <label for="feed-folder" class="mt-3">Folder</label>
+                            <select class="form-control" id="feed-folder">
+                                <option value=""></option>
+                                <option :value="folder.id" v-for="folder in folders">{{ folder.title }}</option>
+                            </select>
+                            <button class="btn btn-block btn-outline-secondary mt-3" type="button">Add</button>
+                        </div>
+                        <div v-else-if="settings=='manage'">
+                            <div v-for="folder in foldersWithFeeds">
+                                <p><strong>{{ folder.title || "Uncategorized" }}</strong></p>
+                                <div v-for="feed in folder.feeds">
+                                    {{ feed.title }}
+
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-link dropdown-toggle" @click="settingsManageDropdown='feed:'+feed.id">
+                                            <img src="./static/images/folder.svg">
+                                        </button>
+                                        <div class="dropdown-menu show py-0 overflow-hidden"
+                                             style="top: 0; left: 0; position: absolute; transform: translate3d(0px, 38px, 0px);"
+                                             v-if="settingsManageDropdown=='feed:'+feed.id">
+                                            <a href="#" class="dropdown-item px-3"
+                                               @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">---</a>
+                                            <a href="#" class="dropdown-item px-3"
+                                               v-if="folder.id != feed.folder_id"
+                                               v-for="folder in folders"
+                                               @click.prevent="moveFeed(feed, folder)">
+                                                {{ folder.title }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-link">
+                                        <img src="./static/images/trash-2.svg">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <label for="">New Folder</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" v-model="newFolderTitle">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" @click="newFolderCreate()">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else-if="settings=='import'">
+                        </div>
                     </div>
                 </div>
             </div>

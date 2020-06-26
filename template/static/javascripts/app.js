@@ -32,7 +32,9 @@ var vm = new Vue({
       ],
       'itemSelected': null,
       'settingsShow': false,
-      'settings': 'new'
+      'settings': 'manage',
+      'settingsManageDropdown': null,
+      'newFolderTitle': null,
     }
   },
   computed: {
@@ -88,6 +90,17 @@ var vm = new Vue({
     formatDate: function(timestamp_s) {
       var d = new Date(timestamp_s * 1000)
       return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear()
+    },
+    moveFeed: function(feed, folder) {
+      feed.folder_id = folder ? folder.id : null
+      this.settingsManageDropdown = null
+    },
+    newFolderCreate: function() {
+      this.folders.push({
+        id: Math.random() * 10000,
+        title: this.newFolderTitle,
+        is_expanded: true,
+      })
     },
   }
 })
