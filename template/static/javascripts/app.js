@@ -6,6 +6,7 @@ var FILTERS = [
   {'title': 'Starred', 'value': 'starred', 'icon': 'star'},
 ]
 
+Vue.use(window['v-click-outside'])
 
 var vm = new Vue({
   el: '#app',
@@ -102,6 +103,22 @@ var vm = new Vue({
         title: this.newFolderTitle,
         is_expanded: true,
       })
+    },
+    renameFeed: function(feed) {
+      var newTitle = prompt('Enter new title', feed.title)
+      feed.title = newTitle
+      this.settingsManageDropdown = null
+    },
+    deleteFeed: function(feed) {
+      if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
+        this.feeds = this.feeds.filter(function(f) { f.id != feed.id })
+      }
+    },
+    hideSettingsMenu: function() {
+      this.settingsManageDropdown = null
+    },
+    hideSettingsModal: function() {
+      this.settingsShow = false
     },
   }
 })

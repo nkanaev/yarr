@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>yarr</title>
     <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css">
     <link rel="stylesheet" href="./static/stylesheets/app.css">
 </head>
@@ -128,28 +128,22 @@
                                 <div><strong>{{ folder.title || "Uncategorized" }}</strong></div>
                                 <div v-for="feed in folder.feeds" class="d-flex align-items-center">
                                     <div class="w-100">
-                                        <div class="input-group input-group-sm" v-if="settingsManageEdit=='feed:'+feed.id">
-                                            <input type="text" class="form-control" :value="feed.title">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary">Rename</button>
-                                                <button class="btn btn-outline-secondary" @click="settingsManageEdit=null">&times;</button>
-                                            </div>
-                                        </div>
-                                        <span v-else>
-                                            {{ feed.title }}
-                                        </span>
+                                        {{ feed.title }}
                                     </div>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown d-inline-block">
-                                            <button class="btn btn-link p-1" @click="settingsManageEdit='feed:'+feed.id">
-                                                <img src="./static/images/edit.svg">
-                                            </button>
                                             <button class="btn btn-link p-1" @click="settingsManageDropdown='feed:'+feed.id">
-                                                <img src="./static/images/folder.svg">
+                                                <img src="./static/images/more-vertical.svg">
                                             </button>
-                                            <div class="dropdown-menu show py-0 overflow-hidden"
-                                                 style="top: 0; left: 0; position: absolute; transform: translate3d(0, 38px, 0px);"
-                                                 v-if="settingsManageDropdown=='feed:'+feed.id">
+                                            <div class="dropdown-menu menu-settings show overflow-hidden"
+                                                 style="width: 200px; top: 0; left: 0; position: absolute; transform: translate3d(-160px, 38px, 0px);"
+                                                 v-if="settingsManageDropdown=='feed:'+feed.id"
+                                                 v-click-outside="hideSettingsMenu">
+                                                <a href="#" class="dropdown-item px-3" @click="renameFeed(feed)">
+                                                    Rename
+                                                </a>
+                                                <div class="dropdown-divider"></div>
+                                                <h6 class="dropdown-header px-3">Move to...</h6>
                                                 <a href="#" class="dropdown-item px-3"
                                                    @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">Uncategorized</a>
                                                 <a href="#" class="dropdown-item px-3"
@@ -158,11 +152,13 @@
                                                    @click.prevent="moveFeed(feed, folder)">
                                                     {{ folder.title }}
                                                 </a>
+                                                <div class="dropdown-divider"></div>
+                                                <a href="#" class="dropdown-item px-3 text-danger"
+                                                   @click="deleteFeed(feed)">
+                                                    Delete
+                                                </a>
                                             </div>
                                         </div>
-                                        <button class="btn btn-link p-1">
-                                            <img src="./static/images/trash-2.svg">
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -184,6 +180,7 @@
         </div>
     </div>
     <script src="./static/javascripts/vue.min.js"></script>
+    <script src="./static/javascripts/v-click-outside.umd.js"></script>
     <script src="./static/javascripts/app.js"></script>
 </body>
 </html>
