@@ -124,37 +124,52 @@
                             <button class="btn btn-block btn-outline-secondary mt-3" type="button">Add</button>
                         </div>
                         <div v-else-if="settings=='manage'">
-                            <div v-for="folder in foldersWithFeeds">
-                                <p><strong>{{ folder.title || "Uncategorized" }}</strong></p>
-                                <div v-for="feed in folder.feeds">
-                                    {{ feed.title }}
-
-                                    <div class="dropdown d-inline-block">
-                                        <button class="btn btn-link dropdown-toggle" @click="settingsManageDropdown='feed:'+feed.id">
-                                            <img src="./static/images/folder.svg">
-                                        </button>
-                                        <div class="dropdown-menu show py-0 overflow-hidden"
-                                             style="top: 0; left: 0; position: absolute; transform: translate3d(0px, 38px, 0px);"
-                                             v-if="settingsManageDropdown=='feed:'+feed.id">
-                                            <a href="#" class="dropdown-item px-3"
-                                               @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">---</a>
-                                            <a href="#" class="dropdown-item px-3"
-                                               v-if="folder.id != feed.folder_id"
-                                               v-for="folder in folders"
-                                               @click.prevent="moveFeed(feed, folder)">
-                                                {{ folder.title }}
-                                            </a>
+                            <div v-for="folder in foldersWithFeeds" class="mb-4">
+                                <div><strong>{{ folder.title || "Uncategorized" }}</strong></div>
+                                <div v-for="feed in folder.feeds" class="d-flex align-items-center">
+                                    <div class="w-100">
+                                        <div class="input-group input-group-sm" v-if="settingsManageEdit=='feed:'+feed.id">
+                                            <input type="text" class="form-control" :value="feed.title">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary">Rename</button>
+                                                <button class="btn btn-outline-secondary" @click="settingsManageEdit=null">&times;</button>
+                                            </div>
                                         </div>
+                                        <span v-else>
+                                            {{ feed.title }}
+                                        </span>
                                     </div>
-                                    <button class="btn btn-link">
-                                        <img src="./static/images/trash-2.svg">
-                                    </button>
+                                    <div class="flex-shrink-0">
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-link p-1" @click="settingsManageEdit='feed:'+feed.id">
+                                                <img src="./static/images/edit.svg">
+                                            </button>
+                                            <button class="btn btn-link p-1" @click="settingsManageDropdown='feed:'+feed.id">
+                                                <img src="./static/images/folder.svg">
+                                            </button>
+                                            <div class="dropdown-menu show py-0 overflow-hidden"
+                                                 style="top: 0; left: 0; position: absolute; transform: translate3d(0, 38px, 0px);"
+                                                 v-if="settingsManageDropdown=='feed:'+feed.id">
+                                                <a href="#" class="dropdown-item px-3"
+                                                   @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">Uncategorized</a>
+                                                <a href="#" class="dropdown-item px-3"
+                                                   v-if="folder.id != feed.folder_id"
+                                                   v-for="folder in folders"
+                                                   @click.prevent="moveFeed(feed, folder)">
+                                                    {{ folder.title }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-link p-1">
+                                            <img src="./static/images/trash-2.svg">
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <label for="">New Folder</label>
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" v-model="newFolderTitle">
+                            <div class="mt-5">
+                                <label for="settings-new-folder">New Folder</label>
+                                <div class="input-group">
+                                    <input id="settings-new-folder" type="text" class="form-control" v-model="newFolderTitle">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary" @click="newFolderCreate()">Add</button>
                                     </div>

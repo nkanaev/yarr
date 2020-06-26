@@ -34,6 +34,7 @@ var vm = new Vue({
       'settingsShow': false,
       'settings': 'manage',
       'settingsManageDropdown': null,
+      'settingsManageEdit': null,
       'newFolderTitle': null,
     }
   },

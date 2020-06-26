@@ -2,6 +2,23 @@
   display: none !important;
 }
 
+body {
+  font-size: 15px !important;
+}
+
+.form-control {
+  transition: none;
+}
+
+.form-control:focus {
+  border-color: #80bdff !important;
+  box-shadow: inset 0 0 0 2px #80bdff !important;
+}
+
+.btn:focus {
+  box-shadow: none !important;
+}
+
 .wrapper {
   max-width: 1368px;
   margin: 0 auto;
