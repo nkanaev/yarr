@@ -55,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-link" @click="settingsShow = true">
+            <button class="btn btn-link" v-b-modal.settings-modal>
                 <img src="./static/images/settings.svg" alt="">
             </button>
         </div>
@@ -91,96 +91,84 @@
                 </div>
             </div>
         </div>
-        <div class="modal" :class="{show: settingsShow, 'd-block': settingsShow}" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="card-header px-0">
-                        <button type="button"
-                                class="close mr-3"
-                                @click="settingsShow = false">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <ul class="nav nav-tabs card-header-tabs mx-0 px-3">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" :class="{active: settings=='create'}" @click.prevent="settings='create'">New Feed</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" :class="{active: settings=='manage'}" @click.prevent="settings='manage'">Manage Feeds</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" :class="{active: settings=='import'}" @click.prevent="settings='import'">Import/Export</a>
-                            </li>
-                        </ul>
+        <b-modal id="settings-modal" hide-footer lazy header-class="settings-header">
+            <template v-slot:modal-header="{ close }">
+                <ul class="nav nav-tabs card-header-tabs mx-0 px-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" :class="{active: settings=='create'}" @click.prevent="settings='create'">New Feed</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" :class="{active: settings=='manage'}" @click.prevent="settings='manage'">Manage Feeds</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" :class="{active: settings=='import'}" @click.prevent="settings='import'">Import/Export</a>
+                    </li>
+                </ul>
+            </template>
+            <div v-if="settings=='create'">
+                <label for="feed-url">URL</label>
+                <input id="feed-url" type="text" class="form-control">
+                <label for="feed-folder" class="mt-3">Folder</label>
+                <select class="form-control" id="feed-folder">
+                    <option value=""></option>
+                    <option :value="folder.id" v-for="folder in folders">{{ folder.title }}</option>
+                </select>
+                <button class="btn btn-block btn-outline-secondary mt-3" type="button">Add</button>
+            </div>
+            <div v-else-if="settings=='manage'">
+                <div v-for="folder in foldersWithFeeds" class="mb-4">
+                    <div><strong>{{ folder.title || "Uncategorized" }}</strong></div>
+                    <div v-for="feed in folder.feeds" class="d-flex align-items-center">
+                        <div class="w-100">
+                            {{ feed.title }}
+                        </div>
+                        <div class="flex-shrink-0">
+                            <div class="dropdown d-inline-block">
+                                <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
+                                    <template v-slot:button-content>
+                                        <img src="./static/images/more-vertical.svg">
+                                    </template>
+                                    <b-dropdown-item @click.prevent="renameFeed(feed)">Rename</b-dropdown-item>
+                                    <b-dropdown-divider></b-dropdown-divider>
+                                    <b-dropdown-header>Move to...</b-dropdown-header>
+                                    <b-dropdown-item
+                                       v-if="folder.id != feed.folder_id"
+                                       v-for="folder in folders"
+                                       @click.prevent="moveFeed(feed, folder)">
+                                        {{ folder.title }}
+                                    </b-dropdown-item>
+                                    <b-dropdown-item
+                                       @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">
+                                        Uncategorized
+                                    </b-dropdown-item>
+                                    <b-dropdown-divider></b-dropdown-divider>
+                                    <b-dropdown-item class="dropdown-danger"
+                                       @click.prevent="deleteFeed(feed)">
+                                        Delete
+                                    </b-dropdown-item>
+                                </b-dropdown>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <div v-if="settings=='create'">
-                            <label for="feed-url">URL</label>
-                            <input id="feed-url" type="text" class="form-control">
-                            <label for="feed-folder" class="mt-3">Folder</label>
-                            <select class="form-control" id="feed-folder">
-                                <option value=""></option>
-                                <option :value="folder.id" v-for="folder in folders">{{ folder.title }}</option>
-                            </select>
-                            <button class="btn btn-block btn-outline-secondary mt-3" type="button">Add</button>
-                        </div>
-                        <div v-else-if="settings=='manage'">
-                            <div v-for="folder in foldersWithFeeds" class="mb-4">
-                                <div><strong>{{ folder.title || "Uncategorized" }}</strong></div>
-                                <div v-for="feed in folder.feeds" class="d-flex align-items-center">
-                                    <div class="w-100">
-                                        {{ feed.title }}
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <div class="dropdown d-inline-block">
-                                            <button class="btn btn-link p-1" @click="settingsManageDropdown='feed:'+feed.id">
-                                                <img src="./static/images/more-vertical.svg">
-                                            </button>
-                                            <div class="dropdown-menu menu-settings show overflow-hidden"
-                                                 style="width: 200px; top: 0; left: 0; position: absolute; transform: translate3d(-160px, 38px, 0px);"
-                                                 v-if="settingsManageDropdown=='feed:'+feed.id"
-                                                 v-click-outside="hideSettingsMenu">
-                                                <a href="#" class="dropdown-item px-3" @click="renameFeed(feed)">
-                                                    Rename
-                                                </a>
-                                                <div class="dropdown-divider"></div>
-                                                <h6 class="dropdown-header px-3">Move to...</h6>
-                                                <a href="#" class="dropdown-item px-3"
-                                                   @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">Uncategorized</a>
-                                                <a href="#" class="dropdown-item px-3"
-                                                   v-if="folder.id != feed.folder_id"
-                                                   v-for="folder in folders"
-                                                   @click.prevent="moveFeed(feed, folder)">
-                                                    {{ folder.title }}
-                                                </a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item px-3 text-danger"
-                                                   @click="deleteFeed(feed)">
-                                                    Delete
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-5">
-                                <label for="settings-new-folder">New Folder</label>
-                                <div class="input-group">
-                                    <input id="settings-new-folder" type="text" class="form-control" v-model="newFolderTitle">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" @click="newFolderCreate()">Add</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-else-if="settings=='import'">
+                </div>
+                <div class="mt-5">
+                    <label for="settings-new-folder">New Folder</label>
+                    <div class="input-group">
+                        <input id="settings-new-folder" type="text" class="form-control" v-model="newFolderTitle">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" @click="newFolderCreate()">Add</button>
                         </div>
                     </div>
                 </div>
             </div>
+            <div v-else-if="settings=='import'">
+            </div>
         </div>
     </div>
     <script src="./static/javascripts/vue.min.js"></script>
-    <script src="./static/javascripts/v-click-outside.umd.js"></script>
+    <script src="./static/javascripts/popper.min.js"></script>
+    <!-- <script src="./static/javascripts/bootstrap.min.js"></script> -->
+    <script src="./static/javascripts/bootstrap-vue.min.js"></script>
     <script src="./static/javascripts/app.js"></script>
 </body>
 </html>

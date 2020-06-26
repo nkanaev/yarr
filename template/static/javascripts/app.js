@@ -6,8 +6,6 @@ var FILTERS = [
   {'title': 'Starred', 'value': 'starred', 'icon': 'star'},
 ]
 
-Vue.use(window['v-click-outside'])
-
 var vm = new Vue({
   el: '#app',
   data: function() {
@@ -32,10 +30,7 @@ var vm = new Vue({
         {'id': '789', 'title': 'Marques Brownlee: ‘Reflecting on the Color of My Skin’', 'status': 'read', 'feed_id': 2, 'date': 1592250298},
       ],
       'itemSelected': null,
-      'settingsShow': false,
       'settings': 'manage',
-      'settingsManageDropdown': null,
-      'settingsManageEdit': null,
       'newFolderTitle': null,
     }
   },
@@ -72,18 +67,6 @@ var vm = new Vue({
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedDetails = this.itemsById[newVal]
     },
-    'settingsShow': function(newVal) {
-      if (newVal === true) {
-        var vm = this
-        var backdrop = document.createElement('div')
-        backdrop.classList.add('modal-backdrop', 'fade', 'show')
-        document.body.classList.add('modal-open')
-        document.body.appendChild(backdrop)
-      } else {
-        document.body.classList.remove('modal-open')
-        document.body.querySelector('.modal-backdrop').remove()
-      }
-    },
   },
   methods: {
     toggleFolderExpanded: function(folder) {
@@ -95,7 +78,6 @@ var vm = new Vue({
     },
     moveFeed: function(feed, folder) {
       feed.folder_id = folder ? folder.id : null
-      this.settingsManageDropdown = null
     },
     newFolderCreate: function() {
       this.folders.push({
@@ -107,19 +89,11 @@ var vm = new Vue({
     renameFeed: function(feed) {
       var newTitle = prompt('Enter new title', feed.title)
       feed.title = newTitle
-      this.settingsManageDropdown = null
     },
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         this.feeds = this.feeds.filter(function(f) { f.id != feed.id })
       }
     },
-    hideSettingsMenu: function() {
-      this.settingsManageDropdown = null
-    },
-    hideSettingsModal: function() {
-      this.settingsShow = false
-    },
   }
 })
-vm.settingsShow = true

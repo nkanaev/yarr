@@ -78,3 +78,38 @@ body {
 .dropdown-header {
   cursor: default;
 }
+
+.dropdown-toggle-no-caret:after {
+  display: none;
+}
+
+.settings-dropdown .dropdown-toggle {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.settings-dropdown .dropdown-menu {
+  width: 200px;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
+}
+
+.settings-dropdown .dropdown-menu:focus {
+  outline: none;
+}
+
+.settings-dropdown .dropdown-item, .settings-dropdown .dropdown-header {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.dropdown-danger .dropdown-item {
+  color: #dc3545!important;
+}
+
+.settings-header {
+  padding: .75rem 0 !important;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+}
