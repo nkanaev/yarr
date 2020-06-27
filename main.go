@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/nkanaev/yarr/storage"
+	"github.com/nkanaev/yarr/worker"
 	"log"
 )
 
@@ -66,5 +67,9 @@ func main() {
 	})
 	log.Print(store.CreateItems(items))
 	log.Print(store.ListItems())
+	*/
+	/*
+	log.Print(worker.FindFeeds("https://horriblesubs.info/"))
+	log.Print(worker.FindFeeds("http://daringfireball.net/"))
 	*/
 }
