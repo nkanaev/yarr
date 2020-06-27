@@ -2,7 +2,8 @@ package main
 
 import (
 	"github.com/nkanaev/yarr/storage"
-	"github.com/nkanaev/yarr/worker"
+	//"github.com/nkanaev/yarr/worker"
+	"github.com/nkanaev/yarr/server"
 	"log"
 )
 
@@ -72,4 +73,6 @@ func main() {
 	log.Print(worker.FindFeeds("https://horriblesubs.info/"))
 	log.Print(worker.FindFeeds("http://daringfireball.net/"))
 	*/
+	srv := server.New()
+	srv.ListenAndServe()
 }
