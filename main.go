@@ -1,18 +1,20 @@
 package main
 
 import (
-	"github.com/nkanaev/yarr/storage"
+	//"github.com/nkanaev/yarr/storage"
 	//"github.com/nkanaev/yarr/worker"
 	"github.com/nkanaev/yarr/server"
-	"log"
+	//"log"
 )
 
 func main() {
+	/*
 	store, err := storage.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Print(store)
+	*/
 	/*
 	folder := store.CreateFolder("foo")
 	store.RenameFolder(folder.Id, "bar")
