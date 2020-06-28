@@ -32,12 +32,12 @@ func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
 }
 
 var routes []Route = []Route{
-	p("/", Index),
-	p("/static/*path", Static),
-	p("/api/folders", FolderList),
-	p("/api/folders/:id", Folder),
-	p("/api/feeds", FeedList),
-	p("/api/feeds/:id", Feed),
+	p("/", IndexHandler),
+	p("/static/*path", StaticHandler),
+	p("/api/folders", FolderListHandler),
+	p("/api/folders/:id", FolderHandler),
+	p("/api/feeds", FeedListHandler),
+	p("/api/feeds/:id", FeedHandler),
 }
 
 func Vars(req *http.Request) map[string]string {
