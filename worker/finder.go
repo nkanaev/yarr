@@ -1,37 +1,35 @@
 package worker
 
 import (
-	"log"
-	//"net/http"
 	"net/url"
+	"net/http"
 	"github.com/PuerkitoBio/goquery"
 )
 
 type FeedSource struct {
-	Title string
-	Url *url.URL
+	Title string `json:"title"`
+	Url string `json:"url"`
 }
 
+const feedLinks = `link[type='application/rss+xml'],link[type='application/atom+xml']`
 
-func FindFeeds(u string) []FeedSource {
-	doc, err := goquery.NewDocument(u)
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	log.Print(doc.Url)
-	// Find the review items
+func FindFeeds(r *http.Response) ([]FeedSource, error) {
 	sources := make([]FeedSource, 0, 0)
-	doc.Find("link[type='application/rss+xml'],link[type='application/atom+xml']").Each(func(i int, s *goquery.Selection) {
+	doc, err := goquery.NewDocumentFromResponse(r)
+	if err != nil {
+		return sources, err
+	}
+	doc.Find(feedLinks).Each(func(i int, s *goquery.Selection) {
 		if href, ok := s.Attr("href"); ok {
-			feedUrl, feedErr := url.Parse(href)
-			if feedErr != nil {
-				log.Fatal(err)
+			feedUrl, err := url.Parse(href)
+			if err != nil {
+				return
 			}
 			title := s.AttrOr("title", "")
-			feedUrl = doc.Url.ResolveReference(feedUrl)
-			sources = append(sources, FeedSource{Title: title, Url: feedUrl})
+			url := doc.Url.ResolveReference(feedUrl).String()
+			sources = append(sources, FeedSource{Title: title, Url: url})
 		}
 	})
-	return sources
+	return sources, nil
 }

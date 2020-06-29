@@ -1,9 +1,11 @@
 package server
 
 import (
+	"encoding/json"
 	"context"
 	"regexp"
 	"net/http"
+	"log"
 )
 
 type Route struct {
@@ -38,6 +40,7 @@ var routes []Route = []Route{
 	p("/api/folders/:id", FolderHandler),
 	p("/api/feeds", FeedListHandler),
 	p("/api/feeds/:id", FeedHandler),
+	p("/api/feeds/find", FeedHandler),
 }
 
 func Vars(req *http.Request) map[string]string {
@@ -64,6 +67,16 @@ func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 	}
 	rw.WriteHeader(http.StatusNotFound)
+}
+
+func writeJSON(rw http.ResponseWriter, data interface{}) {
+	rw.Header().Set("Content-Type", "application/json; charset=utf-8")
+	reply, err := json.Marshal(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rw.Write(reply)
+	rw.Write([]byte("\n"))
 }
 
 func New() *http.Server {
