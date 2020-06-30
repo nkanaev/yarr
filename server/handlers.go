@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"mime"
 	"strings"
+	"path/filepath"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -33,7 +34,7 @@ func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	defer f.Close()
-	rw.Header().Set("Content-Type", mime.TypeByExtension(path))
+	rw.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(path)))
 	io.Copy(rw, f)
 }
 
