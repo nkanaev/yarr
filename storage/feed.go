@@ -13,8 +13,10 @@ type Feed struct {
 func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, folderId int64) *Feed {
 	result, err := s.db.Exec(`
 		insert into feeds (title, description, link, feed_link, icon, folder_id) 
-		values (?, ?, ?, ?, ?, ?)`,
+		values (?, ?, ?, ?, ?, ?)
+		on conflict (feed_link) do update set folder_id=?`,
 		title, description, link, feedLink, icon, intOrNil(folderId),
+		intOrNil(folderId),
 	)
 	if err != nil {
 		return nil

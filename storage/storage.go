@@ -20,11 +20,12 @@ create table if not exists feeds (
  title          text not null,
  description    text,
  link           text,
- feed_link      text,
+ feed_link      text not null,
  icon           text
 );
 
 create index if not exists idx_feed_folder_id on feeds(folder_id);
+create unique index if not exists idx_feed_feed_link on feeds(feed_link);
 
 create table if not exists items (
  id             string primary key,

@@ -2,6 +2,8 @@ package server
 
 import (
 	"github.com/nkanaev/yarr/worker"
+	"github.com/nkanaev/yarr/storage"
+	"github.com/mmcdole/gofeed"
 	"net/http"
 	"encoding/json"
 	"os"
@@ -14,7 +16,6 @@ import (
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
-	fmt.Println(os.Getwd())
 	f, err := os.Open("template/index.html")
 	if err != nil {
 		log.Fatal(err)
@@ -45,8 +46,8 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 type NewFeed struct {
-	Url string	   `json:"url"`
-	FolderID int64 `json:"folder_id,omitempty"`
+	Url string	    `json:"url"`
+	FolderID *int64 `json:"folder_id,omitempty"`
 }
 
 func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
@@ -57,6 +58,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
 		feedUrl := feed.Url
 		res, err := http.Get(feedUrl)	
 		if err != nil {
@@ -73,6 +75,8 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 			sources, err := worker.FindFeeds(res)
 			if err != nil {
 				log.Print(err)
+				rw.WriteHeader(http.StatusBadRequest)
+				return
 			}
 			if len(sources) == 0 {
 				writeJSON(rw, map[string]string{"status": "notfound"})
@@ -84,14 +88,41 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 			} else if len(sources) == 1 {
 				feedUrl = sources[0].Url
 				fmt.Println("feedUrl:", feedUrl)
+				err = createFeed(db(req), feedUrl, 0)
+				if err == nil {
+					writeJSON(rw, map[string]string{"status": "success"})
+				}
+			}
+		} else if strings.HasPrefix(contentType, "text/xml") || strings.HasPrefix(contentType, "application/xml") {
+			err = createFeed(db(req), feedUrl, 0)
+			if err == nil {
 				writeJSON(rw, map[string]string{"status": "success"})
 			}
-			fmt.Println("got html url", sources, feedUrl)
-		} else if strings.HasPrefix(contentType, "text/xml") {
-			log.Print("got rss feed")
+		} else {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
 		}
-		log.Print(res.Header.Get("Content-Type"))
 	}
+}
+
+func createFeed(s *storage.Storage, url string, folderId int64) error {
+	fmt.Println(s, url)
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(url)
+	if err != nil {
+		return err
+	}
+	entry := s.CreateFeed(
+		feed.Title,
+		feed.Description,
+		feed.Link,
+		feed.FeedLink,
+		"",
+		folderId,
+	)
+
+	fmt.Println("here we go", entry)
+	return nil
 }
 
 func FeedHandler(rw http.ResponseWriter, req *http.Request) {
