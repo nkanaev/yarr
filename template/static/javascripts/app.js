@@ -25,11 +25,6 @@ var vm = new Vue({
       'feeds': [],
       'feedSelected': null,
       'items': [], 
-      'x': [
-        {'id': '123', 'title': 'Apple Pulls Pocket Casts and Castro From Chinese App Store', 'status': 'unread', 'feed_id': 2, 'date': 1592250298},
-        {'id': '456', 'title': 'On Apple Announcing the ARM Mac Transition at WWDC This Month', 'status': 'starred', 'feed_id': 2, 'date': 1592250298},
-        {'id': '789', 'title': 'Marques Brownlee: ‘Reflecting on the Color of My Skin’', 'status': 'read', 'feed_id': 2, 'date': 1592250298},
-      ],
       'itemSelected': null,
       'settings': 'manage',
       'newFolderTitle': null,
