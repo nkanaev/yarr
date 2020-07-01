@@ -32,6 +32,7 @@ var vm = new Vue({
       'itemSelected': null,
       'settings': 'manage',
       'newFolderTitle': null,
+      'loading': {newfeed: 0},
     }
   },
   computed: {
@@ -94,6 +95,21 @@ var vm = new Vue({
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         this.feeds = this.feeds.filter(function(f) { f.id != feed.id })
       }
+    },
+    createFeed: function(event) {
+      var form = event.target
+      var data = {
+        url: form.querySelector('input[name=url]').value,
+        folder_id: parseInt(form.querySelector('select[name=folder_id]').value) || null,
+      }
+      this.loading.newfeed = true
+      var vm = this
+      api.feeds.create(data).then(function(result) {
+        if (result.status === 'success') {
+          vm.$bvModal.hide('settings-modal')
+        }
+        vm.loading.newfeed = false
+      })
     },
   }
 })
