@@ -142,3 +142,38 @@ select.form-control:not([multiple]):not([size]) {
   border-color: var(--color-primary);
   background-color: transparent;
 }
+
+@keyframes loading {
+  0% {
+    transform: rotate(0)
+  }
+
+  100% {
+    transform: rotate(360deg)
+  }
+}
+
+.loading {
+  color: transparent!important;
+  min-height: .8rem;
+  pointer-events: none;
+  position: relative;
+}
+
+.loading::after {
+  animation: loading .5s infinite linear;
+  border: .1rem solid #6c757d;
+  border-radius: 50%;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  content: "";
+  display: block;
+  height: 1rem;
+  width: 1rem;
+  left: 50%;
+  margin-left: -.5rem;
+  margin-top: -.5rem;
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+}

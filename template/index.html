@@ -111,7 +111,7 @@
                     <option value=""></option>
                     <option :value="folder.id" v-for="folder in folders">{{ folder.title }}</option>
                 </select>
-                <button class="btn btn-block btn-outline-secondary mt-3" type="button">Add</button>
+                <button class="btn btn-block btn-outline-secondary mt-3 loading" type="button">Add</button>
             </div>
             <div v-else-if="settings=='manage'">
                 <div v-for="folder in foldersWithFeeds" class="mb-4">
