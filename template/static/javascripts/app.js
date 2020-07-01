@@ -89,7 +89,12 @@ var vm = new Vue({
     },
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
-        this.feeds = this.feeds.filter(function(f) { f.id != feed.id })
+        var vm = this
+        api.feeds.delete(feed.id).then(function() {
+          api.feeds.list().then(function(feeds) {
+            vm.feeds = feeds
+          })
+        })
       }
     },
     createFeed: function(event) {
@@ -102,6 +107,9 @@ var vm = new Vue({
       var vm = this
       api.feeds.create(data).then(function(result) {
         if (result.status === 'success') {
+          api.feeds.list().then(function(feeds) {
+            vm.feeds = feeds
+          })
           vm.$bvModal.hide('settings-modal')
         }
         vm.loading.newfeed = false

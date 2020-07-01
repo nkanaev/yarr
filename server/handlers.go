@@ -13,6 +13,7 @@ import (
 	"mime"
 	"strings"
 	"path/filepath"
+	"strconv"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -86,7 +87,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		contentType := res.Header.Get("Content-Type")
-		if strings.HasPrefix(contentType, "text/html") {
+		if strings.HasPrefix(contentType, "text/html") || contentType == "" {
 			sources, err := worker.FindFeeds(res)
 			if err != nil {
 				log.Print(err)
@@ -102,11 +103,13 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 				})
 			} else if len(sources) == 1 {
 				feedUrl = sources[0].Url
-				fmt.Println("feedUrl:", feedUrl)
 				err = createFeed(db(req), feedUrl, feed.FolderID)
-				if err == nil {
-					writeJSON(rw, map[string]string{"status": "success"})
+				if err != nil {
+					log.Print(err)
+					rw.WriteHeader(http.StatusBadRequest)
+					return
 				}
+				writeJSON(rw, map[string]string{"status": "success"})
 			}
 		} else if strings.HasPrefix(contentType, "text/xml") || strings.HasPrefix(contentType, "application/xml") {
 			err = createFeed(db(req), feedUrl, feed.FolderID)
@@ -121,17 +124,20 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func createFeed(s *storage.Storage, url string, folderId *int64) error {
-	fmt.Println(s, url)
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(url)
 	if err != nil {
 		return err
 	}
+	feedLink := feed.FeedLink
+	if len(feedLink) == 0 {
+		feedLink = url
+	}
 	entry := s.CreateFeed(
 		feed.Title,
 		feed.Description,
 		feed.Link,
-		feed.FeedLink,
+		feedLink,
 		"",
 		folderId,
 	)
@@ -141,4 +147,13 @@ func createFeed(s *storage.Storage, url string, folderId *int64) error {
 }
 
 func FeedHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "DELETE" {
+		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		db(req).DeleteFeed(id)
+		rw.WriteHeader(http.StatusNoContent)
+	}
 }

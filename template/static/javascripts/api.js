@@ -2,28 +2,32 @@
 
 (function() {
   var api = function(method, endpoint, data) {
-    var promise = fetch(endpoint, {
+    return fetch(endpoint, {
       method: method,
       headers: {'content-type': 'application/json'},
       body: JSON.stringify(data),
     })
-    return promise.then(function(res) {
-      if (res.ok) return res.json()
-    })
+  }
+
+  var json = function(res) {
+    return res.json()
   }
 
   window.api = {
     feeds: {
       list: function() {
-        return api('get', '/api/feeds')
+        return api('get', '/api/feeds').then(json)
       },
       create: function(data) {
-        return api('post', '/api/feeds', data)
+        return api('post', '/api/feeds', data).then(json)
       },
+      delete: function(id) {
+        return api('delete', '/api/feeds/' + id)
+      }
     },
     folders: {
       list: function() {
-        return api('get', '/api/folders')
+        return api('get', '/api/folders').then(json)
       },
     }
   }
