@@ -17,6 +17,7 @@ type Route struct {
 
 type Handler struct {
 	db *storage.Storage
+	fetchRunning bool
 }
 
 func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
@@ -38,6 +39,7 @@ func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
 var routes []Route = []Route{
 	p("/", IndexHandler),
 	p("/static/*path", StaticHandler),
+	p("/api/status", StatusHandler),
 	p("/api/folders", FolderListHandler),
 	p("/api/folders/:id", FolderHandler),
 	p("/api/feeds", FeedListHandler),
@@ -59,15 +61,21 @@ func db(req *http.Request) *storage.Storage {
 	return nil
 }
 
+func handler(req *http.Request) *Handler {
+	return req.Context().Value(ctxHandler).(*Handler)
+}
+
 const (
 	ctxDB = 1
 	ctxVars = 2
+	ctxHandler = 3
 )
 
 func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	for _, route := range routes {
 		if route.urlRegex.MatchString(req.URL.Path) {
 			ctx := context.WithValue(req.Context(), ctxDB, h.db)
+			ctx = context.WithValue(ctx, ctxHandler, &h)
 			if route.urlRegex.NumSubexp() > 0 {
 				vars := make(map[string]string)
 				matches := route.urlRegex.FindStringSubmatchIndex(req.URL.Path)

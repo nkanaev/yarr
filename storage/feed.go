@@ -1,22 +1,22 @@
 package storage
 
 type Feed struct {
-	Id int64
-	FolderId int64
-	Title string
-	Description string
-	Link string
-	FeedLink string
-	Icon string
+	Id int64 `json:"id"`
+	FolderId *int64 `json:"folder_id"`
+	Title string `json:"title"`
+	Description string `json:"description"`
+	Link string `json:"link"`
+	FeedLink string `json:"feed_link"`
+	Icon string	`json:"icon"`
 }
 
-func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, folderId int64) *Feed {
+func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, folderId *int64) *Feed {
 	result, err := s.db.Exec(`
 		insert into feeds (title, description, link, feed_link, icon, folder_id) 
 		values (?, ?, ?, ?, ?, ?)
 		on conflict (feed_link) do update set folder_id=?`,
-		title, description, link, feedLink, icon, intOrNil(folderId),
-		intOrNil(folderId),
+		title, description, link, feedLink, icon, folderId,
+		folderId,
 	)
 	if err != nil {
 		return nil

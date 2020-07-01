@@ -39,7 +39,19 @@ func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 	io.Copy(rw, f)
 }
 
+func StatusHandler(rw http.ResponseWriter, req *http.Request) {
+	writeJSON(rw, map[string]interface{}{
+		"running": handler(req).fetchRunning,
+		"stats": map[string]int64{},
+	})
+}
+
 func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		list := db(req).ListFolders()
+		fmt.Println(list)
+		json.NewEncoder(rw).Encode(list)
+	}
 }
 
 func FolderHandler(rw http.ResponseWriter, req *http.Request) {
@@ -51,7 +63,10 @@ type NewFeed struct {
 }
 
 func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
+	if req.Method == "GET" {
+		list := db(req).ListFeeds()
+		json.NewEncoder(rw).Encode(list)
+	} else if req.Method == "POST" {
 		var feed NewFeed
 		if err := json.NewDecoder(req.Body).Decode(&feed); err != nil {
 			log.Print(err)
@@ -88,13 +103,13 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 			} else if len(sources) == 1 {
 				feedUrl = sources[0].Url
 				fmt.Println("feedUrl:", feedUrl)
-				err = createFeed(db(req), feedUrl, 0)
+				err = createFeed(db(req), feedUrl, feed.FolderID)
 				if err == nil {
 					writeJSON(rw, map[string]string{"status": "success"})
 				}
 			}
 		} else if strings.HasPrefix(contentType, "text/xml") || strings.HasPrefix(contentType, "application/xml") {
-			err = createFeed(db(req), feedUrl, 0)
+			err = createFeed(db(req), feedUrl, feed.FolderID)
 			if err == nil {
 				writeJSON(rw, map[string]string{"status": "success"})
 			}
@@ -105,7 +120,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func createFeed(s *storage.Storage, url string, folderId int64) error {
+func createFeed(s *storage.Storage, url string, folderId *int64) error {
 	fmt.Println(s, url)
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(url)

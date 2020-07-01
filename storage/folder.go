@@ -5,9 +5,9 @@ import (
 )
 
 type Folder struct {
-	Id int64
-	Title string
-	IsExpanded bool
+	Id int64 `json:"id"`
+	Title string `json:"title"`
+	IsExpanded bool `json:"is_expanded"`
 }
 
 func (s *Storage) CreateFolder(title string) *Folder {

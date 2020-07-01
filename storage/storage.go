@@ -11,7 +11,7 @@ var initQuery string = `
 create table if not exists folders (
  id             integer primary key autoincrement,
  title          text not null,
- is_expanded    boolean
+ is_expanded    boolean not null default false
 );
 
 create table if not exists feeds (
