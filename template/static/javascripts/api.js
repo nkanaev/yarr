@@ -20,6 +20,11 @@
       create: function(data) {
         return api('post', '/api/feeds', data)
       },
+    },
+    folders: {
+      list: function() {
+        return api('get', '/api/folders')
+      },
     }
   }
 })()

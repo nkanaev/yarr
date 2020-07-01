@@ -8,23 +8,24 @@ var FILTERS = [
 
 var vm = new Vue({
   el: '#app',
+  created: function() {
+    var vm = this
+    Promise
+      .all([api.folders.list(), api.feeds.list()])
+      .then(function(values) {
+        vm.folders = values[0]
+        vm.feeds = values[1]
+      })
+  },
   data: function() {
     return {
       'filters': FILTERS,
       'filterSelected': 'all',
-      'folders': [
-        {'id': 1, 'title': 'Tech', 'is_expanded': false},
-        {'id': 2, 'title': 'News', 'is_expanded': true},
-      ],
-      'feeds': [
-        {'id': '1', 'title': 'news.ycombinator.com', 'folder_id': 1},
-        {'id': '2', 'title': 'daringfireball', 'folder_id': 1},
-        {'id': '3', 'title': 'BBC', 'folder_id': 2},
-        {'id': '4', 'title': 'The Guardian', 'folder_id': 2},
-        {'id': '5', 'title': 'Random Stuff', 'folder_id': null},
-      ],
+      'folders': [],
+      'feeds': [],
       'feedSelected': null,
-      'items': [
+      'items': [], 
+      'x': [
         {'id': '123', 'title': 'Apple Pulls Pocket Casts and Castro From Chinese App Store', 'status': 'unread', 'feed_id': 2, 'date': 1592250298},
         {'id': '456', 'title': 'On Apple Announcing the ARM Mac Transition at WWDC This Month', 'status': 'starred', 'feed_id': 2, 'date': 1592250298},
         {'id': '789', 'title': 'Marques Brownlee: ‘Reflecting on the Color of My Skin’', 'status': 'read', 'feed_id': 2, 'date': 1592250298},
