@@ -91,9 +91,8 @@
                 </div>
             </div>
         </div>
-        <b-modal id="settings-modal" hide-footer lazy header-class="settings-header">
-            <template v-slot:modal-header="{ close }">
-                <ul class="nav nav-tabs card-header-tabs mx-0 px-3">
+        <b-modal id="settings-modal" hide-header hide-footer lazy>
+                <ul class="nav nav-tabs mx-n3 px-3 mb-3 mt-n3 pt-2 bg-light rounded-top">
                     <li class="nav-item">
                         <a class="nav-link" href="#" :class="{active: settings=='create'}" @click.prevent="settings='create'">New Feed</a>
                     </li>
@@ -104,7 +103,6 @@
                         <a class="nav-link" href="#" :class="{active: settings=='import'}" @click.prevent="settings='import'">Import/Export</a>
                     </li>
                 </ul>
-            </template>
             <div v-if="settings=='create'">
                 <label for="feed-url">URL</label>
                 <input id="feed-url" type="text" class="form-control">
