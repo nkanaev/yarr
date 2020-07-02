@@ -77,6 +77,15 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func FolderHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "DELETE" {
+		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		db(req).DeleteFolder(id)
+		rw.WriteHeader(http.StatusNoContent)
+	}
 }
 
 type NewFeed struct {

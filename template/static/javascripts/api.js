@@ -32,6 +32,9 @@
       create: function(data) {
         return api('post', '/api/folders', data).then(json)
       },
+      delete: function(id) {
+        return api('delete', '/api/folders/' + id)
+      },
     }
   }
 })()

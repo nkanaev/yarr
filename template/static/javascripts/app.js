@@ -9,13 +9,7 @@ var FILTERS = [
 var vm = new Vue({
   el: '#app',
   created: function() {
-    var vm = this
-    Promise
-      .all([api.folders.list(), api.feeds.list()])
-      .then(function(values) {
-        vm.folders = values[0]
-        vm.feeds = values[1]
-      })
+    this.refresh()
   },
   data: function() {
     return {
@@ -65,6 +59,15 @@ var vm = new Vue({
     },
   },
   methods: {
+    refresh: function() {
+      var vm = this
+      Promise
+        .all([api.folders.list(), api.feeds.list()])
+        .then(function(values) {
+          vm.folders = values[0]
+          vm.feeds = values[1]
+        })
+    },
     toggleFolderExpanded: function(folder) {
       folder.is_expanded = !folder.is_expanded
     },
@@ -82,6 +85,17 @@ var vm = new Vue({
       api.folders.create(data).then(function(result) {
         vm.folders.push(result)
       })
+    },
+    renameFolder: function(folder) {
+    
+    },
+    deleteFolder: function(folder) {
+      var vm = this
+      if (confirm('Are you sure you want to delete ' + folder.title + '?')) {
+        api.folders.delete(folder.id).then(function() {
+          vm.refresh()
+        })
+      }
     },
     renameFeed: function(feed) {
       var newTitle = prompt('Enter new title', feed.title)

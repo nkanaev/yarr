@@ -117,37 +117,50 @@
             </div>
             <div v-else-if="settings=='manage'">
                 <div v-for="folder in foldersWithFeeds" class="mb-4">
-                    <div><strong>{{ folder.title || "Uncategorized" }}</strong></div>
+                    <div class="d-flex align-items-center">
+                        <div class="w-100"><b>{{ folder.title || "Uncategorized" }}</b></div>
+                        <div class="flex-shrink-0" v-if="folder.id">
+                            <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
+                                <template v-slot:button-content>
+                                    <img src="./static/images/more-vertical.svg">
+                                </template>
+                                <b-dropdown-item @click.prevent="renameFolder(folder)">Rename</b-dropdown-item>
+                                <b-dropdown-divider></b-dropdown-divider>
+                                <b-dropdown-item class="dropdown-danger"
+                                   @click.prevent="deleteFolder(folder)">
+                                    Delete
+                                </b-dropdown-item>
+                            </b-dropdown>
+                        </div>
+                    </div>
                     <div v-for="feed in folder.feeds" class="d-flex align-items-center">
                         <div class="w-100">
                             {{ feed.title }}
                         </div>
                         <div class="flex-shrink-0">
-                            <div class="dropdown d-inline-block">
-                                <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
-                                    <template v-slot:button-content>
-                                        <img src="./static/images/more-vertical.svg">
-                                    </template>
-                                    <b-dropdown-item @click.prevent="renameFeed(feed)">Rename</b-dropdown-item>
-                                    <b-dropdown-divider></b-dropdown-divider>
-                                    <b-dropdown-header>Move to...</b-dropdown-header>
-                                    <b-dropdown-item
-                                       v-if="folder.id != feed.folder_id"
-                                       v-for="folder in folders"
-                                       @click.prevent="moveFeed(feed, folder)">
-                                        {{ folder.title }}
-                                    </b-dropdown-item>
-                                    <b-dropdown-item
-                                       @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">
-                                        Uncategorized
-                                    </b-dropdown-item>
-                                    <b-dropdown-divider></b-dropdown-divider>
-                                    <b-dropdown-item class="dropdown-danger"
-                                       @click.prevent="deleteFeed(feed)">
-                                        Delete
-                                    </b-dropdown-item>
-                                </b-dropdown>
-                            </div>
+                            <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
+                                <template v-slot:button-content>
+                                    <img src="./static/images/more-vertical.svg">
+                                </template>
+                                <b-dropdown-item @click.prevent="renameFeed(feed)">Rename</b-dropdown-item>
+                                <b-dropdown-divider></b-dropdown-divider>
+                                <b-dropdown-header>Move to...</b-dropdown-header>
+                                <b-dropdown-item
+                                   v-if="folder.id != feed.folder_id"
+                                   v-for="folder in folders"
+                                   @click.prevent="moveFeed(feed, folder)">
+                                    {{ folder.title }}
+                                </b-dropdown-item>
+                                <b-dropdown-item
+                                   @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">
+                                    Uncategorized
+                                </b-dropdown-item>
+                                <b-dropdown-divider></b-dropdown-divider>
+                                <b-dropdown-item class="dropdown-danger"
+                                   @click.prevent="deleteFeed(feed)">
+                                    Delete
+                                </b-dropdown-item>
+                            </b-dropdown>
                         </div>
                     </div>
                 </div>
