@@ -143,8 +143,8 @@
                                     <img src="./static/images/more-vertical.svg">
                                 </template>
                                 <b-dropdown-item @click.prevent="renameFeed(feed)">Rename</b-dropdown-item>
-                                <b-dropdown-divider></b-dropdown-divider>
-                                <b-dropdown-header>Move to...</b-dropdown-header>
+                                <b-dropdown-divider v-if="folders.length"></b-dropdown-divider>
+                                <b-dropdown-header v-if="folders.length">Move to...</b-dropdown-header>
                                 <b-dropdown-item
                                    v-if="folder.id != feed.folder_id"
                                    v-for="folder in folders"
