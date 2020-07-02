@@ -21,6 +21,9 @@
       create: function(data) {
         return api('post', '/api/feeds', data).then(json)
       },
+      update: function(id, data) {
+        return api('put', '/api/feeds/' + id, data)
+      },
       delete: function(id) {
         return api('delete', '/api/feeds/' + id)
       }

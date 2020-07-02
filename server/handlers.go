@@ -93,6 +93,11 @@ type NewFeed struct {
 	FolderID *int64 `json:"folder_id,omitempty"`
 }
 
+type UpdateFeed struct {
+	Title *string `json:"title,omitempty"`
+	FolderID *int64 `json:"folder_id,omitempty"`
+}
+
 func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		list := db(req).ListFeeds()
@@ -177,13 +182,29 @@ func createFeed(s *storage.Storage, url string, folderId *int64) error {
 }
 
 func FeedHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "DELETE" {
-		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
-		if err != nil {
+	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if req.Method == "PUT" {
+		var body UpdateFeed
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		if body.Title != nil {
+			db(req).RenameFeed(id, *body.Title)
+		}
+		if body.FolderID != nil {
+			db(req).UpdateFeedFolder(id, *body.FolderID)
+		}
+		rw.WriteHeader(http.StatusOK)
+	} else if req.Method == "DELETE" {
 		db(req).DeleteFeed(id)
 		rw.WriteHeader(http.StatusNoContent)
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }

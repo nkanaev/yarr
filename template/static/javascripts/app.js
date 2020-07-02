@@ -76,7 +76,10 @@ var vm = new Vue({
       return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear()
     },
     moveFeed: function(feed, folder) {
-      feed.folder_id = folder ? folder.id : null
+      var folder_id = folder ? folder.id : null
+      api.feeds.update(feed.id, {folder_id: folder_id}).then(function() {
+        feed.folder_id = folder_id
+      })
     },
     createFolder: function(event) {
       var form = event.target
@@ -99,7 +102,9 @@ var vm = new Vue({
     },
     renameFeed: function(feed) {
       var newTitle = prompt('Enter new title', feed.title)
-      feed.title = newTitle
+      api.feeds.update(feed.id, {title: newTitle}).then(function() {
+        feed.title = newTitle
+      })
     },
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
