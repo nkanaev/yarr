@@ -47,11 +47,32 @@ func StatusHandler(rw http.ResponseWriter, req *http.Request) {
 	})
 }
 
+type NewFolder struct {
+	Title string `json:"title"`
+}
+
 func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		list := db(req).ListFolders()
 		fmt.Println(list)
 		json.NewEncoder(rw).Encode(list)
+	} else if req.Method == "POST" {
+		var body NewFolder
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			log.Print(err)
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if len(body.Title) == 0 {
+			rw.WriteHeader(http.StatusBadRequest)
+			writeJSON(rw, map[string]string{"error": "Folder title missing."})
+			return
+		}
+		folder := db(req).CreateFolder(body.Title)
+		rw.WriteHeader(http.StatusCreated)
+		json.NewEncoder(rw).Encode(folder)
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 

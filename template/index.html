@@ -152,13 +152,15 @@
                     </div>
                 </div>
                 <div class="mt-5">
-                    <label for="settings-new-folder">New Folder</label>
-                    <div class="input-group">
-                        <input id="settings-new-folder" type="text" class="form-control" v-model="newFolderTitle">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" @click="newFolderCreate()">Add</button>
+                    <form action="" @submit.prevent="createFolder(event)">
+                        <label for="settings-new-folder">New Folder</label>
+                        <div class="input-group">
+                            <input id="settings-new-folder" type="text" class="form-control" name="title">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="submit">Add</button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             <div v-else-if="settings=='import'">

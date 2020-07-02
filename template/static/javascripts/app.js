@@ -27,7 +27,6 @@ var vm = new Vue({
       'items': [], 
       'itemSelected': null,
       'settings': 'manage',
-      'newFolderTitle': null,
       'loading': {newfeed: 0},
     }
   },
@@ -76,11 +75,12 @@ var vm = new Vue({
     moveFeed: function(feed, folder) {
       feed.folder_id = folder ? folder.id : null
     },
-    newFolderCreate: function() {
-      this.folders.push({
-        id: Math.random() * 10000,
-        title: this.newFolderTitle,
-        is_expanded: true,
+    createFolder: function(event) {
+      var form = event.target
+      var data = {'title': form.querySelector('input[name=title]').value}
+      var vm = this
+      api.folders.create(data).then(function(result) {
+        vm.folders.push(result)
       })
     },
     renameFeed: function(feed) {

@@ -29,6 +29,9 @@
       list: function() {
         return api('get', '/api/folders').then(json)
       },
+      create: function(data) {
+        return api('post', '/api/folders', data).then(json)
+      },
     }
   }
 })()
