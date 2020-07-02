@@ -76,13 +76,29 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
+
+type UpdateFolder struct {
+	Title *string `json:"title,omitempty"`
+}
+
 func FolderHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "DELETE" {
-		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
-		if err != nil {
+	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if req.Method == "PUT" {
+		var body UpdateFolder
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		if body.Title != nil {
+			db(req).RenameFolder(id, *body.Title)
+		}
+		rw.WriteHeader(http.StatusOK)
+	} else if req.Method == "DELETE" {
 		db(req).DeleteFolder(id)
 		rw.WriteHeader(http.StatusNoContent)
 	}

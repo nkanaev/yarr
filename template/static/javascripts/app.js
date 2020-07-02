@@ -90,7 +90,12 @@ var vm = new Vue({
       })
     },
     renameFolder: function(folder) {
-    
+      var newTitle = prompt('Enter new title', folder.title)
+      if (newTitle) {
+        api.folders.update(folder.id, {title: newTitle}).then(function() {
+          folder.title = newTitle
+        })
+      }
     },
     deleteFolder: function(folder) {
       var vm = this
@@ -102,9 +107,11 @@ var vm = new Vue({
     },
     renameFeed: function(feed) {
       var newTitle = prompt('Enter new title', feed.title)
-      api.feeds.update(feed.id, {title: newTitle}).then(function() {
-        feed.title = newTitle
-      })
+      if (newTitle) {
+        api.feeds.update(feed.id, {title: newTitle}).then(function() {
+          feed.title = newTitle
+        })
+      }
     },
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
