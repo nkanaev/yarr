@@ -256,3 +256,14 @@ func FeedHandler(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
+
+func FeedItemsHandler(rw http.ResponseWriter, req *http.Request) {
+	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	items := db(req).ListFeedItems(id)
+	writeJSON(rw, items)
+}

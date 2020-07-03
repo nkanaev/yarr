@@ -14,17 +14,17 @@ const (
 )
 
 type Item struct {
-	Id string
-	FeedId int64
-	Title string
-	Link string
-	Description string
-	Content string
-	Author string
-	Date *time.Time
-	DateUpdated *time.Time
-	Status ItemStatus
-	Image string
+	Id string `json:"id"`
+	FeedId int64 `json:"feed_id"`
+	Title string `json:"title"`
+	Link string `json:"link"`
+	Description string `json:"description"`
+	Content string `json:"content"`
+	Author string `json:"author"`
+	Date *time.Time `json:"date"`
+	DateUpdated *time.Time `json:"date_updated"`
+	Status ItemStatus `json:"status"`
+	Image string `json:"image"`
 }
 
 func (s *Storage) CreateItems(items []Item) bool {
@@ -70,7 +70,6 @@ func itemQuery(s *Storage, cond string, v ...interface{}) []Item {
 			content, author, date, date_updated, status, image
 		from items
 		where %s`, cond)
-	s.log.Print(query)
 	rows, err := s.db.Query(query, v...)
 	if err != nil {
 		s.log.Print(err)

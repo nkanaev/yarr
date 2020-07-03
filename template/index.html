@@ -77,12 +77,12 @@
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="menu-item p-2">
                         <div class="d-flex flex-column ml-4">
-                            <div style="line-height: 1" class="d-flex">
+                            <div style="line-height: 1" class="d-flex text-muted">
                                 <img src="./static/images/circle-full.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'unread'">
                                 <img src="./static/images/circle.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'read'">
                                 <img src="./static/images/star.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'starred'">
-                                <small class="flex-fill text-truncate">{{feedsById[item.feed_id].title}}</small>
-                                <small class="">{{formatDate(item.date)}}</small>
+                                <small class="flex-fill text-truncate mr-1">{{feedsById[item.feed_id].title}}</small>
+                                <small class="flex-shrink-0">{{formatDate(item.date)}}</small>
                             </div>
                             <span>{{item.title}}</span>
                         </div>
@@ -97,7 +97,7 @@
                     <img src="./static/images/settings.svg" alt="" style="width: 20px; height: 20px;">
                 </button>
             </div>
-            <div v-if="itemSelected" class="mx-3 my-2 overflow-auto">
+            <div v-if="itemSelected" class="px-3 mt-2 overflow-auto">
                 <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
@@ -105,7 +105,7 @@
                 </div>
                 <hr>
                 <div>
-                    content goes here
+                    <div v-html="itemSelectedDetails.description" v-if="itemSelectedDetails.description"></div>
                 </div>
             </div>
         </div>

@@ -43,9 +43,15 @@ var vm = new Vue({
   watch: {
     'feedSelected': function(newVal, oldVal) {
       if (newVal === null) return
+      var vm = this
       var parts = newVal.split(':', 2)
       var type = parts[0]
       var guid = parts[1]
+      if (type === 'feed') {
+        api.feeds.list_items(guid).then(function(items) {
+          vm.items = items
+        })
+      }
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedDetails = this.itemsById[newVal]
@@ -64,9 +70,8 @@ var vm = new Vue({
     toggleFolderExpanded: function(folder) {
       folder.is_expanded = !folder.is_expanded
     },
-    formatDate: function(timestamp_s) {
-      var d = new Date(timestamp_s * 1000)
-      return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear()
+    formatDate: function(datestr) {
+      return new Date(datestr).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"})
     },
     moveFeed: function(feed, folder) {
       var folder_id = folder ? folder.id : null

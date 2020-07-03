@@ -80,6 +80,7 @@ var routes []Route = []Route{
 	p("/api/folders/:id", FolderHandler),
 	p("/api/feeds", FeedListHandler),
 	p("/api/feeds/:id", FeedHandler),
+	p("/api/feeds/:id/items", FeedItemsHandler),
 	p("/api/feeds/find", FeedHandler),
 }
 

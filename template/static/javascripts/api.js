@@ -26,7 +26,10 @@
       },
       delete: function(id) {
         return api('delete', '/api/feeds/' + id)
-      }
+      },
+      list_items: function(id) {
+        return api('get', '/api/feeds/' + id + '/items').then(json)
+      },
     },
     folders: {
       list: function() {
@@ -41,6 +44,6 @@
       delete: function(id) {
         return api('delete', '/api/folders/' + id)
       },
-    }
+    },
   }
 })()
