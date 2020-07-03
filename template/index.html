@@ -10,55 +10,66 @@
 <body>
     <div class="wrapper d-flex vh-100" id="app" v-cloak>
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
-            <div class="mx-2 my-2">
+            <div class="p-2">
                 <div class="mb-5">
-                    <label class="nav-select d-block mb-1" v-for="filter in filters">
-                        <input type="radio" name="filter" :value="filter.value" v-model="filterSelected">
+                    <label class="nav-select">
+                        <input type="radio" name="filter" value="all" v-model="filterSelected">
                         <div class="menu-item d-flex align-items-center w-100">
-                            <img :src="'./static/images/' + filter.icon + '.svg'" alt="" class="nav-icon">
-                            <span class="flex-fill text-left text-truncate">{{filter.title}}</span>
+                            <img src="./static/images/circle-full.svg" alt="" class="nav-icon">
+                            <span class="flex-fill text-left text-truncate">All</span>
+                            <span class="counter text-right"></span>
+                        </div>
+                    </label>
+                    <label class="nav-select">
+                        <input type="radio" name="filter" value="unread" v-model="filterSelected">
+                        <div class="menu-item d-flex align-items-center w-100">
+                            <img src="./static/images/circle.svg" alt="" class="nav-icon">
+                            <span class="flex-fill text-left text-truncate">Unread</span>
+                            <span class="counter text-right"></span>
+                        </div>
+                    </label>
+                    <label class="nav-select">
+                        <input type="radio" name="filter" value="starred" v-model="filterSelected">
+                        <div class="menu-item d-flex align-items-center w-100">
+                            <img src="./static/images/star.svg" alt="" class="nav-icon">
+                            <span class="flex-fill text-left text-truncate">Starred</span>
                             <span class="counter text-right"></span>
                         </div>
                     </label>
                 </div>
-                <div>
-                    <label class="nav-select d-block mb-1">
-                        <input type="radio" name="feed" :value="null" v-model="feedSelected">
-                        <div class="menu-item d-flex align-items-center w-100">
-                            <img src="./static/images/layers.svg" alt="" class="nav-icon">
-                            <span class="flex-fill text-left text-truncate">All Feeds</span>
+                <label class="nav-select">
+                    <input type="radio" name="feed" :value="null" v-model="feedSelected">
+                    <div class="menu-item d-flex align-items-center w-100">
+                        <img src="./static/images/layers.svg" alt="" class="nav-icon">
+                        <span class="flex-fill text-left text-truncate">All Feeds</span>
+                        <span class="counter text-right"></span>
+                    </div>
+                </label>
+                <div v-for="folder in foldersWithFeeds">
+                    <label class="nav-select mt-1">
+                        <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
+                        <div class="menu-item d-flex align-items-center w-100" v-if="folder.id">
+                            <img src="./static/images/chevron-right.svg"
+                                 class="nav-icon"
+                                 :class="{expanded: folder.is_expanded}"
+                                 @click.prevent="toggleFolderExpanded(folder)">
+                            <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
                             <span class="counter text-right"></span>
                         </div>
                     </label>
-                    <div v-for="folder in foldersWithFeeds">
-                        <label class="nav-select d-block mb-1">
-                            <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
-                            <div class="menu-item d-flex align-items-center w-100" v-if="folder.id">
-                                <img src="./static/images/chevron-right.svg"
-                                     class="nav-icon"
-                                     :class="{expanded: folder.is_expanded}"
-                                     @click.prevent="toggleFolderExpanded(folder)">
-                                <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
+                    <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
+                        <label class="nav-select"
+                               v-for="feed in folder.feeds">
+                            <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
+                            <div class="menu-item d-flex align-items-center w-100">
+                                <img src="./static/images/rss.svg" alt="" class="nav-icon">
+                                <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right"></span>
                             </div>
                         </label>
-                        <div v-show="!folder.id || folder.is_expanded" :class="{'pl-3': folder.id}">
-                            <label class="nav-select d-block mb-1"
-                                   v-for="feed in folder.feeds">
-                                <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
-                                <div class="menu-item d-flex align-items-center w-100">
-                                    <img src="./static/images/rss.svg" alt="" class="nav-icon">
-                                    <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
-                                    <span class="counter text-right"></span>
-                                </div>
-                            </label>
-                        </div>
                     </div>
                 </div>
             </div>
-            <button class="btn btn-link" v-b-modal.settings-modal>
-                <img src="./static/images/settings.svg" alt="">
-            </button>
         </div>
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="my-2 mx-2">
@@ -79,8 +90,14 @@
                 </label>
             </div>
         </div>
-        <div class="vh-100 overflow-auto w-100">
-            <div v-if="itemSelected" class="mx-3 my-2">
+        <div class="vh-100 d-flex flex-column w-100">
+            <div class="p-2 d-flex">
+                <div class="flex-grow-1"></div>
+                <button class="btn btn-link p-0" v-b-modal.settings-modal style="line-height: 1">
+                    <img src="./static/images/settings.svg" alt="" style="width: 20px; height: 20px;">
+                </button>
+            </div>
+            <div v-if="itemSelected" class="mx-3 my-2 overflow-auto">
                 <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
@@ -107,7 +124,7 @@
             <div v-if="settings=='create'">
                 <form action="" @submit.prevent="createFeed(event)">
                     <label for="feed-url">URL</label>
-                    <input id="feed-url" name="url" type="url" class="form-control" required>
+                    <input id="feed-url" name="url" type="url" class="form-control" required autocomplete="off">
                     <label for="feed-folder" class="mt-3">Folder</label>
                     <select class="form-control" id="feed-folder" name="folder_id">
                         <option value=""></option>
@@ -169,7 +186,7 @@
                     <form action="" @submit.prevent="createFolder(event)">
                         <label for="settings-new-folder">New Folder</label>
                         <div class="input-group">
-                            <input id="settings-new-folder" type="text" class="form-control" name="title" required>
+                            <input id="settings-new-folder" type="text" class="form-control" name="title" required autocomplete="off">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="submit">Add</button>
                             </div>

@@ -1,11 +1,5 @@
 'use strict';
 
-var FILTERS = [
-  {'title': 'All', 'value': 'all', 'icon': 'circle-full'},
-  {'title': 'Unread', 'value': 'unread', 'icon': 'circle'},
-  {'title': 'Starred', 'value': 'starred', 'icon': 'star'},
-]
-
 var vm = new Vue({
   el: '#app',
   created: function() {
@@ -13,7 +7,6 @@ var vm = new Vue({
   },
   data: function() {
     return {
-      'filters': FILTERS,
       'filterSelected': 'all',
       'folders': [],
       'feeds': [],
