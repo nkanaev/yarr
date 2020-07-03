@@ -1,6 +1,9 @@
 package storage
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type ItemStatus int
 
@@ -18,8 +21,8 @@ type Item struct {
 	Description string
 	Content string
 	Author string
-	Date int64
-	DateUpdated int64
+	Date *time.Time
+	DateUpdated *time.Time
 	Status ItemStatus
 	Image string
 }

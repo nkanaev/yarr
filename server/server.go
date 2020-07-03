@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"github.com/nkanaev/yarr/storage"
 	"log"
+	"fmt"
 )
 
 type Route struct {
@@ -18,6 +19,41 @@ type Route struct {
 type Handler struct {
 	db *storage.Storage
 	fetchRunning bool
+	feedQueue chan storage.Feed
+	counter chan int
+	queueSize int
+}
+
+func (h *Handler) startJobs() {
+	go func() {
+		fmt.Println("one")
+		for {
+			feed := <-h.feedQueue
+			fmt.Println("got feed", feed)
+			items := listItems(feed)
+			h.db.CreateItems(items)
+		}
+	}()
+	go func() {
+		fmt.Println("two")
+		for {
+			val := <-h.counter
+			h.queueSize += val
+		}			
+	}()
+	h.fetchAllFeeds()
+}
+
+func (h *Handler) fetchFeed(feed storage.Feed) {
+	h.queueSize += 1	
+	h.feedQueue <- feed
+}
+
+func (h *Handler) fetchAllFeeds() {
+	for _, feed := range h.db.ListFeeds() {
+		fmt.Println("here", feed)
+		h.fetchFeed(feed)
+	}
 }
 
 func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
@@ -103,7 +139,12 @@ func writeJSON(rw http.ResponseWriter, data interface{}) {
 
 func New() *http.Server {
 	db, _ := storage.New()
-	h := Handler{db: db}
+	h := Handler{
+		db: db,
+		feedQueue: make(chan storage.Feed),
+		counter: make(chan int),
+	}
 	s := &http.Server{Addr: "127.0.0.1:8000", Handler: h}
+	h.startJobs()
 	return s
 }

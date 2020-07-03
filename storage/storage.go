@@ -35,8 +35,8 @@ create table if not exists items (
  description    text,
  content        text,
  author         text,
- date           integer,
- date_updated   integer,
+ date           datetime,
+ date_updated   datetime,
  status         integer,
  image          text
 );

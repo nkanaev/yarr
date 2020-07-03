@@ -174,6 +174,40 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
+	result := make([]storage.Item, len(items))
+	for _, item := range items {
+		imageURL := ""
+		if item.Image != nil {
+			imageURL = item.Image.URL
+		}
+		author := ""
+		if item.Author != nil {
+			author = item.Author.Name
+		}
+		result = append(result, storage.Item{
+			Id: item.GUID,
+			FeedId: feed.Id,
+			Title: item.Title,
+			Link: item.Link,
+			Description: item.Description,
+			Content: item.Content,
+			Author: author,
+			Date: item.PublishedParsed,
+			DateUpdated: item.UpdatedParsed,
+			Status: storage.UNREAD,
+			Image: imageURL,
+		})
+	}
+	return result
+}
+
+func listItems(f storage.Feed) []storage.Item {
+	fp := gofeed.NewParser()	
+	feed, _ := fp.ParseURL(f.FeedLink)
+	return convertItems(feed.Items, f)
+}
+
 func createFeed(s *storage.Storage, url string, folderId *int64) error {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(url)
@@ -184,7 +218,7 @@ func createFeed(s *storage.Storage, url string, folderId *int64) error {
 	if len(feedLink) == 0 {
 		feedLink = url
 	}
-	entry := s.CreateFeed(
+	s.CreateFeed(
 		feed.Title,
 		feed.Description,
 		feed.Link,
@@ -192,8 +226,6 @@ func createFeed(s *storage.Storage, url string, folderId *int64) error {
 		"",
 		folderId,
 	)
-
-	fmt.Println("here we go", entry)
 	return nil
 }
 
