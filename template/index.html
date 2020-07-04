@@ -97,7 +97,7 @@
                     <img src="./static/images/settings.svg" alt="" style="width: 20px; height: 20px;">
                 </button>
             </div>
-            <div v-if="itemSelected" class="px-3 mt-2 overflow-auto">
+            <div v-if="itemSelected" class="px-3 pt-2 border-top overflow-auto">
                 <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
@@ -105,7 +105,8 @@
                 </div>
                 <hr>
                 <div>
-                    <div v-html="itemSelectedDetails.description" v-if="itemSelectedDetails.description"></div>
+                    <div v-html="itemSelectedDetails.content" v-if="itemSelectedDetails.content"></div>
+                    <div v-html="itemSelectedDetails.description" v-else-if="itemSelectedDetails.description"></div>
                 </div>
             </div>
         </div>
