@@ -202,3 +202,17 @@ select.form-control:not([multiple]):not([size]) {
   background: #f5f7f9;
   box-shadow: none;
 }
+
+.content a:hover {
+  text-decoration: none;
+}
+
+.content blockquote {
+  border-left: 3px solid #22262a;
+  padding-left: 1rem;
+}
+
+.content img {
+  width: 100%;
+  height: auto;
+}

@@ -94,14 +94,14 @@
                     <img src="./static/images/settings.svg" alt="" style="width: 20px; height: 20px;">
                 </button>
             </div>
-            <div v-if="itemSelected" class="px-3 pt-2 border-top overflow-auto">
+            <div v-if="itemSelected" class="px-3 pt-3 pb-5 border-top overflow-auto">
                 <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
-                <div>
+                <div class="content">
                     <div v-html="itemSelectedDetails.content" v-if="itemSelectedDetails.content"></div>
                     <div v-html="itemSelectedDetails.description" v-else-if="itemSelectedDetails.description"></div>
                 </div>
