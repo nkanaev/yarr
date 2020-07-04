@@ -76,11 +76,8 @@
                 <label class="nav-select mb-1" v-for="item in items" :class="{'text-muted': item.status === 'read'}" :key="item.id">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="menu-item p-2">
-                        <div class="d-flex flex-column ml-4">
+                        <div class="d-flex flex-column">
                             <div style="line-height: 1" class="d-flex text-muted">
-                                <img src="./static/images/circle-full.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'unread'">
-                                <img src="./static/images/circle.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'read'">
-                                <img src="./static/images/star.svg" class="nav-icon ml-n4 mr-2" v-if="item.status === 'starred'">
                                 <small class="flex-fill text-truncate mr-1">{{feedsById[item.feed_id].title}}</small>
                                 <small class="flex-shrink-0">{{formatDate(item.date)}}</small>
                             </div>
