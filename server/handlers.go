@@ -9,7 +9,6 @@ import (
 	"os"
 	"log"
 	"io"
-	"fmt"
 	"mime"
 	"strings"
 	"path/filepath"
@@ -54,7 +53,6 @@ type NewFolder struct {
 func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		list := db(req).ListFolders()
-		fmt.Println(list)
 		json.NewEncoder(rw).Encode(list)
 	} else if req.Method == "POST" {
 		var body NewFolder

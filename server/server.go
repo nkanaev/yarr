@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"github.com/nkanaev/yarr/storage"
 	"log"
-	"fmt"
 )
 
 type Route struct {
@@ -26,16 +25,13 @@ type Handler struct {
 
 func (h *Handler) startJobs() {
 	go func() {
-		fmt.Println("one")
 		for {
 			feed := <-h.feedQueue
-			fmt.Println("got feed", feed)
 			items := listItems(feed)
 			h.db.CreateItems(items)
 		}
 	}()
 	go func() {
-		fmt.Println("two")
 		for {
 			val := <-h.counter
 			h.queueSize += val
@@ -51,7 +47,6 @@ func (h *Handler) fetchFeed(feed storage.Feed) {
 
 func (h *Handler) fetchAllFeeds() {
 	for _, feed := range h.db.ListFeeds() {
-		fmt.Println("here", feed)
 		h.fetchFeed(feed)
 	}
 }
