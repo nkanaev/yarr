@@ -216,7 +216,7 @@ func createFeed(s *storage.Storage, url string, folderId *int64) error {
 	if len(feedLink) == 0 {
 		feedLink = url
 	}
-	s.CreateFeed(
+	storedFeed := s.CreateFeed(
 		feed.Title,
 		feed.Description,
 		feed.Link,
@@ -224,6 +224,7 @@ func createFeed(s *storage.Storage, url string, folderId *int64) error {
 		"",
 		folderId,
 	)
+	s.CreateItems(convertItems(feed.Items, *storedFeed))
 	return nil
 }
 
