@@ -3,6 +3,7 @@ package storage
 import (
 	"fmt"
 	"time"
+	"encoding/json"
 )
 
 type ItemStatus int
@@ -12,6 +13,31 @@ const (
 	READ    ItemStatus = 1
 	STARRED ItemStatus = 2
 )
+
+var StatusRepresentations = map[ItemStatus]string {
+	UNREAD: "unread",
+	READ: "read",
+	STARRED: "starred",
+}
+
+var StatusValues = map[string]ItemStatus {
+	"unread": UNREAD,
+	"read": READ,
+	"starred": STARRED,
+}
+
+func (s ItemStatus) MarshalJSON() ([]byte, error) {
+	return json.Marshal(StatusRepresentations[s])
+}
+
+func (s *ItemStatus) UnmarshalJSON(b []byte) error {
+	var str string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	*s = StatusValues[str]
+	return nil
+}
 
 type Item struct {
 	Id string `json:"id"`
