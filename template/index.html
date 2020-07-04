@@ -128,7 +128,7 @@
                         <option value=""></option>
                         <option :value="folder.id" v-for="folder in folders">{{ folder.title }}</option>
                     </select>
-                    <button class="btn btn-block btn-outline-secondary mt-3" :class="{loading: loading.newfeed}" type="submit">Add</button>
+                    <button class="btn btn-block btn-default mt-3" :class="{loading: loading.newfeed}" type="submit">Add</button>
                 </form>
             </div>
             <div v-else-if="settings=='manage'">
@@ -186,7 +186,7 @@
                         <div class="input-group">
                             <input id="settings-new-folder" type="text" class="form-control" name="title" required autocomplete="off">
                             <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="submit">Add</button>
+                                <button class="btn btn-default" type="submit">Add</button>
                             </div>
                         </div>
                     </form>

@@ -11,7 +11,7 @@ body {
 }
 
 .form-control {
-  transition: none;
+  box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.07);
 }
 
 select.form-control {
@@ -182,4 +182,16 @@ select.form-control:not([multiple]):not([size]) {
   position: absolute;
   top: 50%;
   z-index: 1;
+}
+
+.btn-default {
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  background: linear-gradient(#fff, #f5f7f9);
+}
+
+.btn-default:active {
+  background: #f5f7f9;
+  box-shadow: none;
 }
