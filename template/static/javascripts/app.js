@@ -81,10 +81,12 @@ var vm = new Vue({
     },
     createFolder: function(event) {
       var form = event.target
-      var data = {'title': form.querySelector('input[name=title]').value}
+      var titleInput = form.querySelector('input[name=title]')
+      var data = {'title': titleInput.value}
       var vm = this
       api.folders.create(data).then(function(result) {
         vm.folders.push(result)
+        titleInput.value = ''
       })
     },
     renameFolder: function(folder) {

@@ -73,7 +73,7 @@
         </div>
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="my-2 mx-2">
-                <label class="nav-select mb-1" v-for="item in items" :class="{'text-muted': item.status === 'read'}">
+                <label class="nav-select mb-1" v-for="item in items" :class="{'text-muted': item.status === 'read'}" :key="item.id">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="menu-item p-2">
                         <div class="d-flex flex-column ml-4">
@@ -135,9 +135,9 @@
                 </form>
             </div>
             <div v-else-if="settings=='manage'">
-                <div v-for="folder in foldersWithFeeds" class="mb-4">
+                <div v-for="folder in foldersWithFeeds" class="mb-4" :key="folder.id">
                     <div class="d-flex align-items-center">
-                        <div class="w-100"><b>{{ folder.title || "Uncategorized" }}</b></div>
+                        <div class="w-100" v-if="folder.id"><b>{{ folder.title }}</b></div>
                         <div class="flex-shrink-0" v-if="folder.id">
                             <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
                                 <template v-slot:button-content>
@@ -152,7 +152,7 @@
                             </b-dropdown>
                         </div>
                     </div>
-                    <div v-for="feed in folder.feeds" class="d-flex align-items-center">
+                    <div v-for="feed in folder.feeds" class="d-flex align-items-center" :key="feed.id">
                         <div class="w-100">
                             {{ feed.title }}
                         </div>
