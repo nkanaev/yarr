@@ -11,9 +11,9 @@ var vm = new Vue({
       'folders': [],
       'feeds': [],
       'feedSelected': null,
-      'items': [], 
+      'items': [],
       'itemSelected': null,
-      'settings': 'manage',
+      'settings': 'create',
       'loading': {newfeed: 0},
     }
   },
