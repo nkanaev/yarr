@@ -110,13 +110,22 @@
         <b-modal id="settings-modal" hide-header hide-footer lazy>
             <ul class="nav nav-tabs mx-n3 px-3 mb-3 mt-n3 pt-2 bg-light rounded-top">
                 <li class="nav-item">
-                    <a class="nav-link" href="#" :class="{active: settings=='create'}" @click.prevent="settings='create'">New Feed</a>
+                    <a class="nav-link" href="#" :class="{active: settings=='create'}" @click.prevent="settings='create'">
+                        <img src="./static/images/plus-square.svg" alt="" class="tab-icon">
+                        New Feed
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" :class="{active: settings=='manage'}" @click.prevent="settings='manage'">Manage Feeds</a>
+                    <a class="nav-link" href="#" :class="{active: settings=='manage'}" @click.prevent="settings='manage'">
+                        <img src="./static/images/list.svg" alt="" class="tab-icon">
+                        Manage Feeds
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" :class="{active: settings=='import'}" @click.prevent="settings='import'">Import/Export</a>
+                    <a class="nav-link" href="#" :class="{active: settings=='import'}" @click.prevent="settings='import'">
+                        <img src="./static/images/upload.svg" alt="" class="tab-icon">
+                        Import/Export
+                    </a>
                 </li>
             </ul>
             <div v-if="settings=='create'">

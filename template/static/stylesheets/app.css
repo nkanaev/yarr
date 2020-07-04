@@ -44,6 +44,13 @@ select.form-control:not([multiple]):not([size]) {
   margin-right: 7px;
 }
 
+.tab-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-top: -3px;
+  margin-right: .1rem;
+}
+
 .feed-icon {
   width: 16px;
   height: 16px;
@@ -143,7 +150,7 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .nav-tabs .nav-link.active {
-  color: inherit;
+  color: var(--color-primary);
   border-radius: 0 !important;
   border-color: var(--color-primary);
   background-color: transparent;
