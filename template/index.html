@@ -73,7 +73,10 @@
         </div>
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="my-2 mx-2">
-                <label class="nav-select mb-1" v-for="item in items" :class="{'text-muted': item.status === 'read'}" :key="item.id">
+                <label v-for="item in items" :key="item.id"
+                       class="nav-select mb-1"
+                       :class="{'text-muted'  : filterSelected=='all' && item.status=='read',
+                                'text-primary': filterSelected=='all' && item.status=='starred'}">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="menu-item p-2">
                         <div class="d-flex flex-column">
