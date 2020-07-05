@@ -32,7 +32,7 @@ func (s ItemStatus) MarshalJSON() ([]byte, error) {
 
 func (s *ItemStatus) UnmarshalJSON(b []byte) error {
 	var str string
-	if err := json.Unmarshal(b, &s); err != nil {
+	if err := json.Unmarshal(b, &str); err != nil {
 		return err
 	}
 	*s = StatusValues[str]
@@ -40,7 +40,8 @@ func (s *ItemStatus) UnmarshalJSON(b []byte) error {
 }
 
 type Item struct {
-	Id string `json:"id"`
+	Id int64 `json:"id"`
+	GUID string `json:"guid"`
 	FeedId int64 `json:"feed_id"`
 	Title string `json:"title"`
 	Link string `json:"link"`
@@ -62,12 +63,12 @@ func (s *Storage) CreateItems(items []Item) bool {
 	for _, item := range items {
 		_, err = tx.Exec(`
 			insert into items (
-				id, feed_id, title, link, description,
+				guid, feed_id, title, link, description,
 				content, author, date, date_updated, status, image
 			)
 			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			on conflict (id) do update set date_updated=?`,
-			item.Id, item.FeedId, item.Title, item.Link, item.Description,
+			on conflict (guid) do update set date_updated=?`,
+			item.GUID, item.FeedId, item.Title, item.Link, item.Description,
 			item.Content, item.Author, item.Date, item.DateUpdated, UNREAD, item.Image,
 			// upsert values
 			item.DateUpdated,
@@ -92,7 +93,7 @@ func itemQuery(s *Storage, cond string, v ...interface{}) []Item {
 	result := make([]Item, 0, 0)
 	query := fmt.Sprintf(`
 		select
-			id, feed_id, title, link, description,
+			id, guid, feed_id, title, link, description,
 			content, author, date, date_updated, status, image
 		from items
 		where %s`, cond)
@@ -105,6 +106,7 @@ func itemQuery(s *Storage, cond string, v ...interface{}) []Item {
 		var x Item
 		err = rows.Scan(
 			&x.Id,
+			&x.GUID,
 			&x.FeedId,
 			&x.Title,
 			&x.Link,
@@ -143,4 +145,9 @@ func (s *Storage) ListFeedItems(feed_id int64) []Item {
 
 func (s *Storage) ListFeedItemsFiltered(feed_id int64, status ItemStatus) []Item {
 	return itemQuery(s, `feed_id = ? and status = ?`, feed_id, status)
+}
+
+func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
+	_, err := s.db.Exec(`update items set status = ? where id = ?`, status, item_id)
+	return err == nil
 }

@@ -28,7 +28,8 @@ create index if not exists idx_feed_folder_id on feeds(folder_id);
 create unique index if not exists idx_feed_feed_link on feeds(feed_link);
 
 create table if not exists items (
- id             string primary key,
+ id             integer primary key autoincrement,
+ guid           string not null,
  feed_id        references feeds(id),
  title          text,
  link           text,
@@ -43,6 +44,7 @@ create table if not exists items (
 
 create index if not exists idx_item_feed_id on items(feed_id);
 create index if not exists idx_item_status  on items(status);
+create unique index if not exists idx_item_guid on items(guid);
 `
 
 type Storage struct {

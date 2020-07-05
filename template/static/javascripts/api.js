@@ -45,5 +45,10 @@
         return api('delete', '/api/folders/' + id)
       },
     },
+    items: {
+      update: function(id, data) {
+        return api('put', '/api/items/' + id, data)
+      }
+    }
   }
 })()

@@ -57,6 +57,7 @@ var vm = new Vue({
       this.itemSelectedDetails = this.itemsById[newVal]
       if (this.itemSelectedDetails.status == 'unread') {
         this.itemSelectedDetails.status = 'read'
+        api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
       }
     },
   },
@@ -150,6 +151,7 @@ var vm = new Vue({
       } else if (item.status != 'starred') {
         item.status = 'starred'
       }
+      api.items.update(item.id, {status: item.status})
     },
     toggleItemRead: function(item) {
       if (item.status == 'unread') {
@@ -157,6 +159,7 @@ var vm = new Vue({
       } else if (item.status == 'read') {
         item.status = 'unread'
       }
+      api.items.update(item.id, {status: item.status})
     },
   }
 })

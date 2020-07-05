@@ -184,7 +184,7 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 			author = item.Author.Name
 		}
 		result = append(result, storage.Item{
-			Id: item.GUID,
+			GUID: item.GUID,
 			FeedId: feed.Id,
 			Title: item.Title,
 			Link: item.Link,
@@ -265,4 +265,30 @@ func FeedItemsHandler(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 	items := db(req).ListFeedItems(id)
 	writeJSON(rw, items)
+}
+
+type UpdateItem struct {
+	Status *storage.ItemStatus `json:"status,omitempty"`
+}
+
+func ItemHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "PUT" {
+		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		var body UpdateItem
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			log.Print(err)
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if body.Status != nil {
+			db(req).UpdateItemStatus(id, *body.Status)
+		}
+		rw.WriteHeader(http.StatusOK)
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }

@@ -77,6 +77,7 @@ var routes []Route = []Route{
 	p("/api/feeds/:id", FeedHandler),
 	p("/api/feeds/:id/items", FeedItemsHandler),
 	p("/api/feeds/find", FeedHandler),
+	p("/api/items/:id", ItemHandler),
 }
 
 func Vars(req *http.Request) map[string]string {
