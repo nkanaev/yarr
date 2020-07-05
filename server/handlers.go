@@ -263,7 +263,7 @@ func FeedItemsHandler(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	rw.WriteHeader(http.StatusOK)
-	items := db(req).ListFeedItems(id)
+	items := db(req).ListItems(storage.ItemFilter{FeedID: &id})
 	writeJSON(rw, items)
 }
 
@@ -288,6 +288,29 @@ func ItemHandler(rw http.ResponseWriter, req *http.Request) {
 			db(req).UpdateItemStatus(id, *body.Status)
 		}
 		rw.WriteHeader(http.StatusOK)
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func FolderItemsHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+		if err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		items := db(req).ListItems(storage.ItemFilter{FolderID: &id})
+		writeJSON(rw, items)
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		items := db(req).ListItems(storage.ItemFilter{})
+		writeJSON(rw, items)
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}

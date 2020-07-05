@@ -73,10 +73,12 @@ var routes []Route = []Route{
 	p("/api/status", StatusHandler),
 	p("/api/folders", FolderListHandler),
 	p("/api/folders/:id", FolderHandler),
+	p("/api/folders/:id/items", FolderItemsHandler),
 	p("/api/feeds", FeedListHandler),
 	p("/api/feeds/:id", FeedHandler),
 	p("/api/feeds/:id/items", FeedItemsHandler),
 	p("/api/feeds/find", FeedHandler),
+	p("/api/items", ItemListHandler),
 	p("/api/items/:id", ItemHandler),
 }
 

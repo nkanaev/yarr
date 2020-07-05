@@ -42,16 +42,22 @@ var vm = new Vue({
   },
   watch: {
     'feedSelected': function(newVal, oldVal) {
-      if (newVal === null) return
-      var vm = this
-      var parts = newVal.split(':', 2)
-      var type = parts[0]
-      var guid = parts[1]
-      if (type === 'feed') {
-        api.feeds.list_items(guid).then(function(items) {
-          vm.items = items
-        })
+      var promise = null
+      if (newVal === null) {
+        promise = api.items.list()
+      } else {
+        var parts = newVal.split(':', 2)
+        var type = parts[0]
+        var guid = parts[1]
+        if (type === 'feed') {
+          promise = api.feeds.list_items(guid)
+        } else if (type == 'folder') {
+          promise = api.folders.list_items(guid)
+        }
       }
+      promise.then(function(items) {
+        vm.items = items
+      })
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedDetails = this.itemsById[newVal]

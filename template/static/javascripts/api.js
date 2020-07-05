@@ -44,8 +44,14 @@
       delete: function(id) {
         return api('delete', '/api/folders/' + id)
       },
+      list_items: function(id) {
+        return api('get', '/api/folders/' + id + '/items').then(json)
+      }
     },
     items: {
+      list: function() {
+        return api('get', '/api/items').then(json)
+      },
       update: function(id, data) {
         return api('put', '/api/items/' + id, data)
       }
