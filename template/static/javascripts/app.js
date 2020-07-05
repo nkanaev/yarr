@@ -55,6 +55,9 @@ var vm = new Vue({
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedDetails = this.itemsById[newVal]
+      if (this.itemSelectedDetails.status == 'unread') {
+        this.itemSelectedDetails.status = 'read'
+      }
     },
   },
   methods: {
@@ -140,6 +143,20 @@ var vm = new Vue({
         }
         vm.loading.newfeed = false
       })
+    },
+    toggleItemStarred: function(item) {
+      if (item.status == 'starred') {
+        item.status = 'read'
+      } else if (item.status != 'starred') {
+        item.status = 'starred'
+      }
+    },
+    toggleItemRead: function(item) {
+      if (item.status == 'unread') {
+        item.status = 'read'
+      } else if (item.status == 'read') {
+        item.status = 'unread'
+      }
     },
   }
 })

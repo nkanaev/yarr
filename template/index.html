@@ -89,7 +89,18 @@
         </div>
         <div class="vh-100 d-flex flex-column w-100">
             <div class="p-2 d-flex">
-                <div class="flex-grow-1"></div>
+                <div class="flex-grow-1">
+                    <div v-if="itemSelected">
+                        <button class="btn btn-link p-0" style="line-height: 1" @click="toggleItemStarred(itemSelectedDetails)">
+                            <img v-if="itemSelectedDetails.status=='starred'" src="./static/images/star-full.svg" alt="" style="width: 20px; height: 20px;">
+                            <img v-else-if="itemSelectedDetails.status!='starred'" src="./static/images/star.svg" alt="" style="width: 20px; height: 20px;">
+                        </button>
+                        <button class="btn btn-link p-0" style="line-height: 1" v-if="itemSelectedDetails.status!='starred'" @click="toggleItemRead(itemSelectedDetails)">
+                            <img v-if="itemSelectedDetails.status=='unread'" src="./static/images/circle-full.svg" alt="" style="width: 20px; height: 20px;">
+                            <img v-if="itemSelectedDetails.status=='read'" src="./static/images/circle.svg" src="./static/images/circle-full.svg" alt="" style="width: 20px; height: 20px;">
+                        </button>
+                    </div>
+                </div>
                 <button class="btn btn-link p-0" v-b-modal.settings-modal style="line-height: 1">
                     <img src="./static/images/settings.svg" alt="" style="width: 20px; height: 20px;">
                 </button>
