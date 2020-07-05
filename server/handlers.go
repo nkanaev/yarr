@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/nkanaev/yarr/worker"
 	"github.com/nkanaev/yarr/storage"
 	"github.com/mmcdole/gofeed"
 	"net/http"
@@ -137,7 +136,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 
 		contentType := res.Header.Get("Content-Type")
 		if strings.HasPrefix(contentType, "text/html") || contentType == "" {
-			sources, err := worker.FindFeeds(res)
+			sources, err := FindFeeds(res)
 			if err != nil {
 				log.Print(err)
 				rw.WriteHeader(http.StatusBadRequest)
