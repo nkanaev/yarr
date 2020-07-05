@@ -98,10 +98,16 @@
                             <img v-if="itemSelectedDetails.status=='starred'" src="./static/images/star-full.svg" alt="" style="width: 20px; height: 20px;">
                             <img v-else-if="itemSelectedDetails.status!='starred'" src="./static/images/star.svg" alt="" style="width: 20px; height: 20px;">
                         </button>
-                        <button class="btn btn-link p-0" style="line-height: 1" v-if="itemSelectedDetails.status!='starred'" @click="toggleItemRead(itemSelectedDetails)">
+                        <button class="btn btn-link p-0"
+                                style="line-height: 1"
+                                :disabled="itemSelectedDetails.status=='starred'"
+                                @click="toggleItemRead(itemSelectedDetails)">
                             <img v-if="itemSelectedDetails.status=='unread'" src="./static/images/circle-full.svg" alt="" style="width: 20px; height: 20px;">
-                            <img v-if="itemSelectedDetails.status=='read'" src="./static/images/circle.svg" src="./static/images/circle-full.svg" alt="" style="width: 20px; height: 20px;">
+                            <img v-if="itemSelectedDetails.status!='unread'" src="./static/images/circle.svg" alt="" style="width: 20px; height: 20px;">
                         </button>
+                        <a class="btn btn-link p-0" :href="itemSelectedDetails.link" target="_blank" style="line-height: 1">
+                            <img src="./static/images/external-link.svg" alt="" style="width: 20px; height: 20px;">
+                        </a>
                     </div>
                 </div>
                 <button class="btn btn-link p-0" v-b-modal.settings-modal style="line-height: 1">

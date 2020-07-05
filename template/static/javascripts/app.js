@@ -13,6 +13,7 @@ var vm = new Vue({
       'feedSelected': null,
       'items': [],
       'itemSelected': null,
+      'itemSelectedDetails': {},
       'settings': 'create',
       'loading': {newfeed: 0},
     }
