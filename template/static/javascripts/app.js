@@ -4,6 +4,12 @@ var vm = new Vue({
   el: '#app',
   created: function() {
     this.refresh()
+    var vm = this
+    api.settings.get().then(function(data) {
+      console.log(1)
+      vm.filterSelected = data.filter
+      console.log(1)
+    })
   },
   data: function() {
     return {
@@ -42,6 +48,11 @@ var vm = new Vue({
     },
   },
   watch: {
+    'filterSelected': function(newVal) {
+      api.settings.update({filter: newVal}).then(function() {
+        this.$emit('refresh:items')
+      }.bind(this))
+    },
     'feedSelected': function(newVal, oldVal) {
       var promise = null
       if (newVal === null) {

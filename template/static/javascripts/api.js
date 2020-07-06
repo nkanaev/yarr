@@ -55,6 +55,14 @@
       update: function(id, data) {
         return api('put', '/api/items/' + id, data)
       }
-    }
+    },
+    settings: {
+      get: function() {
+        return api('get', '/api/settings').then(json)
+      },
+      update: function(data) {
+        return api('put', '/api/settings', data)
+      },
+    },
   }
 })()
