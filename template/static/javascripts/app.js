@@ -3,17 +3,16 @@
 var vm = new Vue({
   el: '#app',
   created: function() {
-    this.refresh()
     var vm = this
     api.settings.get().then(function(data) {
-      console.log(1)
       vm.filterSelected = data.filter
-      console.log(1)
+      vm.refreshItems()
     })
+    this.refreshFeeds()
   },
   data: function() {
     return {
-      'filterSelected': 'all',
+      'filterSelected': null,
       'folders': [],
       'feeds': [],
       'feedSelected': null,
@@ -48,17 +47,40 @@ var vm = new Vue({
     },
   },
   watch: {
-    'filterSelected': function(newVal) {
+    'filterSelected': function(newVal, oldVal) {
+      if (oldVal === null) return  // do nothing, initial setup
+      var vm = this
       api.settings.update({filter: newVal}).then(function() {
-        this.$emit('refresh:items')
-      }.bind(this))
+        vm.refreshItems()
+      })
     },
     'feedSelected': function(newVal, oldVal) {
+      this.refreshItems()
+    },
+    'itemSelected': function(newVal, oldVal) {
+      this.itemSelectedDetails = this.itemsById[newVal]
+      if (this.itemSelectedDetails.status == 'unread') {
+        this.itemSelectedDetails.status = 'read'
+        api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
+      }
+    },
+  },
+  methods: {
+    refreshFeeds: function() {
+      var vm = this
+      Promise
+        .all([api.folders.list(), api.feeds.list()])
+        .then(function(values) {
+          vm.folders = values[0]
+          vm.feeds = values[1]
+        })
+    },
+    refreshItems: function() {
       var promise = null
-      if (newVal === null) {
+      if (!this.feedSelected) {
         promise = api.items.list()
       } else {
-        var parts = newVal.split(':', 2)
+        var parts = this.feedSelected.split(':', 2)
         var type = parts[0]
         var guid = parts[1]
         if (type === 'feed') {
@@ -70,24 +92,6 @@ var vm = new Vue({
       promise.then(function(items) {
         vm.items = items
       })
-    },
-    'itemSelected': function(newVal, oldVal) {
-      this.itemSelectedDetails = this.itemsById[newVal]
-      if (this.itemSelectedDetails.status == 'unread') {
-        this.itemSelectedDetails.status = 'read'
-        api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
-      }
-    },
-  },
-  methods: {
-    refresh: function() {
-      var vm = this
-      Promise
-        .all([api.folders.list(), api.feeds.list()])
-        .then(function(values) {
-          vm.folders = values[0]
-          vm.feeds = values[1]
-        })
     },
     toggleFolderExpanded: function(folder) {
       folder.is_expanded = !folder.is_expanded

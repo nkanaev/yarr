@@ -10,6 +10,21 @@ func settingsDefaults() map[string]interface{} {
 	}
 }
 
+func (s *Storage) GetSettingsValue(key string) interface{} {
+	row := s.db.QueryRow(`select val from settings where key=?`, key)
+	if row == nil {
+		return settingsDefaults()[key]
+	}
+	var val []byte
+	row.Scan(&val)
+	var valDecoded interface{}
+	if err := json.Unmarshal([]byte(val), &valDecoded); err != nil {
+		s.log.Print(err)
+		return nil
+	}
+	return valDecoded
+}
+
 func (s *Storage) GetSettings() map[string]interface{} {
 	result := settingsDefaults()		
 	rows, err := s.db.Query(`select key, val from settings;`)
