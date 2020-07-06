@@ -201,7 +201,11 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 
 func listItems(f storage.Feed) []storage.Item {
 	fp := gofeed.NewParser()	
-	feed, _ := fp.ParseURL(f.FeedLink)
+	feed, err := fp.ParseURL(f.FeedLink)
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
 	return convertItems(feed.Items, f)
 }
 
