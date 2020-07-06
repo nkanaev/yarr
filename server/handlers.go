@@ -314,3 +314,21 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
+
+func SettingsHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		rw.WriteHeader(http.StatusOK)
+		writeJSON(rw, db(req).GetSettings())
+	} else if req.Method == "PUT" {
+		settings := make(map[string]interface{})
+		if err := json.NewDecoder(req.Body).Decode(&settings); err != nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if db(req).UpdateSettings(settings) {
+			rw.WriteHeader(http.StatusOK)
+		} else {
+			rw.WriteHeader(http.StatusBadRequest)
+		}
+	}
+}

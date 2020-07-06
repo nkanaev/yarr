@@ -80,6 +80,7 @@ var routes []Route = []Route{
 	p("/api/feeds/find", FeedHandler),
 	p("/api/items", ItemListHandler),
 	p("/api/items/:id", ItemHandler),
+	p("/api/settings", SettingsHandler),
 }
 
 func Vars(req *http.Request) map[string]string {

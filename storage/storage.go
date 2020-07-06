@@ -45,6 +45,11 @@ create table if not exists items (
 create index if not exists idx_item_feed_id on items(feed_id);
 create index if not exists idx_item_status  on items(status);
 create unique index if not exists idx_item_guid on items(guid);
+
+create table if not exists settings (
+ key            string primary key,
+ val            blob
+);
 `
 
 type Storage struct {
