@@ -4,7 +4,7 @@ import "encoding/json"
 
 func settingsDefaults() map[string]interface{} {
 	return map[string]interface{}{
-		"filter": "all",
+		"filter": "",
 		"feed_list_width": 300,
 		"item_list_width": 300,
 	}
