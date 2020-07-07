@@ -61,7 +61,10 @@
       },
       update: function(id, data) {
         return api('put', '/api/items/' + id, data)
-      }
+      },
+      mark_read: function(query) {
+        return api('put', '/api/items' + param(query))
+      },
     },
     settings: {
       get: function() {

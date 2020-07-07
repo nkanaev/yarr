@@ -161,3 +161,34 @@ func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
 	_, err := s.db.Exec(`update items set status = ? where id = ?`, status, item_id)
 	return err == nil
 }
+
+func (s *Storage) MarkItemsRead(filter ItemFilter) bool {
+	cond := make([]string, 0)
+	args := make([]interface{}, 0)
+
+	if filter.FolderID != nil {
+		cond = append(cond, "f.folder_id = ?")
+		args = append(args, *filter.FolderID)
+	}
+	if filter.FeedID != nil {
+		cond = append(cond, "i.feed_id = ?")
+		args = append(args, *filter.FeedID)
+	}
+	predicate := "1"
+	if len(cond) > 0 {
+		predicate = strings.Join(cond, " and ")
+	}
+	query := fmt.Sprintf(`
+		update items set status = %d
+		where id in (
+			select i.id from items i
+			join feeds f on f.id = i.feed_id
+			where %s and i.status != %d
+		)
+		`, READ, predicate, STARRED)
+	_, err := s.db.Exec(query, args...)
+	if err != nil {
+		s.log.Print(err)
+	}
+	return err == nil
+}

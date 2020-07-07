@@ -300,7 +300,19 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 			filter.Status = &statusValue
 		}
 		items := db(req).ListItems(filter)	
+		rw.WriteHeader(http.StatusOK)
 		writeJSON(rw, items)
+	} else if req.Method == "PUT" {
+		query := req.URL.Query()
+		filter := storage.ItemFilter{}
+		if folderID, err := strconv.ParseInt(query.Get("folder_id"), 10, 64); err == nil {
+			filter.FolderID = &folderID
+		}
+		if feedID, err := strconv.ParseInt(query.Get("feed_id"), 10, 64); err == nil {
+			filter.FeedID = &feedID
+		}
+		db(req).MarkItemsRead(filter)
+		rw.WriteHeader(http.StatusOK)
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}

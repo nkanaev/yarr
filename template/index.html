@@ -71,8 +71,13 @@
                 </div>
             </div>
         </div>
-        <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
-            <div class="my-2 mx-2">
+        <div class="vh-100 d-flex flex-column border-right flex-shrink-0" style="width: 300px">
+            <div class="p-2 border-bottom" v-if="filterSelected != 'starred'">
+                <button class="btn btn-outline-secondary p-0" @click="markItemsRead()">
+                    <img src="./static/images/check.svg" alt="" style="width: 20px; height: 20px;">
+                </button>
+            </div>
+            <div class="p-2 overflow-auto">
                 <label v-for="item in items" :key="item.id"
                        class="nav-select mb-1"
                        :class="{'text-muted'  : filterSelected=='all' && item.status=='read',

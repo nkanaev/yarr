@@ -66,17 +66,7 @@ var vm = new Vue({
     },
   },
   methods: {
-    refreshFeeds: function() {
-      var vm = this
-      Promise
-        .all([api.folders.list(), api.feeds.list()])
-        .then(function(values) {
-          vm.folders = values[0]
-          vm.feeds = values[1]
-        })
-    },
-    refreshItems: function() {
-      var promise = null
+    getItemsQuery: function() {
       var query = {}
       if (this.feedSelected) {
         var parts = this.feedSelected.split(':', 2)
@@ -91,8 +81,32 @@ var vm = new Vue({
       if (this.filterSelected) {
         query.status = this.filterSelected
       }
+      return query
+    },
+    refreshFeeds: function() {
+      var vm = this
+      Promise
+        .all([api.folders.list(), api.feeds.list()])
+        .then(function(values) {
+          vm.folders = values[0]
+          vm.feeds = values[1]
+        })
+    },
+    refreshItems: function() {
+      var query = this.getItemsQuery()
       api.items.list(query).then(function(items) {
         vm.items = items
+      })
+    },
+    markItemsRead: function() {
+      var vm = this
+      var query = this.getItemsQuery()
+      api.items.mark_read(query).then(function() {
+        vm.items.forEach(function(item) {
+          if (item.status != 'starred') {
+            item.status = 'read'
+          }
+        })
       })
     },
     toggleFolderExpanded: function(folder) {
