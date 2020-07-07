@@ -63,10 +63,12 @@ func New() (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+	/*
 	_, err = db.Exec(initQuery)
 	if err != nil {
 		return nil, err
 	}
+	*/
 	logger := log.New(os.Stdout, "storage: ", log.Ldate | log.Ltime | log.Lshortfile)
 	return &Storage{db: db, log: logger}, nil
 }

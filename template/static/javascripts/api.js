@@ -12,6 +12,13 @@
   var json = function(res) {
     return res.json()
   }
+  
+  var param = function(query) {
+    if (!query) return ''
+    return '?' + Object.keys(query).map(function(key) {
+      return encodeURIComponent(key) + '=' + encodeURIComponent(query[key])
+    }).join('&')
+  }
 
   window.api = {
     feeds: {
@@ -49,8 +56,8 @@
       }
     },
     items: {
-      list: function() {
-        return api('get', '/api/items').then(json)
+      list: function(query) {
+        return api('get', '/api/items' + param(query)).then(json)
       },
       update: function(id, data) {
         return api('put', '/api/items/' + id, data)

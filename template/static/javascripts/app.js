@@ -77,19 +77,21 @@ var vm = new Vue({
     },
     refreshItems: function() {
       var promise = null
-      if (!this.feedSelected) {
-        promise = api.items.list()
-      } else {
+      var query = {}
+      if (this.feedSelected) {
         var parts = this.feedSelected.split(':', 2)
         var type = parts[0]
         var guid = parts[1]
-        if (type === 'feed') {
-          promise = api.feeds.list_items(guid)
+        if (type == 'feed') {
+          query.feed_id = guid
         } else if (type == 'folder') {
-          promise = api.folders.list_items(guid)
+          query.folder_id = guid
         }
       }
-      promise.then(function(items) {
+      if (this.filterSelected) {
+        query.status = this.filterSelected
+      }
+      api.items.list(query).then(function(items) {
         vm.items = items
       })
     },

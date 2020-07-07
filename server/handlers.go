@@ -259,26 +259,6 @@ func FeedHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func findItems(db *storage.Storage, filter storage.ItemFilter) []storage.Item {
-	statusFilter := db.GetSettingsValue("filter")
-	if statusFilter != nil && len(statusFilter.(string)) != 0 {
-		status := storage.StatusValues[statusFilter.(string)]
-		filter.Status = &status
-	}
-	return db.ListItems(filter)	
-}
-
-func FeedItemsHandler(rw http.ResponseWriter, req *http.Request) {
-	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
-	if err != nil {
-		rw.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	rw.WriteHeader(http.StatusOK)
-	items := findItems(db(req), storage.ItemFilter{FeedID: &id})
-	writeJSON(rw, items)
-}
-
 type UpdateItem struct {
 	Status *storage.ItemStatus `json:"status,omitempty"`
 }
@@ -305,23 +285,21 @@ func ItemHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func FolderItemsHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
-		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		items := findItems(db(req), storage.ItemFilter{FolderID: &id})
-		writeJSON(rw, items)
-	} else {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
-	}
-}
-
 func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
-		items := findItems(db(req), storage.ItemFilter{})
+		query := req.URL.Query()
+		filter := storage.ItemFilter{}
+		if folderID, err := strconv.ParseInt(query.Get("folder_id"), 10, 64); err == nil {
+			filter.FolderID = &folderID
+		}
+		if feedID, err := strconv.ParseInt(query.Get("feed_id"), 10, 64); err == nil {
+			filter.FeedID = &feedID
+		}
+		if status := query.Get("status"); len(status) != 0 {
+			statusValue := storage.StatusValues[status]
+			filter.Status = &statusValue
+		}
+		items := db(req).ListItems(filter)	
 		writeJSON(rw, items)
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
