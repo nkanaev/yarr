@@ -102,11 +102,7 @@ var vm = new Vue({
       var vm = this
       var query = this.getItemsQuery()
       api.items.mark_read(query).then(function() {
-        vm.items.forEach(function(item) {
-          if (item.status != 'starred') {
-            item.status = 'read'
-          }
-        })
+        vm.items = []
       })
     },
     toggleFolderExpanded: function(folder) {
