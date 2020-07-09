@@ -1,5 +1,24 @@
 'use strict';
 
+var debounce = function(callback, wait) {
+  var timeout
+  return function() {
+    var context = this, args = arguments
+    clearTimeout(timeout)
+    timeout = setTimeout(function() {
+      callback.apply(this, args)
+    }, wait)
+  }
+}
+
+Vue.directive('scroll', {
+  inserted: function(el, binding) {
+    el.addEventListener('scroll', debounce(function(event) {
+      binding.value(event, el)
+    }, 200))
+  },
+})
+
 var vm = new Vue({
   el: '#app',
   created: function() {
@@ -17,10 +36,17 @@ var vm = new Vue({
       'feeds': [],
       'feedSelected': null,
       'items': [],
+      'itemsPage': {
+        'cur': 1,
+        'num': 1,
+      },
       'itemSelected': null,
       'itemSelectedDetails': {},
       'settings': 'create',
-      'loading': {newfeed: 0},
+      'loading': {
+        'newfeed': false,
+        'items': false,
+      },
     }
   },
   computed: {
@@ -94,9 +120,28 @@ var vm = new Vue({
     },
     refreshItems: function() {
       var query = this.getItemsQuery()
-      api.items.list(query).then(function(items) {
-        vm.items = items
+      this.loading.items = true
+      var vm = this
+      api.items.list(query).then(function(data) {
+        vm.items = data.list
+        vm.itemsPage = data.page
+        vm.loading.items = false
       })
+    },
+    loadMoreItems: function(event, el) {
+      if (this.itemsPage.cur >= this.itemsPage.num) return
+      if (this.loading.items) return
+      var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < 50
+      if (closeToBottom) {
+        this.loading.moreitems = true
+        var query = this.getItemsQuery()
+        query.page = this.itemsPage.cur + 1
+        api.items.list(query).then(function(data) {
+          vm.items = vm.items.concat(data.list)
+          vm.itemsPage = data.page
+          vm.loading.items = false
+        })
+      }
     },
     markItemsRead: function() {
       var vm = this

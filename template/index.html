@@ -77,9 +77,9 @@
                     <img src="./static/images/check.svg" alt="" style="width: 20px; height: 20px;">
                 </button>
             </div>
-            <div class="p-2 overflow-auto">
+            <div class="p-2 overflow-auto" v-scroll="loadMoreItems">
                 <label v-for="item in items" :key="item.id"
-                       class="nav-select mb-1"
+                       class="nav-select"
                        :class="{'text-muted'  : filterSelected=='all' && item.status=='read',
                                 'text-primary': filterSelected=='all' && item.status=='starred'}">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
@@ -93,6 +93,7 @@
                         </div>
                     </div>
                 </label>
+                <button class="btn btn-link btn-block loading my-3" v-if="itemsPage.cur < itemsPage.num"></button>
             </div>
         </div>
         <div class="vh-100 d-flex flex-column w-100">

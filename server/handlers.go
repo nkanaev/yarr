@@ -12,6 +12,7 @@ import (
 	"strings"
 	"path/filepath"
 	"strconv"
+	"math"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -287,7 +288,12 @@ func ItemHandler(rw http.ResponseWriter, req *http.Request) {
 
 func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
+		perPage := 20
+		curPage := 1
 		query := req.URL.Query()
+		if page, err := strconv.ParseInt(query.Get("page"), 10, 64); err == nil {
+			curPage = int(page)
+		}
 		filter := storage.ItemFilter{}
 		if folderID, err := strconv.ParseInt(query.Get("folder_id"), 10, 64); err == nil {
 			filter.FolderID = &folderID
@@ -299,9 +305,16 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 			statusValue := storage.StatusValues[status]
 			filter.Status = &statusValue
 		}
-		items := db(req).ListItems(filter)	
+		items := db(req).ListItems(filter, (curPage-1)*perPage, perPage)
+		count := db(req).CountItems(filter)
 		rw.WriteHeader(http.StatusOK)
-		writeJSON(rw, items)
+		writeJSON(rw, map[string]interface{}{
+			"page": map[string]int{
+				"cur": curPage,
+				"num": int(math.Ceil(float64(count) / float64(perPage))),
+			},
+			"list": items,
+		})
 	} else if req.Method == "PUT" {
 		query := req.URL.Query()
 		filter := storage.ItemFilter{}

@@ -96,7 +96,7 @@ func (s *Storage) CreateItems(items []Item) bool {
 	return true
 }
 
-func (s *Storage) ListItems(filter ItemFilter) []Item {
+func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 	cond := make([]string, 0)
 	args := make([]interface{}, 0)
 	if filter.FolderID != nil {
@@ -116,7 +116,11 @@ func (s *Storage) ListItems(filter ItemFilter) []Item {
 	if len(cond) > 0 {
 		predicate = strings.Join(cond, " and ")
 	}
+	return predicate, args
+}
 
+func (s *Storage) ListItems(filter ItemFilter, offset, limit int) []Item {
+	predicate, args := listQueryPredicate(filter)
 	result := make([]Item, 0, 0)
 	query := fmt.Sprintf(`
 		select
@@ -126,7 +130,8 @@ func (s *Storage) ListItems(filter ItemFilter) []Item {
 		join feeds f on f.id = i.feed_id
 		where %s
 		order by i.date desc
-		`, predicate)
+		limit %d offset %d
+		`, predicate, limit, offset)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		s.log.Print(err)
@@ -155,6 +160,22 @@ func (s *Storage) ListItems(filter ItemFilter) []Item {
 		result = append(result, x)
 	}
 	return result
+}
+
+func (s *Storage) CountItems(filter ItemFilter) int64 {
+	predicate, args := listQueryPredicate(filter)
+	query := fmt.Sprintf(`
+		select count(i.id)
+		from items i
+		join feeds f on f.id = i.feed_id
+		where %s`, predicate)
+	row := s.db.QueryRow(query, args...)
+	if row != nil {
+		var result int64
+		row.Scan(&result)
+		return result
+	}
+	return 0
 }
 
 func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
