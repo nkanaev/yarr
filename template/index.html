@@ -85,7 +85,7 @@
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="menu-item p-2">
                         <div class="d-flex flex-column">
-                            <div style="line-height: 1" class="d-flex text-muted">
+                            <div style="line-height: 1.2; opacity: .6;" class="d-flex">
                                 <small class="flex-fill text-truncate mr-1">{{feedsById[item.feed_id].title}}</small>
                                 <small class="flex-shrink-0">{{formatDate(item.date)}}</small>
                             </div>
@@ -120,7 +120,7 @@
                     <img src="./static/images/settings.svg" alt="" style="width: 20px; height: 20px;">
                 </button>
             </div>
-            <div v-if="itemSelected" class="px-3 pt-3 pb-5 border-top overflow-auto">
+            <div v-if="itemSelected" class="px-5 pt-3 pb-5 border-top overflow-auto">
                 <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
@@ -228,16 +228,15 @@
                 </div>
             </div>
             <div v-else-if="settings=='import'">
-                <form id="opml-import-form" enctype="multipart/form-data">
-                    <label for="opml-import">Import Subscription</label>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="opml-import" @change="importOPML" name="opml">
-                        <label class="custom-file-label" for="opml-import">Choose file</label>
-                    </div>
+                <form class="d-inline-block m" id="opml-import-form" enctype="multipart/form-data" style="position: relative;">
+                    <input type="file"
+                           id="opml-import"
+                           @change="importOPML"
+                           name="opml"
+                           style="opacity: 0; width: 1px; height: 0; position: absolute;">
+                    <label class="btn btn-default m-0" for="opml-import">Import subscriptions</label>
                 </form>
-                <label class="mt-3">Export Subscriptions</label>
-                <br>
-                <a class="btn btn-default" href="/opml/export" target="_blank">Download</a>
+                <a class="btn btn-default" href="/opml/export">Export subscriptions</a>
             </div>
         </div>
     </div>

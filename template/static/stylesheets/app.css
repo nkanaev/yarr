@@ -203,6 +203,11 @@ select.form-control:not([multiple]):not([size]) {
   box-shadow: none;
 }
 
+.content {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
 .content a:hover {
   text-decoration: none;
 }
