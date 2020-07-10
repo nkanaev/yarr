@@ -74,5 +74,11 @@
         return api('put', '/api/settings', data)
       },
     },
+    upload_opml: function(form) {
+      return fetch('/opml/import', {
+        method: 'post',
+        body: new FormData(form),
+      })
+    },
   }
 })()

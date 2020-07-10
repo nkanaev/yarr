@@ -79,6 +79,8 @@ var routes []Route = []Route{
 	p("/api/items", ItemListHandler),
 	p("/api/items/:id", ItemHandler),
 	p("/api/settings", SettingsHandler),
+	p("/opml/import", OPMLImportHandler),
+	p("/opml/export", OPMLExportHandler),
 }
 
 func Vars(req *http.Request) map[string]string {

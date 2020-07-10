@@ -8,11 +8,13 @@ import (
 	"os"
 	"log"
 	"io"
+	"io/ioutil"
 	"mime"
 	"strings"
 	"path/filepath"
 	"strconv"
 	"math"
+	"fmt"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -346,5 +348,31 @@ func SettingsHandler(rw http.ResponseWriter, req *http.Request) {
 		} else {
 			rw.WriteHeader(http.StatusBadRequest)
 		}
+	}
+}
+
+func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "POST" {
+		file, _, err := req.FormFile("opml")
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		content, err := ioutil.ReadAll(file)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		fmt.Println(string(content))
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		rw.Header().Set("Content-Type", "application/xml; charset=utf-8")
+		rw.Header().Set("Content-Disposition", `attachment; filename="subscriptions.opml"`)
+		rw.Write([]byte("content"))
 	}
 }

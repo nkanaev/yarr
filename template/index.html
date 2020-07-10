@@ -228,6 +228,16 @@
                 </div>
             </div>
             <div v-else-if="settings=='import'">
+                <form id="opml-import-form" enctype="multipart/form-data">
+                    <label for="opml-import">Import Subscription</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="opml-import" @change="importOPML" name="opml">
+                        <label class="custom-file-label" for="opml-import">Choose file</label>
+                    </div>
+                </form>
+                <label class="mt-3">Export Subscriptions</label>
+                <br>
+                <a class="btn btn-default" href="/opml/export" target="_blank">Download</a>
             </div>
         </div>
     </div>
