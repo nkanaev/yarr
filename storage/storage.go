@@ -14,6 +14,8 @@ create table if not exists folders (
  is_expanded    boolean not null default false
 );
 
+create unique index if not exists idx_folder_title on folders(title);
+
 create table if not exists feeds (
  id             integer primary key autoincrement,
  folder_id      references folders(id),
@@ -63,12 +65,10 @@ func New() (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
-	/*
 	_, err = db.Exec(initQuery)
 	if err != nil {
 		return nil, err
 	}
-	*/
 	logger := log.New(os.Stdout, "storage: ", log.Ldate | log.Ltime | log.Lshortfile)
 	return &Storage{db: db, log: logger}, nil
 }

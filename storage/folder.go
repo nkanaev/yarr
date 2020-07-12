@@ -13,16 +13,33 @@ type Folder struct {
 func (s *Storage) CreateFolder(title string) *Folder {
 	expanded := true
 	result, err := s.db.Exec(`
-		insert into folders (title, is_expanded) values (?, ?)`,
+		insert into folders (title, is_expanded) values (?, ?)
+		on conflict (title) do nothing`,
 		title, expanded,
 	)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-	id, idErr := result.LastInsertId()
-	if idErr != nil {
+
+	var id int64
+	numrows, err := result.RowsAffected()
+	if err != nil {
+		s.log.Print(err)
 		return nil
+	}
+	if numrows == 1 {
+		id, err = result.LastInsertId()
+		if err != nil {
+			s.log.Print(err)
+			return nil
+		}
+	} else {
+		err = s.db.QueryRow(`select id, is_expanded from folders where title=?`, title).Scan(&id, &expanded)
+		if err != nil {
+			s.log.Print(err)
+			return nil
+		}
 	}
 	return &Folder{Id: id, Title: title, IsExpanded: expanded}
 }

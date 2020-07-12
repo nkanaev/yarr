@@ -5,16 +5,15 @@ import (
 	"github.com/mmcdole/gofeed"
 	"net/http"
 	"encoding/json"
+	"encoding/xml"
 	"os"
 	"log"
 	"io"
-	"io/ioutil"
 	"mime"
 	"strings"
 	"path/filepath"
 	"strconv"
 	"math"
-	"fmt"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -351,6 +350,33 @@ func SettingsHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
+type opml struct {
+	XMLName  xml.Name  `xml:"opml"`
+	Version  string    `xml:"version,attr"`
+	Outlines []outline `xml:"body>outline"`
+}
+
+type outline struct {
+	Type     string    `xml:"type,attr,omitempty"`
+	Title     string    `xml:"text,attr"`
+	FeedURL  string    `xml:"xmlUrl,attr,omitempty"`
+	SiteURL  string    `xml:"htmlUrl,attr,omitempty"`
+	Description  string    `xml:"description,attr,omitempty"`
+	Outlines []outline `xml:"outline,omitempty"`
+}
+
+func (o outline) AllFeeds() []outline {
+	result := make([]outline, 0)
+	for _, sub := range o.Outlines {
+		if sub.Type == "rss" {
+			result = append(result, sub)
+		} else {
+			result = append(result, sub.AllFeeds()...)
+		}
+	}
+	return result
+}
+
 func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		file, _, err := req.FormFile("opml")
@@ -358,12 +384,25 @@ func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 			log.Print(err)
 			return
 		}
-		content, err := ioutil.ReadAll(file)
+		feeds := new(opml)
+		decoder := xml.NewDecoder(file)
+		decoder.Entity = xml.HTMLEntity
+		decoder.Strict = false
+		err = decoder.Decode(&feeds)
 		if err != nil {
 			log.Print(err)
 			return
 		}
-		fmt.Println(string(content))
+		for _, outline := range feeds.Outlines {
+			if outline.Type == "rss" {
+				db(req).CreateFeed(outline.Title, outline.Description, outline.SiteURL, outline.FeedURL, "", nil)
+			} else {
+				folder := db(req).CreateFolder(outline.Title)
+				for _, o := range outline.AllFeeds() {
+					db(req).CreateFeed(o.Title, o.Description, o.SiteURL, o.FeedURL, "", &folder.Id)
+				}
+			}
+		}
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}

@@ -241,10 +241,12 @@ var vm = new Vue({
       api.items.update(item.id, {status: item.status})
     },
     importOPML: function(event) {
+      var vm = this
       var input = event.target
       var form = document.querySelector('#opml-import-form')
       api.upload_opml(form).then(function() {
         input.value = ''
+        vm.refreshFeeds()
       })
     },
   }
