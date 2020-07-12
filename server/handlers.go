@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"math"
+	"html"
+	"fmt"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -412,6 +414,57 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		rw.Header().Set("Content-Type", "application/xml; charset=utf-8")
 		rw.Header().Set("Content-Disposition", `attachment; filename="subscriptions.opml"`)
-		rw.Write([]byte("content"))
+
+		builder := strings.Builder{}
+
+		line := func(s string, args ...string) {
+			if len(args) > 0 {
+				escapedargs := make([]interface{}, len(args))
+				for idx, arg := range args {
+					escapedargs[idx] = html.EscapeString(arg)
+				}
+				s = fmt.Sprintf(s, escapedargs...)
+			}
+			builder.WriteString(s)
+			builder.WriteString("\n")
+		}
+
+		feedline := func(feed storage.Feed, indent int) {
+			line(
+				strings.Repeat(" ", indent) +
+				`<outline type="rss" text="%s" description="%s" xmlUrl="%s" htmlUrl="%s"/>`,
+				feed.Title, feed.Description,
+				feed.FeedLink, feed.Link,
+			)
+		}
+		line(`<?xml version="1.0" encoding="UTF-8"?>`)
+		line(`<opml version="1.1">`)
+		line(`<head>`)
+		line(`  <title>subscriptions.opml</title>`)
+		line(`</head>`)
+		line(`<body>`)
+		feedsByFolderID := make(map[int64][]storage.Feed)
+		for _, feed := range db(req).ListFeeds() {
+			var folderId = int64(0)
+			if feed.FolderId != nil {
+				folderId = *feed.FolderId
+			}
+			if feedsByFolderID[folderId] == nil {
+				feedsByFolderID[folderId] = make([]storage.Feed, 0)
+			}
+			feedsByFolderID[folderId] = append(feedsByFolderID[folderId], feed)
+		}
+		for _, folder := range db(req).ListFolders() {
+			line(`  <outline text="%s"`, folder.Title)
+			for _, feed := range feedsByFolderID[folder.Id] {
+				feedline(feed, 4)
+			}
+			line(`  </outline>`)
+		}
+		for _, feed := range feedsByFolderID[0] {
+			feedline(feed, 2)
+		}
+		builder.WriteString(`</body>`)
+		rw.Write([]byte(builder.String()))
 	}
 }
