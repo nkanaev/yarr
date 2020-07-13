@@ -455,7 +455,7 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 			feedsByFolderID[folderId] = append(feedsByFolderID[folderId], feed)
 		}
 		for _, folder := range db(req).ListFolders() {
-			line(`  <outline text="%s"`, folder.Title)
+			line(`  <outline text="%s">`, folder.Title)
 			for _, feed := range feedsByFolderID[folder.Id] {
 				feedline(feed, 4)
 			}
@@ -464,7 +464,8 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 		for _, feed := range feedsByFolderID[0] {
 			feedline(feed, 2)
 		}
-		builder.WriteString(`</body>`)
+		line(`</body>`)
+		line(`</opml>`)
 		rw.Write([]byte(builder.String()))
 	}
 }
