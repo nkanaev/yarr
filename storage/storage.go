@@ -41,17 +41,21 @@ create table if not exists items (
  date           datetime,
  date_updated   datetime,
  status         integer,
- image          text
+ image          text,
+ search_rowid   integer
 );
 
 create index if not exists idx_item_feed_id on items(feed_id);
 create index if not exists idx_item_status  on items(status);
 create unique index if not exists idx_item_guid on items(guid);
+create index if not exists idx_item_search_rowid on items(search_rowid);
 
 create table if not exists settings (
  key            string primary key,
  val            blob
 );
+
+create virtual table if not exists search using fts5(title, description, content);
 `
 
 type Storage struct {
