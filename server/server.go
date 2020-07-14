@@ -37,7 +37,8 @@ func (h *Handler) startJobs() {
 			h.queueSize += val
 		}			
 	}()
-	h.fetchAllFeeds()
+	go h.db.SyncSearch()
+	//h.fetchAllFeeds()
 }
 
 func (h *Handler) fetchFeed(feed storage.Feed) {

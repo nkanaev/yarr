@@ -5,6 +5,7 @@ import (
 	"time"
 	"strings"
 	"encoding/json"
+	"golang.org/x/net/html"
 )
 
 type ItemStatus int
@@ -240,4 +241,61 @@ func (s *Storage) FeedStats() []FeedStat {
 		result = append(result, stat)
 	}
 	return result
+}
+
+func HTMLText(s string) string {
+    tokenizer := html.NewTokenizer(strings.NewReader(s))
+	contents := make([]string, 0)
+    for {
+		token := tokenizer.Next()
+		if token == html.ErrorToken {
+			break
+		}
+		if token == html.TextToken {
+            content := strings.TrimSpace(html.UnescapeString(string(tokenizer.Text())))
+            if len(content) > 0 {
+				contents = append(contents, content)
+            }
+		}
+    }
+	return strings.Join(contents, " ")
+}
+
+func (s *Storage) SyncSearch() {
+	rows, err := s.db.Query(`
+		select id, title, content, description
+		from items
+		where search_rowid is null;
+	`)
+	if err != nil {
+		s.log.Print(err)
+		return
+	}
+
+	items := make([]Item, 0)
+	for rows.Next() {
+		var item Item
+		rows.Scan(&item.Id, &item.Title, &item.Content, &item.Description)
+		fmt.Println(item)
+		items = append(items, item)
+	}
+
+	for _, item := range items {
+		result, err := s.db.Exec(`
+			insert into search (title, description, content) values (?, ?, ?)`,
+			item.Title, HTMLText(item.Description), HTMLText(item.Content),
+		)
+		if err != nil {
+			s.log.Print(err)
+			return
+		}
+		if numrows, err := result.RowsAffected(); err == nil && numrows == 1 {
+			if rowId, err := result.LastInsertId(); err == nil {
+				s.db.Exec(
+					`update items set search_rowid = ? where id = ?`,
+					rowId, item.Id,
+				)
+			}
+		}
+	}
 }
