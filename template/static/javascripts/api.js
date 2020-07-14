@@ -74,6 +74,9 @@
         return api('put', '/api/settings', data)
       },
     },
+    status: function() {
+      return api('get', '/api/status').then(json)
+    },
     upload_opml: function(form) {
       return fetch('/opml/import', {
         method: 'post',

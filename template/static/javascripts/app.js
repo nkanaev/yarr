@@ -28,6 +28,7 @@ var vm = new Vue({
       vm.refreshItems()
     })
     this.refreshFeeds()
+    this.refreshStats()
   },
   data: function() {
     return {
@@ -47,6 +48,7 @@ var vm = new Vue({
         'newfeed': false,
         'items': false,
       },
+      'feedStats': {},
     }
   },
   computed: {
@@ -71,6 +73,34 @@ var vm = new Vue({
     itemsById: function() {
       return this.items.reduce(function(acc, item) { acc[item.id] = item; return acc }, {})
     },
+    filteredFeedStats: function() {
+      var filter = this.filterSelected
+      if (filter != 'unread' && filter != 'starred') return {}
+
+      var feedStats = this.feedStats
+      return this.feeds.reduce(function(acc, feed) {
+        if (feedStats[feed.id]) acc[feed.id] = vm.feedStats[feed.id][filter]
+        return acc
+      }, {})
+    },
+    filteredFolderStats: function() {
+      var filter = this.filterSelected
+      if (filter != 'unread' && filter != 'starred') return {}
+
+      var feedStats = this.filteredFeedStats
+      return this.feeds.reduce(function(acc, feed) {
+        if (!acc[feed.folder_id]) acc[feed.folder_id] = 0
+        if (feedStats[feed.id]) acc[feed.folder_id] += feedStats[feed.id]
+        return acc
+      }, {})
+    },
+    totalStats: function() {
+      return Object.values(this.feedStats).reduce(function(acc, stat) {
+        acc.unread += stat.unread
+        acc.starred += stat.starred
+        return acc
+      }, {unread: 0, starred: 0})
+    },
   },
   watch: {
     'filterSelected': function(newVal, oldVal) {
@@ -87,11 +117,21 @@ var vm = new Vue({
       this.itemSelectedDetails = this.itemsById[newVal]
       if (this.itemSelectedDetails.status == 'unread') {
         this.itemSelectedDetails.status = 'read'
+        this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
         api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
       }
     },
   },
   methods: {
+    refreshStats: function() {
+      var vm = this
+      api.status().then(function(data) {
+        vm.feedStats = data.stats.reduce(function(acc, stat) {
+          acc[stat.feed_id] = stat
+          return acc
+        }, {})
+      })
+    },
     getItemsQuery: function() {
       var query = {}
       if (this.feedSelected) {
@@ -148,6 +188,7 @@ var vm = new Vue({
       var query = this.getItemsQuery()
       api.items.mark_read(query).then(function() {
         vm.items = []
+        vm.refreshStats()
       })
     },
     toggleFolderExpanded: function(folder) {
@@ -227,16 +268,20 @@ var vm = new Vue({
     toggleItemStarred: function(item) {
       if (item.status == 'starred') {
         item.status = 'read'
+        this.feedStats[item.feed_id].starred -= 1
       } else if (item.status != 'starred') {
         item.status = 'starred'
+        this.feedStats[item.feed_id].starred += 1
       }
       api.items.update(item.id, {status: item.status})
     },
     toggleItemRead: function(item) {
       if (item.status == 'unread') {
         item.status = 'read'
+        this.feedStats[item.feed_id].unread -= 1
       } else if (item.status == 'read') {
         item.status = 'unread'
+        this.feedStats[item.feed_id].unread += 1
       }
       api.items.update(item.id, {status: item.status})
     },

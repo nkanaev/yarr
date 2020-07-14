@@ -213,3 +213,31 @@ func (s *Storage) MarkItemsRead(filter ItemFilter) bool {
 	}
 	return err == nil
 }
+
+type FeedStat struct {
+	FeedId int64 `json:"feed_id"`
+	UnreadCount int64 `json:"unread"`
+	StarredCount int64 `json:"starred"`
+}
+
+func (s *Storage) FeedStats() []FeedStat {
+	result := make([]FeedStat, 0)
+	rows, err := s.db.Query(fmt.Sprintf(`
+		select
+			feed_id,
+			sum(case status when %d then 1 else 0 end),
+			sum(case status when %d then 1 else 0 end)
+		from items
+		group by feed_id
+	`, UNREAD, STARRED))
+	if err != nil {
+		s.log.Print(err)
+		return result
+	}
+	for rows.Next() {
+		stat := FeedStat{}
+		rows.Scan(&stat.FeedId, &stat.UnreadCount, &stat.StarredCount)
+		result = append(result, stat)
+	}
+	return result
+}

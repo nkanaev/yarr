@@ -25,7 +25,7 @@
                         <div class="menu-item d-flex align-items-center w-100">
                             <img src="./static/images/circle.svg" alt="" class="nav-icon">
                             <span class="flex-fill text-left text-truncate">Unread</span>
-                            <span class="counter text-right"></span>
+                            <span class="counter text-right">{{totalStats.unread || ''}}</span>
                         </div>
                     </label>
                     <label class="nav-select">
@@ -33,7 +33,7 @@
                         <div class="menu-item d-flex align-items-center w-100">
                             <img src="./static/images/star.svg" alt="" class="nav-icon">
                             <span class="flex-fill text-left text-truncate">Starred</span>
-                            <span class="counter text-right"></span>
+                            <span class="counter text-right">{{totalStats.starred || ''}}</span>
                         </div>
                     </label>
                 </div>
@@ -54,7 +54,7 @@
                                  :class="{expanded: folder.is_expanded}"
                                  @click.prevent="toggleFolderExpanded(folder)">
                             <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
-                            <span class="counter text-right"></span>
+                            <span class="counter text-right">{{filteredFolderStats[folder.id] || ''}}</span>
                         </div>
                     </label>
                     <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
@@ -64,7 +64,7 @@
                             <div class="menu-item d-flex align-items-center w-100">
                                 <img src="./static/images/rss.svg" alt="" class="nav-icon">
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
-                                <span class="counter text-right"></span>
+                                <span class="counter text-right">{{filteredFeedStats[feed.id] || ''}}</span>
                             </div>
                         </label>
                     </div>
