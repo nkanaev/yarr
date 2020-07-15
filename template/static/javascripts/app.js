@@ -3,10 +3,10 @@
 var debounce = function(callback, wait) {
   var timeout
   return function() {
-    var context = this, args = arguments
+    var ctx = this, args = arguments
     clearTimeout(timeout)
     timeout = setTimeout(function() {
-      callback.apply(this, args)
+      callback.apply(ctx, args)
     }, wait)
   }
 }
@@ -43,6 +43,7 @@ var vm = new Vue({
       },
       'itemSelected': null,
       'itemSelectedDetails': {},
+      'itemSearch': '',
       'settings': 'create',
       'loading': {
         'newfeed': false,
@@ -121,6 +122,11 @@ var vm = new Vue({
         api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
       }
     },
+    'itemSearch': debounce(function(newVal) {
+      if (newVal) {
+        this.refreshItems()
+      }
+    }, 500),
   },
   methods: {
     refreshStats: function() {
@@ -146,6 +152,9 @@ var vm = new Vue({
       }
       if (this.filterSelected) {
         query.status = this.filterSelected
+      }
+      if (this.itemSearch) {
+        query.search = this.itemSearch
       }
       return query
     },

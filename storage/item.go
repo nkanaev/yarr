@@ -60,6 +60,7 @@ type ItemFilter struct {
 	FolderID *int64
 	FeedID *int64
 	Status *ItemStatus
+	Search *string
 }
 
 func (s *Storage) CreateItems(items []Item) bool {
@@ -111,6 +112,16 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 	if filter.Status != nil {
 		cond = append(cond, "i.status = ?")
 		args = append(args, *filter.Status)
+	}
+	if filter.Search != nil {
+		words := strings.Fields(*filter.Search)
+		terms := make([]string, len(words))
+		for idx, word := range words {
+			terms[idx] = word + "*"
+		}
+
+		cond = append(cond, "i.search_rowid in (select rowid from search where search match ?)")
+		args = append(args, strings.Join(terms, " "))
 	}
 
 	predicate := "1"

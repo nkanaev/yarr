@@ -72,10 +72,13 @@
             </div>
         </div>
         <div class="vh-100 d-flex flex-column border-right flex-shrink-0" style="width: 300px">
-            <div class="p-2 border-bottom" v-if="filterSelected != 'starred'">
-                <button class="btn btn-outline-secondary p-0" @click="markItemsRead()">
-                    <img src="./static/images/check.svg" alt="" style="width: 20px; height: 20px;">
-                </button>
+            <div class="d-flex">
+                <input class="form-control" type="" v-model="itemSearch">
+                <div class="p-2 border-bottom" v-if="filterSelected != 'starred'">
+                    <button class="btn btn-outline-secondary p-0" @click="markItemsRead()">
+                        <img src="./static/images/check.svg" alt="" style="width: 20px; height: 20px;">
+                    </button>
+                </div>
             </div>
             <div class="p-2 overflow-auto" v-scroll="loadMoreItems">
                 <label v-for="item in items" :key="item.id"

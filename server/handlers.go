@@ -308,6 +308,9 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 			statusValue := storage.StatusValues[status]
 			filter.Status = &statusValue
 		}
+		if search := query.Get("search"); len(search) != 0 {
+			filter.Search = &search
+		}
 		items := db(req).ListItems(filter, (curPage-1)*perPage, perPage)
 		count := db(req).CountItems(filter)
 		rw.WriteHeader(http.StatusOK)
