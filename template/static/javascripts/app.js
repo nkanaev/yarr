@@ -43,6 +43,7 @@ var vm = new Vue({
       },
       'itemSelected': null,
       'itemSelectedDetails': {},
+      'itemSelectedReadability': '',
       'itemSearch': '',
       'settings': 'create',
       'loading': {
@@ -115,6 +116,7 @@ var vm = new Vue({
       this.refreshItems()
     },
     'itemSelected': function(newVal, oldVal) {
+      this.itemSelectedReadability = ''
       this.itemSelectedDetails = this.itemsById[newVal]
       if (this.itemSelectedDetails.status == 'unread') {
         this.itemSelectedDetails.status = 'read'
@@ -302,6 +304,19 @@ var vm = new Vue({
         input.value = ''
         vm.refreshFeeds()
       })
+    },
+    getReadable: function(item) {
+      if (item.link) {
+        var vm = this
+        api.crawl(item.link).then(function(body) {
+          if (!body.length) return
+          var doc = new DOMParser().parseFromString(body, 'text/html')
+          var parsed = new Readability(doc).parse()
+          if (parsed && parsed.content) {
+            vm.itemSelectedReadability = parsed.content
+          }
+        })
+      }
     },
   }
 })

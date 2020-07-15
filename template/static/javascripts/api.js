@@ -83,5 +83,10 @@
         body: new FormData(form),
       })
     },
+    crawl: function(url) {
+      return fetch('/page?url=' + url).then(function(res) {
+        return res.text()
+      })
+    }
   }
 })()

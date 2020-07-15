@@ -117,6 +117,9 @@
                         <a class="btn btn-link p-0" :href="itemSelectedDetails.link" target="_blank" style="line-height: 1">
                             <img src="./static/images/external-link.svg" alt="" style="width: 20px; height: 20px;">
                         </a>
+                        <button class="btn btn-link p-0" @click="getReadable(itemSelectedDetails)">
+                            <img src="./static/images/book.svg" alt="" style="width: 20px; height: 20px;">
+                        </button>
                     </div>
                 </div>
                 <button class="btn btn-link p-0" v-b-modal.settings-modal style="line-height: 1">
@@ -131,7 +134,8 @@
                 </div>
                 <hr>
                 <div class="content">
-                    <div v-html="itemSelectedDetails.content" v-if="itemSelectedDetails.content"></div>
+                    <div v-html="itemSelectedReadability" v-if="itemSelectedReadability"></div>
+                    <div v-html="itemSelectedDetails.content" v-else-if="itemSelectedDetails.content"></div>
                     <div v-html="itemSelectedDetails.description" v-else-if="itemSelectedDetails.description"></div>
                 </div>
             </div>
@@ -247,6 +251,7 @@
     <script src="./static/javascripts/popper.min.js"></script>
     <!-- <script src="./static/javascripts/bootstrap.min.js"></script> -->
     <script src="./static/javascripts/bootstrap-vue.min.js"></script>
+    <script src="./static/javascripts/Readability.js"></script>
     <script src="./static/javascripts/api.js"></script>
     <script src="./static/javascripts/app.js"></script>
 </body>

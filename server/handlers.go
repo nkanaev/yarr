@@ -16,6 +16,7 @@ import (
 	"math"
 	"html"
 	"fmt"
+	"io/ioutil"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -470,5 +471,18 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 		line(`</body>`)
 		line(`</opml>`)
 		rw.Write([]byte(builder.String()))
+	}
+}
+
+func PageCrawlHandler(rw http.ResponseWriter, req *http.Request) {
+	query := req.URL.Query()
+	if url := query.Get("url"); len(url) > 0 {
+		res, err := http.Get(url)	
+		if err == nil {
+			body, err := ioutil.ReadAll(res.Body)
+			if err == nil {
+				rw.Write(body)
+			}
+		}
 	}
 }
