@@ -38,7 +38,7 @@ func (h *Handler) startJobs() {
 		}			
 	}()
 	go h.db.SyncSearch()
-	//h.fetchAllFeeds()
+	h.fetchAllFeeds()
 }
 
 func (h *Handler) fetchFeed(feed storage.Feed) {
@@ -141,6 +141,7 @@ func writeJSON(rw http.ResponseWriter, data interface{}) {
 
 func New() *http.Server {
 	db, _ := storage.New()
+	db.DeleteOldItems()
 	h := Handler{
 		db: db,
 		feedQueue: make(chan storage.Feed),

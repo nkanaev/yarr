@@ -310,3 +310,19 @@ func (s *Storage) SyncSearch() {
 		}
 	}
 }
+
+func (s *Storage) DeleteOldItems() {
+	result, err := s.db.Exec(
+		`delete from items where status = ? and date < ?`,
+		READ, time.Now().Add(-time.Hour * 24 * 90) /* 90 days */)
+	if err != nil {
+		s.log.Print(err)
+		return
+	}
+	num, err := result.RowsAffected()
+	if err != nil {
+		s.log.Print(err)
+		return
+	}
+	s.log.Printf("Deleted %d items\n", num)
+}
