@@ -81,6 +81,7 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 
 type UpdateFolder struct {
 	Title *string `json:"title,omitempty"`
+	IsExpanded *bool `json:"is_expanded,omitempty"`
 }
 
 func FolderHandler(rw http.ResponseWriter, req *http.Request) {
@@ -98,6 +99,9 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		if body.Title != nil {
 			db(req).RenameFolder(id, *body.Title)
+		}
+		if body.IsExpanded != nil {
+			db(req).ToggleFolderExpanded(id, *body.IsExpanded)
 		}
 		rw.WriteHeader(http.StatusOK)
 	} else if req.Method == "DELETE" {

@@ -57,6 +57,7 @@ var vm = new Vue({
   created: function() {
     var vm = this
     api.settings.get().then(function(data) {
+      vm.feedSelected = data.feed
       vm.filterSelected = data.filter
       vm.refreshItems()
     })
@@ -140,13 +141,11 @@ var vm = new Vue({
   watch: {
     'filterSelected': function(newVal, oldVal) {
       if (oldVal === null) return  // do nothing, initial setup
-      var vm = this
-      api.settings.update({filter: newVal}).then(function() {
-        vm.refreshItems()
-      })
+      api.settings.update({filter: newVal}).then(this.refreshItems.bind(this))
     },
     'feedSelected': function(newVal, oldVal) {
-      this.refreshItems()
+      if (oldVal === null) return  // do nothing, initial setup
+      api.settings.update({feed: newVal}).then(this.refreshItems.bind(this))
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedReadability = ''
@@ -237,6 +236,7 @@ var vm = new Vue({
     },
     toggleFolderExpanded: function(folder) {
       folder.is_expanded = !folder.is_expanded
+      api.folders.update(folder.id, {is_expanded: folder.is_expanded})
     },
     formatDate: function(datestr) {
       var options = {
