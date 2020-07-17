@@ -19,6 +19,39 @@ Vue.directive('scroll', {
   },
 })
 
+function dateRepr(d) {
+  var sec = (new Date().getTime() - d.getTime()) / 1000
+  if (sec < 2700)  // less than 45 minutes
+    return Math.round(sec / 60) + 'm'
+  else if (sec < 86400)  // less than 24 hours
+    return Math.round(sec / 3600) + 'h'
+  else if (sec < 604800)  // less than a week
+    return Math.round(sec / 86400) + 'd'
+  else
+    return d.toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"})
+}
+
+Vue.component('relative-time', {
+  props: ['val'],
+  data: function() {
+    var d = new Date(this.val)
+    return {
+      'date': d,
+      'formatted': dateRepr(d),
+      'interval': null,
+    }
+  },
+  template: '<time :datetime="val">{{formatted}}</time>',
+  mounted: function() {
+    this.interval = setInterval(function() {
+      this.formatted = dateRepr(this.date)
+    }.bind(this), 600000)  // every 10 minutes
+  },
+  destroyed: function() {
+    clearInterval(this.interval)
+  },
+})
+
 var vm = new Vue({
   el: '#app',
   created: function() {
@@ -206,7 +239,11 @@ var vm = new Vue({
       folder.is_expanded = !folder.is_expanded
     },
     formatDate: function(datestr) {
-      return new Date(datestr).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"})
+      var options = {
+        year: "numeric", month: "long", day: "numeric",
+        hour: '2-digit', minute: '2-digit',
+      }
+      return new Date(datestr).toLocaleDateString(undefined, options)
     },
     moveFeed: function(feed, folder) {
       var folder_id = folder ? folder.id : null

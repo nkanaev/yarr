@@ -90,7 +90,7 @@
                         <div class="d-flex flex-column">
                             <div style="line-height: 1.2; opacity: .6;" class="d-flex">
                                 <small class="flex-fill text-truncate mr-1">{{feedsById[item.feed_id].title}}</small>
-                                <small class="flex-shrink-0">{{formatDate(item.date)}}</small>
+                                <small class="flex-shrink-0"><relative-time :val="item.date"/></small>
                             </div>
                             <span>{{item.title}}</span>
                         </div>
