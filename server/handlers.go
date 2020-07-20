@@ -4,6 +4,7 @@ import (
 	"github.com/nkanaev/yarr/storage"
 	"github.com/mmcdole/gofeed"
 	"net/http"
+	"html/template"
 	"encoding/json"
 	"encoding/xml"
 	"os"
@@ -20,15 +21,14 @@ import (
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
-	f, err := os.Open("template/index.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
+	t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
+		"inline": func(svg string) template.HTML {
+			content, _ := ioutil.ReadFile("template/static/images/" + svg)
+			return template.HTML(content)
+		},
+	}).ParseFiles("template/index.html"))
 	rw.Header().Set("Content-Type", "text/html")
-	io.Copy(rw, f)
-
+	t.Execute(rw, nil)
 }
 
 func StaticHandler(rw http.ResponseWriter, req *http.Request) {

@@ -15,7 +15,7 @@
                     <label class="nav-select">
                         <input type="radio" name="filter" value="" v-model="filterSelected">
                         <div class="menu-item d-flex align-items-center w-100">
-                            <img src="./static/images/circle-full.svg" alt="" class="nav-icon">
+                            <span class="nav-icon">{% inline "circle-full.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">All</span>
                             <span class="counter text-right"></span>
                         </div>
@@ -23,7 +23,7 @@
                     <label class="nav-select">
                         <input type="radio" name="filter" value="unread" v-model="filterSelected">
                         <div class="menu-item d-flex align-items-center w-100">
-                            <img src="./static/images/circle.svg" alt="" class="nav-icon">
+                            <span class="nav-icon">{% inline "circle.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">Unread</span>
                             <span class="counter text-right">{{totalStats.unread || ''}}</span>
                         </div>
@@ -31,7 +31,7 @@
                     <label class="nav-select">
                         <input type="radio" name="filter" value="starred" v-model="filterSelected">
                         <div class="menu-item d-flex align-items-center w-100">
-                            <img src="./static/images/star.svg" alt="" class="nav-icon">
+                            <span class="nav-icon">{% inline "star.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">Starred</span>
                             <span class="counter text-right">{{totalStats.starred || ''}}</span>
                         </div>
@@ -40,7 +40,7 @@
                 <label class="nav-select">
                     <input type="radio" name="feed" value="" v-model="feedSelected">
                     <div class="menu-item d-flex align-items-center w-100">
-                        <img src="./static/images/layers.svg" alt="" class="nav-icon">
+                        <span class="nav-icon">{% inline "layers.svg" %}</span>
                         <span class="flex-fill text-left text-truncate">All Feeds</span>
                         <span class="counter text-right"></span>
                     </div>
@@ -49,10 +49,11 @@
                     <label class="nav-select mt-1">
                         <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
                         <div class="menu-item d-flex align-items-center w-100" v-if="folder.id">
-                            <img src="./static/images/chevron-right.svg"
-                                 class="nav-icon"
-                                 :class="{expanded: folder.is_expanded}"
-                                 @click.prevent="toggleFolderExpanded(folder)">
+                            <span class="nav-icon"
+                                  :class="{expanded: folder.is_expanded}"
+                                  @click.prevent="toggleFolderExpanded(folder)">
+                                {% inline "chevron-right.svg" %}
+                            </span>
                             <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
                             <span class="counter text-right">{{filteredFolderStats[folder.id] || ''}}</span>
                         </div>
@@ -62,7 +63,7 @@
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                             <div class="menu-item d-flex align-items-center w-100">
-                                <img src="./static/images/rss.svg" alt="" class="nav-icon">
+                                <span class="nav-icon">{% inline "rss.svg" %}</span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right">{{filteredFeedStats[feed.id] || ''}}</span>
                             </div>
@@ -76,7 +77,7 @@
                 <input class="form-control" type="" v-model="itemSearch">
                 <div class="p-2 border-bottom" v-if="filterSelected != 'starred'">
                     <button class="btn btn-outline-secondary p-0" @click="markItemsRead()">
-                        <img src="./static/images/check.svg" alt="" style="width: 20px; height: 20px;">
+                        <span class="nav-icon">{% inline "layers.svg" %}</span>
                     </button>
                 </div>
             </div>
@@ -104,26 +105,26 @@
                 <div class="flex-grow-1">
                     <div v-if="itemSelected">
                         <button class="btn btn-link p-0" style="line-height: 1" @click="toggleItemStarred(itemSelectedDetails)">
-                            <img v-if="itemSelectedDetails.status=='starred'" src="./static/images/star-full.svg" alt="" style="width: 20px; height: 20px;">
-                            <img v-else-if="itemSelectedDetails.status!='starred'" src="./static/images/star.svg" alt="" style="width: 20px; height: 20px;">
+                            <span v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
+                            <span v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
                         </button>
                         <button class="btn btn-link p-0"
                                 style="line-height: 1"
                                 :disabled="itemSelectedDetails.status=='starred'"
                                 @click="toggleItemRead(itemSelectedDetails)">
-                            <img v-if="itemSelectedDetails.status=='unread'" src="./static/images/circle-full.svg" alt="" style="width: 20px; height: 20px;">
-                            <img v-if="itemSelectedDetails.status!='unread'" src="./static/images/circle.svg" alt="" style="width: 20px; height: 20px;">
+                            <span v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
+                            <span v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                         </button>
                         <a class="btn btn-link p-0" :href="itemSelectedDetails.link" target="_blank" style="line-height: 1">
-                            <img src="./static/images/external-link.svg" alt="" style="width: 20px; height: 20px;">
+                            <span>{% inline "external-link.svg" %}</span>
                         </a>
                         <button class="btn btn-link p-0" @click="getReadable(itemSelectedDetails)">
-                            <img src="./static/images/book.svg" alt="" style="width: 20px; height: 20px;">
+                            <span>{% inline "book.svg" %}</span>
                         </button>
                     </div>
                 </div>
                 <button class="btn btn-link p-0" v-b-modal.settings-modal style="line-height: 1">
-                    <img src="./static/images/settings.svg" alt="" style="width: 20px; height: 20px;">
+                    <span>{% inline "settings.svg" %}</span>
                 </button>
             </div>
             <div v-if="itemSelected" class="px-5 pt-3 pb-5 border-top overflow-auto">
@@ -144,19 +145,19 @@
             <ul class="nav nav-tabs mx-n3 px-3 mb-3 mt-n3 pt-2 bg-light rounded-top">
                 <li class="nav-item">
                     <a class="nav-link" href="#" :class="{active: settings=='create'}" @click.prevent="settings='create'">
-                        <img src="./static/images/plus-square.svg" alt="" class="tab-icon">
+                        <span class="tab-icon">{% inline "plus-square.svg" %}</span>
                         New Feed
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" :class="{active: settings=='manage'}" @click.prevent="settings='manage'">
-                        <img src="./static/images/list.svg" alt="" class="tab-icon">
+                        <span class="tab-icon">{% inline "list.svg" %}</span>
                         Manage Feeds
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" :class="{active: settings=='import'}" @click.prevent="settings='import'">
-                        <img src="./static/images/upload.svg" alt="" class="tab-icon">
+                        <span class="tab-icon">{% inline "upload.svg" %}</span>
                         Import/Export
                     </a>
                 </li>
@@ -180,7 +181,7 @@
                         <div class="flex-shrink-0" v-if="folder.id">
                             <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
                                 <template v-slot:button-content>
-                                    <img src="./static/images/more-vertical.svg">
+                                    <span>{% inline "more-vertical.svg" %}</span>
                                 </template>
                                 <b-dropdown-item @click.prevent="renameFolder(folder)">Rename</b-dropdown-item>
                                 <b-dropdown-divider></b-dropdown-divider>
@@ -198,7 +199,7 @@
                         <div class="flex-shrink-0">
                             <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
                                 <template v-slot:button-content>
-                                    <img src="./static/images/more-vertical.svg">
+                                    <span>{% inline "more-vertical.svg" %}</span>
                                 </template>
                                 <b-dropdown-item @click.prevent="renameFeed(feed)">Rename</b-dropdown-item>
                                 <b-dropdown-divider v-if="folders.length"></b-dropdown-divider>

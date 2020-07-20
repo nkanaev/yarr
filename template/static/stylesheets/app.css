@@ -44,6 +44,13 @@ select.form-control:not([multiple]):not([size]) {
   margin-right: 7px;
 }
 
+.nav-icon svg, .tab-icon svg {
+  width: 100%;
+  height: auto;
+  vertical-align: baseline;
+  display: block;
+}
+
 .tab-icon {
   width: 1rem;
   height: 1rem;

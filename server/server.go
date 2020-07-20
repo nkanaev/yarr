@@ -148,6 +148,6 @@ func New() *http.Server {
 		counter: make(chan int),
 	}
 	s := &http.Server{Addr: "127.0.0.1:8000", Handler: h}
-	h.startJobs()
+	//h.startJobs()
 	return s
 }
