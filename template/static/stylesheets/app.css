@@ -37,25 +37,15 @@ select.form-control:not([multiple]):not([size]) {
   margin: 0 auto;
 }
 
-.nav-icon {
-  width: 14px;
-  height: 14px;
-  min-width: 14px;
-  margin-right: 7px;
+.icon {
+  height: 1rem;
+  width: 1rem;
 }
 
-.nav-icon svg, .tab-icon svg {
-  width: 100%;
-  height: auto;
-  vertical-align: baseline;
-  display: block;
-}
-
-.tab-icon {
+.icon > svg {
   width: 1rem;
   height: 1rem;
-  margin-top: -3px;
-  margin-right: .1rem;
+  display: block;
 }
 
 .feed-icon {
@@ -144,6 +134,8 @@ select.form-control:not([multiple]):not([size]) {
 
 .nav-tabs .nav-link {
   padding: .5rem 0;
+  display: flex;
+  align-items: center;
 }
 
 .nav-tabs .nav-item + .nav-item {
@@ -196,6 +188,10 @@ select.form-control:not([multiple]):not([size]) {
   position: absolute;
   top: 50%;
   z-index: 1;
+}
+
+.btn-link {
+  color: inherit;
 }
 
 .btn-default {
