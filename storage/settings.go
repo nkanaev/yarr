@@ -4,8 +4,8 @@ import "encoding/json"
 
 func settingsDefaults() map[string]interface{} {
 	return map[string]interface{}{
-		"filter": "",
-		"feed": "",
+		"filter":          "",
+		"feed":            "",
 		"feed_list_width": 300,
 		"item_list_width": 300,
 	}
@@ -27,7 +27,7 @@ func (s *Storage) GetSettingsValue(key string) interface{} {
 }
 
 func (s *Storage) GetSettings() map[string]interface{} {
-	result := settingsDefaults()		
+	result := settingsDefaults()
 	rows, err := s.db.Query(`select key, val from settings;`)
 	if err != nil {
 		s.log.Print(err)
@@ -66,7 +66,7 @@ func (s *Storage) UpdateSettings(kv map[string]interface{}) bool {
 		)
 		if err != nil {
 			s.log.Print(err)
-			return false	
+			return false
 		}
 	}
 	return true

@@ -1,26 +1,26 @@
 package server
 
 import (
-	"encoding/json"
 	"context"
-	"regexp"
-	"net/http"
+	"encoding/json"
 	"github.com/nkanaev/yarr/storage"
 	"log"
+	"net/http"
+	"regexp"
 )
 
 type Route struct {
-	url string
+	url      string
 	urlRegex *regexp.Regexp
-	handler func(http.ResponseWriter, *http.Request)
+	handler  func(http.ResponseWriter, *http.Request)
 }
 
 type Handler struct {
-	db *storage.Storage
+	db           *storage.Storage
 	fetchRunning bool
-	feedQueue chan storage.Feed
-	counter chan int
-	queueSize int
+	feedQueue    chan storage.Feed
+	counter      chan int
+	queueSize    int
 }
 
 func (h *Handler) startJobs() {
@@ -35,14 +35,14 @@ func (h *Handler) startJobs() {
 		for {
 			val := <-h.counter
 			h.queueSize += val
-		}			
+		}
 	}()
 	go h.db.SyncSearch()
 	h.fetchAllFeeds()
 }
 
 func (h *Handler) fetchFeed(feed storage.Feed) {
-	h.queueSize += 1	
+	h.queueSize += 1
 	h.feedQueue <- feed
 }
 
@@ -62,9 +62,9 @@ func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
 	})
 	urlRegexp = "^" + urlRegexp + "$"
 	return Route{
-		url: path,
+		url:      path,
 		urlRegex: regexp.MustCompile(urlRegexp),
-		handler: handler,
+		handler:  handler,
 	}
 }
 
@@ -104,8 +104,8 @@ func handler(req *http.Request) *Handler {
 }
 
 const (
-	ctxDB = 1
-	ctxVars = 2
+	ctxDB      = 1
+	ctxVars    = 2
 	ctxHandler = 3
 )
 
@@ -143,9 +143,9 @@ func New() *http.Server {
 	db, _ := storage.New()
 	db.DeleteOldItems()
 	h := Handler{
-		db: db,
+		db:        db,
 		feedQueue: make(chan storage.Feed),
-		counter: make(chan int),
+		counter:   make(chan int),
 	}
 	s := &http.Server{Addr: "127.0.0.1:8000", Handler: h}
 	//h.startJobs()

@@ -1,10 +1,10 @@
 package storage
 
 import (
-	"os"
-	"log"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"log"
+	"os"
 )
 
 var initQuery string = `
@@ -63,7 +63,7 @@ end;
 `
 
 type Storage struct {
-	db *sql.DB
+	db  *sql.DB
 	log *log.Logger
 }
 
@@ -77,7 +77,7 @@ func New() (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
-	logger := log.New(os.Stdout, "storage: ", log.Ldate | log.Ltime | log.Lshortfile)
+	logger := log.New(os.Stdout, "storage: ", log.Ldate|log.Ltime|log.Lshortfile)
 	return &Storage{db: db, log: logger}, nil
 }
 

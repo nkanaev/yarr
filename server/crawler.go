@@ -1,18 +1,17 @@
 package server
 
 import (
-	"net/url"
-	"net/http"
 	"github.com/PuerkitoBio/goquery"
+	"net/http"
+	"net/url"
 )
 
 type FeedSource struct {
 	Title string `json:"title"`
-	Url string `json:"url"`
+	Url   string `json:"url"`
 }
 
 const feedLinks = `link[type='application/rss+xml'],link[type='application/atom+xml']`
-
 
 func FindFeeds(r *http.Response) ([]FeedSource, error) {
 	sources := make([]FeedSource, 0, 0)

@@ -1,23 +1,23 @@
 package server
 
 import (
-	"github.com/nkanaev/yarr/storage"
-	"github.com/mmcdole/gofeed"
-	"net/http"
-	"html/template"
 	"encoding/json"
 	"encoding/xml"
-	"os"
-	"log"
+	"fmt"
+	"github.com/mmcdole/gofeed"
+	"github.com/nkanaev/yarr/storage"
+	"html"
+	"html/template"
 	"io"
+	"io/ioutil"
+	"log"
+	"math"
 	"mime"
-	"strings"
+	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
-	"math"
-	"html"
-	"fmt"
-	"io/ioutil"
+	"strings"
 )
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
@@ -46,7 +46,7 @@ func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 func StatusHandler(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, map[string]interface{}{
 		"running": handler(req).fetchRunning,
-		"stats": db(req).FeedStats(),
+		"stats":   db(req).FeedStats(),
 	})
 }
 
@@ -78,10 +78,9 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-
 type UpdateFolder struct {
-	Title *string `json:"title,omitempty"`
-	IsExpanded *bool `json:"is_expanded,omitempty"`
+	Title      *string `json:"title,omitempty"`
+	IsExpanded *bool   `json:"is_expanded,omitempty"`
 }
 
 func FolderHandler(rw http.ResponseWriter, req *http.Request) {
@@ -111,13 +110,13 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 type NewFeed struct {
-	Url string	    `json:"url"`
+	Url      string `json:"url"`
 	FolderID *int64 `json:"folder_id,omitempty"`
 }
 
 type UpdateFeed struct {
-	Title *string `json:"title,omitempty"`
-	FolderID *int64 `json:"folder_id,omitempty"`
+	Title    *string `json:"title,omitempty"`
+	FolderID *int64  `json:"folder_id,omitempty"`
 }
 
 func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
@@ -133,7 +132,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		feedUrl := feed.Url
-		res, err := http.Get(feedUrl)	
+		res, err := http.Get(feedUrl)
 		if err != nil {
 			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
@@ -192,24 +191,24 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 			author = item.Author.Name
 		}
 		result = append(result, storage.Item{
-			GUID: item.GUID,
-			FeedId: feed.Id,
-			Title: item.Title,
-			Link: item.Link,
+			GUID:        item.GUID,
+			FeedId:      feed.Id,
+			Title:       item.Title,
+			Link:        item.Link,
 			Description: item.Description,
-			Content: item.Content,
-			Author: author,
-			Date: item.PublishedParsed,
+			Content:     item.Content,
+			Author:      author,
+			Date:        item.PublishedParsed,
 			DateUpdated: item.UpdatedParsed,
-			Status: storage.UNREAD,
-			Image: imageURL,
+			Status:      storage.UNREAD,
+			Image:       imageURL,
 		})
 	}
 	return result
 }
 
 func listItems(f storage.Feed) []storage.Item {
-	fp := gofeed.NewParser()	
+	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(f.FeedLink)
 	if err != nil {
 		log.Print(err)
@@ -365,12 +364,12 @@ type opml struct {
 }
 
 type outline struct {
-	Type     string    `xml:"type,attr,omitempty"`
-	Title     string    `xml:"text,attr"`
-	FeedURL  string    `xml:"xmlUrl,attr,omitempty"`
-	SiteURL  string    `xml:"htmlUrl,attr,omitempty"`
-	Description  string    `xml:"description,attr,omitempty"`
-	Outlines []outline `xml:"outline,omitempty"`
+	Type        string    `xml:"type,attr,omitempty"`
+	Title       string    `xml:"text,attr"`
+	FeedURL     string    `xml:"xmlUrl,attr,omitempty"`
+	SiteURL     string    `xml:"htmlUrl,attr,omitempty"`
+	Description string    `xml:"description,attr,omitempty"`
+	Outlines    []outline `xml:"outline,omitempty"`
 }
 
 func (o outline) AllFeeds() []outline {
@@ -437,8 +436,8 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 
 		feedline := func(feed storage.Feed, indent int) {
 			line(
-				strings.Repeat(" ", indent) +
-				`<outline type="rss" text="%s" description="%s" xmlUrl="%s" htmlUrl="%s"/>`,
+				strings.Repeat(" ", indent)+
+					`<outline type="rss" text="%s" description="%s" xmlUrl="%s" htmlUrl="%s"/>`,
 				feed.Title, feed.Description,
 				feed.FeedLink, feed.Link,
 			)
@@ -479,7 +478,7 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 func PageCrawlHandler(rw http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
 	if url := query.Get("url"); len(url) > 0 {
-		res, err := http.Get(url)	
+		res, err := http.Get(url)
 		if err == nil {
 			body, err := ioutil.ReadAll(res.Body)
 			if err == nil {

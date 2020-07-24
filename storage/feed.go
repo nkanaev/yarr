@@ -1,13 +1,13 @@
 package storage
 
 type Feed struct {
-	Id int64 `json:"id"`
-	FolderId *int64 `json:"folder_id"`
-	Title string `json:"title"`
+	Id          int64  `json:"id"`
+	FolderId    *int64 `json:"folder_id"`
+	Title       string `json:"title"`
 	Description string `json:"description"`
-	Link string `json:"link"`
-	FeedLink string `json:"feed_link"`
-	Icon string	`json:"icon"`
+	Link        string `json:"link"`
+	FeedLink    string `json:"feed_link"`
+	Icon        string `json:"icon"`
 }
 
 func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, folderId *int64) *Feed {
@@ -26,13 +26,13 @@ func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, fo
 		return nil
 	}
 	return &Feed{
-		Id: id,
-		Title: title,
+		Id:          id,
+		Title:       title,
 		Description: description,
-		Link: link,
-		FeedLink: feedLink,
-		Icon: icon,
-		FolderId: folderId,
+		Link:        link,
+		FeedLink:    feedLink,
+		Icon:        icon,
+		FolderId:    folderId,
 	}
 }
 

@@ -1,11 +1,11 @@
 package storage
 
 import (
-	"fmt"
-	"time"
-	"strings"
 	"encoding/json"
+	"fmt"
 	"golang.org/x/net/html"
+	"strings"
+	"time"
 )
 
 type ItemStatus int
@@ -16,15 +16,15 @@ const (
 	STARRED ItemStatus = 2
 )
 
-var StatusRepresentations = map[ItemStatus]string {
-	UNREAD: "unread",
-	READ: "read",
+var StatusRepresentations = map[ItemStatus]string{
+	UNREAD:  "unread",
+	READ:    "read",
 	STARRED: "starred",
 }
 
-var StatusValues = map[string]ItemStatus {
-	"unread": UNREAD,
-	"read": READ,
+var StatusValues = map[string]ItemStatus{
+	"unread":  UNREAD,
+	"read":    READ,
 	"starred": STARRED,
 }
 
@@ -42,25 +42,25 @@ func (s *ItemStatus) UnmarshalJSON(b []byte) error {
 }
 
 type Item struct {
-	Id int64 `json:"id"`
-	GUID string `json:"guid"`
-	FeedId int64 `json:"feed_id"`
-	Title string `json:"title"`
-	Link string `json:"link"`
-	Description string `json:"description"`
-	Content string `json:"content"`
-	Author string `json:"author"`
-	Date *time.Time `json:"date"`
+	Id          int64      `json:"id"`
+	GUID        string     `json:"guid"`
+	FeedId      int64      `json:"feed_id"`
+	Title       string     `json:"title"`
+	Link        string     `json:"link"`
+	Description string     `json:"description"`
+	Content     string     `json:"content"`
+	Author      string     `json:"author"`
+	Date        *time.Time `json:"date"`
 	DateUpdated *time.Time `json:"date_updated"`
-	Status ItemStatus `json:"status"`
-	Image string `json:"image"`
+	Status      ItemStatus `json:"status"`
+	Image       string     `json:"image"`
 }
 
 type ItemFilter struct {
 	FolderID *int64
-	FeedID *int64
-	Status *ItemStatus
-	Search *string
+	FeedID   *int64
+	Status   *ItemStatus
+	Search   *string
 }
 
 func (s *Storage) CreateItems(items []Item) bool {
@@ -227,8 +227,8 @@ func (s *Storage) MarkItemsRead(filter ItemFilter) bool {
 }
 
 type FeedStat struct {
-	FeedId int64 `json:"feed_id"`
-	UnreadCount int64 `json:"unread"`
+	FeedId       int64 `json:"feed_id"`
+	UnreadCount  int64 `json:"unread"`
 	StarredCount int64 `json:"starred"`
 }
 
@@ -255,20 +255,20 @@ func (s *Storage) FeedStats() []FeedStat {
 }
 
 func HTMLText(s string) string {
-    tokenizer := html.NewTokenizer(strings.NewReader(s))
+	tokenizer := html.NewTokenizer(strings.NewReader(s))
 	contents := make([]string, 0)
-    for {
+	for {
 		token := tokenizer.Next()
 		if token == html.ErrorToken {
 			break
 		}
 		if token == html.TextToken {
-            content := strings.TrimSpace(html.UnescapeString(string(tokenizer.Text())))
-            if len(content) > 0 {
+			content := strings.TrimSpace(html.UnescapeString(string(tokenizer.Text())))
+			if len(content) > 0 {
 				contents = append(contents, content)
-            }
+			}
 		}
-    }
+	}
 	return strings.Join(contents, " ")
 }
 
@@ -314,7 +314,7 @@ func (s *Storage) SyncSearch() {
 func (s *Storage) DeleteOldItems() {
 	result, err := s.db.Exec(
 		`delete from items where status = ? and date < ?`,
-		READ, time.Now().Add(-time.Hour * 24 * 90) /* 90 days */)
+		READ, time.Now().Add(-time.Hour*24*90) /* 90 days */)
 	if err != nil {
 		s.log.Print(err)
 		return
