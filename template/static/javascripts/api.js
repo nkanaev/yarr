@@ -4,7 +4,7 @@
   var api = function(method, endpoint, data) {
     return fetch(endpoint, {
       method: method,
-      headers: {'content-type': 'application/json'},
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data),
     })
   }

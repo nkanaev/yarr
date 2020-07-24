@@ -57,7 +57,7 @@ type NewFolder struct {
 func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		list := db(req).ListFolders()
-		json.NewEncoder(rw).Encode(list)
+		writeJSON(rw, list)
 	} else if req.Method == "POST" {
 		var body NewFolder
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
@@ -72,7 +72,7 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		folder := db(req).CreateFolder(body.Title)
 		rw.WriteHeader(http.StatusCreated)
-		json.NewEncoder(rw).Encode(folder)
+		writeJSON(rw, folder)
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -123,7 +123,7 @@ type UpdateFeed struct {
 func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		list := db(req).ListFeeds()
-		json.NewEncoder(rw).Encode(list)
+		writeJSON(rw, list)
 	} else if req.Method == "POST" {
 		var feed NewFeed
 		if err := json.NewDecoder(req.Body).Decode(&feed); err != nil {
@@ -318,7 +318,6 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		items := db(req).ListItems(filter, (curPage-1)*perPage, perPage)
 		count := db(req).CountItems(filter)
-		rw.WriteHeader(http.StatusOK)
 		writeJSON(rw, map[string]interface{}{
 			"page": map[string]int{
 				"cur": curPage,
@@ -344,7 +343,6 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 
 func SettingsHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
-		rw.WriteHeader(http.StatusOK)
 		writeJSON(rw, db(req).GetSettings())
 	} else if req.Method == "PUT" {
 		settings := make(map[string]interface{})
