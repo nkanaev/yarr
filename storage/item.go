@@ -324,5 +324,7 @@ func (s *Storage) DeleteOldItems() {
 		s.log.Print(err)
 		return
 	}
-	s.log.Printf("Deleted %d items\n", num)
+	if num > 0 {
+		s.log.Printf("Deleted %d old items\n", num)
+	}
 }

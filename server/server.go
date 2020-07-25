@@ -17,10 +17,28 @@ type Route struct {
 
 type Handler struct {
 	db           *storage.Storage
+	log          *log.Logger
 	fetchRunning bool
 	feedQueue    chan storage.Feed
 	counter      chan int
 	queueSize    int
+}
+
+func New(db *storage.Storage, logger *log.Logger) *Handler {
+	db.DeleteOldItems()
+	h := Handler{
+		db:        db,
+		log:       logger,
+		feedQueue: make(chan storage.Feed),
+		counter:   make(chan int),
+	}
+	return &h
+}
+
+func (h *Handler) Start(addr string) {
+	h.startJobs()
+	s := &http.Server{Addr: addr, Handler: h}
+	s.ListenAndServe()
 }
 
 func (h *Handler) startJobs() {
@@ -137,17 +155,4 @@ func writeJSON(rw http.ResponseWriter, data interface{}) {
 	}
 	rw.Write(reply)
 	rw.Write([]byte("\n"))
-}
-
-func New() *http.Server {
-	db, _ := storage.New()
-	db.DeleteOldItems()
-	h := Handler{
-		db:        db,
-		feedQueue: make(chan storage.Feed),
-		counter:   make(chan int),
-	}
-	s := &http.Server{Addr: "127.0.0.1:8000", Handler: h}
-	//h.startJobs()
-	return s
 }

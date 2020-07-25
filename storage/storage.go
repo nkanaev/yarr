@@ -55,7 +55,7 @@ create table if not exists settings (
  val            blob
 );
 
-create virtual table if not exists search using fts5(title, description, content);
+create virtual table if not exists search using fts4(title, description, content);
 
 create trigger if not exists del_item_search after delete on items begin
   delete from search where rowid = old.search_rowid;
@@ -67,17 +67,26 @@ type Storage struct {
 	log *log.Logger
 }
 
-func New() (*Storage, error) {
-	path := "./storage.db"
+func New(path string, logger *log.Logger) (*Storage, error) {
+	initialize := false
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			initialize = true
+		} else {
+			return nil, err
+		}
+	}
+
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, err
 	}
-	_, err = db.Exec(initQuery)
-	if err != nil {
-		return nil, err
+
+	if initialize {
+		if _, err := db.Exec(initQuery); err != nil {
+			return nil, err
+		}
 	}
-	logger := log.New(os.Stdout, "storage: ", log.Ldate|log.Ltime|log.Lshortfile)
 	return &Storage{db: db, log: logger}, nil
 }
 
