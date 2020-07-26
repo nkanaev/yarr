@@ -121,7 +121,8 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .counter {
-  max-width: 100px;
+  padding-left: .5rem;
+  opacity: .6;
 }
 
 .selectgroup {
