@@ -12,43 +12,43 @@
         <div class="vh-100 overflow-auto border-right flex-shrink-0" style="width: 300px">
             <div class="p-2">
                 <div class="mb-5">
-                    <label class="nav-select">
+                    <label class="selectgroup">
                         <input type="radio" name="filter" value="" v-model="filterSelected">
-                        <div class="menu-item d-flex align-items-center w-100">
+                        <div class="selectgroup-label d-flex align-items-center w-100">
                             <span class="icon mr-2">{% inline "circle-full.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">All</span>
                             <span class="counter text-right"></span>
                         </div>
                     </label>
-                    <label class="nav-select">
+                    <label class="selectgroup">
                         <input type="radio" name="filter" value="unread" v-model="filterSelected">
-                        <div class="menu-item d-flex align-items-center w-100">
+                        <div class="selectgroup-label d-flex align-items-center w-100">
                             <span class="icon mr-2">{% inline "circle.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">Unread</span>
                             <span class="counter text-right">{{totalStats.unread || ''}}</span>
                         </div>
                     </label>
-                    <label class="nav-select">
+                    <label class="selectgroup">
                         <input type="radio" name="filter" value="starred" v-model="filterSelected">
-                        <div class="menu-item d-flex align-items-center w-100">
+                        <div class="selectgroup-label d-flex align-items-center w-100">
                             <span class="icon mr-2">{% inline "star.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">Starred</span>
                             <span class="counter text-right">{{totalStats.starred || ''}}</span>
                         </div>
                     </label>
                 </div>
-                <label class="nav-select">
+                <label class="selectgroup">
                     <input type="radio" name="feed" value="" v-model="feedSelected">
-                    <div class="menu-item d-flex align-items-center w-100">
+                    <div class="selectgroup-label d-flex align-items-center w-100">
                         <span class="icon mr-2">{% inline "layers.svg" %}</span>
                         <span class="flex-fill text-left text-truncate">All Feeds</span>
                         <span class="counter text-right"></span>
                     </div>
                 </label>
                 <div v-for="folder in foldersWithFeeds">
-                    <label class="nav-select mt-1">
+                    <label class="selectgroup mt-1">
                         <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
-                        <div class="menu-item d-flex align-items-center w-100" v-if="folder.id">
+                        <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
                             <span class="icon mr-2"
                                   :class="{expanded: folder.is_expanded}"
                                   @click.prevent="toggleFolderExpanded(folder)">
@@ -59,10 +59,10 @@
                         </div>
                     </label>
                     <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
-                        <label class="nav-select"
+                        <label class="selectgroup"
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
-                            <div class="menu-item d-flex align-items-center w-100">
+                            <div class="selectgroup-label d-flex align-items-center w-100">
                                 <span class="icon mr-2">{% inline "rss.svg" %}</span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right">{{filteredFeedStats[feed.id] || ''}}</span>
@@ -73,61 +73,59 @@
             </div>
         </div>
         <div class="vh-100 d-flex flex-column border-right flex-shrink-0" style="width: 300px">
-            <div class="d-flex">
-                <input class="form-control" type="" v-model="itemSearch">
-                <div class="p-2 border-bottom" v-if="filterSelected != 'starred'">
-                    <button class="btn btn-outline-secondary p-0" @click="markItemsRead()">
-                        <span class="icon">{% inline "layers.svg" %}</span>
-                    </button>
-                </div>
+            <div class="px-2 toolbar d-flex align-items-center">
+                <button class="toolbar-item">
+                    <span class="icon">{% inline "search.svg" %}</span>
+                </button>
+                <input class="d-block toolbar-search" type="" v-model="itemSearch">
+                <div class="flex-grow-1">&nbsp;</div>
+                <button class="toolbar-item" @click="markItemsRead()" v-if="filterSelected != 'starred'">
+                    <span class="icon">{% inline "check.svg" %}</span>
+                </button>
             </div>
-            <div class="p-2 overflow-auto" v-scroll="loadMoreItems">
+            <div class="p-2 overflow-auto border-top" v-scroll="loadMoreItems">
                 <label v-for="item in items" :key="item.id"
-                       class="nav-select"
+                       class="selectgroup"
                        :class="{'text-muted'  : filterSelected=='all' && item.status=='read',
                                 'text-primary': filterSelected=='all' && item.status=='starred'}">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
-                    <div class="menu-item p-2">
-                        <div class="d-flex flex-column">
-                            <div style="line-height: 1.2; opacity: .6;" class="d-flex">
-                                <small class="flex-fill text-truncate mr-1">{{feedsById[item.feed_id].title}}</small>
-                                <small class="flex-shrink-0"><relative-time :val="item.date"/></small>
-                            </div>
-                            <span>{{item.title}}</span>
+                    <div class="selectgroup-label d-flex flex-column">
+                        <div style="line-height: 1.2; opacity: .6;" class="d-flex">
+                            <small class="flex-fill text-truncate mr-1">{{feedsById[item.feed_id].title}}</small>
+                            <small class="flex-shrink-0"><relative-time :val="item.date"/></small>
                         </div>
+                        <span>{{item.title}}</span>
                     </div>
                 </label>
                 <button class="btn btn-link btn-block loading my-3" v-if="itemsPage.cur < itemsPage.num"></button>
             </div>
         </div>
         <div class="vh-100 d-flex flex-column w-100">
-            <div class="p-2 d-flex">
-                <div class="flex-grow-1">
-                    <div v-if="itemSelected">
-                        <button class="btn btn-link p-0" style="line-height: 1" @click="toggleItemStarred(itemSelectedDetails)">
-                            <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
-                            <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
-                        </button>
-                        <button class="btn btn-link p-0"
-                                style="line-height: 1"
-                                :disabled="itemSelectedDetails.status=='starred'"
-                                @click="toggleItemRead(itemSelectedDetails)">
-                            <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
-                            <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
-                        </button>
-                        <a class="btn btn-link p-0" :href="itemSelectedDetails.link" target="_blank" style="line-height: 1">
-                            <span class="icon">{% inline "external-link.svg" %}</span>
-                        </a>
-                        <button class="btn btn-link p-0" @click="getReadable(itemSelectedDetails)">
-                            <span class="icon">{% inline "book.svg" %}</span>
-                        </button>
-                    </div>
+            <div class="toolbar pl-2 d-flex align-items-center">
+                <div v-if="itemSelected">
+                    <button class="toolbar-item" @click="toggleItemStarred(itemSelectedDetails)">
+                        <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
+                        <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
+                    </button>
+                    <button class="toolbar-item"
+                            :disabled="itemSelectedDetails.status=='starred'"
+                            @click="toggleItemRead(itemSelectedDetails)">
+                        <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
+                        <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
+                    </button>
+                    <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank">
+                        <span class="icon">{% inline "external-link.svg" %}</span>
+                    </a>
+                    <button class="toolbar-item" @click="getReadable(itemSelectedDetails)">
+                        <span class="icon">{% inline "book-open.svg" %}</span>
+                    </button>
                 </div>
-                <button class="btn btn-link p-0" v-b-modal.settings-modal style="line-height: 1">
+                <div class="flex-grow-1">&nbsp;</div>
+                <button class="toolbar-item" v-b-modal.settings-modal>
                     <span class="icon">{% inline "settings.svg" %}</span>
                 </button>
             </div>
-            <div v-if="itemSelected" class="px-5 pt-3 pb-5 border-top overflow-auto">
+            <div v-if="itemSelected" class="px-4 pt-3 pb-5 border-top overflow-auto">
                 <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
