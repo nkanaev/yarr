@@ -20,6 +20,23 @@ import (
 	"strings"
 )
 
+var routes []Route = []Route{
+	p("/", IndexHandler),
+	p("/static/*path", StaticHandler),
+	p("/api/status", StatusHandler),
+	p("/api/folders", FolderListHandler),
+	p("/api/folders/:id", FolderHandler),
+	p("/api/feeds", FeedListHandler),
+	p("/api/feeds/:id", FeedHandler),
+	p("/api/feeds/find", FeedHandler),
+	p("/api/items", ItemListHandler),
+	p("/api/items/:id", ItemHandler),
+	p("/api/settings", SettingsHandler),
+	p("/opml/import", OPMLImportHandler),
+	p("/opml/export", OPMLExportHandler),
+	p("/page", PageCrawlHandler),
+}
+
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 	t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
 		"inline": func(svg string) template.HTML {

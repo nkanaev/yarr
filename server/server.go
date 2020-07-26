@@ -2,18 +2,10 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/nkanaev/yarr/storage"
 	"log"
 	"net/http"
-	"regexp"
 )
-
-type Route struct {
-	url      string
-	urlRegex *regexp.Regexp
-	handler  func(http.ResponseWriter, *http.Request)
-}
 
 type Handler struct {
 	db           *storage.Storage
@@ -25,14 +17,12 @@ type Handler struct {
 }
 
 func New(db *storage.Storage, logger *log.Logger) *Handler {
-	db.DeleteOldItems()
-	h := Handler{
+	return &Handler{
 		db:        db,
 		log:       logger,
 		feedQueue: make(chan storage.Feed),
 		counter:   make(chan int),
 	}
-	return &h
 }
 
 func (h *Handler) Start(addr string) {
@@ -41,7 +31,19 @@ func (h *Handler) Start(addr string) {
 	s.ListenAndServe()
 }
 
+func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	route, vars := getRoute(req)
+	if route == nil {
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	}
+	ctx := context.WithValue(req.Context(), ctxHandler, &h)
+	ctx = context.WithValue(ctx, ctxVars, vars)
+	route.handler(rw, req.WithContext(ctx))
+}
+
 func (h *Handler) startJobs() {
+	h.db.DeleteOldItems()
 	go func() {
 		for {
 			feed := <-h.feedQueue
@@ -70,39 +72,6 @@ func (h *Handler) fetchAllFeeds() {
 	}
 }
 
-func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
-	var urlRegexp string
-	urlRegexp = regexp.MustCompile(`[\*\:]\w+`).ReplaceAllStringFunc(path, func(m string) string {
-		if m[0:1] == `*` {
-			return "(?P<" + m[1:] + ">.+)"
-		}
-		return "(?P<" + m[1:] + ">[^/]+)"
-	})
-	urlRegexp = "^" + urlRegexp + "$"
-	return Route{
-		url:      path,
-		urlRegex: regexp.MustCompile(urlRegexp),
-		handler:  handler,
-	}
-}
-
-var routes []Route = []Route{
-	p("/", IndexHandler),
-	p("/static/*path", StaticHandler),
-	p("/api/status", StatusHandler),
-	p("/api/folders", FolderListHandler),
-	p("/api/folders/:id", FolderHandler),
-	p("/api/feeds", FeedListHandler),
-	p("/api/feeds/:id", FeedHandler),
-	p("/api/feeds/find", FeedHandler),
-	p("/api/items", ItemListHandler),
-	p("/api/items/:id", ItemHandler),
-	p("/api/settings", SettingsHandler),
-	p("/opml/import", OPMLImportHandler),
-	p("/opml/export", OPMLExportHandler),
-	p("/page", PageCrawlHandler),
-}
-
 func Vars(req *http.Request) map[string]string {
 	if rv := req.Context().Value(ctxVars); rv != nil {
 		return rv.(map[string]string)
@@ -111,8 +80,8 @@ func Vars(req *http.Request) map[string]string {
 }
 
 func db(req *http.Request) *storage.Storage {
-	if rv := req.Context().Value(ctxDB); rv != nil {
-		return rv.(*storage.Storage)
+	if h := handler(req); h != nil {
+		return h.db
 	}
 	return nil
 }
@@ -122,37 +91,6 @@ func handler(req *http.Request) *Handler {
 }
 
 const (
-	ctxDB      = 1
 	ctxVars    = 2
 	ctxHandler = 3
 )
-
-func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	for _, route := range routes {
-		if route.urlRegex.MatchString(req.URL.Path) {
-			ctx := context.WithValue(req.Context(), ctxDB, h.db)
-			ctx = context.WithValue(ctx, ctxHandler, &h)
-			if route.urlRegex.NumSubexp() > 0 {
-				vars := make(map[string]string)
-				matches := route.urlRegex.FindStringSubmatchIndex(req.URL.Path)
-				for i, key := range route.urlRegex.SubexpNames()[1:] {
-					vars[key] = req.URL.Path[matches[i*2+2]:matches[i*2+3]]
-				}
-				ctx = context.WithValue(ctx, ctxVars, vars)
-			}
-			route.handler(rw, req.WithContext(ctx))
-			return
-		}
-	}
-	rw.WriteHeader(http.StatusNotFound)
-}
-
-func writeJSON(rw http.ResponseWriter, data interface{}) {
-	rw.Header().Set("Content-Type", "application/json; charset=utf-8")
-	reply, err := json.Marshal(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-	rw.Write(reply)
-	rw.Write([]byte("\n"))
-}
