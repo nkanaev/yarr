@@ -332,7 +332,8 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 		if search := query.Get("search"); len(search) != 0 {
 			filter.Search = &search
 		}
-		items := db(req).ListItems(filter, (curPage-1)*perPage, perPage)
+		newestFirst := query.Get("oldest_first") != "true"
+		items := db(req).ListItems(filter, (curPage-1)*perPage, perPage, newestFirst)
 		count := db(req).CountItems(filter)
 		writeJSON(rw, map[string]interface{}{
 			"page": map[string]int{

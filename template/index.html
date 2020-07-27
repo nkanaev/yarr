@@ -23,9 +23,19 @@
                         <span class="icon mr-1">{% inline "plus.svg" %}</span>
                         New Feed
                     </b-dropdown-item-button>
-                    <b-dropdown-item-button @click="showSettings('manage')">
+                    <b-dropdown-item-button @click.stop="showSettings('manage')">
                         <span class="icon mr-1">{% inline "list.svg" %}</span>
                         Manage Feeds
+                    </b-dropdown-item-button>
+                    <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-header>Sort by</b-dropdown-header>
+                    <b-dropdown-item-button @click.stop="itemSortNewestFirst=true">
+                        <span class="icon mr-1" :class="{invisible: !itemSortNewestFirst}">{% inline "check.svg" %}</span>
+                        Newest First
+                    </b-dropdown-item-button>
+                    <b-dropdown-item-button @click="itemSortNewestFirst=false">
+                        <span class="icon mr-1" :class="{invisible: itemSortNewestFirst}">{% inline "check.svg" %}</span>
+                        Oldest First
                     </b-dropdown-item-button>
                     <b-dropdown-divider></b-dropdown-divider>
                     <b-dropdown-form id="opml-import-form" enctype="multipart/form-data">

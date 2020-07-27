@@ -131,9 +131,13 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 	return predicate, args
 }
 
-func (s *Storage) ListItems(filter ItemFilter, offset, limit int) []Item {
+func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bool) []Item {
 	predicate, args := listQueryPredicate(filter)
 	result := make([]Item, 0, 0)
+	order := "desc"
+	if !newestFirst {
+		order = "asc"
+	}
 	query := fmt.Sprintf(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.description,
@@ -141,9 +145,9 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int) []Item {
 		from items i
 		join feeds f on f.id = i.feed_id
 		where %s
-		order by i.date desc
+		order by i.date %s
 		limit %d offset %d
-		`, predicate, limit, offset)
+		`, predicate, order, limit, offset)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		s.log.Print(err)

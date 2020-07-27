@@ -8,6 +8,7 @@ func settingsDefaults() map[string]interface{} {
 		"feed":            "",
 		"feed_list_width": 300,
 		"item_list_width": 300,
+		"sort_newest_first": true,
 	}
 }
 

@@ -59,6 +59,7 @@ var vm = new Vue({
     api.settings.get().then(function(data) {
       vm.feedSelected = data.feed
       vm.filterSelected = data.filter
+      vm.itemSortNewestFirst = data.sort_newest_first
       vm.refreshItems()
     })
     this.refreshFeeds()
@@ -79,6 +80,7 @@ var vm = new Vue({
       'itemSelectedDetails': {},
       'itemSelectedReadability': '',
       'itemSearch': '',
+      'itemSortNewestFirst': null,
       'settings': 'create',
       'loading': {
         'newfeed': false,
@@ -161,6 +163,10 @@ var vm = new Vue({
         this.refreshItems()
       }
     }, 500),
+    'itemSortNewestFirst': function(newVal, oldVal) {
+      if (oldVal === null) return
+      api.settings.update({sort_newest_first: newVal}).then(this.refreshItems.bind(this))
+    },
   },
   methods: {
     refreshStats: function() {
@@ -189,6 +195,9 @@ var vm = new Vue({
       }
       if (this.itemSearch) {
         query.search = this.itemSearch
+      }
+      if (!this.itemSortNewestFirst) {
+        query.oldest_first = true
       }
       return query
     },
