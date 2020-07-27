@@ -17,7 +17,7 @@
                 <!--<button class="toolbar-item" v-b-modal.settings-modal>-->
                 <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="toolbar-item px-2">
                     <template v-slot:button-content class="toolbar-item">
-                        <span class="icon">{% inline "more-vertical.svg" %}</span>
+                        <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
                     <b-dropdown-item-button @click="showSettings('create')">
                         <span class="icon mr-1">{% inline "plus.svg" %}</span>
@@ -50,7 +50,7 @@
                     <label class="selectgroup">
                         <input type="radio" name="filter" value="unread" v-model="filterSelected">
                         <div class="selectgroup-label d-flex align-items-center w-100">
-                            <span class="icon mr-2">{% inline "circle.svg"  %}</span>
+                            <span class="icon mr-2">{% inline "circle-full.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">Unread</span>
                             <span class="counter text-right">{{totalStats.unread || ''}}</span>
                         </div>
@@ -66,7 +66,7 @@
                     <label class="selectgroup">
                         <input type="radio" name="filter" value="" v-model="filterSelected">
                         <div class="selectgroup-label d-flex align-items-center w-100">
-                            <span class="icon mr-2">{% inline "circle-full.svg"  %}</span>
+                            <span class="icon mr-2">{% inline "assorted.svg"  %}</span>
                             <span class="flex-fill text-left text-truncate">All</span>
                             <span class="counter text-right"></span>
                         </div>
