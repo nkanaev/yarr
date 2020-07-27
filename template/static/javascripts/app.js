@@ -19,6 +19,31 @@ Vue.directive('scroll', {
   },
 })
 
+Vue.component('drag', {
+  props: ['width'],
+  template: '<div class="drag"></div>',
+  mounted: function() {
+    var vm = this
+    var startX = undefined
+    var initW = undefined
+    var onMouseMove = function(e) {
+      var offset = e.clientX - startX
+      var newWidth = initW + offset
+      vm.$emit('resize', newWidth)
+    }
+    var onMouseUp = function(e) {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+    }
+    this.$el.addEventListener('mousedown', function(e) {
+      startX = e.clientX
+      initW = vm.width
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
+    })
+  },
+})
+
 function dateRepr(d) {
   var sec = (new Date().getTime() - d.getTime()) / 1000
   if (sec < 2700)  // less than 45 minutes
@@ -60,6 +85,8 @@ var vm = new Vue({
       vm.feedSelected = data.feed
       vm.filterSelected = data.filter
       vm.itemSortNewestFirst = data.sort_newest_first
+      vm.feedListWidth = data.feed_list_width || 300
+      vm.itemListWidth = data.item_list_width || 300
       vm.refreshItems()
     })
     this.refreshFeeds()
@@ -71,6 +98,7 @@ var vm = new Vue({
       'folders': [],
       'feeds': [],
       'feedSelected': null,
+      'feedListWidth': null,
       'items': [],
       'itemsPage': {
         'cur': 1,
@@ -81,6 +109,7 @@ var vm = new Vue({
       'itemSelectedReadability': '',
       'itemSearch': '',
       'itemSortNewestFirst': null,
+      'itemListWidth': null,
       'settings': 'create',
       'loading': {
         'newfeed': false,
@@ -167,6 +196,14 @@ var vm = new Vue({
       if (oldVal === null) return
       api.settings.update({sort_newest_first: newVal}).then(this.refreshItems.bind(this))
     },
+    'feedListWidth': debounce(function(newVal, oldVal) {
+      if (oldVal === null) return
+      api.settings.update({feed_list_width: newVal})
+    }, 1000),
+    'itemListWidth': debounce(function(newVal, oldVal) {
+      if (oldVal === null) return
+      api.settings.update({item_list_width: newVal})
+    }, 1000),
   },
   methods: {
     refreshStats: function() {
@@ -367,6 +404,12 @@ var vm = new Vue({
     showSettings: function(settings) {
       this.settings = settings
       this.$bvModal.show('settings-modal')
+    },
+    resizeFeedList: function(width) {
+      this.feedListWidth = Math.min(Math.max(200, width), 700)
+    },
+    resizeItemList: function(width) {
+      this.itemListWidth = Math.min(Math.max(200, width), 700)
     },
   }
 })
