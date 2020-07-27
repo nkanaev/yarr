@@ -30,13 +30,15 @@ select.form-control {
 }
 
 select.form-control:not([multiple]):not([size]) {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23667189'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") no-repeat right .35rem center/.6rem .6rem;
   padding-right: 1.2rem;
+  cursor: pointer;
 }
 
 .form-control:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(0,123,255,.25), inset 0 1px 1px rgba(16,22,26,.2);
+  box-shadow: none;  /*0 0 0 2px rgba(0,123,255,.25), inset 0 1px 1px rgba(16,22,26,.2);*/
 }
 
 .btn:focus {
@@ -224,6 +226,23 @@ select.form-control:not([multiple]):not([size]) {
 .btn-default:active {
   background: #f5f7f9;
   box-shadow: none;
+}
+
+.btn-default:focus {
+  border-color: var(--color-primary);
+}
+
+.list-row {
+  padding-left: .5rem;
+  padding-right: .5rem;
+  margin-left: -.5rem;
+  margin-right: -.5rem;
+  border-radius: 3px;
+  cursor: default;
+}
+
+.list-row:hover {
+  background-color: #f8f9fa;
 }
 
 .toolbar {
