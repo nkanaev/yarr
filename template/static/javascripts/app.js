@@ -355,5 +355,9 @@ var vm = new Vue({
         })
       }
     },
+    showSettings: function(settings) {
+      this.settings = settings
+      this.$bvModal.show('settings-modal')
+    },
   }
 })

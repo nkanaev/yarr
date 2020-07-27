@@ -11,7 +11,7 @@ body {
 }
 
 .wrapper {
-  max-width: 1368px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -45,6 +45,10 @@ select.form-control:not([multiple]):not([size]) {
 
 .dropdown-header {
   cursor: default;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dropdown-toggle-no-caret:after {
@@ -67,6 +71,14 @@ select.form-control:not([multiple]):not([size]) {
 .settings-dropdown .dropdown-item, .settings-dropdown .dropdown-header {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.settings-dropdown .dropdown-item:focus {
+  outline: none;
+}
+
+.settings-dropdown.large .dropdown-item {
+  padding: .5rem 1rem;
 }
 
 .dropdown-danger .dropdown-item {
@@ -100,17 +112,23 @@ select.form-control:not([multiple]):not([size]) {
   background-color: transparent;
 }
 
+.b-dropdown-form:focus {
+  outline: none;
+}
+
 /* custom elements */
 
 .icon {
   height: 1rem;
   width: 1rem;
+  line-height: 1;
+  max-height: 1rem;
 }
 
 .icon > svg {
   width: 1rem;
   height: 1rem;
-  display: block;
+  vertical-align: text-top;
 }
 
 .feed-icon {
@@ -209,8 +227,8 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .toolbar {
-  height: 2rem !important;
   min-height: 2rem !important;
+  max-height: 2rem !important;
 }
 
 .toolbar-item {
@@ -221,8 +239,8 @@ select.form-control:not([multiple]):not([size]) {
   border: 1px solid transparent;
   padding: .25rem .5rem;
   font-size: 1rem;
-  line-height: 2;
   border-radius: .25rem;
+  line-height: 1;
   color: inherit;
 
   text-align: center;
@@ -245,10 +263,22 @@ select.form-control:not([multiple]):not([size]) {
   cursor: not-allowed;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
+}
+
 /* content */
 
 .content {
   line-height: 1.5;
+}
+
+.content img {
+  max-width: 100%;
 }
 
 .content a:hover {
