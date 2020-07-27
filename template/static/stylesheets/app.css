@@ -305,7 +305,7 @@ select.form-control:not([multiple]):not([size]) {
   right: 0;
   width: 6px;
   height: 100%;
-  z-index: 10000;
+  z-index: 900;
   cursor: col-resize;
 }
 
