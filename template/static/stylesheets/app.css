@@ -121,14 +121,14 @@ select.form-control:not([multiple]):not([size]) {
 .icon {
   height: 1rem;
   width: 1rem;
+  display: inline-block;
   line-height: 1;
-  max-height: 1rem;
 }
 
 .icon > svg {
   width: 1rem;
   height: 1rem;
-  vertical-align: text-top;
+  vertical-align: top;
 }
 
 .feed-icon {
