@@ -14,7 +14,7 @@
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
             <div class="px-2 toolbar d-flex align-items-center mb-3">
                 <span class="icon mx-2">{% inline "anchor.svg" %}</span>
-                <div class="flex-grow-1">&nbsp;</div>
+                <div class="flex-grow-1 noselect">&nbsp;</div>
                 <!--<button class="toolbar-item" v-b-modal.settings-modal>-->
                 <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="toolbar-item px-2">
                     <template v-slot:button-content class="toolbar-item">
@@ -127,7 +127,7 @@
                     <span class="icon">{% inline "search.svg" %}</span>
                 </button>
                 <input class="d-block toolbar-search" type="" v-model="itemSearch">
-                <div class="flex-grow-1">&nbsp;</div>
+                <div class="flex-grow-1 noselect">&nbsp;</div>
                 <button class="toolbar-item" @click="markItemsRead()" v-if="filterSelected == 'unread'">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>

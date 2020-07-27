@@ -151,6 +151,14 @@ select.form-control:not([multiple]):not([size]) {
   margin: 0;
 }
 
+.selectgroup *, .noselect {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+}
+
 .selectgroup input {
   opacity: 0;
   position: absolute;
