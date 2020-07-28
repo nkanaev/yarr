@@ -193,9 +193,14 @@ var vm = new Vue({
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === null) return  // do nothing, initial setup
       api.settings.update({feed: newVal}).then(this.refreshItems.bind(this))
+      this.itemSelected = null
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedReadability = ''
+      if (newVal === null) {
+        this.itemSelectedDetails = null
+        return
+      }
       this.itemSelectedDetails = this.itemsById[newVal]
       if (this.itemSelectedDetails.status == 'unread') {
         this.itemSelectedDetails.status = 'read'
