@@ -242,7 +242,7 @@
                                 </b-dropdown-item>
                                 <b-dropdown-item
                                    @click.prevent="moveFeed(feed, null)" v-if="feed.folder_id">
-                                    Uncategorized
+                                    <span class="text-muted">Uncategorized</span>
                                 </b-dropdown-item>
                                 <b-dropdown-divider></b-dropdown-divider>
                                 <b-dropdown-item class="dropdown-danger"
