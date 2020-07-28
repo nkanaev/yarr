@@ -1,5 +1,7 @@
 'use strict';
 
+var TITLE = document.title
+
 DOMPurify.addHook('afterSanitizeAttributes', function (node) {
   // set all elements owning target to target=_blank
   if ('target' in node) {
@@ -186,6 +188,16 @@ var vm = new Vue({
     },
   },
   watch: {
+    'feedStats': {
+      deep: true,
+      handler: debounce(function() {
+        var title = TITLE
+        if (this.totalStats.unread) {
+          title += ' ('+this.totalStats.unread+')'
+        }
+        document.title = title
+      }, 500),
+    },
     'filterSelected': function(newVal, oldVal) {
       if (oldVal === null) return  // do nothing, initial setup
       api.settings.update({filter: newVal}).then(this.refreshItems.bind(this))
