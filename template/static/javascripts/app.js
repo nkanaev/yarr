@@ -1,5 +1,7 @@
 'use strict';
 
+Vue.prototype.$sanitize = DOMPurify.sanitize
+
 var debounce = function(callback, wait) {
   var timeout
   return function() {

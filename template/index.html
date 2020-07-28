@@ -177,9 +177,9 @@
                 </div>
                 <hr>
                 <div class="content">
-                    <div v-html="itemSelectedReadability" v-if="itemSelectedReadability"></div>
-                    <div v-html="itemSelectedDetails.content" v-else-if="itemSelectedDetails.content"></div>
-                    <div v-html="itemSelectedDetails.description" v-else-if="itemSelectedDetails.description"></div>
+                    <div v-html="$sanitize(itemSelectedReadability)" v-if="itemSelectedReadability"></div>
+                    <div v-html="$sanitize(itemSelectedDetails.content)" v-else-if="itemSelectedDetails.content"></div>
+                    <div v-html="$sanitize(itemSelectedDetails.description)" v-else-if="itemSelectedDetails.description"></div>
                 </div>
             </div>
         </div>
@@ -261,6 +261,7 @@
     <!-- <script src="./static/javascripts/bootstrap.min.js"></script> -->
     <script src="./static/javascripts/bootstrap-vue.min.js"></script>
     <script src="./static/javascripts/Readability.js"></script>
+    <script src="./static/javascripts/purify.min.js"></script>
     <script src="./static/javascripts/api.js"></script>
     <script src="./static/javascripts/app.js"></script>
 </body>
