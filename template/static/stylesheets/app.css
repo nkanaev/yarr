@@ -146,6 +146,10 @@ select.form-control:not([multiple]):not([size]) {
   opacity: .6;
 }
 
+.light {
+  opacity: .6;
+}
+
 .selectgroup {
   position: relative;
   display: block;

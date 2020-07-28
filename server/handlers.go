@@ -184,7 +184,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 				}
 				writeJSON(rw, map[string]string{"status": "success"})
 			}
-		} else if strings.HasPrefix(contentType, "text/xml") || strings.HasPrefix(contentType, "application/xml") {
+		} else if strings.HasPrefix(contentType, "text/xml") || strings.HasPrefix(contentType, "application/xml") || strings.HasPrefix(contentType, "application/rss+xml") {
 			err = createFeed(db(req), feedUrl, feed.FolderID)
 			if err == nil {
 				writeJSON(rw, map[string]string{"status": "success"})

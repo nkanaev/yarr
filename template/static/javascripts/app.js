@@ -117,6 +117,8 @@ var vm = new Vue({
       'feeds': [],
       'feedSelected': null,
       'feedListWidth': null,
+      'feedNewChoice': [],
+      'feedNewChoiceSelected': '',
       'items': [],
       'itemsPage': {
         'cur': 1,
@@ -380,6 +382,9 @@ var vm = new Vue({
         url: form.querySelector('input[name=url]').value,
         folder_id: parseInt(form.querySelector('select[name=folder_id]').value) || null,
       }
+      if (this.feedNewChoiceSelected) {
+        data.url = this.feedNewChoiceSelected
+      }
       this.loading.newfeed = true
       var vm = this
       api.feeds.create(data).then(function(result) {
@@ -388,6 +393,9 @@ var vm = new Vue({
             vm.feeds = feeds
           })
           vm.$bvModal.hide('settings-modal')
+        } else if (result.status === 'multiple') {
+          vm.feedNewChoice = result.choice
+          vm.feedNewChoiceSelected = result.choice[0].url
         }
         vm.loading.newfeed = false
       })
@@ -443,6 +451,10 @@ var vm = new Vue({
     },
     resizeItemList: function(width) {
       this.itemListWidth = Math.min(Math.max(200, width), 700)
+    },
+    resetFeedChoice: function() {
+      this.feedNewChoice = []
+      this.feedNewChoiceSelected = ''
     },
   }
 })
