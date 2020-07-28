@@ -1,5 +1,19 @@
 'use strict';
 
+DOMPurify.addHook('afterSanitizeAttributes', function (node) {
+  // set all elements owning target to target=_blank
+  if ('target' in node) {
+    node.setAttribute('target', '_blank');
+  }
+  // set non-HTML/MathML links to xlink:show=new
+  if (
+    !node.hasAttribute('target') &&
+    (node.hasAttribute('xlink:href') || node.hasAttribute('href'))
+  ) {
+    node.setAttribute('xlink:show', 'new');
+  }
+});
+
 Vue.prototype.$sanitize = DOMPurify.sanitize
 
 var debounce = function(callback, wait) {
