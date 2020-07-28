@@ -1,5 +1,9 @@
 package storage
 
+import (
+	"html"
+)
+
 type Feed struct {
 	Id          int64  `json:"id"`
 	FolderId    *int64 `json:"folder_id"`
@@ -15,7 +19,7 @@ func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, fo
 		insert into feeds (title, description, link, feed_link, icon, folder_id) 
 		values (?, ?, ?, ?, ?, ?)
 		on conflict (feed_link) do update set folder_id=?`,
-		title, description, link, feedLink, icon, folderId,
+		html.UnescapeString(title), description, link, feedLink, icon, folderId,
 		folderId,
 	)
 	if err != nil {

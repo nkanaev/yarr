@@ -3,7 +3,8 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/html"
+	xhtml "golang.org/x/net/html"
+	"html"
 	"strings"
 	"time"
 )
@@ -77,7 +78,7 @@ func (s *Storage) CreateItems(items []Item) bool {
 			)
 			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			on conflict (guid) do update set date_updated=?`,
-			item.GUID, item.FeedId, item.Title, item.Link, item.Description,
+			item.GUID, item.FeedId, html.UnescapeString(item.Title), item.Link, item.Description,
 			item.Content, item.Author, item.Date, item.DateUpdated, UNREAD, item.Image,
 			// upsert values
 			item.DateUpdated,
@@ -259,15 +260,15 @@ func (s *Storage) FeedStats() []FeedStat {
 }
 
 func HTMLText(s string) string {
-	tokenizer := html.NewTokenizer(strings.NewReader(s))
+	tokenizer := xhtml.NewTokenizer(strings.NewReader(s))
 	contents := make([]string, 0)
 	for {
 		token := tokenizer.Next()
-		if token == html.ErrorToken {
+		if token == xhtml.ErrorToken {
 			break
 		}
-		if token == html.TextToken {
-			content := strings.TrimSpace(html.UnescapeString(string(tokenizer.Text())))
+		if token == xhtml.TextToken {
+			content := strings.TrimSpace(xhtml.UnescapeString(string(tokenizer.Text())))
 			if len(content) > 0 {
 				contents = append(contents, content)
 			}
