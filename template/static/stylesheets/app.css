@@ -313,6 +313,37 @@ select.form-control:not([multiple]):not([size]) {
   cursor: col-resize;
 }
 
+.input-icon {
+  position: relative;
+}
+
+.input-icon .icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 2rem;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.input-icon input {
+  padding-left: 2rem !important;
+  width: 100%;
+}
+
+.toolbar-search {
+  border: none;
+  border-radius: 3px;
+  padding: .25rem .5rem;
+  line-height: 1;
+}
+
+.toolbar-search:hover, .toolbar-search:focus {
+  background-color: #f3f3f3;
+  outline: none;
+}
+
 /* content */
 
 .content {

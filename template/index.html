@@ -123,12 +123,11 @@
         <div class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0"  :style="{width: itemListWidth+'px'}">
             <drag :width="itemListWidth" @resize="resizeItemList"></drag>
             <div class="px-2 toolbar d-flex align-items-center">
-                <button class="toolbar-item">
+                <div class="input-icon flex-grow-1">
                     <span class="icon">{% inline "search.svg" %}</span>
-                </button>
-                <input class="d-block toolbar-search" type="" v-model="itemSearch">
-                <div class="flex-grow-1 noselect">&nbsp;</div>
-                <button class="toolbar-item" @click="markItemsRead()" v-if="filterSelected == 'unread'">
+                    <input class="d-block toolbar-search" type="" v-model="itemSearch">
+                </div>
+                <button class="toolbar-item ml-2" @click="markItemsRead()" v-if="filterSelected == 'unread'">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
             </div>
