@@ -223,9 +223,7 @@ var vm = new Vue({
       }
     },
     'itemSearch': debounce(function(newVal) {
-      if (newVal) {
-        this.refreshItems()
-      }
+      this.refreshItems()
     }, 500),
     'itemSortNewestFirst': function(newVal, oldVal) {
       if (oldVal === null) return
