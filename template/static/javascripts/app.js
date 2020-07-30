@@ -203,6 +203,7 @@ var vm = new Vue({
     'filterSelected': function(newVal, oldVal) {
       if (oldVal === null) return  // do nothing, initial setup
       api.settings.update({filter: newVal}).then(this.refreshItems.bind(this))
+      this.itemSelected = null
     },
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === null) return  // do nothing, initial setup

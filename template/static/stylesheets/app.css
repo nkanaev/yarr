@@ -350,7 +350,7 @@ select.form-control:not([multiple]):not([size]) {
   line-height: 1.5;
 }
 
-.content img {
+.content img, .content video {
   max-width: 100%;
 }
 
