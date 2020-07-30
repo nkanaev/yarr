@@ -196,7 +196,7 @@
                     <div class="mt-4" v-if="feedNewChoice.length">
                         <p class="mb-2">
                             Multiple feeds found. Choose one below:
-                            <a href="#" class="float-right" @click.prevent="resetFeedChoice()">cancel</a>
+                            <a href="#" class="float-right text-decoration-none" @click.prevent="resetFeedChoice()">cancel</a>
                         </p>
                         <label class="selectgroup" v-for="choice in feedNewChoice">
                             <input type="radio" name="feedToAdd" :value="choice.url" v-model="feedNewChoiceSelected">

@@ -5,23 +5,24 @@ import (
 	"github.com/nkanaev/yarr/storage"
 	"log"
 	"net/http"
+	"runtime"
+	"sync/atomic"
+	"time"
 )
 
 type Handler struct {
 	db           *storage.Storage
 	log          *log.Logger
-	fetchRunning bool
 	feedQueue    chan storage.Feed
-	counter      chan int
-	queueSize    int
+	queueSize    int32
 }
 
 func New(db *storage.Storage, logger *log.Logger) *Handler {
 	return &Handler{
 		db:        db,
 		log:       logger,
-		feedQueue: make(chan storage.Feed),
-		counter:   make(chan int),
+		feedQueue: make(chan storage.Feed, 1000),
+		queueSize: 0,
 	}
 }
 
@@ -43,33 +44,39 @@ func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (h *Handler) startJobs() {
-	h.db.DeleteOldItems()
-	go func() {
+	delTicker := time.NewTicker(time.Hour * 24)
+	worker := func() {
 		for {
-			feed := <-h.feedQueue
-			items := listItems(feed)
-			h.db.CreateItems(items)
+			select {
+			case feed := <-h.feedQueue:
+				items := listItems(feed)
+				h.db.CreateItems(items)
+				atomic.AddInt32(&h.queueSize, -1)
+			case <- delTicker.C:
+				h.db.DeleteOldItems()
+			}
 		}
-	}()
-	go func() {
-		for {
-			val := <-h.counter
-			h.queueSize += val
-		}
-	}()
+	}
+
+	num := runtime.NumCPU() - 1
+	if num < 1 {
+		num = 1
+	}
+	for i := 0; i < num; i++ {
+		go worker()
+	}
+	go h.db.DeleteOldItems()
 	go h.db.SyncSearch()
-	h.fetchAllFeeds()
-}
 
-func (h *Handler) fetchFeed(feed storage.Feed) {
-	h.queueSize += 1
-	h.feedQueue <- feed
-}
-
-func (h *Handler) fetchAllFeeds() {
+	// fetch all feeds
 	for _, feed := range h.db.ListFeeds() {
 		h.fetchFeed(feed)
 	}
+}
+
+func (h *Handler) fetchFeed(feed storage.Feed) {
+	atomic.AddInt32(&h.queueSize, 1)
+	h.feedQueue <- feed
 }
 
 func Vars(req *http.Request) map[string]string {
