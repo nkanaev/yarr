@@ -136,6 +136,8 @@ var vm = new Vue({
         'items': false,
       },
       'feedStats': {},
+      'font': 'sans-serif',
+      'theme': 'light',
     }
   },
   computed: {

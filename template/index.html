@@ -167,6 +167,39 @@
                 <button class="toolbar-item" @click="getReadable(itemSelectedDetails)">
                     <span class="icon">{% inline "book-open.svg" %}</span>
                 </button>
+                <button class="toolbar-item" id="content-customize">
+                    <span class="icon">{% inline "sliders.svg" %}</span>
+                </button>
+                <b-popover target="content-customize" triggers="click" placement="bottom">
+                    <div class="p-1" style="width: 200px;">
+                        <div class="d-flex">
+                            <label class="themepicker">
+                                <input type="radio" name="settingsFont" value="light" v-model="theme">
+                                <div class="themepicker-label appearance-option"></div>
+                            </label>
+                            <label class="themepicker">
+                                <input type="radio" name="settingsFont" value="sepia" v-model="theme">
+                                <div class="themepicker-label appearance-option"></div>
+                            </label>
+                            <label class="themepicker">
+                                <input type="radio" name="settingsFont" value="night" v-model="theme">
+                                <div class="themepicker-label appearance-option"></div>
+                            </label>
+                        </div>
+                        <div class="mt-2">
+                            <label class="selectgroup" v-for="font in ['', 'serif', 'sans-serif']">
+                                <input type="radio" name="feedToAdd" :value="font" v-model="font">
+                                <div class="selectgroup-label appearance-option">
+                                    <div :style="{'font-family': font}">{{ font || 'System' }}</div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="btn-group d-flex mt-2">
+                            <button class="btn btn-outline appearance-option" style="font-size: 0.8rem">A</button>
+                            <button class="btn btn-outline appearance-option" style="font-size: 1.2rem">A</button>
+                        </div>
+                    </div>
+                </b-popover>
             </div>
             <div v-if="itemSelected" class="px-4 pt-3 pb-5 border-top overflow-auto">
                 <h3>{{itemSelectedDetails.title}}</h3>
