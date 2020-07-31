@@ -8,8 +8,7 @@
     <link rel="icon shortcut" href="./static/images/anchor.png">
 </head>
 <body>
-<div class="container-fluid p-0" :class="'theme-' + settings.theme" id="app" v-cloak>
-    <div class="wrapper d-flex vh-100 ">
+    <div class="wrapper d-flex vh-100" id="app" v-cloak>
         <!-- feed list -->
         <div class="vh-100 position-relative overflow-auto border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
@@ -313,14 +312,13 @@
             </div>
         </div>
     </div>
-</div>
-<script src="./static/javascripts/vue.min.js"></script>
-<script src="./static/javascripts/popper.min.js"></script>
-<!-- <script src="./static/javascripts/bootstrap.min.js"></script> -->
-<script src="./static/javascripts/bootstrap-vue.min.js"></script>
-<script src="./static/javascripts/Readability.js"></script>
-<script src="./static/javascripts/purify.min.js"></script>
-<script src="./static/javascripts/api.js"></script>
-<script src="./static/javascripts/app.js"></script>
+    <script src="./static/javascripts/vue.min.js"></script>
+    <script src="./static/javascripts/popper.min.js"></script>
+    <!-- <script src="./static/javascripts/bootstrap.min.js"></script> -->
+    <script src="./static/javascripts/bootstrap-vue.min.js"></script>
+    <script src="./static/javascripts/Readability.js"></script>
+    <script src="./static/javascripts/purify.min.js"></script>
+    <script src="./static/javascripts/api.js"></script>
+    <script src="./static/javascripts/app.js"></script>
 </body>
 </html>

@@ -223,6 +223,12 @@ var vm = new Vue({
     },
   },
   watch: {
+    'settings': {
+      deep: true,
+      handler: function(newVal) {
+        document.body.classList.value = 'theme-' + newVal.theme
+      },
+    },
     'feedStats': {
       deep: true,
       handler: debounce(function() {
