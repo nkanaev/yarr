@@ -434,3 +434,18 @@ select.form-control:not([multiple]):not([size]) {
   border-left: 3px solid #22262a;
   padding-left: 1rem;
 }
+
+/* theme */
+
+.theme-light {
+  
+}
+
+.theme-sepia {
+  background-color: yellow;
+}
+
+.theme-night {
+  background-color: black;
+  color: white;
+}
