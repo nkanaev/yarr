@@ -354,8 +354,9 @@ select.form-control:not([multiple]):not([size]) {
   max-width: 100%;
 }
 
-.content a:hover {
-  text-decoration: none;
+.content a {
+  color: inherit;
+  text-decoration: underline;
 }
 
 .content blockquote {
