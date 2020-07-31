@@ -381,36 +381,31 @@ select.form-control:not([multiple]):not([size]) {
   height: 1.75rem;
   border-radius: 4px;
   cursor: pointer;
-  border: 1px solid transparent;
-}
-
-.themepicker input:checked + .themepicker-label {
-  box-shadow: inset 0 0 0px 1px #017bfe;
-  border-color: #017bfe !important;
-}
-
-.themepicker-label:hover {
-  box-shadow: inset 0 0 0px 1px rgb(1, 123, 254, .6);
-  border-color: rgb(1, 123, 254, .6) !important;
 }
 
 .themepicker input[value=light] + .themepicker-label {
+  box-shadow: inset 0 0 0px 1px #dee2e6;
   background: #fff;
-  border-color: #dee2e6;
 }
 
 .themepicker input[value=sepia] + .themepicker-label {
   background: yellow;
-  border-color: yellow;
 }
 
 .themepicker input[value=night] + .themepicker-label {
   background: #111;
-  border-color: #111;
 }
 
 .themepicker + .themepicker {
   margin-left: .5rem;
+}
+
+.themepicker-label:hover {
+  box-shadow: inset 0 0 0 2px rgb(1, 123, 254, .6) !important;
+}
+
+.themepicker input:checked + .themepicker-label {
+  box-shadow: inset 0 0 0px 2px #017bfe !important;
 }
 
 .appearance-option {
