@@ -135,9 +135,7 @@
             </div>
             <div class="p-2 overflow-auto border-top" v-scroll="loadMoreItems">
                 <label v-for="item in items" :key="item.id"
-                       class="selectgroup"
-                       :class="{'text-muted'  : filterSelected=='all' && item.status=='read',
-                                'text-primary': filterSelected=='all' && item.status=='starred'}">
+                       class="selectgroup">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="selectgroup-label d-flex flex-column">
                         <div style="line-height: 1.2; opacity: .6;" class="d-flex">
