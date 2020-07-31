@@ -25,13 +25,8 @@ function fontAvailable(desiredFont) {
   var width = element.offsetWidth;
   element.style.setProperty('font-family', desiredFont);
   var new_width = element.offsetWidth;
-  console.log(desiredFont, width !== new_width)
   element.remove();
   return (width !== new_width);
-}
-
-Vue.prototype.$fonts = function() {
-  return FONTS.filter(fontAvailable)
 }
 
 DOMPurify.addHook('afterSanitizeAttributes', function (node) {
@@ -167,9 +162,13 @@ var vm = new Vue({
         'newfeed': false,
         'items': false,
       },
+      'availableFonts': FONTS.filter(fontAvailable),
       'feedStats': {},
-      'font': '',
-      'theme': 'light',
+      'settings': {
+        'font': '',
+        'theme': 'light',
+        'size': 1.0,
+      },
     }
   },
   computed: {
@@ -489,5 +488,9 @@ var vm = new Vue({
       this.feedNewChoice = []
       this.feedNewChoiceSelected = ''
     },
+    incrFont: function(x) {
+      console.log(x, this.settings.size)
+      this.settings.size = +(this.settings.size + (0.1 * x)).toFixed(1)
+    }
   }
 })
