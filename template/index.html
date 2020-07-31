@@ -187,10 +187,16 @@
                             </label>
                         </div>
                         <div class="mt-2">
-                            <label class="selectgroup" v-for="font in ['', 'serif', 'sans-serif']">
-                                <input type="radio" name="feedToAdd" :value="font" v-model="font">
+                            <label class="selectgroup">
+                                <input type="radio" name="font" value="" v-model="font">
                                 <div class="selectgroup-label appearance-option">
-                                    <div :style="{'font-family': font}">{{ font || 'System' }}</div>
+                                    System Default
+                                </div>
+                            </label>
+                            <label class="selectgroup" v-for="f in $fonts()" :key="font">
+                                <input type="radio" name="font" :value="f" v-model="font">
+                                <div class="selectgroup-label appearance-option":style="{'font-family': f}">
+                                    {{ f }}
                                 </div>
                             </label>
                         </div>
@@ -208,7 +214,7 @@
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
-                <div class="content">
+                <div class="content" :style="{'font-family': font,}">
                     <div v-html="$sanitize(itemSelectedReadability)" v-if="itemSelectedReadability"></div>
                     <div v-html="$sanitize(itemSelectedDetails.content)" v-else-if="itemSelectedDetails.content"></div>
                     <div v-html="$sanitize(itemSelectedDetails.description)" v-else-if="itemSelectedDetails.description"></div>

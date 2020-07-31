@@ -2,6 +2,38 @@
 
 var TITLE = document.title
 
+var FONTS = [
+  "Arial",
+  "Courier New",
+  "Georgia",
+  "Helvetica Neue",
+  "Segoe UI",
+  "Tahoma",
+  "Times New Roman",
+  "Verdana",
+]
+
+// adapted from https://github.com/darkwing/FontChecker
+function fontAvailable(desiredFont) {
+  var element = document.createElement('span')
+  element.style.setProperty('position', 'absolute')
+  element.style.setProperty('top', '-10')
+  element.style.setProperty('right', '-10')
+  element.style.setProperty('font-family', '__RUBBISH_FONT__')
+  element.innerHTML = 'abcdefghijklmnopqrstuvwxyz'
+  document.body.appendChild(element)
+  var width = element.offsetWidth;
+  element.style.setProperty('font-family', desiredFont);
+  var new_width = element.offsetWidth;
+  console.log(desiredFont, width !== new_width)
+  element.remove();
+  return (width !== new_width);
+}
+
+Vue.prototype.$fonts = function() {
+  return FONTS.filter(fontAvailable)
+}
+
 DOMPurify.addHook('afterSanitizeAttributes', function (node) {
   // set all elements owning target to target=_blank
   if ('target' in node) {
@@ -136,7 +168,7 @@ var vm = new Vue({
         'items': false,
       },
       'feedStats': {},
-      'font': 'sans-serif',
+      'font': '',
       'theme': 'light',
     }
   },
