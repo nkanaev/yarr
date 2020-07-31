@@ -251,6 +251,7 @@ select.form-control:not([multiple]):not([size]) {
   margin-left: -.5rem;
   margin-right: -.5rem;
   border-radius: 3px;
+  user-select: none;
   cursor: default;
 }
 
@@ -342,6 +343,10 @@ select.form-control:not([multiple]):not([size]) {
 .toolbar-search:hover, .toolbar-search:focus {
   background-color: #f3f3f3;
   outline: none;
+}
+
+.selectgroup-label, .toolbar-item, .toolbar-search, .list-row {
+  transition: background-color .1s ease-out;
 }
 
 /* content */

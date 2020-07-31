@@ -183,6 +183,9 @@
             </div>
         </div>
         <b-modal id="settings-modal" hide-header hide-footer lazy>
+            <button class="btn btn-link outline-none float-right p-2 mr-n2 mt-n2" style="line-height: 1" @click="$bvModal.hide('settings-modal')">
+                <span class="icon">{% inline "x.svg" %}</span>
+            </button>
             <div v-if="settings=='create'">
                 <p class="cursor-default"><b>New Feed</b></p>
                 <form action="" @submit.prevent="createFeed(event)" class="mt-4">
