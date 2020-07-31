@@ -123,6 +123,15 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
+.b-tooltip {
+  opacity: 1;
+  font-size: .7rem;
+}
+
+.b-tooltip:focus {
+  outline: none;
+}
+
 /* custom elements */
 
 .icon {

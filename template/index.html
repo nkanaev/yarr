@@ -15,7 +15,6 @@
             <div class="px-2 toolbar d-flex align-items-center mb-3">
                 <span class="icon mx-2">{% inline "anchor.svg" %}</span>
                 <div class="flex-grow-1 noselect">&nbsp;</div>
-                <!--<button class="toolbar-item" v-b-modal.settings-modal>-->
                 <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="toolbar-item px-2">
                     <template v-slot:button-content class="toolbar-item">
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
@@ -127,7 +126,10 @@
                     <span class="icon">{% inline "search.svg" %}</span>
                     <input class="d-block toolbar-search" type="" v-model="itemSearch">
                 </div>
-                <button class="toolbar-item ml-2" @click="markItemsRead()" v-if="filterSelected == 'unread'">
+                <button class="toolbar-item ml-2"
+                        @click="markItemsRead()"
+                        v-if="filterSelected == 'unread'"
+                        v-b-tooltip.hover.bottom="'Mark All Read'">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
             </div>
@@ -151,23 +153,26 @@
         <!-- item show -->
         <div class="vh-100 d-flex flex-column w-100">
             <div class="toolbar pl-2 d-flex align-items-center" v-if="itemSelected">
-                <button class="toolbar-item" @click="toggleItemStarred(itemSelectedDetails)">
+                <button class="toolbar-item"
+                        @click="toggleItemStarred(itemSelectedDetails)"
+                        v-b-tooltip.hover.bottom="'Mark Starred'">
                     <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
                     <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
                 </button>
                 <button class="toolbar-item"
                         :disabled="itemSelectedDetails.status=='starred'"
+                        v-b-tooltip.hover.bottom="'Mark Unread'"
                         @click="toggleItemRead(itemSelectedDetails)">
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank">
+                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open URL'">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
-                <button class="toolbar-item" @click="getReadable(itemSelectedDetails)">
+                <button class="toolbar-item" @click="getReadable(itemSelectedDetails)" v-b-tooltip.hover.bottom="'Fetch Content'">
                     <span class="icon">{% inline "book-open.svg" %}</span>
                 </button>
-                <button class="toolbar-item" id="content-customize">
+                <button class="toolbar-item" id="content-customize" v-b-tooltip.hover.bottom="'Customize'">
                     <span class="icon">{% inline "sliders.svg" %}</span>
                 </button>
                 <b-popover target="content-customize" triggers="click" placement="bottom">
