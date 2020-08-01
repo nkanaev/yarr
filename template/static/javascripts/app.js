@@ -497,6 +497,9 @@ var vm = new Vue({
     incrFont: function(x) {
       console.log(x, this.settings.size)
       this.settings.size = +(this.settings.size + (0.1 * x)).toFixed(1)
-    }
+    },
+    fetchAllFeeds: function() {
+      api.feeds.refresh()
+    },
   }
 })

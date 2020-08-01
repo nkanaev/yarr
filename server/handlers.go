@@ -27,6 +27,7 @@ var routes []Route = []Route{
 	p("/api/folders", FolderListHandler),
 	p("/api/folders/:id", FolderHandler),
 	p("/api/feeds", FeedListHandler),
+	p("/api/feeds/refresh", FeedRefreshHandler),
 	p("/api/feeds/:id", FeedHandler),
 	p("/api/feeds/find", FeedHandler),
 	p("/api/items", ItemListHandler),
@@ -134,6 +135,15 @@ type NewFeed struct {
 type UpdateFeed struct {
 	Title    *string `json:"title,omitempty"`
 	FolderID *int64  `json:"folder_id,omitempty"`
+}
+
+func FeedRefreshHandler(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == "POST" {
+		handler(req).fetchAllFeeds()
+		rw.WriteHeader(http.StatusOK)
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 func FeedListHandler(rw http.ResponseWriter, req *http.Request) {

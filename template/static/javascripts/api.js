@@ -37,6 +37,9 @@
       list_items: function(id) {
         return api('get', '/api/feeds/' + id + '/items').then(json)
       },
+      refresh: function() {
+        return api('post', '/api/feeds/refresh')
+      },
     },
     folders: {
       list: function() {

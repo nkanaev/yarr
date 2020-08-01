@@ -28,6 +28,11 @@
                         Manage Feeds
                     </b-dropdown-item-button>
                     <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-item-button @click.stop="fetchAllFeeds()">
+                        <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
+                        Refresh Feeds
+                    </b-dropdown-item-button>
+                    <b-dropdown-divider></b-dropdown-divider>
                     <b-dropdown-header>Sort by</b-dropdown-header>
                     <b-dropdown-item-button @click.stop="itemSortNewestFirst=true">
                         <span class="icon mr-1" :class="{invisible: !itemSortNewestFirst}">{% inline "check.svg" %}</span>
