@@ -67,8 +67,10 @@ func (h *Handler) startJobs() {
 	}
 	go h.db.DeleteOldItems()
 	go h.db.SyncSearch()
+	//h.fetchAllFeeds()
+}
 
-	// fetch all feeds
+func (h *Handler) fetchAllFeeds() {
 	for _, feed := range h.db.ListFeeds() {
 		h.fetchFeed(feed)
 	}

@@ -292,7 +292,6 @@ func (s *Storage) SyncSearch() {
 	for rows.Next() {
 		var item Item
 		rows.Scan(&item.Id, &item.Title, &item.Content, &item.Description)
-		fmt.Println(item)
 		items = append(items, item)
 	}
 
