@@ -51,7 +51,6 @@ Vue.component('drag', {
   props: ['width'],
   template: '<div class="drag"></div>',
   mounted: function() {
-    var vm = this
     var startX = undefined
     var initW = undefined
     var onMouseMove = function(e) {
@@ -108,7 +107,6 @@ Vue.component('relative-time', {
 var vm = new Vue({
   el: '#app',
   created: function() {
-    var vm = this
     api.settings.get().then(function(data) {
       vm.feedSelected = data.feed
       vm.filterSelected = data.filter
@@ -271,7 +269,6 @@ var vm = new Vue({
   },
   methods: {
     refreshStats: function() {
-      var vm = this
       api.status().then(function(data) {
         vm.feedStats = data.stats.reduce(function(acc, stat) {
           acc[stat.feed_id] = stat
@@ -303,7 +300,6 @@ var vm = new Vue({
       return query
     },
     refreshFeeds: function() {
-      var vm = this
       Promise
         .all([api.folders.list(), api.feeds.list()])
         .then(function(values) {
@@ -314,7 +310,6 @@ var vm = new Vue({
     refreshItems: function() {
       var query = this.getItemsQuery()
       this.loading.items = true
-      var vm = this
       api.items.list(query).then(function(data) {
         vm.items = data.list
         vm.itemsPage = data.page
@@ -337,7 +332,6 @@ var vm = new Vue({
       }
     },
     markItemsRead: function() {
-      var vm = this
       var query = this.getItemsQuery()
       api.items.mark_read(query).then(function() {
         vm.items = []
@@ -365,7 +359,6 @@ var vm = new Vue({
       var form = event.target
       var titleInput = form.querySelector('input[name=title]')
       var data = {'title': titleInput.value}
-      var vm = this
       api.folders.create(data).then(function(result) {
         vm.folders.push(result)
         titleInput.value = ''
@@ -380,7 +373,6 @@ var vm = new Vue({
       }
     },
     deleteFolder: function(folder) {
-      var vm = this
       if (confirm('Are you sure you want to delete ' + folder.title + '?')) {
         api.folders.delete(folder.id).then(function() {
           vm.refresh()
@@ -397,7 +389,6 @@ var vm = new Vue({
     },
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
-        var vm = this
         api.feeds.delete(feed.id).then(function() {
           api.feeds.list().then(function(feeds) {
             vm.feeds = feeds
@@ -415,7 +406,6 @@ var vm = new Vue({
         data.url = this.feedNewChoiceSelected
       }
       this.loading.newfeed = true
-      var vm = this
       api.feeds.create(data).then(function(result) {
         if (result.status === 'success') {
           api.feeds.list().then(function(feeds) {
@@ -450,7 +440,6 @@ var vm = new Vue({
       api.items.update(item.id, {status: item.status})
     },
     importOPML: function(event) {
-      var vm = this
       var input = event.target
       var form = document.querySelector('#opml-import-form')
       api.upload_opml(form).then(function() {
@@ -460,7 +449,6 @@ var vm = new Vue({
     },
     getReadable: function(item) {
       if (item.link) {
-        var vm = this
         api.crawl(item.link).then(function(body) {
           if (!body.length) return
           var doc = new DOMParser().parseFromString(body, 'text/html')
