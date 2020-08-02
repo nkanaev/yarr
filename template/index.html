@@ -201,7 +201,7 @@
                                     System Default
                                 </div>
                             </label>
-                            <label class="selectgroup" v-for="f in availableFonts" :key="f">
+                            <label class="selectgroup" v-for="f in fonts" :key="f">
                                 <input type="radio" name="font" :value="f" v-model="theme.font">
                                 <div class="selectgroup-label appearance-option":style="{'font-family': f}">
                                     {{ f }}

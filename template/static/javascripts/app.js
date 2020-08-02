@@ -7,27 +7,10 @@ var FONTS = [
   "Courier New",
   "Georgia",
   "Helvetica Neue",
-  "Segoe UI",
   "Tahoma",
   "Times New Roman",
   "Verdana",
 ]
-
-// adapted from https://github.com/darkwing/FontChecker
-function fontAvailable(desiredFont) {
-  var element = document.createElement('span')
-  element.style.setProperty('position', 'absolute')
-  element.style.setProperty('top', '-10')
-  element.style.setProperty('right', '-10')
-  element.style.setProperty('font-family', '__RUBBISH_FONT__')
-  element.innerHTML = 'abcdefghijklmnopqrstuvwxyz'
-  document.body.appendChild(element)
-  var width = element.offsetWidth;
-  element.style.setProperty('font-family', desiredFont);
-  var new_width = element.offsetWidth;
-  element.remove();
-  return (width !== new_width);
-}
 
 DOMPurify.addHook('afterSanitizeAttributes', function (node) {
   // set all elements owning target to target=_blank
@@ -165,7 +148,7 @@ var vm = new Vue({
         'newfeed': false,
         'items': false,
       },
-      'availableFonts': FONTS.filter(fontAvailable),
+      'fonts': FONTS,
       'feedStats': {},
       'theme': {
         'name': 'light',
