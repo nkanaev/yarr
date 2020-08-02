@@ -376,6 +376,7 @@ var vm = new Vue({
       if (confirm('Are you sure you want to delete ' + folder.title + '?')) {
         api.folders.delete(folder.id).then(function() {
           if (vm.feedSelected === 'folder:'+folder.id) {
+            vm.items = []
             vm.feedSelected = ''
           }
           vm.refreshStats()
@@ -395,6 +396,7 @@ var vm = new Vue({
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         api.feeds.delete(feed.id).then(function() {
           if (vm.feedSelected === 'feed:'+feed.id) {
+            vm.items = []
             vm.feedSelected = ''
           }
           vm.refreshStats()
