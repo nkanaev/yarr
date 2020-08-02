@@ -375,7 +375,11 @@ var vm = new Vue({
     deleteFolder: function(folder) {
       if (confirm('Are you sure you want to delete ' + folder.title + '?')) {
         api.folders.delete(folder.id).then(function() {
-          vm.refresh()
+          if (vm.feedSelected === 'folder:'+folder.id) {
+            vm.feedSelected = ''
+          }
+          vm.refreshStats()
+          vm.refreshFeeds()
         })
       }
     },
@@ -390,9 +394,11 @@ var vm = new Vue({
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         api.feeds.delete(feed.id).then(function() {
-          api.feeds.list().then(function(feeds) {
-            vm.feeds = feeds
-          })
+          if (vm.feedSelected === 'feed:'+feed.id) {
+            vm.feedSelected = ''
+          }
+          vm.refreshStats()
+          vm.refreshFeeds()
         })
       }
     },
