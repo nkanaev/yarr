@@ -417,9 +417,8 @@ var vm = new Vue({
       this.loading.newfeed = true
       api.feeds.create(data).then(function(result) {
         if (result.status === 'success') {
-          api.feeds.list().then(function(feeds) {
-            vm.feeds = feeds
-          })
+          vm.refreshFeeds()
+          vm.refreshStats()
           vm.$bvModal.hide('settings-modal')
         } else if (result.status === 'multiple') {
           vm.feedNewChoice = result.choice
