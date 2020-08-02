@@ -268,6 +268,9 @@ var vm = new Vue({
   methods: {
     refreshStats: function() {
       api.status().then(function(data) {
+        if (data.running) {
+          setTimeout(vm.refreshStats.bind(vm), 2000)
+        }
         vm.feedStats = data.stats.reduce(function(acc, stat) {
           acc[stat.feed_id] = stat
           return acc
@@ -451,6 +454,7 @@ var vm = new Vue({
       api.upload_opml(form).then(function() {
         input.value = ''
         vm.refreshFeeds()
+        vm.refreshStats()
       })
     },
     getReadable: function(item) {

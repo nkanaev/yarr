@@ -14,15 +14,16 @@ type Handler struct {
 	db           *storage.Storage
 	log          *log.Logger
 	feedQueue    chan storage.Feed
-	queueSize    int32
+	queueSize    *int32
 }
 
 func New(db *storage.Storage, logger *log.Logger) *Handler {
+	queueSize := int32(0)
 	return &Handler{
 		db:        db,
 		log:       logger,
 		feedQueue: make(chan storage.Feed, 1000),
-		queueSize: 0,
+		queueSize: &queueSize,
 	}
 }
 
@@ -51,7 +52,7 @@ func (h *Handler) startJobs() {
 			case feed := <-h.feedQueue:
 				items := listItems(feed)
 				h.db.CreateItems(items)
-				atomic.AddInt32(&h.queueSize, -1)
+				atomic.AddInt32(h.queueSize, -1)
 			case <- delTicker.C:
 				h.db.DeleteOldItems()
 			}
@@ -77,7 +78,7 @@ func (h *Handler) fetchAllFeeds() {
 }
 
 func (h *Handler) fetchFeed(feed storage.Feed) {
-	atomic.AddInt32(&h.queueSize, 1)
+	atomic.AddInt32(h.queueSize, 1)
 	h.feedQueue <- feed
 }
 
