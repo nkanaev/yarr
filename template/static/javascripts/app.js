@@ -6,8 +6,6 @@ var FONTS = [
   "Arial",
   "Courier New",
   "Georgia",
-  "Helvetica Neue",
-  "Tahoma",
   "Times New Roman",
   "Verdana",
 ]
