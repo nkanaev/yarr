@@ -182,27 +182,27 @@
                     <div class="p-1" style="width: 200px;">
                         <div class="d-flex">
                             <label class="themepicker">
-                                <input type="radio" name="settingsTheme" value="light" v-model="settings.theme">
+                                <input type="radio" name="settingsTheme" value="light" v-model="theme.name">
                                 <div class="themepicker-label appearance-option"></div>
                             </label>
                             <label class="themepicker">
-                                <input type="radio" name="settingsTheme" value="sepia" v-model="settings.theme">
+                                <input type="radio" name="settingsTheme" value="sepia" v-model="theme.name">
                                 <div class="themepicker-label appearance-option"></div>
                             </label>
                             <label class="themepicker">
-                                <input type="radio" name="settingsTheme" value="night" v-model="settings.theme">
+                                <input type="radio" name="settingsTheme" value="night" v-model="theme.name">
                                 <div class="themepicker-label appearance-option"></div>
                             </label>
                         </div>
                         <div class="mt-2">
                             <label class="selectgroup">
-                                <input type="radio" name="font" value="" v-model="settings.font">
+                                <input type="radio" name="font" value="" v-model="theme.font">
                                 <div class="selectgroup-label appearance-option">
                                     System Default
                                 </div>
                             </label>
                             <label class="selectgroup" v-for="f in availableFonts" :key="f">
-                                <input type="radio" name="font" :value="f" v-model="settings.font">
+                                <input type="radio" name="font" :value="f" v-model="theme.font">
                                 <div class="selectgroup-label appearance-option":style="{'font-family': f}">
                                     {{ f }}
                                 </div>
@@ -224,7 +224,7 @@
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
-                <div class="content" :style="{'font-family': settings.font, 'font-size': settings.size + 'rem'}">
+                <div class="content" :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">
                     <div v-html="$sanitize(itemSelectedReadability)" v-if="itemSelectedReadability"></div>
                     <div v-html="$sanitize(itemSelectedDetails.content)" v-else-if="itemSelectedDetails.content"></div>
                     <div v-html="$sanitize(itemSelectedDetails.description)" v-else-if="itemSelectedDetails.description"></div>

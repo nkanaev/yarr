@@ -9,6 +9,9 @@ func settingsDefaults() map[string]interface{} {
 		"feed_list_width": 300,
 		"item_list_width": 300,
 		"sort_newest_first": true,
+		"theme_name": "light",
+		"theme_font": "",
+		"theme_size": 1,
 	}
 }
 

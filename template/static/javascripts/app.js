@@ -132,6 +132,9 @@ var vm = new Vue({
       vm.itemSortNewestFirst = data.sort_newest_first
       vm.feedListWidth = data.feed_list_width || 300
       vm.itemListWidth = data.item_list_width || 300
+      vm.theme.name = data.theme_name
+      vm.theme.font = data.theme_font
+      vm.theme.size = data.theme_size
       vm.refreshItems()
     })
     this.refreshFeeds()
@@ -164,10 +167,10 @@ var vm = new Vue({
       },
       'availableFonts': FONTS.filter(fontAvailable),
       'feedStats': {},
-      'settings': {
+      'theme': {
+        'name': 'light',
         'font': '',
-        'theme': 'light',
-        'size': 1.0,
+        'size': 1,
       },
     }
   },
@@ -223,10 +226,15 @@ var vm = new Vue({
     },
   },
   watch: {
-    'settings': {
+    'theme': {
       deep: true,
-      handler: function(newVal) {
-        document.body.classList.value = 'theme-' + newVal.theme
+      handler: function(theme) {
+        document.body.classList.value = 'theme-' + theme.name
+        api.settings.update({
+          theme_name: theme.name,
+          theme_font: theme.font,
+          theme_size: theme.size,
+        })
       },
     },
     'feedStats': {
@@ -495,8 +503,7 @@ var vm = new Vue({
       this.feedNewChoiceSelected = ''
     },
     incrFont: function(x) {
-      console.log(x, this.settings.size)
-      this.settings.size = +(this.settings.size + (0.1 * x)).toFixed(1)
+      this.theme.size = +(this.theme.size + (0.1 * x)).toFixed(1)
     },
     fetchAllFeeds: function() {
       api.feeds.refresh()
