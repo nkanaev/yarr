@@ -49,12 +49,13 @@ Vue.component('drag', {
   props: ['width'],
   template: '<div class="drag"></div>',
   mounted: function() {
+    var self = this
     var startX = undefined
     var initW = undefined
     var onMouseMove = function(e) {
       var offset = e.clientX - startX
       var newWidth = initW + offset
-      vm.$emit('resize', newWidth)
+      self.$emit('resize', newWidth)
     }
     var onMouseUp = function(e) {
       document.removeEventListener('mousemove', onMouseMove)
@@ -62,7 +63,7 @@ Vue.component('drag', {
     }
     this.$el.addEventListener('mousedown', function(e) {
       startX = e.clientX
-      initW = vm.width
+      initW = self.width
       document.addEventListener('mousemove', onMouseMove)
       document.addEventListener('mouseup', onMouseUp)
     })
