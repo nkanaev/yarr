@@ -444,6 +444,10 @@ select.form-control:not([multiple]):not([size]) {
   padding-left: 1rem;
 }
 
+.content pre {
+  overflow-x: scroll;
+}
+
 /* theme */
 
 .theme-light {

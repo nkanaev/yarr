@@ -154,7 +154,7 @@
             </div>
         </div>
         <!-- item show -->
-        <div class="vh-100 d-flex flex-column w-100">
+        <div class="vh-100 d-flex flex-column w-100" style="min-width: 0;">
             <div class="toolbar pl-2 d-flex align-items-center" v-if="itemSelected">
                 <button class="toolbar-item"
                         @click="toggleItemStarred(itemSelectedDetails)"
@@ -217,18 +217,18 @@
                     </div>
                 </b-popover>
             </div>
-            <div v-if="itemSelected" class="px-4 pt-3 pb-5 border-top overflow-auto">
+            <div v-if="itemSelected"
+                 class="content px-4 pt-3 pb-5 border-top overflow-auto"
+                 :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">
                 <h3>{{itemSelectedDetails.title}}</h3>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
-                <div class="content" :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">
-                    <div v-html="$sanitize(itemSelectedReadability)" v-if="itemSelectedReadability"></div>
-                    <div v-html="$sanitize(itemSelectedDetails.content)" v-else-if="itemSelectedDetails.content"></div>
-                    <div v-html="$sanitize(itemSelectedDetails.description)" v-else-if="itemSelectedDetails.description"></div>
-                </div>
+                <div v-html="$sanitize(itemSelectedReadability)" v-if="itemSelectedReadability"></div>
+                <div v-html="$sanitize(itemSelectedDetails.content)" v-else-if="itemSelectedDetails.content"></div>
+                <div v-html="$sanitize(itemSelectedDetails.description)" v-else-if="itemSelectedDetails.description"></div>
             </div>
         </div>
         <b-modal id="settings-modal" hide-header hide-footer lazy>
