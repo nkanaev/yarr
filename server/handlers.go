@@ -27,9 +27,10 @@ var routes []Route = []Route{
 	p("/api/folders", FolderListHandler),
 	p("/api/folders/:id", FolderHandler),
 	p("/api/feeds", FeedListHandler),
-	p("/api/feeds/refresh", FeedRefreshHandler),
-	p("/api/feeds/:id", FeedHandler),
 	p("/api/feeds/find", FeedHandler),
+	p("/api/feeds/refresh", FeedRefreshHandler),
+	p("/api/feeds/:id/icon", FeedIconHandler),
+	p("/api/feeds/:id", FeedHandler),
 	p("/api/items", ItemListHandler),
 	p("/api/items/:id", ItemHandler),
 	p("/api/settings", SettingsHandler),
@@ -146,6 +147,22 @@ func FeedRefreshHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func FeedIconHandler(rw http.ResponseWriter, req *http.Request) {
+	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	feed := db(req).GetFeed(id)
+	if feed != nil && feed.Icon != nil {
+		rw.Header().Set("Content-Type", http.DetectContentType(*feed.Icon))
+		rw.Header().Set("Content-Length", strconv.Itoa(len(*feed.Icon)))
+		rw.Write(*feed.Icon)
+	} else {
+		rw.WriteHeader(http.StatusNotFound)
+	}
+}
+
 func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		list := db(req).ListFeeds()
@@ -259,7 +276,6 @@ func createFeed(s *storage.Storage, url string, folderId *int64) error {
 		feed.Description,
 		feed.Link,
 		feedLink,
-		"",
 		folderId,
 	)
 	s.CreateItems(convertItems(feed.Items, *storedFeed))
@@ -430,11 +446,11 @@ func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		for _, outline := range feeds.Outlines {
 			if outline.Type == "rss" {
-				db(req).CreateFeed(outline.Title, outline.Description, outline.SiteURL, outline.FeedURL, "", nil)
+				db(req).CreateFeed(outline.Title, outline.Description, outline.SiteURL, outline.FeedURL, nil)
 			} else {
 				folder := db(req).CreateFolder(outline.Title)
 				for _, o := range outline.AllFeeds() {
-					db(req).CreateFeed(o.Title, o.Description, o.SiteURL, o.FeedURL, "", &folder.Id)
+					db(req).CreateFeed(o.Title, o.Description, o.SiteURL, o.FeedURL, &folder.Id)
 				}
 			}
 		}

@@ -53,6 +53,15 @@ func (h *Handler) startJobs() {
 				items := listItems(feed)
 				h.db.CreateItems(items)
 				atomic.AddInt32(h.queueSize, -1)
+				if !feed.HasIcon {
+					icon, err := findFavicon(feed.Link, feed.FeedLink)
+					if icon != nil {
+						h.db.UpdateFeedIcon(feed.Id, icon)
+					}
+					if err != nil {
+						h.log.Print(err)
+					}
+				}
 			case <- delTicker.C:
 				h.db.DeleteOldItems()
 			}

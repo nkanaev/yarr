@@ -141,7 +141,7 @@ select.form-control:not([multiple]):not([size]) {
   line-height: 1;
 }
 
-.icon > svg {
+.icon > svg , .icon > img {
   width: 1rem;
   height: 1rem;
   vertical-align: top;

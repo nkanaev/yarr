@@ -114,7 +114,8 @@
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                             <div class="selectgroup-label d-flex align-items-center w-100">
-                                <span class="icon mr-2">{% inline "rss.svg" %}</span>
+                                <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
+                                <span class="icon mr-2" v-else><img :src="'/api/feeds/'+feed.id+'/icon'" alt=""></span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right">{{filteredFeedStats[feed.id] || ''}}</span>
                             </div>

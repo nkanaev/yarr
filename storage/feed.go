@@ -5,21 +5,22 @@ import (
 )
 
 type Feed struct {
-	Id          int64  `json:"id"`
-	FolderId    *int64 `json:"folder_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Link        string `json:"link"`
-	FeedLink    string `json:"feed_link"`
-	Icon        string `json:"icon"`
+	Id          int64   `json:"id"`
+	FolderId    *int64  `json:"folder_id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Link        string  `json:"link"`
+	FeedLink    string  `json:"feed_link"`
+	Icon        *[]byte `json:"icon,omitempty"`
+	HasIcon     bool    `json:"has_icon"`
 }
 
-func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, folderId *int64) *Feed {
+func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId *int64) *Feed {
 	result, err := s.db.Exec(`
-		insert into feeds (title, description, link, feed_link, icon, folder_id) 
-		values (?, ?, ?, ?, ?, ?)
+		insert into feeds (title, description, link, feed_link, folder_id) 
+		values (?, ?, ?, ?, ?)
 		on conflict (feed_link) do update set folder_id=?`,
-		html.UnescapeString(title), description, link, feedLink, icon, folderId,
+		html.UnescapeString(title), description, link, feedLink, folderId,
 		folderId,
 	)
 	if err != nil {
@@ -35,7 +36,6 @@ func (s *Storage) CreateFeed(title, description, link, feedLink, icon string, fo
 		Description: description,
 		Link:        link,
 		FeedLink:    feedLink,
-		Icon:        icon,
 		FolderId:    folderId,
 	}
 }
@@ -56,10 +56,16 @@ func (s *Storage) UpdateFeedFolder(feedId int64, newFolderId int64) bool {
 	return err == nil
 }
 
+func (s *Storage) UpdateFeedIcon(feedId int64, icon *[]byte) bool {
+	_, err := s.db.Exec(`update feeds set icon = ? where id = ?`, icon, feedId)
+	return err == nil
+}
+
 func (s *Storage) ListFeeds() []Feed {
 	result := make([]Feed, 0, 0)
 	rows, err := s.db.Query(`
-		select id, folder_id, title, description, link, feed_link, icon
+		select id, folder_id, title, description, link, feed_link,
+		       ifnull(icon, '') != '' as has_icon
 		from feeds
 	`)
 	if err != nil {
@@ -75,7 +81,7 @@ func (s *Storage) ListFeeds() []Feed {
 			&f.Description,
 			&f.Link,
 			&f.FeedLink,
-			&f.Icon,
+			&f.HasIcon,
 		)
 		if err != nil {
 			s.log.Print(err)
@@ -84,4 +90,27 @@ func (s *Storage) ListFeeds() []Feed {
 		result = append(result, f)
 	}
 	return result
+}
+
+func (s *Storage) GetFeed(id int64) *Feed {
+	row := s.db.QueryRow(`
+		select id, folder_id, title, description, link, feed_link, icon,
+		       ifnull(icon, '') != '' as has_icon
+		from feeds where id = ?
+	`, id)
+	if row != nil {
+		var f Feed
+		row.Scan(
+			&f.Id,
+			&f.FolderId,
+			&f.Title,
+			&f.Description,
+			&f.Link,
+			&f.FeedLink,
+			&f.Icon,
+			&f.HasIcon,
+		)
+		return &f
+	}
+	return nil
 }

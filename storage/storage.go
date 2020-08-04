@@ -23,7 +23,7 @@ create table if not exists feeds (
  description    text,
  link           text,
  feed_link      text not null,
- icon           text
+ icon           blob
 );
 
 create index if not exists idx_feed_folder_id on feeds(folder_id);
