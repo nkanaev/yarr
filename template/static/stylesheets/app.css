@@ -432,6 +432,7 @@ select.form-control:not([multiple]):not([size]) {
 
 .content img, .content video {
   max-width: 100%;
+  height: auto;
 }
 
 .content a {
