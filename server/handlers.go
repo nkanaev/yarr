@@ -65,7 +65,7 @@ func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 
 func StatusHandler(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, map[string]interface{}{
-		"running": *handler(req).queueSize > 0,
+		"running": *handler(req).queueSize,
 		"stats":   db(req).FeedStats(),
 	})
 }

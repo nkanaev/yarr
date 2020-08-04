@@ -13,8 +13,10 @@
         <div class="vh-100 position-relative overflow-auto border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
             <div class="px-2 toolbar d-flex align-items-center mb-3">
-                <span class="icon mx-2">{% inline "anchor.svg" %}</span>
-                <div class="flex-grow-1 noselect">&nbsp;</div>
+                <div class="icon mx-2" :class="{loading: loading.feeds}">{% inline "anchor.svg" %}</div>
+                <div class="text-truncate cursor-default flex-grow-1 noselect">
+                    <span v-if="loading.feeds">Refreshing ({{loading.feeds}} left)</span>
+                </div>
                 <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="toolbar-item px-2">
                     <template v-slot:button-content class="toolbar-item">
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>

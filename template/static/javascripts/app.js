@@ -142,6 +142,7 @@ var vm = new Vue({
       'itemListWidth': null,
       'settings': 'create',
       'loading': {
+        'feeds': false,
         'newfeed': false,
         'items': false,
       },
@@ -272,6 +273,7 @@ var vm = new Vue({
   methods: {
     refreshStats: function() {
       api.status().then(function(data) {
+        vm.loading.feeds = data.running
         if (data.running) {
           setTimeout(vm.refreshStats.bind(vm), 2000)
         }
@@ -490,7 +492,7 @@ var vm = new Vue({
       this.theme.size = +(this.theme.size + (0.1 * x)).toFixed(1)
     },
     fetchAllFeeds: function() {
-      api.feeds.refresh()
+      api.feeds.refresh().then(this.refreshStats.bind(this))
     },
   }
 })
