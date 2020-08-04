@@ -287,7 +287,8 @@
                     </div>
                     <div v-for="feed in folder.feeds" class="list-row d-flex align-items-center" :key="feed.id">
                         <div class="w-100 text-truncate">
-                            <span class="icon mr-2">{% inline "rss.svg" %}</span>
+                            <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
+                            <span class="icon mr-2" v-else><img :src="'/api/feeds/'+feed.id+'/icon'" alt=""></span>
                             {{ feed.title }}
                         </div>
                         <div class="flex-shrink-0">
