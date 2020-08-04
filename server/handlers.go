@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -131,11 +132,6 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 type NewFeed struct {
 	Url      string `json:"url"`
 	FolderID *int64 `json:"folder_id,omitempty"`
-}
-
-type UpdateFeed struct {
-	Title    *string `json:"title,omitempty"`
-	FolderID *int64  `json:"folder_id,omitempty"`
 }
 
 func FeedRefreshHandler(rw http.ResponseWriter, req *http.Request) {
@@ -289,17 +285,29 @@ func FeedHandler(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if req.Method == "PUT" {
-		var body UpdateFeed
+		feed := db(req).GetFeed(id)
+		if feed == nil {
+			rw.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		body := make(map[string]interface{})
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if body.Title != nil {
-			db(req).RenameFeed(id, *body.Title)
+		if title, ok := body["title"]; ok {
+			if reflect.TypeOf(title).Kind() == reflect.String {
+				db(req).RenameFeed(id, title.(string))
+			}
 		}
-		if body.FolderID != nil {
-			db(req).UpdateFeedFolder(id, *body.FolderID)
+		if f_id, ok := body["folder_id"]; ok {
+			if f_id == nil {
+				db(req).UpdateFeedFolder(id, nil)
+			} else if reflect.TypeOf(f_id).Kind() == reflect.Float64 {
+				folderId := int64(f_id.(float64))
+				db(req).UpdateFeedFolder(id, &folderId)
+			}
 		}
 		rw.WriteHeader(http.StatusOK)
 	} else if req.Method == "DELETE" {

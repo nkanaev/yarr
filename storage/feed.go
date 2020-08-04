@@ -51,8 +51,8 @@ func (s *Storage) RenameFeed(feedId int64, newTitle string) bool {
 	return err == nil
 }
 
-func (s *Storage) UpdateFeedFolder(feedId int64, newFolderId int64) bool {
-	_, err := s.db.Exec(`update feeds set folder_id = ? where id = ?`, intOrNil(newFolderId), feedId)
+func (s *Storage) UpdateFeedFolder(feedId int64, newFolderId *int64) bool {
+	_, err := s.db.Exec(`update feeds set folder_id = ? where id = ?`, newFolderId, feedId)
 	return err == nil
 }
 

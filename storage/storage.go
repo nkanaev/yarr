@@ -89,10 +89,3 @@ func New(path string, logger *log.Logger) (*Storage, error) {
 	}
 	return &Storage{db: db, log: logger}, nil
 }
-
-func intOrNil(id int64) interface{} {
-	if id == 0 {
-		return nil
-	}
-	return id
-}
