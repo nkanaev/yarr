@@ -219,6 +219,7 @@
                 </b-popover>
             </div>
             <div v-if="itemSelected"
+                 ref="content"
                  class="content px-4 pt-3 pb-5 border-top overflow-auto"
                  :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">
                 <h3>{{itemSelectedDetails.title}}</h3>

@@ -243,6 +243,9 @@ var vm = new Vue({
         this.itemSelectedDetails = null
         return
       }
+      if (this.$refs.content) {
+        this.$refs.content.scrollTop = 0
+      }
       this.itemSelectedDetails = this.itemsById[newVal]
       if (this.itemSelectedDetails.status == 'unread') {
         this.itemSelectedDetails.status = 'read'
