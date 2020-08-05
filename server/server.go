@@ -46,6 +46,20 @@ func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 func (h *Handler) startJobs() {
 	delTicker := time.NewTicker(time.Hour * 24)
+
+	syncSearchChannel := make(chan bool, 10)
+	var syncSearchTimer *time.Timer  // TODO: should this be atomic?
+
+	syncSearch := func() {
+		if syncSearchTimer == nil {
+			syncSearchTimer = time.AfterFunc(time.Second * 2, func() {
+				syncSearchChannel <- true
+			})
+		} else {
+			syncSearchTimer.Reset(time.Second * 2)
+		}
+	}
+
 	worker := func() {
 		for {
 			select {
@@ -53,6 +67,7 @@ func (h *Handler) startJobs() {
 				items := listItems(feed)
 				h.db.CreateItems(items)
 				atomic.AddInt32(h.queueSize, -1)
+				syncSearch()
 				if !feed.HasIcon {
 					icon, err := findFavicon(feed.Link, feed.FeedLink)
 					if icon != nil {
@@ -64,6 +79,8 @@ func (h *Handler) startJobs() {
 				}
 			case <- delTicker.C:
 				h.db.DeleteOldItems()
+			case <- syncSearchChannel:
+				h.db.SyncSearch()
 			}
 		}
 	}
