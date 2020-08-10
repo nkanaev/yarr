@@ -447,6 +447,21 @@ select.form-control:not([multiple]):not([size]) {
   overflow-x: scroll;
 }
 
+.content h1 {
+  font-size: 1.8rem;
+}
+.content h2 {
+  font-size: 1.5rem;
+}
+.content h3 {
+  font-size: 1.17rem;
+}
+.content h4,
+.content h5,
+.content h6 {
+  font-size: 1rem;
+}
+
 /* theme: sepia */
 
 .themepicker input[value=sepia] + .themepicker-label,

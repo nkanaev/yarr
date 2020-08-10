@@ -224,7 +224,7 @@
                  ref="content"
                  class="content px-4 pt-3 pb-5 border-top overflow-auto"
                  :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">
-                <h3>{{itemSelectedDetails.title}}</h3>
+                <h1><b>{{itemSelectedDetails.title}}</b></h1>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
