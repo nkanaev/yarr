@@ -37,6 +37,24 @@ var routes []Route = []Route{
 	p("/page", PageCrawlHandler),
 }
 
+type FolderCreateForm struct {
+	Title string `json:"title"`
+}
+
+type FolderUpdateForm struct {
+	Title      *string `json:"title,omitempty"`
+	IsExpanded *bool   `json:"is_expanded,omitempty"`
+}
+
+type FeedCreateForm struct {
+	Url      string `json:"url"`
+	FolderID *int64 `json:"folder_id,omitempty"`
+}
+
+type ItemUpdateForm struct {
+	Status *storage.ItemStatus `json:"status,omitempty"`
+}
+
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 	t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
 		"inline": func(svg string) template.HTML {
@@ -67,16 +85,12 @@ func StatusHandler(rw http.ResponseWriter, req *http.Request) {
 	})
 }
 
-type NewFolder struct {
-	Title string `json:"title"`
-}
-
 func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" {
 		list := db(req).ListFolders()
 		writeJSON(rw, list)
 	} else if req.Method == "POST" {
-		var body NewFolder
+		var body FolderCreateForm
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
@@ -95,11 +109,6 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-type UpdateFolder struct {
-	Title      *string `json:"title,omitempty"`
-	IsExpanded *bool   `json:"is_expanded,omitempty"`
-}
-
 func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
 	if err != nil {
@@ -107,7 +116,7 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if req.Method == "PUT" {
-		var body UpdateFolder
+		var body FolderUpdateForm
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
@@ -124,11 +133,6 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 		db(req).DeleteFolder(id)
 		rw.WriteHeader(http.StatusNoContent)
 	}
-}
-
-type NewFeed struct {
-	Url      string `json:"url"`
-	FolderID *int64 `json:"folder_id,omitempty"`
 }
 
 func FeedRefreshHandler(rw http.ResponseWriter, req *http.Request) {
@@ -161,7 +165,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		list := db(req).ListFeeds()
 		writeJSON(rw, list)
 	} else if req.Method == "POST" {
-		var feed NewFeed
+		var feed FeedCreateForm
 		if err := json.NewDecoder(req.Body).Decode(&feed); err != nil {
 			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
@@ -256,10 +260,6 @@ func FeedHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-type UpdateItem struct {
-	Status *storage.ItemStatus `json:"status,omitempty"`
-}
-
 func ItemHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "PUT" {
 		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
@@ -267,7 +267,7 @@ func ItemHandler(rw http.ResponseWriter, req *http.Request) {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		var body UpdateItem
+		var body ItemUpdateForm
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
