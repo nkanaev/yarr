@@ -10,7 +10,6 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
-	"log"
 	"math"
 	"mime"
 	"net/http"
@@ -81,7 +80,7 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	} else if req.Method == "POST" {
 		var body NewFolder
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -112,7 +111,7 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "PUT" {
 		var body UpdateFolder
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -166,7 +165,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	} else if req.Method == "POST" {
 		var feed NewFeed
 		if err := json.NewDecoder(req.Body).Decode(&feed); err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -174,7 +173,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		feedUrl := feed.Url
 		res, err := http.Get(feedUrl)
 		if err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		} else if res.StatusCode != 200 {
@@ -186,7 +185,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		if strings.HasPrefix(contentType, "text/html") || contentType == "" {
 			sources, err := FindFeeds(res)
 			if err != nil {
-				log.Print(err)
+				handler(req).log.Print(err)
 				rw.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -201,7 +200,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 				feedUrl = sources[0].Url
 				err = createFeed(db(req), feedUrl, feed.FolderID)
 				if err != nil {
-					log.Print(err)
+					handler(req).log.Print(err)
 					rw.WriteHeader(http.StatusBadRequest)
 					return
 				}
@@ -247,14 +246,13 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 	return result
 }
 
-func listItems(f storage.Feed) []storage.Item {
+func listItems(f storage.Feed) ([]storage.Item, error) {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(f.FeedLink)
 	if err != nil {
-		log.Print(err)
-		return nil
+		return nil, err
 	}
-	return convertItems(feed.Items, f)
+	return convertItems(feed.Items, f), nil
 }
 
 func createFeed(s *storage.Storage, url string, folderId *int64) error {
@@ -292,7 +290,7 @@ func FeedHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		body := make(map[string]interface{})
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -331,7 +329,7 @@ func ItemHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		var body UpdateItem
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -440,7 +438,7 @@ func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		file, _, err := req.FormFile("opml")
 		if err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			return
 		}
 		feeds := new(opml)
@@ -449,7 +447,7 @@ func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 		decoder.Strict = false
 		err = decoder.Decode(&feeds)
 		if err != nil {
-			log.Print(err)
+			handler(req).log.Print(err)
 			return
 		}
 		for _, outline := range feeds.Outlines {

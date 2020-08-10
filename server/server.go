@@ -64,9 +64,13 @@ func (h *Handler) startJobs() {
 		for {
 			select {
 			case feed := <-h.feedQueue:
-				items := listItems(feed)
-				h.db.CreateItems(items)
+				items, err := listItems(feed)
 				atomic.AddInt32(h.queueSize, -1)
+				if err != nil {
+					h.log.Printf("Failed to fetch %s (%d): %s", feed.FeedLink, feed.Id, err)
+					continue
+				}
+				h.db.CreateItems(items)
 				syncSearch()
 				if !feed.HasIcon {
 					icon, err := findFavicon(feed.Link, feed.FeedLink)
