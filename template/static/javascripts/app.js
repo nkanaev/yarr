@@ -307,7 +307,7 @@ var vm = new Vue({
       return query
     },
     refreshFeeds: function() {
-      Promise
+      return Promise
         .all([api.folders.list(), api.feeds.list()])
         .then(function(values) {
           vm.folders = values[0]
@@ -362,13 +362,26 @@ var vm = new Vue({
         feed.folder_id = folder_id
       })
     },
-    createFolder: function(event) {
-      var form = event.target
-      var titleInput = form.querySelector('input[name=title]')
-      var data = {'title': titleInput.value}
-      api.folders.create(data).then(function(result) {
-        vm.folders.push(result)
-        titleInput.value = ''
+    moveFeedToNewFolder: function(feed) {
+      var title = prompt('Enter folder name:')
+      if (!title) return
+      api.folders.create({'title': title}).then(function(folder) {
+        api.feeds.update(feed.id, {folder_id: folder.id}).then(function() {
+          vm.refreshFeeds()
+        })
+      })
+    },
+    createNewFeedFolder: function() {
+      var title = prompt('Enter folder name:')
+      if (!title) return
+      api.folders.create({'title': title}).then(function(result) {
+        vm.refreshFeeds().then(function() {
+          vm.$nextTick(function() {
+            if (vm.$refs.newFeedFolder) {
+              vm.$refs.newFeedFolder.value = result.id
+            }
+          })
+        })
       })
     },
     renameFolder: function(folder) {
