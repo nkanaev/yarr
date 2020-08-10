@@ -2,9 +2,7 @@ package server
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
-	"github.com/mmcdole/gofeed"
 	"github.com/nkanaev/yarr/storage"
 	"html"
 	"html/template"
@@ -218,64 +216,6 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
-	result := make([]storage.Item, len(items))
-	for _, item := range items {
-		imageURL := ""
-		if item.Image != nil {
-			imageURL = item.Image.URL
-		}
-		author := ""
-		if item.Author != nil {
-			author = item.Author.Name
-		}
-		result = append(result, storage.Item{
-			GUID:        item.GUID,
-			FeedId:      feed.Id,
-			Title:       item.Title,
-			Link:        item.Link,
-			Description: item.Description,
-			Content:     item.Content,
-			Author:      author,
-			Date:        item.PublishedParsed,
-			DateUpdated: item.UpdatedParsed,
-			Status:      storage.UNREAD,
-			Image:       imageURL,
-		})
-	}
-	return result
-}
-
-func listItems(f storage.Feed) ([]storage.Item, error) {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(f.FeedLink)
-	if err != nil {
-		return nil, err
-	}
-	return convertItems(feed.Items, f), nil
-}
-
-func createFeed(s *storage.Storage, url string, folderId *int64) error {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(url)
-	if err != nil {
-		return err
-	}
-	feedLink := feed.FeedLink
-	if len(feedLink) == 0 {
-		feedLink = url
-	}
-	storedFeed := s.CreateFeed(
-		feed.Title,
-		feed.Description,
-		feed.Link,
-		feedLink,
-		folderId,
-	)
-	s.CreateItems(convertItems(feed.Items, *storedFeed))
-	return nil
-}
-
 func FeedHandler(rw http.ResponseWriter, req *http.Request) {
 	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
 	if err != nil {
@@ -407,33 +347,6 @@ func SettingsHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-type opml struct {
-	XMLName  xml.Name  `xml:"opml"`
-	Version  string    `xml:"version,attr"`
-	Outlines []outline `xml:"body>outline"`
-}
-
-type outline struct {
-	Type        string    `xml:"type,attr,omitempty"`
-	Title       string    `xml:"text,attr"`
-	FeedURL     string    `xml:"xmlUrl,attr,omitempty"`
-	SiteURL     string    `xml:"htmlUrl,attr,omitempty"`
-	Description string    `xml:"description,attr,omitempty"`
-	Outlines    []outline `xml:"outline,omitempty"`
-}
-
-func (o outline) AllFeeds() []outline {
-	result := make([]outline, 0)
-	for _, sub := range o.Outlines {
-		if sub.Type == "rss" {
-			result = append(result, sub)
-		} else {
-			result = append(result, sub.AllFeeds()...)
-		}
-	}
-	return result
-}
-
 func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		file, _, err := req.FormFile("opml")
@@ -441,16 +354,12 @@ func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 			handler(req).log.Print(err)
 			return
 		}
-		feeds := new(opml)
-		decoder := xml.NewDecoder(file)
-		decoder.Entity = xml.HTMLEntity
-		decoder.Strict = false
-		err = decoder.Decode(&feeds)
+		doc, err := parseOPML(file)
 		if err != nil {
 			handler(req).log.Print(err)
 			return
 		}
-		for _, outline := range feeds.Outlines {
+		for _, outline := range doc.Outlines {
 			if outline.Type == "rss" {
 				db(req).CreateFeed(outline.Title, outline.Description, outline.SiteURL, outline.FeedURL, nil)
 			} else {

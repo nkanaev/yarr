@@ -3,6 +3,8 @@ package server
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/mmcdole/gofeed"
+	"github.com/nkanaev/yarr/storage"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -90,4 +92,62 @@ func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 		}
 	}
 	return nil, nil
+}
+
+func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
+	result := make([]storage.Item, len(items))
+	for _, item := range items {
+		imageURL := ""
+		if item.Image != nil {
+			imageURL = item.Image.URL
+		}
+		author := ""
+		if item.Author != nil {
+			author = item.Author.Name
+		}
+		result = append(result, storage.Item{
+			GUID:        item.GUID,
+			FeedId:      feed.Id,
+			Title:       item.Title,
+			Link:        item.Link,
+			Description: item.Description,
+			Content:     item.Content,
+			Author:      author,
+			Date:        item.PublishedParsed,
+			DateUpdated: item.UpdatedParsed,
+			Status:      storage.UNREAD,
+			Image:       imageURL,
+		})
+	}
+	return result
+}
+
+func listItems(f storage.Feed) ([]storage.Item, error) {
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(f.FeedLink)
+	if err != nil {
+		return nil, err
+	}
+	return convertItems(feed.Items, f), nil
+}
+
+func createFeed(s *storage.Storage, url string, folderId *int64) error {
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(url)
+	if err != nil {
+		return err
+	}
+	feedLink := feed.FeedLink
+	if len(feedLink) == 0 {
+		feedLink = url
+	}
+	storedFeed := s.CreateFeed(
+		feed.Title,
+		feed.Description,
+		feed.Link,
+		feedLink,
+		folderId,
+	)
+	s.CreateItems(convertItems(feed.Items, *storedFeed))
+	return nil
 }
