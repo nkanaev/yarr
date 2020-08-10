@@ -275,7 +275,7 @@ var vm = new Vue({
       api.status().then(function(data) {
         vm.loading.feeds = data.running
         if (data.running) {
-          setTimeout(vm.refreshStats.bind(vm), 2000)
+          setTimeout(vm.refreshStats.bind(vm), 500)
         }
         vm.feedStats = data.stats.reduce(function(acc, stat) {
           acc[stat.feed_id] = stat
