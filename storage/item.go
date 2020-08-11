@@ -71,7 +71,11 @@ func (s *Storage) CreateItems(items []Item) bool {
 		return false
 	}
 	now := time.Now()
+
 	for _, item := range items {
+		if item.Date == nil {
+			item.Date = item.DateUpdated
+		}
 		_, err = tx.Exec(`
 			insert into items (
 				guid, feed_id, title, link, description,
