@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./static/stylesheets/app.css">
     <link rel="icon shortcut" href="./static/images/anchor.png">
 </head>
-<body>
+<body class="theme-light">
     <div class="wrapper d-flex vh-100" id="app" v-cloak>
         <!-- feed list -->
         <div class="vh-100 position-relative overflow-auto border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
@@ -309,7 +309,7 @@
                                 <b-dropdown-divider v-if="folders.length"></b-dropdown-divider>
                                 <b-dropdown-header v-if="folders.length">Move to...</b-dropdown-header>
                                 <b-dropdown-item @click="moveFeed(feed, null)" v-if="feed.folder_id">
-                                    <span class="text-muted">---</span>
+                                    ---
                                 </b-dropdown-item>
                                 <b-dropdown-item-button
                                     v-if="folder.id != feed.folder_id"

@@ -68,16 +68,21 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .dropdown-menu {
+  padding: 0;
   box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+.dropdown-item, .dropdown-header {
+  padding: .375rem 1rem;
+}
+
+.dropdown-divider {
+  margin: 0;
 }
 
 .settings-dropdown .dropdown-menu:focus {
   outline: none;
-}
-
-.settings-dropdown .dropdown-item, .settings-dropdown .dropdown-header {
-  padding-left: 1rem;
-  padding-right: 1rem;
 }
 
 .settings-dropdown .dropdown-item:focus {
@@ -460,6 +465,12 @@ select.form-control:not([multiple]):not([size]) {
 .content h5,
 .content h6 {
   font-size: 1rem;
+}
+
+/* theme: light */
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--color-primary);
 }
 
 /* theme: sepia */
