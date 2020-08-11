@@ -172,16 +172,16 @@
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
-                <button class="toolbar-item" id="content-customize" v-b-tooltip.hover.bottom="'Customize'">
+                <button class="toolbar-item" id="content-appearance" v-b-tooltip.hover.bottom="'Appearance'">
                     <span class="icon">{% inline "sliders.svg" %}</span>
                 </button>
-                <button class="toolbar-item" @click="getReadable(itemSelectedDetails)" v-b-tooltip.hover.bottom="'Fetch Content'">
+                <button class="toolbar-item" @click="getReadable(itemSelectedDetails)" v-b-tooltip.hover.bottom="'Read Here'">
                     <span class="icon">{% inline "book-open.svg" %}</span>
                 </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open URL'">
+                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open Link'">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
-                <b-popover target="content-customize" triggers="focus" placement="bottom">
+                <b-popover target="content-appearance" triggers="focus" placement="bottom">
                     <div class="p-1" style="width: 200px;">
                         <div class="d-flex">
                             <label class="themepicker">
