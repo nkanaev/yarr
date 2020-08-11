@@ -345,7 +345,6 @@ func (s *Storage) DeleteOldItems() {
 		rows.Scan(&id, nil)
 		feedIds = append(feedIds, id)
 	}
-	s.log.Print(feedIds)
 
 	for _, feedId := range feedIds {
 		result, err := s.db.Exec(`
