@@ -67,6 +67,7 @@ func (s *Storage) ListFeeds() []Feed {
 		select id, folder_id, title, description, link, feed_link,
 		       ifnull(icon, '') != '' as has_icon
 		from feeds
+		order by title collate nocase
 	`)
 	if err != nil {
 		s.log.Print(err)

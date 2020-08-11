@@ -65,6 +65,7 @@ func (s *Storage) ListFolders() []Folder {
 	rows, err := s.db.Query(`
 		select id, title, is_expanded
 		from folders
+		order by title collate nocase
 	`)
 	if err != nil {
 		s.log.Print(err)
