@@ -40,6 +40,7 @@ create table if not exists items (
  author         text,
  date           datetime,
  date_updated   datetime,
+ date_arrived   datetime,
  status         integer,
  image          text,
  search_rowid   integer
