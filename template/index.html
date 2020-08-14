@@ -231,9 +231,7 @@
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
-                <div v-html="$sanitize(itemSelectedReadability)" v-if="itemSelectedReadability"></div>
-                <div v-html="$sanitize(itemSelectedDetails.content)" v-else-if="itemSelectedDetails.content"></div>
-                <div v-html="$sanitize(itemSelectedDetails.description)" v-else-if="itemSelectedDetails.description"></div>
+                <div v-html="itemSelectedContent"></div>
             </div>
         </div>
         <b-modal id="settings-modal" hide-header hide-footer lazy>

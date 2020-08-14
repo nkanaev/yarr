@@ -10,22 +10,6 @@ var FONTS = [
   "Verdana",
 ]
 
-DOMPurify.addHook('afterSanitizeAttributes', function (node) {
-  // set all elements owning target to target=_blank
-  if ('target' in node) {
-    node.setAttribute('target', '_blank');
-  }
-  // set non-HTML/MathML links to xlink:show=new
-  if (
-    !node.hasAttribute('target') &&
-    (node.hasAttribute('xlink:href') || node.hasAttribute('href'))
-  ) {
-    node.setAttribute('xlink:show', 'new');
-  }
-});
-
-Vue.prototype.$sanitize = DOMPurify.sanitize
-
 var debounce = function(callback, wait) {
   var timeout
   return function() {
@@ -35,6 +19,25 @@ var debounce = function(callback, wait) {
       callback.apply(ctx, args)
     }, wait)
   }
+}
+
+var sanitize = function(content, base) {
+  var sanitizer = new DOMPurify
+  sanitizer.addHook('afterSanitizeAttributes', function(node) {
+    // set all elements owning target to target=_blank
+    if ('target' in node)
+      node.setAttribute('target', '_blank')
+    // set non-HTML/MathML links to xlink:show=new
+    if (!node.hasAttribute('target') && (node.hasAttribute('xlink:href') || node.hasAttribute('href')))
+      node.setAttribute('xlink:show', 'new')
+
+    // set absolute urls
+    if (node.attributes.href && node.attributes.href.value)
+      node.href = new URL(node.attributes.href.value, base).toString()
+    if (node.attributes.src && node.attributes.src.value)
+      node.src = new URL(node.attributes.src.value, base).toString()
+  })
+  return sanitizer.sanitize(content)
 }
 
 Vue.directive('scroll', {
@@ -204,6 +207,20 @@ var vm = new Vue({
         acc.starred += stat.starred
         return acc
       }, {unread: 0, starred: 0})
+    },
+    itemSelectedContent: function() {
+      if (!this.itemSelected) return ''
+
+      if (this.itemSelectedReadability)
+        return this.itemSelectedReadability
+
+      var content = ''
+      if (this.itemSelectedDetails.content)
+        content = this.itemSelectedDetails.content
+      else if (this.itemSelectedDetails.description)
+        content = this.itemSelectedDetails.description
+
+      return sanitize(content, this.feedsById[this.itemSelectedDetails.feed_id].link || this.itemSelectedDetails.link)
     },
   },
   watch: {
@@ -479,7 +496,8 @@ var vm = new Vue({
       if (item.link) {
         api.crawl(item.link).then(function(body) {
           if (!body.length) return
-          var doc = new DOMParser().parseFromString(body, 'text/html')
+          var bodyClean = sanitize(body, vm.feedsById[item.feed_id].link || item.link)
+          var doc = new DOMParser().parseFromString(bodyClean, 'text/html')
           var parsed = new Readability(doc).parse()
           if (parsed && parsed.content) {
             vm.itemSelectedReadability = parsed.content
