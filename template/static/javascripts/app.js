@@ -37,7 +37,7 @@ var sanitize = function(content, base) {
     if (node.attributes.src && node.attributes.src.value)
       node.src = new URL(node.attributes.src.value, base).toString()
   })
-  return sanitizer.sanitize(content)
+  return sanitizer.sanitize(content, {FORBID_TAGS: ['style'], FORBID_ATTR: ['style', 'class']})
 }
 
 Vue.directive('scroll', {
