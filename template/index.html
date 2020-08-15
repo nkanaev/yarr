@@ -99,7 +99,10 @@
                     </div>
                 </label>
                 <div v-for="folder in foldersWithFeeds">
-                    <label class="selectgroup mt-1" :class="{'d-none': filterSelected && !filteredFolderStats[folder.id]}">
+                    <label class="selectgroup mt-1"
+                           :class="{'d-none': filterSelected
+                                              && !filteredFolderStats[folder.id]
+                                              && (!itemSelected || feedsById[itemSelectedDetails.feed_id].folder_id != folder.id)}">
                         <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
                         <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
                             <span class="icon mr-2"
@@ -113,7 +116,9 @@
                     </label>
                     <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
                         <label class="selectgroup"
-                               :class="{'d-none': filterSelected && !filteredFeedStats[feed.id]}"
+                              :class="{'d-none': filterSelected
+                                                 && !filteredFeedStats[feed.id]
+                                                 && (!itemSelected || itemSelectedDetails.feed_id != feed.id)}"
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                             <div class="selectgroup-label d-flex align-items-center w-100">
