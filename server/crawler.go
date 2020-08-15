@@ -96,7 +96,7 @@ func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 
 func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 	result := make([]storage.Item, len(items))
-	for _, item := range items {
+	for i, item := range items {
 		imageURL := ""
 		if item.Image != nil {
 			imageURL = item.Image.URL
@@ -105,7 +105,7 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 		if item.Author != nil {
 			author = item.Author.Name
 		}
-		result = append(result, storage.Item{
+		result[i] = storage.Item{
 			GUID:        item.GUID,
 			FeedId:      feed.Id,
 			Title:       item.Title,
@@ -117,7 +117,7 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 			DateUpdated: item.UpdatedParsed,
 			Status:      storage.UNREAD,
 			Image:       imageURL,
-		})
+		}
 	}
 	return result
 }
