@@ -124,6 +124,17 @@ select.form-control:not([multiple]):not([size]) {
   vertical-align: top;
 }
 
+.icon-small {
+  width: .6rem;
+  height: .6rem;
+  display: inline-block;
+}
+
+.icon-small > svg , .icon-small > img {
+  width: .6rem;
+  height: .6rem;
+}
+
 .feed-icon {
   width: 16px;
   height: 16px;
@@ -484,4 +495,14 @@ a,
 .theme-night .toolbar-search:hover,
 .theme-night .toolbar-search:focus {
   background-color: #1a1a1a;
+}
+
+/* animation */
+.indicator-enter-active, .indicator-leave-active {
+  transition: all .3s;
+}
+.indicator-enter, .indicator-leave-to {
+  width: 0;
+  opacity: 0;
+  margin: 0 !important;
 }
