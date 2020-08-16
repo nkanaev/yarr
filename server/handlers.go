@@ -173,7 +173,10 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		feedUrl := feed.Url
-		res, err := http.Get(feedUrl)
+		feedreq, _ := http.NewRequest("GET", feedUrl, nil)
+		feedreq.Header.Set("user-agent", req.Header.Get("user-agent"))
+		feedclient := &http.Client{}
+		res, err := feedclient.Do(feedreq)
 		if err != nil {
 			handler(req).log.Print(err)
 			writeJSON(rw, map[string]string{"status": "notfound"})
@@ -191,7 +194,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 			sources, err := FindFeeds(res)
 			if err != nil {
 				handler(req).log.Print(err)
-				rw.WriteHeader(http.StatusBadRequest)
+				writeJSON(rw, map[string]string{"status": "notfound"})
 				return
 			}
 			if len(sources) == 0 {
@@ -211,13 +214,14 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 				}
 				writeJSON(rw, map[string]string{"status": "success"})
 			}
-		} else if strings.HasPrefix(contentType, "text/xml") || strings.HasPrefix(contentType, "application/xml") || strings.HasPrefix(contentType, "application/rss+xml") {
+		} else if strings.Contains(contentType, "xml") {
+			// text/xml, application/xml, application/rss+xml, application/atom+xml
 			err = createFeed(db(req), feedUrl, feed.FolderID)
 			if err == nil {
 				writeJSON(rw, map[string]string{"status": "success"})
 			}
 		} else {
-			rw.WriteHeader(http.StatusBadRequest)
+			writeJSON(rw, map[string]string{"status": "notfound"})
 			return
 		}
 	}
