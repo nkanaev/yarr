@@ -16,11 +16,15 @@ type Feed struct {
 }
 
 func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId *int64) *Feed {
+	title = html.UnescapeString(title)
+	if len(title) == 0 {
+		title = "<???>"
+	}
 	result, err := s.db.Exec(`
 		insert into feeds (title, description, link, feed_link, folder_id) 
 		values (?, ?, ?, ?, ?)
 		on conflict (feed_link) do update set folder_id=?`,
-		html.UnescapeString(title), description, link, feedLink, folderId,
+		title, description, link, feedLink, folderId,
 		folderId,
 	)
 	if err != nil {
