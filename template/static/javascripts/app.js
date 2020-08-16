@@ -460,6 +460,8 @@ var vm = new Vue({
         } else if (result.status === 'multiple') {
           vm.feedNewChoice = result.choice
           vm.feedNewChoiceSelected = result.choice[0].url
+        } else {
+          alert('No feeds found at the given url.')
         }
         vm.loading.newfeed = false
       })

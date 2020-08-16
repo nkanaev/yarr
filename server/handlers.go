@@ -176,10 +176,13 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		res, err := http.Get(feedUrl)
 		if err != nil {
 			handler(req).log.Print(err)
-			rw.WriteHeader(http.StatusBadRequest)
+			writeJSON(rw, map[string]string{"status": "notfound"})
 			return
 		} else if res.StatusCode != 200 {
-			rw.WriteHeader(http.StatusBadRequest)
+			handler(req).log.Printf("Failed to fetch %s (status: %d)", feedUrl, res.StatusCode)
+			body, err := ioutil.ReadAll(res.Body)
+			handler(req).log.Print(string(body), err)
+			writeJSON(rw, map[string]string{"status": "notfound"})
 			return
 		}
 
