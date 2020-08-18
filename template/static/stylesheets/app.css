@@ -157,7 +157,7 @@ select.form-control:not([multiple]):not([size]) {
   margin: 0;
 }
 
-.selectgroup *, .noselect, .dropdown-item {
+.selectgroup *, .noselect, .dropdown-menu * {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
