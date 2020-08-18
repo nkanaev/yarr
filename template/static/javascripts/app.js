@@ -489,6 +489,7 @@ var vm = new Vue({
     importOPML: function(event) {
       var input = event.target
       var form = document.querySelector('#opml-import-form')
+      this.$refs.menuDropdown.hide()
       api.upload_opml(form).then(function() {
         input.value = ''
         vm.refreshFeeds()

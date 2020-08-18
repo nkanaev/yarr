@@ -18,7 +18,11 @@
                     <div class="text-truncate cursor-default flex-grow-1 noselect">
                         <span v-if="loading.feeds">Refreshing ({{loading.feeds}} left)</span>
                     </div>
-                    <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="toolbar-item px-2">
+                    <b-dropdown
+                            right no-caret lazy="true" variant="link"
+                            class="settings-dropdown"
+                            toggle-class="toolbar-item px-2"
+                            ref="menuDropdown">
                         <template v-slot:button-content class="toolbar-item">
                             <span class="icon">{% inline "more-horizontal.svg" %}</span>
                         </template>
