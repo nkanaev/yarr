@@ -12,62 +12,62 @@
         <!-- feed list -->
         <div class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
-            <div class="px-2 pb-2 overflow-auto">
-                <div class="mb-2 toolbar d-flex align-items-center" style="padding-bottom: 1px;">
-                    <div class="icon mx-2" :class="{loading: loading.feeds}">{% inline "anchor.svg" %}</div>
-                    <div class="text-truncate cursor-default flex-grow-1 noselect">
-                        <span v-if="loading.feeds">Refreshing ({{loading.feeds}} left)</span>
-                    </div>
-                    <b-dropdown
-                            right no-caret lazy="true" variant="link"
-                            class="settings-dropdown"
-                            toggle-class="toolbar-item px-2"
-                            ref="menuDropdown">
-                        <template v-slot:button-content class="toolbar-item">
-                            <span class="icon">{% inline "more-horizontal.svg" %}</span>
-                        </template>
-                        <b-dropdown-item-button @click="showSettings('create')">
-                            <span class="icon mr-1">{% inline "plus.svg" %}</span>
-                            New Feed
-                        </b-dropdown-item-button>
-                        <b-dropdown-item-button @click.stop="showSettings('manage')">
-                            <span class="icon mr-1">{% inline "list.svg" %}</span>
-                            Manage Feeds
-                        </b-dropdown-item-button>
-                        <b-dropdown-divider></b-dropdown-divider>
-                        <b-dropdown-item-button @click.stop="fetchAllFeeds()">
-                            <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
-                            Refresh Feeds
-                        </b-dropdown-item-button>
-                        <b-dropdown-divider></b-dropdown-divider>
-                        <b-dropdown-header>Sort by</b-dropdown-header>
-                        <b-dropdown-item-button @click.stop="itemSortNewestFirst=true">
-                            <span class="icon mr-1" :class="{invisible: !itemSortNewestFirst}">{% inline "check.svg" %}</span>
-                            Newest First
-                        </b-dropdown-item-button>
-                        <b-dropdown-item-button @click="itemSortNewestFirst=false">
-                            <span class="icon mr-1" :class="{invisible: itemSortNewestFirst}">{% inline "check.svg" %}</span>
-                            Oldest First
-                        </b-dropdown-item-button>
-                        <b-dropdown-divider></b-dropdown-divider>
-                        <b-dropdown-header>Subscriptions</b-dropdown-header>
-                        <b-dropdown-form id="opml-import-form" enctype="multipart/form-data">
-                            <input type="file"
-                                   id="opml-import"
-                                   @change="importOPML"
-                                   name="opml"
-                                   style="opacity: 0; width: 1px; height: 0; position: absolute;">
-                            <label class="dropdown-item mb-0 cursor-pointer" for="opml-import">
-                                <span class="icon mr-1">{% inline "download.svg" %}</span>
-                                Import
-                            </label>
-                        </b-dropdown-form>
-                        <b-dropdown-item href="/opml/export">
-                            <span class="icon mr-1">{% inline "upload.svg" %}</span>
-                            Export
-                        </b-dropdown-item>
-                    </b-dropdown>
+            <div class="p-2 toolbar d-flex align-items-center" style="padding-bottom: 1px;">
+                <div class="icon mx-2" :class="{loading: loading.feeds}">{% inline "anchor.svg" %}</div>
+                <div class="text-truncate cursor-default flex-grow-1 noselect">
+                    <span v-if="loading.feeds">Refreshing ({{loading.feeds}} left)</span>
                 </div>
+                <b-dropdown
+                        right no-caret lazy="true" variant="link"
+                        class="settings-dropdown"
+                        toggle-class="toolbar-item px-2"
+                        ref="menuDropdown">
+                    <template v-slot:button-content class="toolbar-item">
+                        <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    </template>
+                    <b-dropdown-item-button @click="showSettings('create')">
+                        <span class="icon mr-1">{% inline "plus.svg" %}</span>
+                        New Feed
+                    </b-dropdown-item-button>
+                    <b-dropdown-item-button @click.stop="showSettings('manage')">
+                        <span class="icon mr-1">{% inline "list.svg" %}</span>
+                        Manage Feeds
+                    </b-dropdown-item-button>
+                    <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-item-button @click.stop="fetchAllFeeds()">
+                        <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
+                        Refresh Feeds
+                    </b-dropdown-item-button>
+                    <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-header>Sort by</b-dropdown-header>
+                    <b-dropdown-item-button @click.stop="itemSortNewestFirst=true">
+                        <span class="icon mr-1" :class="{invisible: !itemSortNewestFirst}">{% inline "check.svg" %}</span>
+                        Newest First
+                    </b-dropdown-item-button>
+                    <b-dropdown-item-button @click="itemSortNewestFirst=false">
+                        <span class="icon mr-1" :class="{invisible: itemSortNewestFirst}">{% inline "check.svg" %}</span>
+                        Oldest First
+                    </b-dropdown-item-button>
+                    <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-header>Subscriptions</b-dropdown-header>
+                    <b-dropdown-form id="opml-import-form" enctype="multipart/form-data">
+                        <input type="file"
+                               id="opml-import"
+                               @change="importOPML"
+                               name="opml"
+                               style="opacity: 0; width: 1px; height: 0; position: absolute;">
+                        <label class="dropdown-item mb-0 cursor-pointer" for="opml-import">
+                            <span class="icon mr-1">{% inline "download.svg" %}</span>
+                            Import
+                        </label>
+                    </b-dropdown-form>
+                    <b-dropdown-item href="/opml/export">
+                        <span class="icon mr-1">{% inline "upload.svg" %}</span>
+                        Export
+                    </b-dropdown-item>
+                </b-dropdown>
+            </div>
+            <div class="p-2 overflow-auto border-top">
                 <div class="mb-5" style="border-top: 1px solid transparent;">
                     <label class="selectgroup">
                         <input type="radio" name="filter" value="unread" v-model="filterSelected">
