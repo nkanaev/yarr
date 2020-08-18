@@ -76,6 +76,9 @@ func (s *Storage) CreateItems(items []Item) bool {
 		if item.Date == nil {
 			item.Date = item.DateUpdated
 		}
+		if item.GUID == "" {
+			item.GUID = item.Link
+		}
 		_, err = tx.Exec(`
 			insert into items (
 				guid, feed_id, title, link, description,
@@ -84,7 +87,7 @@ func (s *Storage) CreateItems(items []Item) bool {
 				status, image
 			)
 			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			on conflict (guid) do update set
+			on conflict (feed_id, guid) do update set
 			date_updated = ?, date_arrived = ?`,
 			item.GUID, item.FeedId, html.UnescapeString(item.Title), item.Link, item.Description,
 			item.Content, item.Author,
