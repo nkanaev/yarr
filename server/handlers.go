@@ -1,7 +1,10 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/base64"
+	"compress/gzip"
 	"fmt"
 	"github.com/nkanaev/yarr/storage"
 	"html"
@@ -37,6 +40,36 @@ var routes []Route = []Route{
 	p("/page", PageCrawlHandler),
 }
 
+type asset struct {
+	etag    string
+	body    string  // base64(gzip(content))
+	gzipped *[]byte
+	decoded *string
+}
+
+func (a *asset) gzip() *[]byte {
+	if a.gzipped == nil {
+		gzipped, _ := base64.StdEncoding.DecodeString(a.body)
+		a.gzipped = &gzipped
+	}
+	return a.gzipped
+}
+
+func (a *asset) text() *string {
+	if a.decoded == nil {
+		gzipped, _ := base64.StdEncoding.DecodeString(a.body)
+		reader, _ := gzip.NewReader(bytes.NewBuffer(gzipped))
+		decoded, _ := ioutil.ReadAll(reader)
+		reader.Close()
+
+		decoded_string := string(decoded)
+		a.decoded = &decoded_string
+	}
+	return a.decoded
+}
+
+var assets map[string]asset
+
 type FolderCreateForm struct {
 	Title string `json:"title"`
 }
@@ -58,6 +91,9 @@ type ItemUpdateForm struct {
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 	t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
 		"inline": func(svg string) template.HTML {
+			if asset, ok := assets["graphicarts/" + svg]; ok {
+				return template.HTML(*asset.text())
+			}
 			content, _ := ioutil.ReadFile("assets/graphicarts/" + svg)
 			return template.HTML(content)
 		},
@@ -67,14 +103,25 @@ func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func StaticHandler(rw http.ResponseWriter, req *http.Request) {
-	path := "assets/" + Vars(req)["path"]
-	f, err := os.Open(path)
+	path := Vars(req)["path"]
+	ctype := mime.TypeByExtension(filepath.Ext(path))
+
+	if assets != nil {
+		if asset, ok := assets[path]; ok {
+			rw.Header().Set("Content-Type", ctype)
+			rw.Header().Set("Content-Encoding", "gzip")
+			rw.Header().Set("Etag", asset.etag)
+			rw.Write(*asset.gzip())
+		}
+	}
+
+	f, err := os.Open("assets/" + path)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
 	defer f.Close()
-	rw.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(path)))
+	rw.Header().Set("Content-Type", ctype)
 	io.Copy(rw, f)
 }
 
