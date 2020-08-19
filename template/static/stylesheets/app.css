@@ -446,7 +446,8 @@ select.form-control:not([multiple]):not([size]) {
 /* theme: light */
 
 a,
-.btn-link:hover {
+.btn-link:hover,
+.toolbar-item.active {
   color: #0080d4;
 }
 

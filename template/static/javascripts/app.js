@@ -201,12 +201,13 @@ var vm = new Vue({
         return acc
       }, {})
     },
-    totalStats: function() {
+    filteredTotalStats: function() {
+      var filter = this.filterSelected
+      if (filter != 'unread' && filter != 'starred') return ''
+
       return Object.values(this.feedStats).reduce(function(acc, stat) {
-        acc.unread += stat.unread
-        acc.starred += stat.starred
-        return acc
-      }, {unread: 0, starred: 0})
+        return acc + stat[filter]
+      }, 0)
     },
     itemSelectedContent: function() {
       if (!this.itemSelected) return ''

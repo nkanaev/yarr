@@ -14,9 +14,31 @@
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
             <div class="p-2 toolbar d-flex align-items-center" style="padding-bottom: 1px;">
                 <div class="icon mx-2" :class="{loading: loading.feeds}">{% inline "anchor.svg" %}</div>
-                <div class="text-truncate cursor-default flex-grow-1 noselect">
+                <div class="text-truncate cursor-default noselect">
                     <span v-if="loading.feeds">Refreshing ({{loading.feeds}} left)</span>
                 </div>
+                <div class="flex-grow-1"></div>
+                <div class="noselect" :class="{'d-none': loading.feeds}">
+                    <button class="toolbar-item"
+                            :class="{active: filterSelected == 'unread'}"
+                            v-b-tooltip.hover.bottom="'Unread'"
+                            @click="filterSelected = 'unread'">
+                        <span class="icon">{% inline "circle-full.svg" %}</span>
+                    </button>
+                    <button class="toolbar-item"
+                            :class="{active: filterSelected == 'starred'}"
+                            v-b-tooltip.hover.bottom="'Starred'"
+                            @click="filterSelected = 'starred'">
+                        <span class="icon">{% inline "star-full.svg" %}</span>
+                    </button>
+                    <button class="toolbar-item"
+                            :class="{active: filterSelected == ''}"
+                            v-b-tooltip.hover.bottom="'All'"
+                            @click="filterSelected = ''">
+                        <span class="icon">{% inline "assorted.svg" %}</span>
+                    </button>
+                </div>
+                <div class="flex-grow-1"></div>
                 <b-dropdown
                         right no-caret lazy="true" variant="link"
                         class="settings-dropdown"
@@ -68,38 +90,14 @@
                 </b-dropdown>
             </div>
             <div class="p-2 overflow-auto border-top">
-                <div class="mb-5" style="border-top: 1px solid transparent;">
-                    <label class="selectgroup">
-                        <input type="radio" name="filter" value="unread" v-model="filterSelected">
-                        <div class="selectgroup-label d-flex align-items-center w-100">
-                            <span class="icon mr-2">{% inline "circle-full.svg"  %}</span>
-                            <span class="flex-fill text-left text-truncate">Unread</span>
-                            <span class="counter text-right">{{totalStats.unread || ''}}</span>
-                        </div>
-                    </label>
-                    <label class="selectgroup">
-                        <input type="radio" name="filter" value="starred" v-model="filterSelected">
-                        <div class="selectgroup-label d-flex align-items-center w-100">
-                            <span class="icon mr-2">{% inline "star.svg"  %}</span>
-                            <span class="flex-fill text-left text-truncate">Starred</span>
-                            <span class="counter text-right">{{totalStats.starred || ''}}</span>
-                        </div>
-                    </label>
-                    <label class="selectgroup">
-                        <input type="radio" name="filter" value="" v-model="filterSelected">
-                        <div class="selectgroup-label d-flex align-items-center w-100">
-                            <span class="icon mr-2">{% inline "assorted.svg"  %}</span>
-                            <span class="flex-fill text-left text-truncate">All</span>
-                            <span class="counter text-right"></span>
-                        </div>
-                    </label>
-                </div>
                 <label class="selectgroup">
                     <input type="radio" name="feed" value="" v-model="feedSelected">
                     <div class="selectgroup-label d-flex align-items-center w-100">
                         <span class="icon mr-2">{% inline "layers.svg" %}</span>
-                        <span class="flex-fill text-left text-truncate">All Feeds</span>
-                        <span class="counter text-right"></span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">All Unread</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">All Starred</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">All Feeds</span>
+                        <span class="counter text-right">{{filteredTotalStats}}</span>
                     </div>
                 </label>
                 <div v-for="folder in foldersWithFeeds">
