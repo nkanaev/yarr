@@ -58,16 +58,16 @@ type ItemUpdateForm struct {
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 	t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
 		"inline": func(svg string) template.HTML {
-			content, _ := ioutil.ReadFile("template/static/images/" + svg)
+			content, _ := ioutil.ReadFile("assets/graphicarts/" + svg)
 			return template.HTML(content)
 		},
-	}).ParseFiles("template/index.html"))
+	}).ParseFiles("assets/index.html"))
 	rw.Header().Set("Content-Type", "text/html")
 	t.Execute(rw, nil)
 }
 
 func StaticHandler(rw http.ResponseWriter, req *http.Request) {
-	path := "template/static/" + Vars(req)["path"]
+	path := "assets/" + Vars(req)["path"]
 	f, err := os.Open(path)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
