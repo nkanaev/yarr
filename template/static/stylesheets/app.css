@@ -344,10 +344,6 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
-.selectgroup-label, .toolbar-item, .toolbar-search, .list-row {
-  transition: background-color .1s ease-out;
-}
-
 .themepicker {
   position: relative;
   background: none;
