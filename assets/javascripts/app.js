@@ -240,8 +240,11 @@ var vm = new Vue({
       deep: true,
       handler: debounce(function() {
         var title = TITLE
-        if (this.totalStats.unread) {
-          title += ' ('+this.totalStats.unread+')'
+        var unreadCount = Object.values(this.feedStats).reduce(function(acc, stat) {
+          return acc + stat.unread
+        }, 0)
+        if (unreadCount) {
+          title += ' ('+unreadCount+')'
         }
         document.title = title
       }, 500),
