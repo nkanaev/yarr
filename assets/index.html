@@ -189,7 +189,10 @@
                 <button class="toolbar-item" id="content-appearance" v-b-tooltip.hover.bottom="'Appearance'">
                     <span class="icon">{% inline "sliders.svg" %}</span>
                 </button>
-                <button class="toolbar-item" @click="getReadable(itemSelectedDetails)" v-b-tooltip.hover.bottom="'Read Here'">
+                <button class="toolbar-item"
+                        :class="{loading: loading.readability, active: itemSelectedReadability}"
+                        @click="getReadable(itemSelectedDetails)"
+                        v-b-tooltip.hover.bottom="'Read Here'">
                     <span class="icon">{% inline "book-open.svg" %}</span>
                 </button>
                 <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open Link'">

@@ -148,6 +148,7 @@ var vm = new Vue({
         'feeds': false,
         'newfeed': false,
         'items': false,
+        'readability': false,
       },
       'fonts': FONTS,
       'feedStats': {},
@@ -501,8 +502,14 @@ var vm = new Vue({
       })
     },
     getReadable: function(item) {
+      if (this.itemSelectedReadability) {
+        this.itemSelectedReadability = null
+        return
+      }
       if (item.link) {
+        this.loading.readability = true
         api.crawl(item.link).then(function(body) {
+          vm.loading.readability = false
           if (!body.length) return
           var bodyClean = sanitize(body, vm.feedsById[item.feed_id].link || item.link)
           var doc = new DOMParser().parseFromString(bodyClean, 'text/html')
