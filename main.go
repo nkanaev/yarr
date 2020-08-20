@@ -18,7 +18,7 @@ func main() {
 	storagePath := filepath.Join(configPath, "yarr")
 	storageFile := filepath.Join(storagePath, "storage.db")
 
-	if err := os.MkdirAll(storageDir, 0755); err != nil {
+	if err := os.MkdirAll(storagePath, 0755); err != nil {
 		logger.Fatal("Failed to create app config dir: ", err)
 	}
 
