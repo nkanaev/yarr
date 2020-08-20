@@ -108,6 +108,10 @@ func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 
 	if assets != nil {
 		if asset, ok := assets[path]; ok {
+			if req.Header.Get("if-none-match") == asset.etag {
+				rw.WriteHeader(http.StatusNotModified)
+				return
+			}
 			rw.Header().Set("Content-Type", ctype)
 			rw.Header().Set("Content-Encoding", "gzip")
 			rw.Header().Set("Etag", asset.etag)
