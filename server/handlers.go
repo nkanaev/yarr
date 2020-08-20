@@ -89,17 +89,22 @@ type ItemUpdateForm struct {
 }
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
-	t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
-		"inline": func(svg string) template.HTML {
-			if asset, ok := assets["graphicarts/" + svg]; ok {
-				return template.HTML(*asset.text())
-			}
-			content, _ := ioutil.ReadFile("assets/graphicarts/" + svg)
-			return template.HTML(content)
-		},
-	}).ParseFiles("assets/index.html"))
-	rw.Header().Set("Content-Type", "text/html")
-	t.Execute(rw, nil)
+	if assets != nil {
+		asset := assets["index.html"]
+
+		rw.Header().Set("Content-Type", "text/html")
+		rw.Header().Set("Content-Encoding", "gzip")
+		rw.Write(*asset.gzip())
+	} else {
+		t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
+			"inline": func(svg string) template.HTML {
+				content, _ := ioutil.ReadFile("assets/graphicarts/" + svg)
+				return template.HTML(content)
+			},
+		}).ParseFiles("assets/index.html"))
+		rw.Header().Set("Content-Type", "text/html")
+		t.Execute(rw, nil)
+	}
 }
 
 func StaticHandler(rw http.ResponseWriter, req *http.Request) {
