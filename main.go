@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/nkanaev/yarr/server"
 	"github.com/nkanaev/yarr/storage"
-	"github.com/shibukawa/configdir"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,17 +11,20 @@ import (
 func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 
-	configDirs := configdir.New("", "yarr")
-	storageDir := configDirs.QueryFolders(configdir.Global)[0].Path
-	storageFile := filepath.Join(storageDir, "storage.db")
+	configPath, err := os.UserConfigDir()
+	if err != nil {
+		logger.Fatal("Failed to get config dir: ", err)
+	}
+	storagePath := filepath.Join(configPath, "yarr")
+	storageFile := filepath.Join(storagePath, "storage.db")
 
 	if err := os.MkdirAll(storageDir, 0755); err != nil {
-		logger.Fatal(err)
+		logger.Fatal("Failed to create app config dir: ", err)
 	}
 
 	db, err := storage.New(storageFile, logger)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal("Failed to initialise database: ", err)
 	}
 
 	srv := server.New(db, logger)
