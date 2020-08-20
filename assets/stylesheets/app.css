@@ -92,6 +92,11 @@ select.form-control:not([multiple]):not([size]) {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
+.modal.fade .modal-dialog {
+  transition: none !important;
+  transform: none !important;
+}
+
 .b-dropdown-form:focus {
   outline: none;
 }
