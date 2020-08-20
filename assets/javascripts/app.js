@@ -222,7 +222,7 @@ var vm = new Vue({
       else if (this.itemSelectedDetails.description)
         content = this.itemSelectedDetails.description
 
-      return sanitize(content, this.feedsById[this.itemSelectedDetails.feed_id].link || this.itemSelectedDetails.link)
+      return sanitize(content, this.itemSelectedDetails.link)
     },
   },
   watch: {
@@ -511,7 +511,7 @@ var vm = new Vue({
         api.crawl(item.link).then(function(body) {
           vm.loading.readability = false
           if (!body.length) return
-          var bodyClean = sanitize(body, vm.feedsById[item.feed_id].link || item.link)
+          var bodyClean = sanitize(body, item.link)
           var doc = new DOMParser().parseFromString(bodyClean, 'text/html')
           var parsed = new Readability(doc).parse()
           if (parsed && parsed.content) {
