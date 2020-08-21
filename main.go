@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/getlantern/systray"
 	"github.com/nkanaev/yarr/server"
 	"github.com/nkanaev/yarr/storage"
+	"github.com/skratchdot/open-golang/open"
 	"log"
 	"os"
 	"path/filepath"
@@ -27,6 +29,28 @@ func main() {
 		logger.Fatal("Failed to initialise database: ", err)
 	}
 
-	srv := server.New(db, logger)
-	srv.Start("127.0.0.1:8000")
+	addr := "127.0.0.1:8000"
+
+	systrayOnReady := func() {
+		//systray.SetIcon(icon.Data)
+		systray.SetTitle("yarr")
+
+		menuOpen := systray.AddMenuItem("Open", "")
+		systray.AddSeparator()
+		menuQuit := systray.AddMenuItem("Quit", "")
+
+		go func() {
+			for {
+				select {
+				case <-menuOpen.ClickedCh:
+					open.Run("http://" + addr)
+				case <-menuQuit.ClickedCh:
+					systray.Quit()
+				}
+			}
+		}()
+		srv := server.New(db, logger)
+		srv.Start(addr)
+	}
+	systray.Run(systrayOnReady, nil)
 }
