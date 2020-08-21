@@ -126,7 +126,6 @@ func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 
 	f, err := os.Open("assets/" + path)
 	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
 	defer f.Close()
