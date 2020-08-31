@@ -1,3 +1,4 @@
 yarr
 *.db
 server/assets_bundle.go
+vendor/
