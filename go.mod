@@ -10,3 +10,5 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 )
+
+replace github.com/mmcdole/gofeed => ./gofeed
