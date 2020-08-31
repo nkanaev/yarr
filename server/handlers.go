@@ -269,7 +269,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 				}
 				writeJSON(rw, map[string]string{"status": "success"})
 			}
-		} else if strings.Contains(contentType, "xml") {
+		} else if strings.Contains(contentType, "xml") || strings.Contains(contentType, "json") {
 			// text/xml, application/xml, application/rss+xml, application/atom+xml
 			err = createFeed(db(req), feedUrl, feed.FolderID)
 			if err == nil {
