@@ -201,14 +201,14 @@ select.form-control:not([multiple]):not([size]) {
   transform: rotate(90deg);
 }
 
-@keyframes loading {
-  0% {
-    transform: rotate(0)
-  }
+@keyframes stroke {
+  from { stroke-dashoffset: 120; }
+  to   { stroke-dashoffset: 0; }
+}
 
-  100% {
-    transform: rotate(360deg)
-  }
+@keyframes rotate {
+  from { transform: rotate(0); }
+  to   { transform: rotate(360deg); }
 }
 
 .loading {
@@ -219,7 +219,7 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .loading::after {
-  animation: loading .5s infinite linear;
+  animation: rotate .5s infinite linear;
   border: .1rem solid #6c757d;
   border-radius: 50%;
   border-right-color: transparent;
@@ -234,6 +234,11 @@ select.form-control:not([multiple]):not([size]) {
   position: absolute;
   top: 50%;
   z-index: 1;
+}
+
+.icon-loading > svg {
+  animation: stroke 2s infinite normal;
+  stroke-dasharray: 60;
 }
 
 .btn-default {

@@ -13,7 +13,7 @@
         <div class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
             <div class="p-2 toolbar d-flex align-items-center" style="padding-bottom: 1px;">
-                <div class="icon mx-2" :class="{loading: loading.feeds}">{% inline "anchor.svg" %}</div>
+                <div class="icon mx-2" :class="{'icon-loading': loading.feeds}">{% inline "anchor.svg" %}</div>
                 <div class="text-truncate cursor-default noselect">
                     <span v-if="loading.feeds">Refreshing ({{loading.feeds}} left)</span>
                 </div>
@@ -190,10 +190,10 @@
                     <span class="icon">{% inline "sliders.svg" %}</span>
                 </button>
                 <button class="toolbar-item"
-                        :class="{loading: loading.readability, active: itemSelectedReadability}"
+                        :class="{active: itemSelectedReadability}"
                         @click="getReadable(itemSelectedDetails)"
                         v-b-tooltip.hover.bottom="'Read Here'">
-                    <span class="icon">{% inline "book-open.svg" %}</span>
+                    <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
                 </button>
                 <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open Link'">
                     <span class="icon">{% inline "external-link.svg" %}</span>
