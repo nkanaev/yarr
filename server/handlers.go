@@ -227,7 +227,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		feed, sources, err := discoverFeed(form.Url, req.Header.Get("user-agent"))
+		feed, sources, err := discoverFeed(form.Url)
 		if err != nil {
 			handler(req).log.Print(err)
 			writeJSON(rw, map[string]string{"status": "notfound"})
