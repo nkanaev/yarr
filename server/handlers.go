@@ -220,64 +220,34 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 		list := db(req).ListFeeds()
 		writeJSON(rw, list)
 	} else if req.Method == "POST" {
-		var feed FeedCreateForm
-		if err := json.NewDecoder(req.Body).Decode(&feed); err != nil {
+		var form FeedCreateForm
+		if err := json.NewDecoder(req.Body).Decode(&form); err != nil {
 			handler(req).log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		feedUrl := feed.Url
-		feedreq, _ := http.NewRequest("GET", feedUrl, nil)
-		feedreq.Header.Set("user-agent", req.Header.Get("user-agent"))
-		feedclient := &http.Client{}
-		res, err := feedclient.Do(feedreq)
+		feed, sources, err := discoverFeed(form.Url, req.Header.Get("user-agent"))
 		if err != nil {
 			handler(req).log.Print(err)
 			writeJSON(rw, map[string]string{"status": "notfound"})
 			return
-		} else if res.StatusCode != 200 {
-			handler(req).log.Printf("Failed to fetch %s (status: %d)", feedUrl, res.StatusCode)
-			body, err := ioutil.ReadAll(res.Body)
-			handler(req).log.Print(string(body), err)
-			writeJSON(rw, map[string]string{"status": "notfound"})
-			return
 		}
 
-		contentType := res.Header.Get("Content-Type")
-		if strings.HasPrefix(contentType, "text/html") || contentType == "" {
-			sources, err := FindFeeds(res)
-			if err != nil {
-				handler(req).log.Print(err)
-				writeJSON(rw, map[string]string{"status": "notfound"})
-				return
-			}
-			if len(sources) == 0 {
-				writeJSON(rw, map[string]string{"status": "notfound"})
-			} else if len(sources) > 1 {
-				writeJSON(rw, map[string]interface{}{
-					"status": "multiple",
-					"choice": sources,
-				})
-			} else if len(sources) == 1 {
-				feedUrl = sources[0].Url
-				err = createFeed(db(req), feedUrl, feed.FolderID)
-				if err != nil {
-					handler(req).log.Print(err)
-					rw.WriteHeader(http.StatusBadRequest)
-					return
-				}
-				writeJSON(rw, map[string]string{"status": "success"})
-			}
-		} else if strings.Contains(contentType, "xml") || strings.Contains(contentType, "json") {
-			// text/xml, application/xml, application/rss+xml, application/atom+xml
-			err = createFeed(db(req), feedUrl, feed.FolderID)
-			if err == nil {
-				writeJSON(rw, map[string]string{"status": "success"})
-			}
+		if feed != nil {
+			storedFeed := db(req).CreateFeed(
+				feed.Title,
+				feed.Description,
+				feed.Link,
+				feed.FeedLink,
+				form.FolderID,
+			)
+			db(req).CreateItems(convertItems(feed.Items, *storedFeed))
+			writeJSON(rw, map[string]string{"status": "success"})
+		} else if sources != nil {
+			writeJSON(rw, map[string]interface{}{"status": "multiple", "choice": sources})
 		} else {
 			writeJSON(rw, map[string]string{"status": "notfound"})
-			return
 		}
 	}
 }

@@ -1,6 +1,8 @@
 package server
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mmcdole/gofeed"
@@ -29,12 +31,18 @@ const feedLinks = `
 	a:contains("FEED")
 `
 
-func FindFeeds(r *http.Response) ([]FeedSource, error) {
+func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
 	sources := make([]FeedSource, 0, 0)
-	doc, err := goquery.NewDocumentFromResponse(r)
+
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(html))
 	if err != nil {
 		return sources, err
 	}
+	base, err := url.Parse(siteurl)
+	if err != nil {
+		return sources, err
+	}
+
 	doc.Find(feedLinks).Each(func(i int, s *goquery.Selection) {
 		if href, ok := s.Attr("href"); ok {
 			feedUrl, err := url.Parse(href)
@@ -42,11 +50,54 @@ func FindFeeds(r *http.Response) ([]FeedSource, error) {
 				return
 			}
 			title := s.AttrOr("title", "")
-			url := doc.Url.ResolveReference(feedUrl).String()
+			url := base.ResolveReference(feedUrl).String()
 			sources = append(sources, FeedSource{Title: title, Url: url})
 		}
 	})
 	return sources, nil
+}
+
+func discoverFeed(url, userAgent string) (*gofeed.Feed, *[]FeedSource, error) {
+	// Query URL
+	feedreq, _ := http.NewRequest("GET", url, nil)
+	feedreq.Header.Set("user-agent", userAgent)
+	feedclient := &http.Client{}
+	res, err := feedclient.Do(feedreq)
+	if err != nil {
+		return nil, nil, err
+	} else if res.StatusCode != 200 {
+		errmsg := fmt.Sprintf("Failed to fetch feed %s (status: %d)", url, res.StatusCode)
+		return nil, nil, errors.New(errmsg)
+	}
+	content, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Try to feed into parser
+	feedparser := gofeed.NewParser()
+	feed, err := feedparser.Parse(bytes.NewReader(content))
+	if err == nil {
+		// WILD: some feeds do not have link to itself
+		if len(feed.FeedLink) == 0 {
+			feed.FeedLink = url
+		}
+		return feed, nil, nil
+	}
+
+	// Possibly an html link. Search for feed links
+	sources, err := searchFeedLinks(content, url)
+	if err != nil {
+		return nil, nil, err
+	} else if len(sources) == 0 {
+		return nil, nil, errors.New("No feeds found at the given url")
+	} else if len(sources) == 1 {
+		if sources[0].Url == url {
+			return nil, nil, errors.New("Recursion!")
+		}
+		return discoverFeed(sources[0].Url, userAgent)
+	}
+	return nil, &sources, nil
 }
 
 func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
@@ -141,25 +192,4 @@ func listItems(f storage.Feed) ([]storage.Item, error) {
 		return nil, err
 	}
 	return convertItems(feed.Items, f), nil
-}
-
-func createFeed(s *storage.Storage, url string, folderId *int64) error {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(url)
-	if err != nil {
-		return err
-	}
-	feedLink := feed.FeedLink
-	if len(feedLink) == 0 {
-		feedLink = url
-	}
-	storedFeed := s.CreateFeed(
-		feed.Title,
-		feed.Description,
-		feed.Link,
-		feedLink,
-		folderId,
-	)
-	s.CreateItems(convertItems(feed.Items, *storedFeed))
-	return nil
 }
