@@ -22,7 +22,7 @@ func New(db *storage.Storage, logger *log.Logger) *Handler {
 	return &Handler{
 		db:        db,
 		log:       logger,
-		feedQueue: make(chan storage.Feed, 1000),
+		feedQueue: make(chan storage.Feed, 3000),
 		queueSize: &queueSize,
 	}
 }
