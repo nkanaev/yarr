@@ -22,7 +22,7 @@ var debounce = function(callback, wait) {
 }
 
 var sanitize = function(content, base) {
-  // NOTE: `item.link` is not always a valid url
+  // WILD: `item.link` is not always a valid url
   try { new URL(base) } catch(err) { base = null }
 
   var sanitizer = new DOMPurify

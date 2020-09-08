@@ -73,9 +73,11 @@ func (s *Storage) CreateItems(items []Item) bool {
 	now := time.Now()
 
 	for _, item := range items {
+		// WILD: some feeds provide only `item.date_updated` (without `item.date_created`)
 		if item.Date == nil {
 			item.Date = item.DateUpdated
 		}
+		// WILD: `item.guid` is not always present
 		if item.GUID == "" {
 			item.GUID = item.Link
 		}

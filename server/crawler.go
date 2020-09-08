@@ -94,7 +94,7 @@ func discoverFeed(url string) (*gofeed.Feed, *[]FeedSource, error) {
 	feedparser := gofeed.NewParser()
 	feed, err := feedparser.Parse(bytes.NewReader(content))
 	if err == nil {
-		// WILD: some feeds do not have link to itself
+		// WILD: feeds may not always have link to themselves
 		if len(feed.FeedLink) == 0 {
 			feed.FeedLink = url
 		}
