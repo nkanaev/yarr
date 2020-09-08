@@ -83,6 +83,8 @@ func New(path string, logger *log.Logger) (*Storage, error) {
 		return nil, err
 	}
 
+	db.SetMaxOpenConns(1)
+
 	if initialize {
 		if _, err := db.Exec(initQuery); err != nil {
 			return nil, err
