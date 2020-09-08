@@ -143,6 +143,11 @@ var vm = new Vue({
       'itemSearch': '',
       'itemSortNewestFirst': null,
       'itemListWidth': null,
+
+      'filteredFeedStats': {},
+      'filteredFolderStats': {},
+      'filteredTotalStats': null,
+
       'settings': 'create',
       'loading': {
         'feeds': false,
@@ -180,35 +185,6 @@ var vm = new Vue({
     },
     itemsById: function() {
       return this.items.reduce(function(acc, item) { acc[item.id] = item; return acc }, {})
-    },
-    filteredFeedStats: function() {
-      var filter = this.filterSelected
-      if (filter != 'unread' && filter != 'starred') return {}
-
-      var feedStats = this.feedStats
-      return this.feeds.reduce(function(acc, feed) {
-        if (feedStats[feed.id]) acc[feed.id] = vm.feedStats[feed.id][filter]
-        return acc
-      }, {})
-    },
-    filteredFolderStats: function() {
-      var filter = this.filterSelected
-      if (filter != 'unread' && filter != 'starred') return {}
-
-      var feedStats = this.filteredFeedStats
-      return this.feeds.reduce(function(acc, feed) {
-        if (!acc[feed.folder_id]) acc[feed.folder_id] = 0
-        if (feedStats[feed.id]) acc[feed.folder_id] += feedStats[feed.id]
-        return acc
-      }, {})
-    },
-    filteredTotalStats: function() {
-      var filter = this.filterSelected
-      if (filter != 'unread' && filter != 'starred') return ''
-
-      return Object.values(this.feedStats).reduce(function(acc, stat) {
-        return acc + stat[filter]
-      }, 0)
     },
     itemSelectedContent: function() {
       if (!this.itemSelected) return ''
@@ -248,12 +224,14 @@ var vm = new Vue({
           title += ' ('+unreadCount+')'
         }
         document.title = title
+        this.computeStats()
       }, 500),
     },
     'filterSelected': function(newVal, oldVal) {
       if (oldVal === null) return  // do nothing, initial setup
       api.settings.update({filter: newVal}).then(this.refreshItems.bind(this))
       this.itemSelected = null
+      this.computeStats()
     },
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === null) return  // do nothing, initial setup
@@ -539,6 +517,34 @@ var vm = new Vue({
     },
     fetchAllFeeds: function() {
       api.feeds.refresh().then(this.refreshStats.bind(this))
+    },
+    computeStats: function() {
+      var filter = this.filterSelected
+      if (!filter) {
+        this.filteredFeedStats = {}
+        this.filteredFolderStats = {}
+        this.filteredTotalStats = null
+        return
+      }
+
+      var statsFeeds = {}, statsFolders = {}, statsTotal = 0
+
+      for (var i = 0; i < this.feeds.length; i++) {
+        var feed = this.feeds[i]
+        if (!this.feedStats[feed.id]) continue
+
+        var n = vm.feedStats[feed.id][filter] || 0
+
+        if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = 0
+
+        statsFeeds[feed.id] = n
+        statsFolders[feed.folder_id] += n
+        statsTotal += n
+      }
+
+      this.filteredFeedStats = statsFeeds
+      this.filteredFolderStats = statsFolders
+      this.filteredTotalStats = statsTotal
     },
   }
 })
