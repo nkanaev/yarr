@@ -22,6 +22,9 @@ var debounce = function(callback, wait) {
 }
 
 var sanitize = function(content, base) {
+  // NOTE: `item.link` is not always a valid url
+  try { new URL(base) } catch(err) { base = null }
+
   var sanitizer = new DOMPurify
   sanitizer.addHook('afterSanitizeAttributes', function(node) {
     // set all elements owning target to target=_blank
@@ -32,9 +35,9 @@ var sanitize = function(content, base) {
       node.setAttribute('xlink:show', 'new')
 
     // set absolute urls
-    if (node.attributes.href && node.attributes.href.value)
+    if (base && node.attributes.href && node.attributes.href.value)
       node.href = new URL(node.attributes.href.value, base).toString()
-    if (node.attributes.src && node.attributes.src.value)
+    if (base && node.attributes.src && node.attributes.src.value)
       node.src = new URL(node.attributes.src.value, base).toString()
   })
   return sanitizer.sanitize(content, {FORBID_TAGS: ['style'], FORBID_ATTR: ['style', 'class']})
