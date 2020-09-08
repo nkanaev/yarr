@@ -40,7 +40,7 @@
                 </div>
                 <div class="flex-grow-1"></div>
                 <b-dropdown
-                        right no-caret lazy="true" variant="link"
+                        right no-caret lazy variant="link"
                         class="settings-dropdown"
                         toggle-class="toolbar-item px-2"
                         ref="menuDropdown">
@@ -296,7 +296,7 @@
                             {{ folder.title }}
                         </div>
                         <div class="flex-shrink-0" v-if="folder.id">
-                            <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
+                            <b-dropdown right no-caret lazy variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
                                 <template v-slot:button-content>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>
@@ -317,7 +317,7 @@
                             {{ feed.title }}
                         </div>
                         <div class="flex-shrink-0">
-                            <b-dropdown right no-caret lazy="true" variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
+                            <b-dropdown right no-caret lazy variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
                                 <template v-slot:button-content>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>
