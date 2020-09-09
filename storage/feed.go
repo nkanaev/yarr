@@ -23,7 +23,7 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 		title = link
 		// use domain if possible
 		linkUrl, err := url.Parse(link)
-		if err != nil && len(linkUrl.Host) > 0 && len(linkUrl.Path) <= 1 {
+		if err == nil && linkUrl.Host != "" && len(linkUrl.Path) <= 1 {
 			title = linkUrl.Host
 		}
 	}
