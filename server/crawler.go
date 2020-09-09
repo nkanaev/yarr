@@ -210,6 +210,10 @@ func listItems(f storage.Feed) ([]storage.Item, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
+	if res.StatusCode == 404 {
+		errmsg := fmt.Sprintf("Failed to list feed items for %s (status: 404)", f.FeedLink)
+		return nil, errors.New(errmsg)
+	}
 	feedparser := gofeed.NewParser()
 	feed, err := feedparser.Parse(res.Body)
 	if err != nil {
