@@ -240,6 +240,7 @@ var vm = new Vue({
       if (oldVal === null) return  // do nothing, initial setup
       api.settings.update({feed: newVal}).then(this.refreshItems.bind(this))
       this.itemSelected = null
+      if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedReadability = ''
@@ -247,9 +248,8 @@ var vm = new Vue({
         this.itemSelectedDetails = null
         return
       }
-      if (this.$refs.content) {
-        this.$refs.content.scrollTop = 0
-      }
+      if (this.$refs.content) this.$refs.content.scrollTop = 0
+
       this.itemSelectedDetails = this.itemsById[newVal]
       if (this.itemSelectedDetails.status == 'unread') {
         this.itemSelectedDetails.status = 'read'
