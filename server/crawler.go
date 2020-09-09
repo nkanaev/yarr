@@ -74,15 +74,15 @@ func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
 	return sources, nil
 }
 
-func discoverFeed(url string) (*gofeed.Feed, *[]FeedSource, error) {
+func discoverFeed(candidateUrl string) (*gofeed.Feed, *[]FeedSource, error) {
 	// Query URL
-	res, err := defaultClient.get(url)
+	res, err := defaultClient.get(candidateUrl)
 	if err != nil {
 		return nil, nil, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		errmsg := fmt.Sprintf("Failed to fetch feed %s (status: %d)", url, res.StatusCode)
+		errmsg := fmt.Sprintf("Failed to fetch feed %s (status: %d)", candidateUrl, res.StatusCode)
 		return nil, nil, errors.New(errmsg)
 	}
 	content, err := ioutil.ReadAll(res.Body)
@@ -96,19 +96,29 @@ func discoverFeed(url string) (*gofeed.Feed, *[]FeedSource, error) {
 	if err == nil {
 		// WILD: feeds may not always have link to themselves
 		if len(feed.FeedLink) == 0 {
-			feed.FeedLink = url
+			feed.FeedLink = candidateUrl
 		}
+
+		// WILD: resolve relative links (path, without host)
+		base, _ := url.Parse(candidateUrl)
+		if link, err := url.Parse(feed.Link); err == nil && link.Host == "" {
+			feed.Link = base.ResolveReference(link).String()
+		}
+		if link, err := url.Parse(feed.FeedLink); err == nil && link.Host == "" {
+			feed.FeedLink = base.ResolveReference(link).String()
+		}
+
 		return feed, nil, nil
 	}
 
 	// Possibly an html link. Search for feed links
-	sources, err := searchFeedLinks(content, url)
+	sources, err := searchFeedLinks(content, candidateUrl)
 	if err != nil {
 		return nil, nil, err
 	} else if len(sources) == 0 {
 		return nil, nil, errors.New("No feeds found at the given url")
 	} else if len(sources) == 1 {
-		if sources[0].Url == url {
+		if sources[0].Url == candidateUrl {
 			return nil, nil, errors.New("Recursion!")
 		}
 		return discoverFeed(sources[0].Url)
