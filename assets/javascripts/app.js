@@ -43,6 +43,8 @@ var sanitize = function(content, base) {
   return sanitizer.sanitize(content, {FORBID_TAGS: ['style'], FORBID_ATTR: ['style', 'class']})
 }
 
+Vue.use(VueLazyload)
+
 Vue.directive('scroll', {
   inserted: function(el, binding) {
     el.addEventListener('scroll', debounce(function(event) {
