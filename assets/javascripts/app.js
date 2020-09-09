@@ -112,19 +112,7 @@ Vue.component('relative-time', {
 })
 
 var vm = new Vue({
-  el: '#app',
   created: function() {
-    api.settings.get().then(function(data) {
-      vm.feedSelected = data.feed
-      vm.filterSelected = data.filter
-      vm.itemSortNewestFirst = data.sort_newest_first
-      vm.feedListWidth = data.feed_list_width || 300
-      vm.itemListWidth = data.item_list_width || 300
-      vm.theme.name = data.theme_name
-      vm.theme.font = data.theme_font
-      vm.theme.size = data.theme_size
-      vm.refreshItems()
-    })
     this.refreshFeeds()
     this.refreshStats()
   },
@@ -552,4 +540,17 @@ var vm = new Vue({
       this.filteredTotalStats = statsTotal
     },
   }
+})
+
+api.settings.get().then(function(data) {
+  vm.feedSelected = data.feed
+  vm.filterSelected = data.filter
+  vm.itemSortNewestFirst = data.sort_newest_first
+  vm.feedListWidth = data.feed_list_width || 300
+  vm.itemListWidth = data.item_list_width || 300
+  vm.theme.name = data.theme_name
+  vm.theme.font = data.theme_font
+  vm.theme.size = data.theme_size
+  vm.refreshItems()
+  vm.$mount('#app')
 })
