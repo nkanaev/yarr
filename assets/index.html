@@ -89,7 +89,7 @@
                     </b-dropdown-item>
                 </b-dropdown>
             </div>
-            <div class="p-2 overflow-auto border-top">
+            <div class="p-2 overflow-auto border-top flex-grow-1">
                 <label class="selectgroup">
                     <input type="radio" name="feed" value="" v-model="feedSelected">
                     <div class="selectgroup-label d-flex align-items-center w-100">
@@ -149,7 +149,7 @@
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
             </div>
-            <div class="p-2 overflow-auto border-top" v-scroll="loadMoreItems" ref="itemlist">
+            <div class="p-2 overflow-auto border-top flex-grow-1" v-scroll="loadMoreItems" ref="itemlist">
                 <label v-for="item in items" :key="item.id"
                        class="selectgroup">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
