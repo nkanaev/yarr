@@ -2,6 +2,7 @@ package storage
 
 import (
 	"html"
+	"net/url"
 )
 
 type Feed struct {
@@ -17,7 +18,19 @@ type Feed struct {
 
 func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId *int64) *Feed {
 	title = html.UnescapeString(title)
-	if len(title) == 0 {
+	// WILD: fallback to `feed.link` -> `feed.feed_link` -> "<???>" if title is missing
+	if title == "" {
+		title = link
+		// use domain if possible
+		linkUrl, err := url.Parse(link)
+		if err != nil && len(linkUrl.Host) > 0 && len(linkUrl.Path) <= 1 {
+			title = linkUrl.Host
+		}
+	}
+	if title == "" {
+		title = feedLink
+	}
+	if title == "" {
 		title = "<???>"
 	}
 	result, err := s.db.Exec(`
