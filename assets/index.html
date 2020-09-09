@@ -12,32 +12,27 @@
         <!-- feed list -->
         <div class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
-            <div class="p-2 toolbar d-flex align-items-center" style="padding-bottom: 1px;">
-                <div class="icon mx-2" :class="{'icon-loading': loading.feeds}">{% inline "anchor.svg" %}</div>
-                <div class="text-truncate cursor-default noselect">
-                    <span v-if="loading.feeds">Refreshing ({{loading.feeds}} left)</span>
-                </div>
+            <div class="p-2 toolbar d-flex align-items-center">
+                <div class="icon mx-2">{% inline "anchor.svg" %}</div>
                 <div class="flex-grow-1"></div>
-                <div class="noselect" :class="{'d-none': loading.feeds}">
-                    <button class="toolbar-item"
-                            :class="{active: filterSelected == 'unread'}"
-                            v-b-tooltip.hover.bottom="'Unread'"
-                            @click="filterSelected = 'unread'">
-                        <span class="icon">{% inline "circle-full.svg" %}</span>
-                    </button>
-                    <button class="toolbar-item"
-                            :class="{active: filterSelected == 'starred'}"
-                            v-b-tooltip.hover.bottom="'Starred'"
-                            @click="filterSelected = 'starred'">
-                        <span class="icon">{% inline "star-full.svg" %}</span>
-                    </button>
-                    <button class="toolbar-item"
-                            :class="{active: filterSelected == ''}"
-                            v-b-tooltip.hover.bottom="'All'"
-                            @click="filterSelected = ''">
-                        <span class="icon">{% inline "assorted.svg" %}</span>
-                    </button>
-                </div>
+                <button class="toolbar-item"
+                        :class="{active: filterSelected == 'unread'}"
+                        v-b-tooltip.hover.bottom="'Unread'"
+                        @click="filterSelected = 'unread'">
+                    <span class="icon">{% inline "circle-full.svg" %}</span>
+                </button>
+                <button class="toolbar-item"
+                        :class="{active: filterSelected == 'starred'}"
+                        v-b-tooltip.hover.bottom="'Starred'"
+                        @click="filterSelected = 'starred'">
+                    <span class="icon">{% inline "star-full.svg" %}</span>
+                </button>
+                <button class="toolbar-item"
+                        :class="{active: filterSelected == ''}"
+                        v-b-tooltip.hover.bottom="'All'"
+                        @click="filterSelected = ''">
+                    <span class="icon">{% inline "assorted.svg" %}</span>
+                </button>
                 <div class="flex-grow-1"></div>
                 <b-dropdown
                         right no-caret lazy variant="link"
@@ -132,6 +127,10 @@
                         </label>
                     </div>
                 </div>
+            </div>
+            <div class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0" v-if="loading.feeds">
+                <span class="icon loading mx-2"></span>
+                <span class="text-truncate cursor-default noselect">Refreshing ({{loading.feeds}} left)</span>
             </div>
         </div>
         <!-- item list -->

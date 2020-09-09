@@ -153,7 +153,7 @@ var vm = new Vue({
 
       'settings': 'create',
       'loading': {
-        'feeds': false,
+        'feeds': 0,
         'newfeed': false,
         'items': false,
         'readability': false,
