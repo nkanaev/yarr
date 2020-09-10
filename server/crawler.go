@@ -138,14 +138,20 @@ func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	}
 
 	if len(websiteUrl) != 0 {
-		doc, err := goquery.NewDocument(websiteUrl)
+		res, err := defaultClient.get(websiteUrl)
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+		doc, err := goquery.NewDocumentFromReader(res.Body)
+		base, err := url.Parse(websiteUrl)
 		if err != nil {
 			return nil, err
 		}
 		doc.Find(`link[rel=icon]`).EachWithBreak(func(i int, s *goquery.Selection) bool {
 			if href, ok := s.Attr("href"); ok {
 				if hrefUrl, err := url.Parse(href); err == nil {
-					faviconUrl := doc.Url.ResolveReference(hrefUrl).String()
+					faviconUrl := base.ResolveReference(hrefUrl).String()
 					candidateUrls = append(candidateUrls, faviconUrl)
 				}
 			}
@@ -233,8 +239,14 @@ func listItems(f storage.Feed) ([]storage.Item, error) {
 }
 
 func init() {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.DisableKeepAlives = true
+	httpClient := &http.Client{
+		Timeout: time.Second * 5,
+		Transport: transport,
+	}
 	defaultClient = &Client{
-		httpClient: &http.Client{Timeout: time.Second * 5},
+		httpClient: httpClient,
 		userAgent:  "Yarr/1.0",
 	}
 }
