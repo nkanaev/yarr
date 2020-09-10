@@ -264,11 +264,13 @@ var vm = new Vue({
     }, 1000),
   },
   methods: {
-    refreshStats: function() {
+    refreshStats: function(loopMode) {
       api.status().then(function(data) {
+        if (loopMode && !vm.itemSelected) vm.refreshItems()
+
         vm.loading.feeds = data.running
         if (data.running) {
-          setTimeout(vm.refreshStats.bind(vm), 500)
+          setTimeout(vm.refreshStats.bind(vm, true), 500)
         }
         vm.feedStats = data.stats.reduce(function(acc, stat) {
           acc[stat.feed_id] = stat
@@ -336,6 +338,7 @@ var vm = new Vue({
       api.items.mark_read(query).then(function() {
         vm.items = []
         vm.itemsPage = {'cur': 1, 'num': 1}
+        vm.itemSelected = null
         vm.refreshStats()
       })
     },
