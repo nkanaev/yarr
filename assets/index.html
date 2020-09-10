@@ -185,9 +185,9 @@
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
-                <button class="toolbar-item" id="content-appearance" v-b-tooltip.hover.bottom="'Appearance'">
+                <a class="toolbar-item" id="content-appearance" v-b-tooltip.hover.bottom="'Appearance'" tabindex="0">
                     <span class="icon">{% inline "sliders.svg" %}</span>
-                </button>
+                </a>
                 <button class="toolbar-item"
                         :class="{active: itemSelectedReadability}"
                         @click="getReadable(itemSelectedDetails)"
