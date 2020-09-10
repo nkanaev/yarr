@@ -29,11 +29,10 @@ func main() {
 		logger.Fatal("Failed to initialise database: ", err)
 	}
 
-	addr := "127.0.0.1:8000"
+	addr := "127.0.0.1:7070"
 
 	systrayOnReady := func() {
-		//systray.SetIcon(icon.Data)
-		systray.SetTitle("yarr")
+		systray.SetIcon(server.Icon)
 
 		menuOpen := systray.AddMenuItem("Open", "")
 		systray.AddSeparator()
