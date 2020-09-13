@@ -1,32 +1,27 @@
 ASSETS = assets/javascripts/* assets/stylesheets/* assets/graphicarts/* assets/index.html
-
 CGO_ENABLED=1
 
-default: build
+default: bundle
 
 server/assets_bundle.go: $(ASSETS)
-	go run bundle.go >/dev/null
+	go run scripts/bundle_assets.go >/dev/null
 
 bundle: server/assets_bundle.go
 
-build: build_mac build_nix build_win
-
-build_mac: bundle
+build_macos: bundle
 	set GOOS=darwin
 	set GOARCH=amd64
-	mkdir -p build/mac
-	go build -tags "sqlite_foreign_keys release mac" -ldflags="-s -w" -o build/mac/yarr main.go
+	mkdir -p _output/mac
+	go build -tags "sqlite_foreign_keys release macos" -ldflags="-s -w" -o _output/mac/yarr main.go
 
-build_nix: bundle
+build_linux: bundle
 	set GOOS=linux
 	set GOARCH=386
-	mkdir -p build/nix
-	go build -tags "sqlite_foreign_keys release nix" -ldflags="-s -w" -o build/nix/yarr main.go
+	mkdir -p _output/nix
+	go build -tags "sqlite_foreign_keys release linux" -ldflags="-s -w" -o _output/nix/yarr main.go
 
-build_win: bundle
+build_windows: bundle
 	set GOOS=windows
 	set GOARCH=386
-	mkdir -p build/win
-	go build -tags "sqlite_foreign_keys release win" -ldflags="-s -w -H windowsgui" -o build/win/yarr.exe main.go
-
-.PHONY: default bundle build build_mac build_nix build_win
+	mkdir -p _output/win
+	go build -tags "sqlite_foreign_keys release windows" -ldflags="-s -w -H windowsgui" -o _output/win/yarr.exe main.go
