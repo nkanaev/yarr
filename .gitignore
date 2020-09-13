@@ -1,6 +1,4 @@
-yarr
-*.db
-server/assets_bundle.go
-vendor/
-gofeed
-_output/
+/server/assets_bundle.go
+/gofeed
+/_output
+/yarr
