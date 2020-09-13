@@ -13,6 +13,7 @@ build_macos: bundle
 	set GOARCH=amd64
 	mkdir -p _output/macos
 	go build -tags "sqlite_foreign_keys release macos" -ldflags="-s -w" -o _output/macos/yarr main.go
+	cp artwork/icon.png _output/macos/icon.png
 	go run scripts/package_macos.go _output/macos
 
 build_linux: bundle
