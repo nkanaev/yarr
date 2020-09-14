@@ -23,3 +23,4 @@ $ cd yarr && make build_macos
 - feeds health checker
 - mobile & tablet layout
 - parameters (`--[no]-gui`, `--addr`, ...)
+- Fever API support
