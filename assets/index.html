@@ -163,7 +163,7 @@
                             </small>
                             <small class="flex-shrink-0"><relative-time :val="item.date"/></small>
                         </div>
-                        <div>{{item.title}}</div>
+                        <div>{{item.title || 'untitled'}}</div>
                     </div>
                 </label>
                 <button class="btn btn-link btn-block loading my-3" v-if="itemsPage.cur < itemsPage.num"></button>
