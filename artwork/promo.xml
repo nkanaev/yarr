@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.1">
+<head>
+  <title>subscriptions.opml</title>
+</head>
+<body>
+  <outline text="comics">
+    <outline type="rss" text="Dresden Codak" description="An Illustrated Celebration of Science, Death and Human Folly" xmlUrl="http://dresdencodak.com/feed/" htmlUrl="http://dresdencodak.com"/>
+    <outline type="rss" text="Lackadaisy Cats" description="Tracy Butler&#39;s anthropomorphic Gangster story set in Prohibition Era St. Louis, Missouri." xmlUrl="http://www.lackadaisycats.com/rss" htmlUrl="http://www.lackadaisy.com"/>
+    <outline type="rss" text="The Oatmeal - Comics, Quizzes, &amp; Stories" description="The oatmeal tastes better than stale skittles found under the couch cushions" xmlUrl="http://feeds.feedburner.com/oatmealfeed" htmlUrl="http://theoatmeal.com/"/>
+    <outline type="rss" text="The Perry Bible Fellowship" description="Offbeat comic strip by Nicholas Gurewitch. Includes archives, information about the author, and purchases." xmlUrl="https://pbfcomics.com/feed/" htmlUrl="https://pbfcomics.com"/>
+  </outline>
+  <outline text="golang">
+    <outline type="rss" text="blog.golang.org" description="" xmlUrl="https://blog.golang.org/feed.atom" htmlUrl="https://blog.golang.org/feed.atom"/>
+    <outline type="rss" text="Dave Cheney" description="#BlackLivesMatter" xmlUrl="https://dave.cheney.net/feed" htmlUrl="https://dave.cheney.net"/>
+    <outline type="rss" text="Go Time" description="Your source for diverse discussions from around the Go community  Panelists include Mat Ryer, Ashley McNamara, Johnny Boursiquot, Carmen Andoh, Jaana B. Dogan (JBD), Mark Bates, and Jon Calhoun.
+
+This show records LIVE every Tuesday at 3pm US Eastern. Join the Golang community and chat with us during the show in the #gotimefm channel of Gophers slack.
+
+We discuss cloud infrastructure, distributed systems, microservices, Kubernetes, Docker... oh and also Go!
+
+Some people search for GoTime or GoTimeFM and can&#39;t find the show, so now the strings GoTime and GoTimeFM are in our description too." xmlUrl="https://changelog.com/gotime/feed" htmlUrl="https://changelog.com/gotime"/>
+    <outline type="rss" text="research!rsc" description="" xmlUrl="http://research.swtch.com/feed.atom" htmlUrl="http://research.swtch.com/feed.atom"/>
+  </outline>
+  <outline text="linklogs">
+    <outline type="rss" text="Daring Fireball" description="By John Gruber" xmlUrl="https://daringfireball.net/feeds/main" htmlUrl="https://daringfireball.net/"/>
+    <outline type="rss" text="kottke.org" description="Jason Kottke&#39;s weblog, home of fine hypertext products" xmlUrl="http://feeds.kottke.org/main" htmlUrl="http://kottke.org/"/>
+  </outline>
+  <outline text="tech">
+    <outline type="rss" text="2ality – JavaScript and more" description="" xmlUrl="https://feeds.feedburner.com/2ality" htmlUrl="https://2ality.com/"/>
+    <outline type="rss" text="Julia Evans" description="" xmlUrl="http://jvns.ca/atom.xml" htmlUrl="http://jvns.ca"/>
+    <outline type="rss" text="null program" description="" xmlUrl="https://nullprogram.com/feed/" htmlUrl="https://nullprogram.com"/>
+  </outline>
+  <outline text="youtube">
+    <outline type="rss" text="Mike Boyd" description="" xmlUrl="http://www.youtube.com/feeds/videos.xml?channel_id=UCIRiWCPZoUyZDbydIqitHtQ" htmlUrl="https://www.youtube.com/channel/UCIRiWCPZoUyZDbydIqitHtQ"/>
+    <outline type="rss" text="Primitive Technology" description="" xmlUrl="http://www.youtube.com/feeds/videos.xml?channel_id=UCAL3JXZSzSm8AlZyD3nQdBA" htmlUrl="https://www.youtube.com/channel/UCAL3JXZSzSm8AlZyD3nQdBA"/>
+  </outline>
+</body>
+</opml>
