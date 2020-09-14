@@ -6,6 +6,8 @@ yet another rss reader.
 
 ## build
 
+Install `Go >= 1.14` and `gcc`, then run:
+
 ```sh
 $ git clone https://github.com/nkanaev/yarr.git
 $ git clone https://github.com/nkanaev/gofeed.git
