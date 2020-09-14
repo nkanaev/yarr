@@ -60,17 +60,36 @@ func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
 		return sources, err
 	}
 
+	// feed {url: title} map
+	feeds := make(map[string]string)
+
 	doc.Find(feedLinks).Each(func(i int, s *goquery.Selection) {
+		// Unlikely to happen, but don't get more than N links
+		if len(feeds) > 10 {
+			return
+		}
 		if href, ok := s.Attr("href"); ok {
 			feedUrl, err := url.Parse(href)
 			if err != nil {
 				return
 			}
+
 			title := s.AttrOr("title", "")
 			url := base.ResolveReference(feedUrl).String()
-			sources = append(sources, FeedSource{Title: title, Url: url})
+
+			if _, alreadyExists := feeds[url]; alreadyExists {
+				if feeds[url] == "" {
+					feeds[url] = title
+				}
+			} else {
+				feeds[url] = title
+			}
 		}
 	})
+
+	for url, title := range feeds {
+		sources = append(sources, FeedSource{Title: title, Url: url})
+	}
 	return sources, nil
 }
 
