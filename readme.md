@@ -33,3 +33,7 @@ $ cd yarr && make build_macos
 - parameters (`--[no]-gui`, `--addr`, ...)
 - Fever API support
 - keyboard navigation
+
+## credits
+
+[Feather](http://feathericons.com/) for icons.
