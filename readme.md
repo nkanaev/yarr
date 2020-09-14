@@ -24,3 +24,4 @@ $ cd yarr && make build_macos
 - mobile & tablet layout
 - parameters (`--[no]-gui`, `--addr`, ...)
 - Fever API support
+- keyboard navigation
