@@ -1,4 +1,4 @@
-# yarr
+# yarr (beta)
 
 yet another rss reader.
 
