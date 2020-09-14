@@ -14,3 +14,12 @@ $ git clone https://github.com/nkanaev/gofeed.git
 $ mv gofeed yarr
 $ cd yarr && make build_macos
 ```
+
+## plans
+
+- test across 3 platforms (macos, linux, windows)
+- binaries
+- gui-less mode (no tray icon)
+- feeds health checker
+- mobile & tablet layout
+- parameters (`--[no]-gui`, `--addr`, ...)
