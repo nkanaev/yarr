@@ -9,7 +9,7 @@ yet another rss reader.
 The goal of the project is to provide a desktop application accessible via web browser.
 Longer-term plans include a self-hosted solution for individuals.
 
-There are plans to add support for mobile & table resolutions.
+There are plans to add support for mobile & tablet resolutions.
 Support for 3rd-party applications (via Fever API) is being considered.
 
 ## build
