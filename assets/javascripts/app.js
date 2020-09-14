@@ -116,6 +116,14 @@ var vm = new Vue({
     this.refreshFeeds()
     this.refreshStats()
   },
+  mounted: function() {
+    this.$root.$on('bv::modal::hidden', function(bvEvent, modalId) {
+      if (vm.settings == 'create') {
+        vm.feedNewChoice = []
+        vm.feedNewChoiceSelected = ''
+      }
+    })
+  },
   data: function() {
     return {
       'filterSelected': null,
