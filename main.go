@@ -31,7 +31,7 @@ func main() {
 	}
 
 	var addr string
-	flag.StrinVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
+	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
 	flag.Parse()
 
 	systrayOnReady := func() {
