@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/getlantern/systray"
 	"github.com/nkanaev/yarr/server"
 	"github.com/nkanaev/yarr/storage"
@@ -29,7 +30,9 @@ func main() {
 		logger.Fatal("Failed to initialise database: ", err)
 	}
 
-	addr := "127.0.0.1:7070"
+	var addr string
+	flag.StrinVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
+	flag.Parse()
 
 	systrayOnReady := func() {
 		systray.SetIcon(server.Icon)
