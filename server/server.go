@@ -11,25 +11,27 @@ import (
 )
 
 type Handler struct {
+	Addr         string
 	db           *storage.Storage
 	log          *log.Logger
 	feedQueue    chan storage.Feed
 	queueSize    *int32
 }
 
-func New(db *storage.Storage, logger *log.Logger) *Handler {
+func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
 	queueSize := int32(0)
 	return &Handler{
 		db:        db,
 		log:       logger,
 		feedQueue: make(chan storage.Feed, 3000),
 		queueSize: &queueSize,
+		Addr:      addr,
 	}
 }
 
-func (h *Handler) Start(addr string) {
+func (h *Handler) Start() {
 	h.startJobs()
-	s := &http.Server{Addr: addr, Handler: h}
+	s := &http.Server{Addr: h.Addr, Handler: h}
 	s.ListenAndServe()
 }
 

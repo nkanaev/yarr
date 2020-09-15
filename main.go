@@ -2,10 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/getlantern/systray"
 	"github.com/nkanaev/yarr/server"
 	"github.com/nkanaev/yarr/storage"
-	"github.com/skratchdot/open-golang/open"
+	"github.com/nkanaev/yarr/platform"
 	"log"
 	"os"
 	"path/filepath"
@@ -34,25 +33,6 @@ func main() {
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
 	flag.Parse()
 
-	systrayOnReady := func() {
-		systray.SetIcon(server.Icon)
-
-		menuOpen := systray.AddMenuItem("Open", "")
-		systray.AddSeparator()
-		menuQuit := systray.AddMenuItem("Quit", "")
-
-		go func() {
-			for {
-				select {
-				case <-menuOpen.ClickedCh:
-					open.Run("http://" + addr)
-				case <-menuQuit.ClickedCh:
-					systray.Quit()
-				}
-			}
-		}()
-		srv := server.New(db, logger)
-		srv.Start(addr)
-	}
-	systray.Run(systrayOnReady, nil)
+	srv := server.New(db, logger, addr)
+	platform.Start(srv)
 }
