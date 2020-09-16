@@ -22,6 +22,13 @@ git clone https://github.com/nkanaev/gofeed.git
 mv gofeed yarr
 cd yarr && make build_macos
 ```
+## run
+1) in terminal:
+```
+go run main.go
+```
+2) in browser, navigate to http://localhost:7070
+
 
 ## plans
 
