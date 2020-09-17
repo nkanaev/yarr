@@ -63,7 +63,7 @@ func main() {
 		for _, filename := range filenames {
 			content, _ := ioutil.ReadFile(filename)
 			assets = append(assets, asset{
-				Name: strings.TrimPrefix(filename, "assets/"),
+				Name: strings.TrimPrefix(strings.ReplaceAll(filename, "\\", "/"), "assets/"),
 				Etag: shasum(content),
 				Body: encode(content),
 			})
