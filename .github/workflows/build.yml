@@ -13,6 +13,19 @@ jobs:
     - {name: "Checkout gofeed", uses: actions/checkout@v2, with: {repository: nkanaev/gofeed, path: gofeed}}
     - name: "Build"
       run: |
+        go version
         make build_macos
         cd _output/macos && zip -r yarr-macos.zip yarr.app
     - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: macos, path: _output/macos/yarr-macos.zip}}
+  build_linux:
+    name: Build for Linux
+    runs-on: ubuntu-18.04
+    steps:
+    - {name: "Checkout", uses: actions/checkout@v2}
+    - {name: "Checkout gofeed", uses: actions/checkout@v2, with: {repository: nkanaev/gofeed, path: gofeed}}
+    - {name: "Setup Go", uses: actions/setup-go@v2, with: {go-version: '^1.14'}}
+    - name: "Build"
+      run: |
+        go version
+        make build_linux
+    - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: linux, path: _output/linux/yarr}}
