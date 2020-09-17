@@ -28,4 +28,5 @@ jobs:
       run: |
         go version
         make build_linux
-    - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: linux, path: _output/linux/yarr}}
+        cd _output/linux && zip -r yarr-linux.zip yarr
+    - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: linux, path: _output/linux/yarr-linux.zip}}
