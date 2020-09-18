@@ -33,7 +33,7 @@ func (h *Handler) Start() {
 	h.startJobs()
 	s := &http.Server{Addr: h.Addr, Handler: h}
 	s.ListenAndServe()
-}
+}	
 
 func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	route, vars := getRoute(req)
