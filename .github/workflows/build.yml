@@ -17,6 +17,17 @@ jobs:
         make build_macos
         cd _output/macos && zip -r yarr-macos.zip yarr.app
     - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: macos, path: _output/macos/yarr-macos.zip}}
+  build_windows:
+    name: Build for Windows
+    runs-on: windows-2019
+    steps:
+    - {name: "Checkout", uses: actions/checkout@v2}
+    - {name: "Checkout gofeed", uses: actions/checkout@v2, with: {repository: nkanaev/gofeed, path: gofeed}}
+    - name: "Build"
+      run: |
+        go version
+        make build_windows
+    - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: windows, path: _output/windows/yarr.exe}}
   build_linux:
     name: Build for Linux
     runs-on: ubuntu-18.04
