@@ -26,4 +26,5 @@ build_windows: bundle
 	set GOOS=windows
 	set GOARCH=386
 	mkdir -p _output/windows
+	windres -i artwork/versioninfo.rc -O coff -o platform/versioninfo.syso
 	go build -tags "sqlite_foreign_keys release windows" -ldflags="-s -w -H windowsgui" -o _output/windows/yarr.exe main.go
