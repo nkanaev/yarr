@@ -37,3 +37,7 @@ cd yarr && make build_macos
 ## credits
 
 [Feather](http://feathericons.com/) for icons.
+
+## code of conduct
+
+Be excellent to each other. Party on, dudes!
