@@ -1,4 +1,4 @@
-# yarr (beta)
+# yarr
 
 yet another rss reader.
 
@@ -12,32 +12,8 @@ Longer-term plans include a self-hosted solution for individuals.
 There are plans to add support for mobile & tablet resolutions.
 Support for 3rd-party applications (via Fever API) is being considered.
 
-## build
-
-Install `Go >= 1.14` and `gcc`, then run:
-
-```sh
-git clone https://github.com/nkanaev/yarr.git
-git clone https://github.com/nkanaev/gofeed.git
-mv gofeed yarr
-cd yarr && make build_macos
-```
-
-## plans
-
-- test across 3 platforms (macos, linux, windows)
-- prebuilt binaries
-- GUI-less mode (no tray icon)
-- feeds health checker
-- mobile & tablet layout
-- parameters (`--[no]-gui`, `--addr`, ...)
-- Fever API support
-- keyboard navigation
+[download](https://github.com/nkanaev/yarr/releases/latest)
 
 ## credits
 
 [Feather](http://feathericons.com/) for icons.
-
-## code of conduct
-
-Be excellent to each other. Party on, dudes!
