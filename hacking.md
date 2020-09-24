@@ -17,7 +17,7 @@ cd yarr
 
 Then:
 
-```
+```sh
 # create a binary for the host os
 make build_macos    # -> _output/macos/yarr.app
 make build_linux    # -> _output/linux/yarr
