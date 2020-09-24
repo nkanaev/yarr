@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [master]
+    tags: [v*]
 
 jobs:
   build_macos:
