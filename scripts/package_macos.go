@@ -38,7 +38,7 @@ var plist = `<?xml version="1.0" encoding="UTF-8"?>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1</string>
+	<string>1.0</string>
 
 	<key>LSMinimumSystemVersion</key>
 	<string>10.13</string>
