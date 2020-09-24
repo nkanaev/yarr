@@ -29,14 +29,9 @@ go run main.go      # starts a server at http://localhost:7070
 
 ## plans
 
-- test across 3 platforms (macos, linux, windows)
-- prebuilt binaries
-- GUI-less mode (no tray icon)
 - feeds health checker
 - mobile & tablet layout
-- parameters (`--[no]-gui`, `--addr`, ...)
 - Fever API support
-- keyboard navigation
 
 ## code of conduct
 
