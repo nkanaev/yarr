@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/nkanaev/yarr/server"
 	"github.com/nkanaev/yarr/storage"
 	"github.com/nkanaev/yarr/platform"
@@ -10,11 +11,21 @@ import (
 	"path/filepath"
 )
 
+var Version string = "v0.0"
+var GitHash string = "unknown"
+
 func main() {
 	var addr, storageFile string
+	var ver bool
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
 	flag.StringVar(&storageFile, "db", "", "storage file path")
+	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.Parse()
+
+	if ver {
+		fmt.Printf("%s (%s)\n", Version, GitHash)
+		return
+	}
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 
