@@ -8,7 +8,7 @@
     <link rel="icon shortcut" href="./static/graphicarts/anchor.png">
 </head>
 <body class="theme-light">
-    <div class="wrapper d-flex vh-100" id="app" v-cloak>
+    <div class="d-flex" id="app" v-cloak>
         <!-- feed list -->
         <div class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
