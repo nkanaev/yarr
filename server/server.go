@@ -32,7 +32,10 @@ func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
 func (h *Handler) Start() {
 	h.startJobs()
 	s := &http.Server{Addr: h.Addr, Handler: h}
-	s.ListenAndServe()
+	err := s.ListenAndServe()
+	if err != http.ErrServerClosed {
+		h.log.Fatal(err)
+	}
 }	
 
 func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
