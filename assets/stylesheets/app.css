@@ -412,6 +412,7 @@ select.form-control:not([multiple]):not([size]) {
 
 .content pre {
   color: inherit;
+  overflow-x: scroll;
 }
 
 .content a {
@@ -422,10 +423,6 @@ select.form-control:not([multiple]):not([size]) {
 .content blockquote {
   border-left: 3px solid #22262a;
   padding-left: 1rem;
-}
-
-.content pre {
-  overflow-x: scroll;
 }
 
 .content h1 {
