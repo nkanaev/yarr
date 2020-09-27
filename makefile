@@ -28,6 +28,12 @@ build_linux: bundle
 	mkdir -p _output/linux
 	go build -tags "sqlite_foreign_keys release linux" -ldflags="$(GO_LDFLAGS)" -o _output/linux/yarr main.go
 
+build_openbsd: bundle
+	set GOOS=openbsd
+	set GOARCH=386
+	mkdir -p _output/openbsd
+	go build -tags "sqlite_foreign_keys release openbsd" -ldflags="$(GO_LDFLAGS)" -o _output/openbsd/yarr main.go
+
 build_windows: bundle
 	set GOOS=windows
 	set GOARCH=386
