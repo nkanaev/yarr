@@ -92,5 +92,5 @@ func main() {
 	var buf bytes.Buffer
 	template := template.Must(template.New("code").Parse(code_template))
 	template.Execute(&buf, assets)
-	ioutil.WriteFile("server/assets_bundle.go", buf.Bytes(), 0644)
+	ioutil.WriteFile("server/assets.go", buf.Bytes(), 0644)
 }

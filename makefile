@@ -9,10 +9,10 @@ GO_LDFLAGS := $(GO_LDFLAGS) -X 'main.Version=$(VERSION)' -X 'main.GitHash=$(GITH
 
 default: bundle
 
-server/assets_bundle.go: $(ASSETS)
+server/assets.go: $(ASSETS)
 	go run scripts/bundle_assets.go >/dev/null
 
-bundle: server/assets_bundle.go
+bundle: server/assets.go
 
 build_macos: bundle
 	set GOOS=darwin
