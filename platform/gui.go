@@ -10,7 +10,7 @@ import (
 
 func Start(s *server.Handler) {
 	systrayOnReady := func() {
-		systray.SetIcon(server.Icon)
+		systray.SetIcon(Icon)
 
 		menuOpen := systray.AddMenuItem("Open", "")
 		systray.AddSeparator()
