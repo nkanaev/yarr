@@ -278,8 +278,8 @@
                         <label class="selectgroup" v-for="choice in feedNewChoice">
                             <input type="radio" name="feedToAdd" :value="choice.url" v-model="feedNewChoiceSelected">
                             <div class="selectgroup-label">
-                                <div>{{ choice.title }}</div>
-                                <div :class="{light: choice.title}">{{ choice.url }}</div>
+                                <div class="text-truncate">{{ choice.title }}</div>
+                                <div class="text-truncate" :class="{light: choice.title}">{{ choice.url }}</div>
                             </div>
                         </label>
                     </div>
