@@ -14,6 +14,10 @@ server/assets.go: $(ASSETS)
 
 bundle: server/assets.go
 
+build_default: bundle
+	mkdir -p _output
+	go build -tags "sqlite_foreign_keys release" -ldflags="$(GO_LDFLAGS)" -o _output/yarr main.go
+
 build_macos: bundle
 	set GOOS=darwin
 	set GOARCH=amd64
