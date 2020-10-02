@@ -321,7 +321,7 @@ var vm = new Vue({
     refreshItems: function() {
       var query = this.getItemsQuery()
       this.loading.items = true
-      api.items.list(query).then(function(data) {
+      return api.items.list(query).then(function(data) {
         vm.items = data.list
         vm.itemsPage = data.page
         vm.loading.items = false
@@ -421,10 +421,17 @@ var vm = new Vue({
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         api.feeds.delete(feed.id).then(function() {
-          if (vm.feedSelected === 'feed:'+feed.id) {
-            vm.items = []
-            vm.feedSelected = ''
+          // note: if item list contains delete feed's entries, refresh it first.
+          for (var i = 0; i < vm.items.length; i++) {
+            if (vm.items[i].feed_id == feed.id) {
+              vm.refreshItems().then(function() {
+                vm.refreshStats()
+                vm.refreshFeeds()
+              })
+              return
+            }
           }
+
           vm.refreshStats()
           vm.refreshFeeds()
         })
