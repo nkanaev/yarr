@@ -48,5 +48,6 @@ func main() {
 	}
 
 	srv := server.New(db, logger, addr)
+	logger.Printf("starting server at http://%s", addr)
 	platform.Start(srv)
 }
