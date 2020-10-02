@@ -78,7 +78,6 @@ func (h *Handler) startJobs() {
 				h.db.CreateItems(items)
 				syncSearch()
 				if !feed.HasIcon {
-					h.log.Println("searching favicon for:", feed.Link, feed.FeedLink)
 					icon, err := findFavicon(feed.Link, feed.FeedLink)
 					if icon != nil {
 						h.db.UpdateFeedIcon(feed.Id, icon)
