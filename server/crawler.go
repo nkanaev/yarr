@@ -158,13 +158,16 @@ func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	}
 
 	if len(websiteUrl) != 0 {
+		base, err := url.Parse(websiteUrl)
+		if err != nil {
+			return nil, err
+		}
 		res, err := defaultClient.get(websiteUrl)
 		if err != nil {
 			return nil, err
 		}
 		defer res.Body.Close()
 		doc, err := goquery.NewDocumentFromReader(res.Body)
-		base, err := url.Parse(websiteUrl)
 		if err != nil {
 			return nil, err
 		}

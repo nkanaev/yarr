@@ -83,7 +83,7 @@ func (h *Handler) startJobs() {
 						h.db.UpdateFeedIcon(feed.Id, icon)
 					}
 					if err != nil {
-						h.log.Print(err)
+						h.log.Printf("Failed to search favicon for %s (%s): %s", feed.Link, feed.FeedLink, err)
 					}
 				}
 			case <- delTicker.C:
