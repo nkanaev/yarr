@@ -8,6 +8,7 @@ import (
 	"github.com/mmcdole/gofeed"
 	"github.com/nkanaev/yarr/storage"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -258,10 +259,16 @@ func listItems(f storage.Feed) ([]storage.Item, error) {
 }
 
 func init() {
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	transport.DisableKeepAlives = true
+	transport := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout: 10 * time.Second,
+		}).DialContext,
+		DisableKeepAlives: true,
+		TLSHandshakeTimeout: time.Second * 10,
+	}
 	httpClient := &http.Client{
-		Timeout: time.Second * 5,
+		Timeout:   time.Second * 30,
 		Transport: transport,
 	}
 	defaultClient = &Client{
