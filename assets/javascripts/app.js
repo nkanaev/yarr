@@ -1,4 +1,5 @@
 'use strict';
+Vue.config.devtools = true
 
 var TITLE = document.title
 
@@ -100,7 +101,7 @@ Vue.component('relative-time', {
       'interval': null,
     }
   },
-  template: '<time :datetime="val">{{formatted}}</time>',
+  template: '<time :datetime="val">{{ formatted }}</time>',
   mounted: function() {
     this.interval = setInterval(function() {
       this.formatted = dateRepr(this.date)

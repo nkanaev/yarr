@@ -92,7 +92,7 @@
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">All Unread</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">All Starred</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">All Feeds</span>
-                        <span class="counter text-right">{{filteredTotalStats}}</span>
+                        <span class="counter text-right">{{ filteredTotalStats }}</span>
                     </div>
                 </label>
                 <div v-for="folder in foldersWithFeeds">
@@ -108,7 +108,7 @@
                                 {% inline "chevron-right.svg" %}
                             </span>
                             <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
-                            <span class="counter text-right">{{filteredFolderStats[folder.id] || ''}}</span>
+                            <span class="counter text-right">{{ filteredFolderStats[folder.id] || '' }}</span>
                         </div>
                     </label>
                     <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
@@ -122,7 +122,7 @@
                                 <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
                                 <span class="icon mr-2" v-else><img v-lazy="'/api/feeds/'+feed.id+'/icon'" alt=""></span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
-                                <span class="counter text-right">{{filteredFeedStats[feed.id] || ''}}</span>
+                                <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
                             </div>
                         </label>
                     </div>
@@ -130,7 +130,7 @@
             </div>
             <div class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0" v-if="loading.feeds">
                 <span class="icon loading mx-2"></span>
-                <span class="text-truncate cursor-default noselect">Refreshing ({{loading.feeds}} left)</span>
+                <span class="text-truncate cursor-default noselect">Refreshing ({{ loading.feedsi }} left)</span>
             </div>
         </div>
         <!-- item list -->
@@ -159,11 +159,11 @@
                                 <span class="icon icon-small mr-1" v-if="item.status=='starred'">{% inline "star-full.svg" %}</span>
                             </transition>
                             <small class="flex-fill text-truncate mr-1">
-                                {{feedsById[item.feed_id].title}}
+                                {{ feedsById[item.feed_id].title }}
                             </small>
                             <small class="flex-shrink-0"><relative-time :val="item.date"/></small>
                         </div>
-                        <div>{{item.title || 'untitled'}}</div>
+                        <div>{{ item.title || 'untitled' }}</div>
                     </div>
                 </label>
                 <button class="btn btn-link btn-block loading my-3" v-if="itemsPage.cur < itemsPage.num"></button>
@@ -244,7 +244,7 @@
                  ref="content"
                  class="content px-4 pt-3 pb-5 border-top overflow-auto"
                  :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">
-                <h1><b>{{itemSelectedDetails.title}}</b></h1>
+                <h1><b>{{ itemSelectedDetails.title }}</b></h1>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
@@ -299,7 +299,7 @@
                                 <template v-slot:button-content>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>
-                                <b-dropdown-header>{{folder.title}}</b-dropdown-header>
+                                <b-dropdown-header>{{ folder.title }}</b-dropdown-header>
                                 <b-dropdown-item @click.prevent="renameFolder(folder)">Rename</b-dropdown-item>
                                 <b-dropdown-divider></b-dropdown-divider>
                                 <b-dropdown-item class="dropdown-danger"
@@ -320,7 +320,7 @@
                                 <template v-slot:button-content>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>
-                                <b-dropdown-header>{{feed.title}}</b-dropdown-header>
+                                <b-dropdown-header>{{ feed.title }}</b-dropdown-header>
                                 <b-dropdown-item :href="feed.link" target="_blank" v-if="feed.link">Visit Website</b-dropdown-item>
                                 <b-dropdown-divider v-if="feed.link"></b-dropdown-divider>
                                 <b-dropdown-item @click.prevent="renameFeed(feed)">Rename</b-dropdown-item>
