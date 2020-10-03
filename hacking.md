@@ -30,7 +30,6 @@ go run main.go      # starts a server at http://localhost:7070
 ## plans
 
 - feeds health checker
-- mobile & tablet layout
 - Fever API support
 
 ## code of conduct
