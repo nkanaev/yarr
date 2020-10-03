@@ -1,5 +1,4 @@
 'use strict';
-Vue.config.devtools = true
 
 var TITLE = document.title
 
