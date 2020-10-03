@@ -6,11 +6,12 @@
     <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css">
     <link rel="stylesheet" href="./static/stylesheets/app.css">
     <link rel="icon shortcut" href="./static/graphicarts/anchor.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 <body class="theme-light">
-    <div class="d-flex" id="app" v-cloak>
+    <div id="app" class="d-flex" :class="{'feed-selected': feedSelected !== null, 'item-selected': itemSelected !== null}" v-cloak>
         <!-- feed list -->
-        <div class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
+        <div id="col-feed-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
             <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
             <div class="p-2 toolbar d-flex align-items-center">
                 <div class="icon mx-2">{% inline "anchor.svg" %}</div>
@@ -134,9 +135,14 @@
             </div>
         </div>
         <!-- item list -->
-        <div class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0"  :style="{width: itemListWidth+'px'}">
+        <div id="col-item-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: itemListWidth+'px'}">
             <drag :width="itemListWidth" @resize="resizeItemList"></drag>
             <div class="px-2 toolbar d-flex align-items-center">
+                <button class="toolbar-item mr-2 d-block d-md-none"
+                        @click="feedSelected = null"
+                        v-b-tooltip.hover.bottom="'Show Feeds'">
+                    <span class="icon">{% inline "chevron-left.svg" %}</span>
+                </button>
                 <div class="input-icon flex-grow-1">
                     <span class="icon">{% inline "search.svg" %}</span>
                     <input class="d-block toolbar-search" type="" v-model="itemSearch">
@@ -170,7 +176,7 @@
             </div>
         </div>
         <!-- item show -->
-        <div class="vh-100 d-flex flex-column w-100" style="min-width: 0;">
+        <div id="col-item" class="vh-100 d-flex flex-column w-100" style="min-width: 0;">
             <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelected">
                 <button class="toolbar-item"
                         @click="toggleItemStarred(itemSelectedDetails)"
