@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-var Version string = "v0.0"
+var Version string = "0.0"
 var GitHash string = "unknown"
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	if ver {
-		fmt.Printf("%s (%s)\n", Version, GitHash)
+		fmt.Printf("v%s (%s)\n", Version, GitHash)
 		return
 	}
 

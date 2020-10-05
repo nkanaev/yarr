@@ -1,13 +1,15 @@
 package main
 
 import (
-	"os"
-	"path"
+	"flag"
 	"fmt"
 	"io/ioutil"
-	"os/exec"
-	"strconv"
 	"log"
+	"os"
+	"os/exec"
+	"path"
+	"strconv"
+	"strings"
 )
 
 var plist = `<?xml version="1.0" encoding="UTF-8"?>
@@ -21,7 +23,7 @@ var plist = `<?xml version="1.0" encoding="UTF-8"?>
 	<key>CFBundleIdentifier</key>
 	<string>nkanaev.yarr</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>VERSION</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleExecutable</key>
@@ -34,11 +36,6 @@ var plist = `<?xml version="1.0" encoding="UTF-8"?>
 
 	<key>NSHighResolutionCapable</key>
 	<string>True</string>
-
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
 
 	<key>LSMinimumSystemVersion</key>
 	<string>10.13</string>
@@ -59,7 +56,11 @@ func run(cmd ...string) {
 }
 
 func main() {
-	outdir := os.Args[1]
+	var version, outdir string
+	flag.StringVar(&version, "version", "0.0", "")
+	flag.StringVar(&outdir, "outdir", "", "")
+	flag.Parse()
+
 	outfile := "yarr"
 
 	binDir := path.Join(outdir, "yarr.app", "Contents/MacOS")
@@ -74,7 +75,7 @@ func main() {
 	f, _ := ioutil.ReadFile(path.Join(outdir, outfile))
 	ioutil.WriteFile(path.Join(binDir, outfile), f, 0755)
 
-	ioutil.WriteFile(plistFile, []byte(plist), 0644)
+	ioutil.WriteFile(plistFile, []byte(strings.Replace(plist, "VERSION", version, 1)), 0644)
 	ioutil.WriteFile(pkginfoFile, []byte("APPL????"), 0644)
 
 	iconFile := path.Join(outdir, "icon.png")
