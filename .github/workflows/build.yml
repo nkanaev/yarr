@@ -11,23 +11,42 @@ jobs:
     steps:
     - {name: "Checkout", uses: actions/checkout@v2}
     - {name: "Checkout gofeed", uses: actions/checkout@v2, with: {repository: nkanaev/gofeed, path: gofeed}}
+    - name: Cache Go Modules
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
     - name: "Build"
-      run: |
-        go version
-        make build_macos
-        cd _output/macos && zip -r yarr-macos.zip yarr.app
-    - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: macos, path: _output/macos/yarr-macos.zip}}
+      run: make build_macos
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos
+        path: _output/macos/yarr.app
+
   build_windows:
     name: Build for Windows
     runs-on: windows-2019
     steps:
     - {name: "Checkout", uses: actions/checkout@v2}
     - {name: "Checkout gofeed", uses: actions/checkout@v2, with: {repository: nkanaev/gofeed, path: gofeed}}
+    - name: Cache Go Modules
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
     - name: "Build"
-      run: |
-        go version
-        make build_windows
-    - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: windows, path: _output/windows/yarr.exe}}
+      run: make build_windows
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows
+        path: _output/windows/yarr.exe
+
   build_linux:
     name: Build for Linux
     runs-on: ubuntu-18.04
@@ -35,9 +54,73 @@ jobs:
     - {name: "Checkout", uses: actions/checkout@v2}
     - {name: "Checkout gofeed", uses: actions/checkout@v2, with: {repository: nkanaev/gofeed, path: gofeed}}
     - {name: "Setup Go", uses: actions/setup-go@v2, with: {go-version: '^1.14'}}
+    - name: Cache Go Modules
+      uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
     - name: "Build"
+      run: make build_linux
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux
+        path: _output/linux/yarr
+
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build_macos, build_windows, build_linux]
+    steps:
+    - name: Create Release
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: true
+          prerelease: true
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: .
+    - name: Preparation
       run: |
-        go version
-        make build_linux
-        cd _output/linux && zip -r yarr-linux.zip yarr
-    - {name: "Upload", uses: actions/upload-artifact@v2, with: {name: linux, path: _output/linux/yarr-linux.zip}}
+        ls -R
+        chmod u+x macos/Contents/MacOS/yarr
+        chmod u+x linux/yarr
+
+        mv macos yarr.app     && zip -r yarr-macos.zip yarr.app
+        mv windows/yarr.exe . && zip yarr-windows.zip yarr.exe
+        mv linux/yarr .       && zip yarr-linux.zip yarr
+    - name: Upload MacOS
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./yarr-macos.zip
+          asset_name: yarr-${{ github.ref }}-macos64.zip
+          asset_content_type: application/zip
+    - name: Upload Windows
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./yarr-windows.zip
+          asset_name: yarr-${{ github.ref }}-windows32.zip
+          asset_content_type: application/zip
+    - name: Upload Linux
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./yarr-linux.zip
+          asset_name: yarr-${{ github.ref }}-linux32.zip
+          asset_content_type: application/zip
