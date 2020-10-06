@@ -1,9 +1,5 @@
 # hacking
 
-If you have any questions/suggestions/proposals,
-you can reach out the author via e-mail (nkanaev@live.com)
-or mastodon (https://fosstodon.org/@nkanaev).
-
 ## build
 
 Install `Go >= 1.14` and `gcc`. Get the source code:
