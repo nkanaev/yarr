@@ -1,9 +1,12 @@
-FROM golang:1.15 AS build
-RUN apt install gcc -y
+FROM golang:alpine AS build
+RUN apk add build-base git
 WORKDIR /src
 COPY . .
 RUN make build_linux
 
-FROM ubuntu:20.04
-COPY --from=build /src/_output/linux/yarr /usr/bin/yarr
-ENTRYPOINT ["/usr/bin/yarr", "-addr", "0.0.0.0:7070"]
+FROM alpine:latest
+RUN apk add --no-cache ca-certificates && \
+    update-ca-certificates
+COPY --from=build /src/_output/linux/yarr /usr/local/bin/yarr
+EXPOSE 7070
+CMD ["/usr/local/bin/yarr", "-addr", "0.0.0.0:7070", "-db", "/data/yarr.db"]
