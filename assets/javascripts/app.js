@@ -163,6 +163,7 @@ var vm = new Vue({
         'font': '',
         'size': 1,
       },
+      'refreshRate': undefined,
     }
   },
   computed: {
@@ -270,6 +271,10 @@ var vm = new Vue({
       if (oldVal === undefined) return  // do nothing, initial setup
       api.settings.update({item_list_width: newVal})
     }, 1000),
+    'refreshRate': function(newVal, oldVal) {
+      if (oldVal === undefined) return  // do nothing, initial setup
+      api.settings.update({refresh_rate: newVal})
+    },
   },
   methods: {
     refreshStats: function(loopMode) {
@@ -574,6 +579,7 @@ api.settings.get().then(function(data) {
   vm.theme.name = data.theme_name
   vm.theme.font = data.theme_font
   vm.theme.size = data.theme_size
+  vm.refreshRate = data.refresh_rate
   vm.refreshItems()
   vm.$mount('#app')
 })

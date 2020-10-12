@@ -56,7 +56,18 @@
                         <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
                         Refresh Feeds
                     </b-dropdown-item-button>
+
                     <b-dropdown-divider></b-dropdown-divider>
+
+                    <b-dropdown-header>Refresh</b-dropdown-header>
+                    <b-dropdown-item-button @click.stop="refreshRate = min" v-for="min in [0, 60]">
+                        <span class="icon mr-1" :class="{invisible: refreshRate != min}">{% inline "check.svg" %}</span>
+                        <span v-if="min ==  0">Manually</span>
+                        <span v-if="min == 60">Every hour</span>
+                    </b-dropdown-item-button>
+
+                    <b-dropdown-divider></b-dropdown-divider>
+
                     <b-dropdown-header>Sort by</b-dropdown-header>
                     <b-dropdown-item-button @click.stop="itemSortNewestFirst=true">
                         <span class="icon mr-1" :class="{invisible: !itemSortNewestFirst}">{% inline "check.svg" %}</span>
