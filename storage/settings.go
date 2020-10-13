@@ -31,6 +31,16 @@ func (s *Storage) GetSettingsValue(key string) interface{} {
 	return valDecoded
 }
 
+func (s *Storage) GetSettingsValueInt64(key string) int64 {
+	val := s.GetSettingsValue(key)
+	if val != nil {
+		if fval, ok := val.(float64); ok {
+			return int64(fval)
+		}
+	}
+	return 0
+}
+
 func (s *Storage) GetSettings() map[string]interface{} {
 	result := settingsDefaults()
 	rows, err := s.db.Query(`select key, val from settings;`)

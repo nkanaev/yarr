@@ -372,6 +372,9 @@ func SettingsHandler(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 		if db(req).UpdateSettings(settings) {
+			if _, ok := settings["refresh_rate"]; ok {
+				handler(req).refreshRate <- db(req).GetSettingsValueInt64("refresh_rate")
+			}
 			rw.WriteHeader(http.StatusOK)
 		} else {
 			rw.WriteHeader(http.StatusBadRequest)
