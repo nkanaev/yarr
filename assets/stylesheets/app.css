@@ -402,6 +402,7 @@ select.form-control:not([multiple]):not([size]) {
 /* content */
 
 .content {
+  overflow-wrap: break-word;
   line-height: 1.5;
 }
 
