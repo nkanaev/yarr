@@ -61,6 +61,12 @@ create virtual table if not exists search using fts4(title, description, content
 create trigger if not exists del_item_search after delete on items begin
   delete from search where rowid = old.search_rowid;
 end;
+
+create table if not exists http_state (
+ url            string not null primary key,
+ last_modified  string not null,
+ etag           string not null
+);
 `
 
 type Storage struct {
