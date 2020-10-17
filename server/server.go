@@ -71,7 +71,7 @@ func (h *Handler) startJobs() {
 		for {
 			select {
 			case feed := <-h.feedQueue:
-				items, err := listItems(feed)
+				items, err := listItems(feed, h.db)
 				atomic.AddInt32(h.queueSize, -1)
 				if err != nil {
 					h.log.Printf("Failed to fetch %s (%d): %s", feed.FeedLink, feed.Id, err)

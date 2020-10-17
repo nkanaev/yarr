@@ -47,6 +47,17 @@ func (c *Client) get(url string) (*http.Response, error) {
 	return c.httpClient.Do(req)
 }
 
+func (c *Client) getConditional(url, lastModified, etag string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("If-Modified-Since", lastModified)
+	req.Header.Set("If-None-Match", etag)
+	return c.httpClient.Do(req)
+}
+
 var defaultClient *Client
 
 func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
@@ -243,16 +254,37 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 	return result
 }
 
-func listItems(f storage.Feed) ([]storage.Item, error) {
-	res, err := defaultClient.get(f.FeedLink)
+func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
+	var res *http.Response
+	var err error
+
+	httpState := db.GetHTTPState(f.FeedLink)
+	if httpState != nil {
+		res, err = defaultClient.getConditional(f.FeedLink, httpState.LastModified, httpState.Etag)
+	} else {
+		res, err = defaultClient.get(f.FeedLink)
+	}
+
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
+
 	if res.StatusCode == 404 {
 		errmsg := fmt.Sprintf("Failed to list feed items for %s (status: 404)", f.FeedLink)
 		return nil, errors.New(errmsg)
 	}
+
+	if res.StatusCode == 304 {
+		return nil, nil
+	}
+
+	lastModified := res.Header.Get("Last-Modified")
+	etag := res.Header.Get("Etag")
+	if lastModified != "" || etag != "" {
+		db.SetHTTPState(f.FeedLink, storage.HTTPState{LastModified: lastModified, Etag: etag})
+	}
+
 	feedparser := gofeed.NewParser()
 	feed, err := feedparser.Parse(res.Body)
 	if err != nil {
