@@ -243,6 +243,15 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 				form.FolderID,
 			)
 			db(req).CreateItems(convertItems(feed.Items, *storedFeed))
+
+			icon, err := findFavicon(storedFeed.Link, storedFeed.FeedLink)
+			if icon != nil {
+				db(req).UpdateFeedIcon(storedFeed.Id, icon)
+			}
+			if err != nil {
+				handler(req).log.Printf("Failed to find favicon for %s (%d): %s", storedFeed.FeedLink, storedFeed.Id, err)
+			}
+
 			writeJSON(rw, map[string]string{"status": "success"})
 		} else if sources != nil {
 			writeJSON(rw, map[string]interface{}{"status": "multiple", "choice": sources})
