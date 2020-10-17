@@ -121,7 +121,7 @@ func (h *Handler) startJobs() {
 					}
 				}
 				if val > 0 {
-					refreshTicker = time.NewTicker(time.Duration(val) * time.Second)
+					refreshTicker = time.NewTicker(time.Duration(val) * time.Minute)
 					refreshTick = refreshTicker.C
 				}
 			}
