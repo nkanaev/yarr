@@ -270,8 +270,8 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode == 404 {
-		errmsg := fmt.Sprintf("Failed to list feed items for %s (status: 404)", f.FeedLink)
+	if res.StatusCode / 100 == 4 || res.StatusCode / 100 == 5 {
+		errmsg := fmt.Sprintf("Failed to list feed items for %s (status: %d)", f.FeedLink, res.StatusCode)
 		return nil, errors.New(errmsg)
 	}
 
