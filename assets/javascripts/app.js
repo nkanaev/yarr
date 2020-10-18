@@ -430,16 +430,10 @@ var vm = new Vue({
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         api.feeds.delete(feed.id).then(function() {
-          // note: if item list contains delete feed's entries, refresh it first.
-          for (var i = 0; i < vm.items.length; i++) {
-            if (vm.items[i].feed_id == feed.id) {
-              vm.refreshItems().then(function() {
-                vm.refreshStats()
-                vm.refreshFeeds()
-              })
-              return
-            }
-          }
+          // unselect feed to prevent reading properties of null in template
+          var isSelected = (vm.feedSelected === 'feed:'+feed.id
+            || (feed.folder_id && vm.feedSelected === 'folder:'+feed.folder_id));
+          if (isSelected) vm.feedSelected = null
 
           vm.refreshStats()
           vm.refreshFeeds()
