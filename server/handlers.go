@@ -38,6 +38,7 @@ var routes []Route = []Route{
 	p("/opml/import", OPMLImportHandler),
 	p("/opml/export", OPMLExportHandler),
 	p("/page", PageCrawlHandler),
+	p("/fever/", FeverHandler),
 }
 
 type asset struct {
