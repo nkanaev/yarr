@@ -12,7 +12,11 @@ var feverHandlers = map[string]func(rw http.ResponseWriter, req *http.Request){
 	"feeds":           FeverFeedsHandler,
 	"unread_item_ids": FeverFilteredItemIDsHandler,
 	"saved_item_ids":  FeverFilteredItemIDsHandler,
+
+	"favicons":        FeverFaviconsHandler,
+	"items":           FeverItemsHandler,
 	"links":           FeverLinksHandler,
+	"mark":            FeverMarkHandler,
 }
 
 type FeverGroup struct {
@@ -152,6 +156,18 @@ func FeverFilteredItemIDsHandler(rw http.ResponseWriter, req *http.Request) {
 	})
 }
 
+func FeverFaviconsHandler(rw http.ResponseWriter, req *http.Request) {
+
+}
+
+func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
+
+}
+
 func FeverLinksHandler(rw http.ResponseWriter, req *http.Request) {
+
+}
+
+func FeverMarkHandler(rw http.ResponseWriter, req *http.Request) {
 
 }
