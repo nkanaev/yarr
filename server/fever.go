@@ -5,6 +5,7 @@ import (
 	"github.com/nkanaev/yarr/storage"
 	"net/http"
 	"strings"
+	"encoding/base64"
 )
 
 var feverHandlers = map[string]func(rw http.ResponseWriter, req *http.Request){
@@ -37,6 +38,11 @@ type FeverFeed struct {
 	SiteUrl           string `json:"site_url"`
 	IsSpark           int    `json:"is_spark"`
 	LastUpdatedOnTime int64  `json:"last_updated_on_time"`
+}
+
+type FeverFavicon struct {
+	ID int64 `json:"id"`
+	Data string `json:"data"`
 }
 
 func writeFeverJSON(rw http.ResponseWriter, data map[string]interface{}) {
@@ -157,7 +163,24 @@ func FeverFilteredItemIDsHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func FeverFaviconsHandler(rw http.ResponseWriter, req *http.Request) {
+	feeds := db(req).ListFeeds()
+	favicons := make([]*FeverFavicon, len(feeds))
+	for i, feed := range feeds {
+		data := "data:image/gif;base64,R0lGODlhAQABAAAAACw="
+		if feed.HasIcon {
+			icon := db(req).GetFeed(feed.Id).Icon
+			data = fmt.Sprintf(
+				"data:%s;base64,%s",
+				http.DetectContentType(*icon),
+				base64.StdEncoding.EncodeToString(*icon),
+			)
+		}
+		favicons[i] = &FeverFavicon{ID: feed.Id, Data: data}
+	}
 
+	writeFeverJSON(rw, map[string]interface{}{
+		"favicons": favicons,
+	})
 }
 
 func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
