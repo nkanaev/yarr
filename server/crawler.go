@@ -270,7 +270,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode / 100 == 4 || res.StatusCode / 100 == 5 {
+	if res.StatusCode/100 == 4 || res.StatusCode/100 == 5 {
 		errmsg := fmt.Sprintf("Failed to list feed items for %s (status: %d)", f.FeedLink, res.StatusCode)
 		return nil, errors.New(errmsg)
 	}
@@ -299,7 +299,7 @@ func init() {
 		DialContext: (&net.Dialer{
 			Timeout: 10 * time.Second,
 		}).DialContext,
-		DisableKeepAlives: true,
+		DisableKeepAlives:   true,
 		TLSHandshakeTimeout: time.Second * 10,
 	}
 	httpClient := &http.Client{

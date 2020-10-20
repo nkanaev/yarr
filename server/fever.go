@@ -13,10 +13,10 @@ var feverHandlers = map[string]func(rw http.ResponseWriter, req *http.Request){
 	"unread_item_ids": FeverFilteredItemIDsHandler,
 	"saved_item_ids":  FeverFilteredItemIDsHandler,
 
-	"favicons":        FeverFaviconsHandler,
-	"items":           FeverItemsHandler,
-	"links":           FeverLinksHandler,
-	"mark":            FeverMarkHandler,
+	"favicons": FeverFaviconsHandler,
+	"items":    FeverItemsHandler,
+	"links":    FeverLinksHandler,
+	"mark":     FeverMarkHandler,
 }
 
 type FeverGroup struct {

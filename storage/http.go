@@ -8,8 +8,8 @@ type HTTPState struct {
 	FeedID        int64
 	LastRefreshed time.Time
 
-	LastModified  string
-	Etag          string
+	LastModified string
+	Etag         string
 }
 
 func (s *Storage) GetHTTPState(feedID int64) *HTTPState {

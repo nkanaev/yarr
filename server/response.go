@@ -2,8 +2,8 @@ package server
 
 import (
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
 )
 
 func writeJSON(rw http.ResponseWriter, data interface{}) {

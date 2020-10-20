@@ -356,7 +356,7 @@ func (s *Storage) DeleteOldItems() {
 			delete from items where feed_id = ? and status != ? and date_arrived < ?`,
 			feedId,
 			STARRED,
-			time.Now().Add(-time.Hour*24*90),  // 90 days
+			time.Now().Add(-time.Hour*24*90), // 90 days
 		)
 		if err != nil {
 			s.log.Print(err)

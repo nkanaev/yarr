@@ -2,9 +2,9 @@ package server
 
 import (
 	"bytes"
-	"encoding/json"
-	"encoding/base64"
 	"compress/gzip"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/nkanaev/yarr/storage"
 	"html"
@@ -43,7 +43,7 @@ var routes []Route = []Route{
 
 type asset struct {
 	etag    string
-	body    string  // base64(gzip(content))
+	body    string // base64(gzip(content))
 	gzipped *[]byte
 	decoded *string
 }
