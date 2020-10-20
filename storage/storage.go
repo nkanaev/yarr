@@ -62,8 +62,11 @@ create trigger if not exists del_item_search after delete on items begin
   delete from search where rowid = old.search_rowid;
 end;
 
-create table if not exists http_state (
- url            string not null primary key,
+create table if not exists http_states (
+ feed_id        references feeds(id) unique,
+ last_refreshed datetime not null,
+
+ -- http header fields --
  last_modified  string not null,
  etag           string not null
 );

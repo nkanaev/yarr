@@ -258,7 +258,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	var res *http.Response
 	var err error
 
-	httpState := db.GetHTTPState(f.FeedLink)
+	httpState := db.GetHTTPState(f.Id)
 	if httpState != nil {
 		res, err = defaultClient.getConditional(f.FeedLink, httpState.LastModified, httpState.Etag)
 	} else {
@@ -282,7 +282,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	lastModified := res.Header.Get("Last-Modified")
 	etag := res.Header.Get("Etag")
 	if lastModified != "" || etag != "" {
-		db.SetHTTPState(f.FeedLink, storage.HTTPState{LastModified: lastModified, Etag: etag})
+		db.SetHTTPState(f.Id, lastModified, etag)
 	}
 
 	feedparser := gofeed.NewParser()
