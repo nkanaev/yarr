@@ -62,6 +62,9 @@ type ItemFilter struct {
 	FeedID   *int64
 	Status   *ItemStatus
 	Search   *string
+
+	IDs      *[]int64
+	SinceID  *int64
 }
 
 func (s *Storage) CreateItems(items []Item) bool {
@@ -140,20 +143,36 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 		args = append(args, strings.Join(terms, " "))
 	}
 
+	if filter.IDs != nil {
+		cond = append(cond, "i.id in ?")
+		args = append(args, filter.IDs)
+	}
+	if filter.SinceID != nil {
+		cond = append(cond, "i.id > ?")
+		args = append(args, filter.SinceID)
+	}
+
 	predicate := "1"
 	if len(cond) > 0 {
 		predicate = strings.Join(cond, " and ")
 	}
+
 	return predicate, args
 }
 
 func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bool) []Item {
 	predicate, args := listQueryPredicate(filter)
 	result := make([]Item, 0, 0)
-	order := "desc"
+
+	order := "date desc"
 	if !newestFirst {
-		order = "asc"
+		order = "date asc"
 	}
+
+	if filter.IDs != nil || filter.SinceID != nil {
+		order = "i.id asc"
+	}
+
 	query := fmt.Sprintf(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.description,
@@ -161,7 +180,7 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 		from items i
 		join feeds f on f.id = i.feed_id
 		where %s
-		order by i.date %s
+		order by %s
 		limit %d offset %d
 		`, predicate, order, limit, offset)
 	rows, err := s.db.Query(query, args...)

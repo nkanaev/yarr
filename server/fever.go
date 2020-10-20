@@ -1,11 +1,12 @@
 package server
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/nkanaev/yarr/storage"
 	"net/http"
+	"strconv"
 	"strings"
-	"encoding/base64"
 )
 
 var feverHandlers = map[string]func(rw http.ResponseWriter, req *http.Request){
@@ -40,8 +41,20 @@ type FeverFeed struct {
 	LastUpdatedOnTime int64  `json:"last_updated_on_time"`
 }
 
+type FeverItem struct {
+	ID            int64  `json:"id"`
+	FeedID        int64  `json:"feed_id"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	HTML          string `json:"html"`
+	Url           string `json:"url"`
+	IsSaved       int    `json:"is_saved"`
+	IsRead        int    `json:"is_read"`
+	CreatedOnTime int64  `json:"created_on_time"`
+}
+
 type FeverFavicon struct {
-	ID int64 `json:"id"`
+	ID   int64  `json:"id"`
 	Data string `json:"data"`
 }
 
@@ -184,7 +197,62 @@ func FeverFaviconsHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
+	filter := storage.ItemFilter{}
+	query := req.URL.Query()
+	if _, ok := query["with_ids"]; ok {
+		ids := make([]int64, 0)
+		for _, idstr := range strings.Split(query.Get("with_ids"), ",") {
+			if idnum, err := strconv.ParseInt(idstr, 10, 64); err == nil {
+				ids = append(ids, idnum)
+			}
+		}
+		filter.IDs = &ids
+	}
 
+	if _, ok := query["since_id"]; ok {
+		idstr := query.Get("since_id")
+		if idnum, err := strconv.ParseInt(idstr, 10, 64); err == nil {
+			filter.SinceID = &idnum
+		}
+	}
+
+	items := db(req).ListItems(filter, 0, 50, true)
+
+	feverItems := make([]FeverItem, len(items))
+	for i, item := range items {
+		date := item.Date
+		if date == nil {
+			date = item.DateUpdated
+		}
+		time := int64(0)
+		if date != nil {
+			time = date.UnixNano() / 1000_000_000
+		}
+
+		isSaved := 0
+		if item.Status == storage.STARRED {
+			isSaved = 1
+		}
+		isRead := 0
+		if item.Status == storage.READ {
+			isRead = 1
+		}
+		feverItems[i] = FeverItem{
+			ID:            item.Id,
+			FeedID:        item.FeedId,
+			Title:         item.Title,
+			Author:        item.Author,
+			HTML:          item.Content,
+			Url:           item.Link,
+			IsSaved:       isSaved,
+			IsRead:        isRead,
+			CreatedOnTime: time,
+		}
+	}
+
+	writeFeverJSON(rw, map[string]interface{}{
+		"items": feverItems,
+	})
 }
 
 func FeverLinksHandler(rw http.ResponseWriter, req *http.Request) {
