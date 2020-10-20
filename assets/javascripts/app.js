@@ -80,14 +80,21 @@ Vue.component('drag', {
 
 function dateRepr(d) {
   var sec = (new Date().getTime() - d.getTime()) / 1000
+  var neg = sec < 0
+  var out = ''
+
+  sec = Math.abs(sec)
   if (sec < 2700)  // less than 45 minutes
-    return Math.round(sec / 60) + 'm'
+    out = Math.round(sec / 60) + 'm'
   else if (sec < 86400)  // less than 24 hours
-    return Math.round(sec / 3600) + 'h'
+    out = Math.round(sec / 3600) + 'h'
   else if (sec < 604800)  // less than a week
-    return Math.round(sec / 86400) + 'd'
+    out = Math.round(sec / 86400) + 'd'
   else
-    return d.toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"})
+    out = d.toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"})
+
+  if (neg) return '-' + out
+  return out
 }
 
 Vue.component('relative-time', {
