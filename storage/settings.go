@@ -23,6 +23,9 @@ func (s *Storage) GetSettingsValue(key string) interface{} {
 	}
 	var val []byte
 	row.Scan(&val)
+	if len(val) == 0 {
+		return nil
+	}
 	var valDecoded interface{}
 	if err := json.Unmarshal([]byte(val), &valDecoded); err != nil {
 		s.log.Print(err)
