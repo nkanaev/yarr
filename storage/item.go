@@ -3,10 +3,10 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	xhtml "golang.org/x/net/html"
 	"html"
 	"strings"
 	"time"
+	xhtml "golang.org/x/net/html"
 )
 
 type ItemStatus int
@@ -143,9 +143,15 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 		args = append(args, strings.Join(terms, " "))
 	}
 
-	if filter.IDs != nil {
-		cond = append(cond, "i.id in ?")
-		args = append(args, filter.IDs)
+	if filter.IDs != nil && len(*filter.IDs) > 0 {
+		qmarks := make([]string, len(*filter.IDs))
+		idargs := make([]interface{}, len(*filter.IDs))
+		for i, id := range *filter.IDs {
+			qmarks[i] = "?"
+			idargs[i] = id
+		}
+		cond = append(cond, "i.id in (" + strings.Join(qmarks, ",") + ")")
+		args = append(args, idargs...)
 	}
 	if filter.SinceID != nil {
 		cond = append(cond, "i.id > ?")
