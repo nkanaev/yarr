@@ -256,7 +256,9 @@ func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func FeverLinksHandler(rw http.ResponseWriter, req *http.Request) {
-
+	writeFeverJSON(rw, map[string]interface{}{
+		"links": make([]interface{}, 0),
+	})
 }
 
 func FeverMarkHandler(rw http.ResponseWriter, req *http.Request) {
