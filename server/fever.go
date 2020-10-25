@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var feverHandlers = map[string]func(rw http.ResponseWriter, req *http.Request){
@@ -199,6 +200,7 @@ func FeverFaviconsHandler(rw http.ResponseWriter, req *http.Request) {
 func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
 	filter := storage.ItemFilter{}
 	query := req.URL.Query()
+	// TODO: must be switch case?
 	if _, ok := query["with_ids"]; ok {
 		ids := make([]int64, 0)
 		for _, idstr := range strings.Split(query.Get("with_ids"), ",") {
@@ -262,5 +264,39 @@ func FeverLinksHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func FeverMarkHandler(rw http.ResponseWriter, req *http.Request) {
+	query := req.URL.Query()
 
+	id, err := strconv.ParseInt(query.Get("id"), 10, 0)
+	if err != nil {
+		handler(req).log.Print("invalid id:", err)
+		return
+	}
+
+	switch query.Get("mark") {
+	case "item":
+		var status storage.ItemStatus
+		switch query.Get("as") {
+		case "read":
+			status = storage.READ
+		case "unread":
+			status = storage.UNREAD
+		case "saved":
+			status = storage.STARRED
+		case "unsaved":
+			status = storage.READ
+		default:
+			fmt.Println("TODO: handle")
+		}
+		db(req).UpdateItemStatus(id, status)
+	case "feed":
+		x, _ := strconv.ParseInt(query.Get("before"), 10, 0)
+		before := time.Unix(x, 0)
+		db(req).MarkItemsRead(storage.MarkFilter{FeedID: &id, Before: &before})
+	case "group":
+		x, _ := strconv.ParseInt(query.Get("before"), 10, 0)
+		before := time.Unix(x, 0)
+		db(req).MarkItemsRead(storage.MarkFilter{FolderID: &id, Before: &before})
+	default:
+		fmt.Println("TODO: handle")
+	}
 }

@@ -67,6 +67,13 @@ type ItemFilter struct {
 	SinceID  *int64
 }
 
+type MarkFilter struct {
+	FolderID *int64
+	FeedID   *int64
+	
+	Before   *time.Time
+}
+
 func (s *Storage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
@@ -240,7 +247,7 @@ func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
 	return err == nil
 }
 
-func (s *Storage) MarkItemsRead(filter ItemFilter) bool {
+func (s *Storage) MarkItemsRead(filter MarkFilter) bool {
 	cond := make([]string, 0)
 	args := make([]interface{}, 0)
 
@@ -252,6 +259,7 @@ func (s *Storage) MarkItemsRead(filter ItemFilter) bool {
 		cond = append(cond, "i.feed_id = ?")
 		args = append(args, *filter.FeedID)
 	}
+	// TODO: filter.Before
 	predicate := "1"
 	if len(cond) > 0 {
 		predicate = strings.Join(cond, " and ")

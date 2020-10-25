@@ -358,7 +358,7 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 		})
 	} else if req.Method == "PUT" {
 		query := req.URL.Query()
-		filter := storage.ItemFilter{}
+		filter := storage.MarkFilter{}
 		if folderID, err := strconv.ParseInt(query.Get("folder_id"), 10, 64); err == nil {
 			filter.FolderID = &folderID
 		}
