@@ -298,7 +298,8 @@ func FeverMarkHandler(rw http.ResponseWriter, req *http.Request) {
 		case "unsaved":
 			status = storage.READ
 		default:
-			fmt.Println("TODO: handle")
+			rw.WriteHeader(http.StatusBadRequest)
+			return
 		}
 		db(req).UpdateItemStatus(id, status)
 	case "feed":
@@ -310,6 +311,7 @@ func FeverMarkHandler(rw http.ResponseWriter, req *http.Request) {
 		before := time.Unix(x, 0)
 		db(req).MarkItemsRead(storage.MarkFilter{FolderID: &id, Before: &before})
 	default:
-		fmt.Println("TODO: handle")
+		rw.WriteHeader(http.StatusBadRequest)
+		return
 	}
 }
