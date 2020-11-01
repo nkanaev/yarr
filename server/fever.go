@@ -136,7 +136,6 @@ func FeverFeedsHandler(rw http.ResponseWriter, req *http.Request) {
 		if state, ok := httpStates[feed.Id]; ok {
 			lastUpdated = state.LastRefreshed.Unix()
 		}
-		// TODO: store last updated on time?
 		feverFeeds[i] = &FeverFeed{
 			ID:          feed.Id,
 			FaviconID:   feed.Id,
