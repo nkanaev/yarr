@@ -205,8 +205,9 @@ func FeverFaviconsHandler(rw http.ResponseWriter, req *http.Request) {
 func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
 	filter := storage.ItemFilter{}
 	query := req.URL.Query()
-	// TODO: must be switch case?
-	if _, ok := query["with_ids"]; ok {
+
+	switch {
+	case query.Get("with_ids") != "":
 		ids := make([]int64, 0)
 		for _, idstr := range strings.Split(query.Get("with_ids"), ",") {
 			if idnum, err := strconv.ParseInt(idstr, 10, 64); err == nil {
@@ -214,16 +215,12 @@ func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
 			}
 		}
 		filter.IDs = &ids
-	}
-
-	if _, ok := query["since_id"]; ok {
+	case query.Get("since_id") != "":
 		idstr := query.Get("since_id")
 		if idnum, err := strconv.ParseInt(idstr, 10, 64); err == nil {
 			filter.SinceID = &idnum
 		}
-	}
-
-	if _, ok := query["max_id"]; ok {
+	case query.Get("max_id") != "":
 		idstr := query.Get("max_id")
 		if idnum, err := strconv.ParseInt(idstr, 10, 64); err == nil {
 			filter.MaxID = &idnum
@@ -278,7 +275,7 @@ func FeverLinksHandler(rw http.ResponseWriter, req *http.Request) {
 func FeverMarkHandler(rw http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
 
-	id, err := strconv.ParseInt(query.Get("id"), 10, 0)
+	id, err := strconv.ParseInt(query.Get("id"), 10, 64)
 	if err != nil {
 		handler(req).log.Print("invalid id:", err)
 		return
@@ -302,11 +299,11 @@ func FeverMarkHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		db(req).UpdateItemStatus(id, status)
 	case "feed":
-		x, _ := strconv.ParseInt(query.Get("before"), 10, 0)
+		x, _ := strconv.ParseInt(query.Get("before"), 10, 64)
 		before := time.Unix(x, 0)
 		db(req).MarkItemsRead(storage.MarkFilter{FeedID: &id, Before: &before})
 	case "group":
-		x, _ := strconv.ParseInt(query.Get("before"), 10, 0)
+		x, _ := strconv.ParseInt(query.Get("before"), 10, 64)
 		before := time.Unix(x, 0)
 		db(req).MarkItemsRead(storage.MarkFilter{FolderID: &id, Before: &before})
 	default:
