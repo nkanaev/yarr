@@ -33,13 +33,13 @@ type FeverFeedsGroup struct {
 }
 
 type FeverFeed struct {
-	ID                int64  `json:"id"`
-	FaviconID         int64  `json:"favicon_id"`
-	Title             string `json:"title"`
-	Url               string `json:"url"`
-	SiteUrl           string `json:"site_url"`
-	IsSpark           int    `json:"is_spark"`
-	LastUpdatedOnTime int64  `json:"last_updated_on_time"`
+	ID          int64  `json:"id"`
+	FaviconID   int64  `json:"favicon_id"`
+	Title       string `json:"title"`
+	Url         string `json:"url"`
+	SiteUrl     string `json:"site_url"`
+	IsSpark     int    `json:"is_spark"`
+	LastUpdated int64  `json:"last_updated_on_time"`
 }
 
 type FeverItem struct {
@@ -128,19 +128,23 @@ func FeverGroupsHandler(rw http.ResponseWriter, req *http.Request) {
 
 func FeverFeedsHandler(rw http.ResponseWriter, req *http.Request) {
 	feeds := db(req).ListFeeds()
+	httpStates := db(req).ListHTTPStates()
 
 	feverFeeds := make([]*FeverFeed, len(feeds))
 	for i, feed := range feeds {
-		// TODO: check url/siteurl
+		var lastUpdated int64
+		if state, ok := httpStates[feed.Id]; ok {
+			lastUpdated = state.LastRefreshed.Unix()
+		}
 		// TODO: store last updated on time?
 		feverFeeds[i] = &FeverFeed{
-			ID:                feed.Id,
-			FaviconID:         feed.Id,
-			Title:             feed.Title,
-			Url:               feed.FeedLink,
-			SiteUrl:           feed.Link,
-			IsSpark:           0,
-			LastUpdatedOnTime: 1,
+			ID:          feed.Id,
+			FaviconID:   feed.Id,
+			Title:       feed.Title,
+			Url:         feed.FeedLink,
+			SiteUrl:     feed.Link,
+			IsSpark:     0,
+			LastUpdated: lastUpdated,
 		}
 	}
 	writeFeverJSON(rw, map[string]interface{}{
