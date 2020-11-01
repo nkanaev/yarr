@@ -218,6 +218,13 @@ func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 	}
 
+	if _, ok := query["max_id"]; ok {
+		idstr := query.Get("max_id")
+		if idnum, err := strconv.ParseInt(idstr, 10, 64); err == nil {
+			filter.MaxID = &idnum
+		}
+	}
+
 	items := db(req).ListItems(filter, 0, 50, true)
 
 	feverItems := make([]FeverItem, len(items))

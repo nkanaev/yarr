@@ -65,6 +65,7 @@ type ItemFilter struct {
 
 	IDs      *[]int64
 	SinceID  *int64
+	MaxID    *int64
 }
 
 type MarkFilter struct {
@@ -164,6 +165,10 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 		cond = append(cond, "i.id > ?")
 		args = append(args, filter.SinceID)
 	}
+	if filter.MaxID != nil {
+		cond = append(cond, "i.id < ?")
+		args = append(args, filter.MaxID)
+	}
 
 	predicate := "1"
 	if len(cond) > 0 {
@@ -182,7 +187,7 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 		order = "date asc"
 	}
 
-	if filter.IDs != nil || filter.SinceID != nil {
+	if filter.IDs != nil || filter.SinceID != nil || filter.MaxID != nil {
 		order = "i.id asc"
 	}
 
