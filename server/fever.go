@@ -43,15 +43,15 @@ type FeverFeed struct {
 }
 
 type FeverItem struct {
-	ID            int64  `json:"id"`
-	FeedID        int64  `json:"feed_id"`
-	Title         string `json:"title"`
-	Author        string `json:"author"`
-	HTML          string `json:"html"`
-	Url           string `json:"url"`
-	IsSaved       int    `json:"is_saved"`
-	IsRead        int    `json:"is_read"`
-	CreatedOnTime int64  `json:"created_on_time"`
+	ID        int64  `json:"id"`
+	FeedID    int64  `json:"feed_id"`
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	HTML      string `json:"html"`
+	Url       string `json:"url"`
+	IsSaved   int    `json:"is_saved"`
+	IsRead    int    `json:"is_read"`
+	CreatedAt int64  `json:"created_on_time"`
 }
 
 type FeverFavicon struct {
@@ -241,7 +241,7 @@ func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		time := int64(0)
 		if date != nil {
-			time = date.UnixNano() / 1000_000_000
+			time = date.Unix()
 		}
 
 		isSaved := 0
@@ -253,15 +253,15 @@ func FeverItemsHandler(rw http.ResponseWriter, req *http.Request) {
 			isRead = 1
 		}
 		feverItems[i] = FeverItem{
-			ID:            item.Id,
-			FeedID:        item.FeedId,
-			Title:         item.Title,
-			Author:        item.Author,
-			HTML:          item.Content,
-			Url:           item.Link,
-			IsSaved:       isSaved,
-			IsRead:        isRead,
-			CreatedOnTime: time,
+			ID:        item.Id,
+			FeedID:    item.FeedId,
+			Title:     item.Title,
+			Author:    item.Author,
+			HTML:      item.Content,
+			Url:       item.Link,
+			IsSaved:   isSaved,
+			IsRead:    isRead,
+			CreatedAt: time,
 		}
 	}
 
