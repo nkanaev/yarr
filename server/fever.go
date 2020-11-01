@@ -62,6 +62,8 @@ type FeverFavicon struct {
 func writeFeverJSON(rw http.ResponseWriter, data map[string]interface{}) {
 	data["api_version"] = 1
 	data["auth"] = 1
+	// NOTE: does not adhere to the API spec
+	data["last_refreshed_on_time"] = time.Now().Unix()
 	writeJSON(rw, data)
 }
 
