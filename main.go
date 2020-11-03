@@ -1,23 +1,26 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"github.com/nkanaev/yarr/platform"
 	"github.com/nkanaev/yarr/server"
 	"github.com/nkanaev/yarr/storage"
-	"github.com/nkanaev/yarr/platform"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var Version string = "0.0"
 var GitHash string = "unknown"
 
 func main() {
-	var addr, db string
+	var addr, db, auth string
 	var ver bool
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
+	flag.StringVar(&auth, "auth", "", "path to a file containing username:password")
 	flag.StringVar(&db, "db", "", "storage file path")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.Parse()
@@ -42,12 +45,40 @@ func main() {
 		db = filepath.Join(storagePath, "storage.db")
 	}
 
+	var username, password string
+	if auth != "" {
+		f, err := os.Open(auth)
+		if err != nil {
+			logger.Fatal("Failed to open auth file: ", err)
+		}
+		defer f.Close()
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			line := scanner.Text()
+			fmt.Println(line)
+			parts := strings.Split(line, ":")
+			if len(parts) != 2 {
+				logger.Fatalf("Invalid auth: %v (expected `username:password`)", line)
+			}
+			username = parts[0]
+			password = parts[1]
+			break
+		}
+	}
+
 	store, err := storage.New(db, logger)
 	if err != nil {
 		logger.Fatal("Failed to initialise database: ", err)
 	}
 
 	srv := server.New(store, logger, addr)
+
+	if username != "" && password != "" {
+		srv.Username = username
+		srv.Password = password
+	}
+	fmt.Println(srv)
+
 	logger.Printf("starting server at http://%s", addr)
 	platform.Start(srv)
 }

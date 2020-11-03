@@ -17,6 +17,9 @@ type Handler struct {
 	feedQueue   chan storage.Feed
 	queueSize   *int32
 	refreshRate chan int64
+	// auth
+	Username    string
+	Password    string
 }
 
 func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
