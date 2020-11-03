@@ -9,6 +9,12 @@ type Route struct {
 	url      string
 	urlRegex *regexp.Regexp
 	handler  func(http.ResponseWriter, *http.Request)
+	skipAuth bool
+}
+
+func (r Route) SkipAuth() Route {
+	r.skipAuth = true
+	return r
 }
 
 func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {

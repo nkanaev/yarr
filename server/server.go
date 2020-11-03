@@ -49,6 +49,14 @@ func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
+
+	if h.requiresAuth() && !route.skipAuth {
+		if !userIsAuthenticated(req, h.Username, h.Password) {
+			rw.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	}
+
 	ctx := context.WithValue(req.Context(), ctxHandler, &h)
 	ctx = context.WithValue(ctx, ctxVars, vars)
 	route.handler(rw, req.WithContext(ctx))
@@ -135,6 +143,10 @@ func (h *Handler) startJobs() {
 	if refreshRate > 0 {
 		h.fetchAllFeeds()
 	}
+}
+
+func (h Handler) requiresAuth() bool {
+	return h.Username != "" && h.Password != ""
 }
 
 func (h *Handler) fetchAllFeeds() {

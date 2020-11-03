@@ -22,8 +22,8 @@ import (
 )
 
 var routes []Route = []Route{
-	p("/", IndexHandler),
-	p("/static/*path", StaticHandler),
+	p("/", IndexHandler).SkipAuth(),
+	p("/static/*path", StaticHandler).SkipAuth(),
 	p("/api/status", StatusHandler),
 	p("/api/folders", FolderListHandler),
 	p("/api/folders/:id", FolderHandler),
@@ -38,7 +38,7 @@ var routes []Route = []Route{
 	p("/opml/import", OPMLImportHandler),
 	p("/opml/export", OPMLExportHandler),
 	p("/page", PageCrawlHandler),
-	p("/fever/", FeverHandler),
+	p("/fever/", FeverHandler).SkipAuth(),
 }
 
 type asset struct {
@@ -90,6 +90,29 @@ type ItemUpdateForm struct {
 }
 
 func IndexHandler(rw http.ResponseWriter, req *http.Request) {
+	h := handler(req)
+	if h.requiresAuth() && !userIsAuthenticated(req, h.Username, h.Password) {
+		if req.Method == "POST" {
+			// TODO: implement
+		}
+
+		if assets != nil {
+			asset := assets["login.html"]
+			rw.Header().Set("Content-Type", "text/html")
+			rw.Header().Set("Content-Encoding", "gzip")
+			rw.Write(*asset.gzip())
+			return
+		} else {
+			f, err := os.Open("assets/login.html")
+			if err != nil {
+				handler(req).log.Print(err)
+				return
+			}
+			io.Copy(rw, f)
+			return
+		}
+	}
+
 	if assets != nil {
 		asset := assets["index.html"]
 
