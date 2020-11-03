@@ -15,10 +15,10 @@ var Version string = "0.0"
 var GitHash string = "unknown"
 
 func main() {
-	var addr, storageFile string
+	var addr, db string
 	var ver bool
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
-	flag.StringVar(&storageFile, "db", "", "storage file path")
+	flag.StringVar(&db, "db", "", "storage file path")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.Parse()
 
@@ -34,20 +34,20 @@ func main() {
 		logger.Fatal("Failed to get config dir: ", err)
 	}
 
-	if storageFile == "" {
+	if db == "" {
 		storagePath := filepath.Join(configPath, "yarr")
 		if err := os.MkdirAll(storagePath, 0755); err != nil {
 			logger.Fatal("Failed to create app config dir: ", err)
 		}
-		storageFile = filepath.Join(storagePath, "storage.db")
+		db = filepath.Join(storagePath, "storage.db")
 	}
 
-	db, err := storage.New(storageFile, logger)
+	store, err := storage.New(db, logger)
 	if err != nil {
 		logger.Fatal("Failed to initialise database: ", err)
 	}
 
-	srv := server.New(db, logger, addr)
+	srv := server.New(store, logger, addr)
 	logger.Printf("starting server at http://%s", addr)
 	platform.Start(srv)
 }
