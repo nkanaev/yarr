@@ -55,7 +55,6 @@ func main() {
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 			line := scanner.Text()
-			fmt.Println(line)
 			parts := strings.Split(line, ":")
 			if len(parts) != 2 {
 				logger.Fatalf("Invalid auth: %v (expected `username:password`)", line)
@@ -77,7 +76,6 @@ func main() {
 		srv.Username = username
 		srv.Password = password
 	}
-	fmt.Println(srv)
 
 	logger.Printf("starting server at http://%s", addr)
 	platform.Start(srv)
