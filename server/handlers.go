@@ -24,7 +24,7 @@ import (
 var routes []Route = []Route{
 	p("/", IndexHandler).ManualAuth(),
 	p("/static/*path", StaticHandler).ManualAuth(),
-	p("/fever/", FeverHandler).ManualAuth(),
+	p("/fever", FeverHandler).ManualAuth(),
 
 	p("/api/status", StatusHandler),
 	p("/api/folders", FolderListHandler),
