@@ -22,8 +22,10 @@ import (
 )
 
 var routes []Route = []Route{
-	p("/", IndexHandler).SkipAuth(),
-	p("/static/*path", StaticHandler).SkipAuth(),
+	p("/", IndexHandler).ManualAuth(),
+	p("/static/*path", StaticHandler).ManualAuth(),
+	p("/fever/", FeverHandler).ManualAuth(),
+
 	p("/api/status", StatusHandler),
 	p("/api/folders", FolderListHandler),
 	p("/api/folders/:id", FolderHandler),
@@ -38,7 +40,6 @@ var routes []Route = []Route{
 	p("/opml/import", OPMLImportHandler),
 	p("/opml/export", OPMLExportHandler),
 	p("/page", PageCrawlHandler),
-	p("/fever/", FeverHandler).SkipAuth(),
 }
 
 type asset struct {

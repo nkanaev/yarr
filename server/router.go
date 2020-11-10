@@ -9,11 +9,11 @@ type Route struct {
 	url      string
 	urlRegex *regexp.Regexp
 	handler  func(http.ResponseWriter, *http.Request)
-	skipAuth bool
+	manualAuth bool
 }
 
-func (r Route) SkipAuth() Route {
-	r.skipAuth = true
+func (r Route) ManualAuth() Route {
+	r.manualAuth = true
 	return r
 }
 

@@ -50,7 +50,7 @@ func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if h.requiresAuth() && !route.skipAuth {
+	if h.requiresAuth() && !route.manualAuth {
 		if !userIsAuthenticated(req, h.Username, h.Password) {
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
