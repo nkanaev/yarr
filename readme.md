@@ -8,7 +8,6 @@ yet another rss reader.
 
 The goal of the project is to provide a desktop application accessible via web browser.
 Longer-term plans include a self-hosted solution for individuals.
-Support for 3rd-party applications (via Fever API) is being considered.
 
 [download](https://github.com/nkanaev/yarr/releases/latest)
 
