@@ -17,10 +17,10 @@ var Version string = "0.0"
 var GitHash string = "unknown"
 
 func main() {
-	var addr, db, auth string
+	var addr, db, authfile string
 	var ver bool
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
-	flag.StringVar(&auth, "auth", "", "path to a file containing username:password")
+	flag.StringVar(&authfile, "auth-file", "", "path to a file containing username:password")
 	flag.StringVar(&db, "db", "", "storage file path")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.Parse()
@@ -46,8 +46,8 @@ func main() {
 	}
 
 	var username, password string
-	if auth != "" {
-		f, err := os.Open(auth)
+	if authfile != "" {
+		f, err := os.Open(authfile)
 		if err != nil {
 			logger.Fatal("Failed to open auth file: ", err)
 		}
