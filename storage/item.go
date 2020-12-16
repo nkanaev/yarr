@@ -62,17 +62,11 @@ type ItemFilter struct {
 	FeedID   *int64
 	Status   *ItemStatus
 	Search   *string
-
-	IDs      *[]int64
-	SinceID  *int64
-	MaxID    *int64
 }
 
 type MarkFilter struct {
 	FolderID *int64
 	FeedID   *int64
-	
-	Before   *time.Time
 }
 
 func (s *Storage) CreateItems(items []Item) bool {
@@ -151,25 +145,6 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 		args = append(args, strings.Join(terms, " "))
 	}
 
-	if filter.IDs != nil && len(*filter.IDs) > 0 {
-		qmarks := make([]string, len(*filter.IDs))
-		idargs := make([]interface{}, len(*filter.IDs))
-		for i, id := range *filter.IDs {
-			qmarks[i] = "?"
-			idargs[i] = id
-		}
-		cond = append(cond, "i.id in (" + strings.Join(qmarks, ",") + ")")
-		args = append(args, idargs...)
-	}
-	if filter.SinceID != nil {
-		cond = append(cond, "i.id > ?")
-		args = append(args, filter.SinceID)
-	}
-	if filter.MaxID != nil {
-		cond = append(cond, "i.id < ?")
-		args = append(args, filter.MaxID)
-	}
-
 	predicate := "1"
 	if len(cond) > 0 {
 		predicate = strings.Join(cond, " and ")
@@ -185,10 +160,6 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 	order := "date desc"
 	if !newestFirst {
 		order = "date asc"
-	}
-
-	if filter.IDs != nil || filter.SinceID != nil || filter.MaxID != nil {
-		order = "i.id asc"
 	}
 
 	query := fmt.Sprintf(`
