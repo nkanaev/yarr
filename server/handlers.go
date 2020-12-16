@@ -93,7 +93,13 @@ func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 	h := handler(req)
 	if h.requiresAuth() && !userIsAuthenticated(req, h.Username, h.Password) {
 		if req.Method == "POST" {
-			// TODO: implement
+			username := req.FormValue("username")
+			password := req.FormValue("password")
+			if safeCompare(username, h.Username) && safeCompare(password, h.Password) {
+				userAuthenticate(rw, username, password)
+				http.Redirect(rw, req, req.URL.Path, http.StatusFound)
+				return
+			}
 		}
 
 		if assets != nil {
