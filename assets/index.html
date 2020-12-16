@@ -94,6 +94,11 @@
                         <span class="icon mr-1">{% inline "upload.svg" %}</span>
                         Export
                     </b-dropdown-item>
+                    <b-dropdown-divider v-if="authenticated"></b-dropdown-divider>
+                    <b-dropdown-item-button v-if="authenticated">
+                        <span class="icon mr-1">{% inline "log-out.svg" %}</span>
+                        Log out
+                    </b-dropdown-item-button>
                 </b-dropdown>
             </div>
             <div class="p-2 overflow-auto border-top flex-grow-1">

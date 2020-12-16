@@ -2,6 +2,11 @@
 
 var TITLE = document.title
 
+function authenticated() {
+  return /auth=.+/g.test(document.cookie)
+
+}
+
 var FONTS = [
   "Arial",
   "Courier New",
@@ -171,6 +176,7 @@ var vm = new Vue({
         'size': 1,
       },
       'refreshRate': undefined,
+      'authenticated': authenticated(),
     }
   },
   computed: {
