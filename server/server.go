@@ -20,6 +20,9 @@ type Handler struct {
 	// auth
 	Username    string
 	Password    string
+	// https
+	CertFile    string
+	KeyFile     string
 }
 
 func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
@@ -37,7 +40,13 @@ func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
 func (h *Handler) Start() {
 	h.startJobs()
 	s := &http.Server{Addr: h.Addr, Handler: h}
-	err := s.ListenAndServe()
+
+	var err error
+	if h.CertFile != "" && h.KeyFile != "" {
+		err = s.ListenAndServeTLS(h.CertFile, h.KeyFile)
+	} else {
+		err = s.ListenAndServe()
+	}
 	if err != http.ErrServerClosed {
 		h.log.Fatal(err)
 	}
