@@ -2,9 +2,12 @@
 
 (function() {
   var api = function(method, endpoint, data) {
+    var headers = {'Content-Type': 'application/json'}
+    if (['get', 'post', 'put'].indexOf(method) !== -1)
+      headers['x-requested-by'] = 'yarr'
     return fetch(endpoint, {
       method: method,
-      headers: {'Content-Type': 'application/json'},
+      headers: headers,
       body: JSON.stringify(data),
     })
   }
@@ -12,7 +15,7 @@
   var json = function(res) {
     return res.json()
   }
-  
+
   var param = function(query) {
     if (!query) return ''
     return '?' + Object.keys(query).map(function(key) {

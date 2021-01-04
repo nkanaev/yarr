@@ -43,6 +43,10 @@ func (h *Handler) Start() {
 	}
 }
 
+func unsafeMethod(method string) bool {
+	return method == "POST" || method == "PUT" || method == "DELETE"
+}
+
 func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	route, vars := getRoute(req)
 	if route == nil {
@@ -51,6 +55,10 @@ func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if h.requiresAuth() && !route.manualAuth {
+		if unsafeMethod(req.Method) && req.Header.Get("X-Requested-By") != "yarr" {
+			rw.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		if !userIsAuthenticated(req, h.Username, h.Password) {
 			rw.WriteHeader(http.StatusUnauthorized)
 			return
