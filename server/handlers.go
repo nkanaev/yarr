@@ -95,7 +95,7 @@ func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 		if req.Method == "POST" {
 			username := req.FormValue("username")
 			password := req.FormValue("password")
-			if safeCompare(username, h.Username) && safeCompare(password, h.Password) {
+			if stringsEqual(username, h.Username) && stringsEqual(password, h.Password) {
 				userAuthenticate(rw, username, password)
 				http.Redirect(rw, req, req.URL.Path, http.StatusFound)
 				return
