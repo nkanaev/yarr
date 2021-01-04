@@ -235,7 +235,6 @@ func (s *Storage) MarkItemsRead(filter MarkFilter) bool {
 		cond = append(cond, "i.feed_id = ?")
 		args = append(args, *filter.FeedID)
 	}
-	// TODO: filter.Before
 	predicate := "1"
 	if len(cond) > 0 {
 		predicate = strings.Join(cond, " and ")
