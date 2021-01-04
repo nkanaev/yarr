@@ -3,7 +3,7 @@
 (function() {
   var api = function(method, endpoint, data) {
     var headers = {'Content-Type': 'application/json'}
-    if (['get', 'post', 'put'].indexOf(method) !== -1)
+    if (['post', 'put', 'delete'].indexOf(method) !== -1)
       headers['x-requested-by'] = 'yarr'
     return fetch(endpoint, {
       method: method,
