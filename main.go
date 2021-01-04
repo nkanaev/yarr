@@ -45,6 +45,8 @@ func main() {
 		db = filepath.Join(storagePath, "storage.db")
 	}
 
+	logger.Printf("using db file %s", db)
+
 	var username, password string
 	if authfile != "" {
 		f, err := os.Open(authfile)
