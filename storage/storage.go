@@ -65,11 +65,15 @@ end;
 create table if not exists http_states (
  feed_id        references feeds(id) unique,
  last_refreshed datetime not null,
- last_error     string,
 
  -- http header fields --
  last_modified  string not null,
  etag           string not null
+);
+
+create table if not exists feed_errors (
+ feed_id        references feeds(id) unique,
+ error          string
 );
 `
 

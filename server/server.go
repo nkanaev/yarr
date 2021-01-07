@@ -103,6 +103,7 @@ func (h *Handler) startJobs() {
 				atomic.AddInt32(h.queueSize, -1)
 				if err != nil {
 					h.log.Printf("Failed to fetch %s (%d): %s", feed.FeedLink, feed.Id, err)
+					h.db.SetFeedError(feed.Id, err)
 					continue
 				}
 				h.db.CreateItems(items)
@@ -168,6 +169,7 @@ func (h Handler) requiresAuth() bool {
 
 func (h *Handler) fetchAllFeeds() {
 	h.log.Print("Refreshing all feeds")
+	h.db.ResetFeedErrors()
 	for _, feed := range h.db.ListFeeds() {
 		h.fetchFeed(feed)
 	}
