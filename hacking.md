@@ -23,10 +23,6 @@ make build_windows  # -> _output/windows/yarr.exe
 go run main.go      # starts a server at http://localhost:7070
 ```
 
-## plans
-
-- feeds health checker
-
 ## code of conduct
 
 Be excellent to each other. Party on, dudes!
