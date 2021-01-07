@@ -150,3 +150,23 @@ func (s *Storage) SetFeedError(feedID int64, lastError error) {
 		s.log.Print(err)
 	}
 }
+
+func (s *Storage) GetFeedErrors() map[int64]string {
+	errors := make(map[int64]string)
+
+	rows, err := s.db.Query(`select feed_id, error from feed_errors`)
+	if err != nil {
+		s.log.Print(err)
+		return errors
+	}
+
+	for rows.Next() {
+		var id int64
+		var error string
+		if err = rows.Scan(&id, &error); err != nil {
+			s.log.Print(err)
+		}
+		errors[id] = error
+	}
+	return errors
+}

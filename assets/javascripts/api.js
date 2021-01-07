@@ -43,6 +43,9 @@
       refresh: function() {
         return api('post', '/api/feeds/refresh')
       },
+      list_errors: function() {
+        return api('get', '/api/feeds/errors').then(json)
+      },
     },
     folders: {
       list: function() {

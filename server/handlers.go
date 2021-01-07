@@ -31,6 +31,7 @@ var routes []Route = []Route{
 	p("/api/feeds", FeedListHandler),
 	p("/api/feeds/find", FeedHandler),
 	p("/api/feeds/refresh", FeedRefreshHandler),
+	p("/api/feeds/errors", FeedErrorsHandler),
 	p("/api/feeds/:id/icon", FeedIconHandler),
 	p("/api/feeds/:id", FeedHandler),
 	p("/api/items", ItemListHandler),
@@ -227,6 +228,11 @@ func FeedRefreshHandler(rw http.ResponseWriter, req *http.Request) {
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+func FeedErrorsHandler(rw http.ResponseWriter, req *http.Request) {
+	errors := db(req).GetFeedErrors()
+	writeJSON(rw, errors)
 }
 
 func FeedIconHandler(rw http.ResponseWriter, req *http.Request) {

@@ -337,6 +337,11 @@
                             <span class="icon mr-2" v-else><img v-lazy="'/api/feeds/'+feed.id+'/icon'" alt=""></span>
                             {{ feed.title }}
                         </div>
+                        <span class="icon flex-shrink-0 mx-2"
+                              v-b-tooltip.hover.top="feed_errors[feed.id]"
+                              v-if="feed_errors[feed.id]">
+                            {% inline "alert-circle.svg" %}
+                        </span>
                         <div class="flex-shrink-0">
                             <b-dropdown right no-caret lazy variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
                                 <template v-slot:button-content>
