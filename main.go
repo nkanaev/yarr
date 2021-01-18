@@ -7,6 +7,7 @@ import (
 	"github.com/nkanaev/yarr/platform"
 	"github.com/nkanaev/yarr/server"
 	"github.com/nkanaev/yarr/storage"
+	sdopen "github.com/skratchdot/open-golang/open"
 	"log"
 	"os"
 	"path/filepath"
@@ -18,13 +19,14 @@ var GitHash string = "unknown"
 
 func main() {
 	var addr, db, authfile, certfile, keyfile string
-	var ver bool
+	var ver, open bool
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
 	flag.StringVar(&authfile, "auth-file", "", "path to a file containing username:password")
 	flag.StringVar(&certfile, "cert-file", "", "path to cert file for https")
 	flag.StringVar(&keyfile, "key-file", "", "path to key file for https")
 	flag.StringVar(&db, "db", "", "storage file path")
 	flag.BoolVar(&ver, "version", false, "print application version")
+	flag.BoolVar(&open, "open", false, "open the server in browser")
 	flag.Parse()
 
 	if ver {
@@ -80,11 +82,9 @@ func main() {
 
 	srv := server.New(store, logger, addr)
 
-	proto := "http"
 	if certfile != "" && keyfile != "" {
 		srv.CertFile = certfile
 		srv.KeyFile = keyfile
-		proto = "https"
 	}
 
 	if username != "" && password != "" {
@@ -92,6 +92,9 @@ func main() {
 		srv.Password = password
 	}
 
-	logger.Printf("starting server at %s://%s", proto, addr)
+	logger.Printf("starting server at %s", srv.GetAddr())
+	if open {
+		sdopen.Run(srv.GetAddr())
+	}
 	platform.Start(srv)
 }

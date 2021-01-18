@@ -20,7 +20,7 @@ func Start(s *server.Handler) {
 			for {
 				select {
 				case <-menuOpen.ClickedCh:
-					open.Run("http://" + s.Addr)
+					open.Run(s.GetAddr())
 				case <-menuQuit.ClickedCh:
 					systray.Quit()
 				}

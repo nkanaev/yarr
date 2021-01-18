@@ -37,6 +37,14 @@ func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
 	}
 }
 
+func (h *Handler) GetAddr() string {
+	proto := "http"
+	if (h.CertFile != "" && h.KeyFile != "") {
+		proto = "https"
+	}
+	return proto + "://" + h.Addr
+}
+
 func (h *Handler) Start() {
 	h.startJobs()
 	s := &http.Server{Addr: h.Addr, Handler: h}
