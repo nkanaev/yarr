@@ -90,12 +90,12 @@
                             Import
                         </label>
                     </b-dropdown-form>
-                    <b-dropdown-item href="/opml/export">
+                    <b-dropdown-item href="./opml/export">
                         <span class="icon mr-1">{% inline "upload.svg" %}</span>
                         Export
                     </b-dropdown-item>
                     <b-dropdown-divider v-if="authenticated"></b-dropdown-divider>
-                    <b-dropdown-item-button v-if="authenticated">
+                    <b-dropdown-item-button v-if="authenticated" @click="logout()">
                         <span class="icon mr-1">{% inline "log-out.svg" %}</span>
                         Log out
                     </b-dropdown-item-button>
@@ -137,7 +137,7 @@
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                             <div class="selectgroup-label d-flex align-items-center w-100">
                                 <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
-                                <span class="icon mr-2" v-else><img v-lazy="'/api/feeds/'+feed.id+'/icon'" alt=""></span>
+                                <span class="icon mr-2" v-else><img v-lazy="'./api/feeds/'+feed.id+'/icon'" alt=""></span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
                             </div>
@@ -334,7 +334,7 @@
                     <div v-for="feed in folder.feeds" class="list-row d-flex align-items-center" :key="feed.id">
                         <div class="w-100 text-truncate">
                             <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
-                            <span class="icon mr-2" v-else><img v-lazy="'/api/feeds/'+feed.id+'/icon'" alt=""></span>
+                            <span class="icon mr-2" v-else><img v-lazy="'./api/feeds/'+feed.id+'/icon'" alt=""></span>
                             {{ feed.title }}
                         </div>
                         <span class="icon flex-shrink-0 mx-2"

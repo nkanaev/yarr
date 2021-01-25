@@ -11,7 +11,7 @@ import (
 )
 
 func userIsAuthenticated(req *http.Request, username, password string) bool {
-	cookie, _ :=  req.Cookie("auth")
+	cookie, _ := req.Cookie("auth")
 	if cookie == nil {
 		return false
 	}
@@ -23,11 +23,18 @@ func userIsAuthenticated(req *http.Request, username, password string) bool {
 }
 
 func userAuthenticate(rw http.ResponseWriter, username, password string) {
-	expires := time.Now().Add(time.Hour * 24 * 7)  // 1 week
+	expires := time.Now().Add(time.Hour * 24 * 7) // 1 week
+	var cookiePath string
+	if BasePath != "" {
+		cookiePath = BasePath
+	} else {
+		cookiePath = "/"
+	}
 	cookie := http.Cookie{
-		Name: "auth",
-		Value: username + ":" + secret(username, password),
+		Name:    "auth",
+		Value:   username + ":" + secret(username, password),
 		Expires: expires,
+		Path:    cookiePath,
 	}
 	http.SetCookie(rw, &cookie)
 }

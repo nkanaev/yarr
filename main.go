@@ -4,14 +4,15 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/nkanaev/yarr/platform"
-	"github.com/nkanaev/yarr/server"
-	"github.com/nkanaev/yarr/storage"
-	sdopen "github.com/skratchdot/open-golang/open"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/nkanaev/yarr/platform"
+	"github.com/nkanaev/yarr/server"
+	"github.com/nkanaev/yarr/storage"
+	sdopen "github.com/skratchdot/open-golang/open"
 )
 
 var Version string = "0.0"
@@ -22,6 +23,7 @@ func main() {
 	var ver, open bool
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
 	flag.StringVar(&authfile, "auth-file", "", "path to a file containing username:password")
+	flag.StringVar(&server.BasePath, "base", "", "base path of the service url")
 	flag.StringVar(&certfile, "cert-file", "", "path to cert file for https")
 	flag.StringVar(&keyfile, "key-file", "", "path to key file for https")
 	flag.StringVar(&db, "db", "", "storage file path")
@@ -33,6 +35,16 @@ func main() {
 		fmt.Printf("v%s (%s)\n", Version, GitHash)
 		return
 	}
+
+	if server.BasePath != "" && !strings.HasPrefix(server.BasePath, "/") {
+		server.BasePath = "/" + server.BasePath
+	}
+
+	if server.BasePath != "" && strings.HasSuffix(server.BasePath, "/") {
+		server.BasePath = strings.TrimSuffix(server.BasePath, "/")
+	}
+
+	server.BasePathReady <- true
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 
