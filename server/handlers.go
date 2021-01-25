@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/nkanaev/yarr/storage"
 	"html"
 	"html/template"
 	"io"
@@ -18,41 +19,27 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-
-	"github.com/nkanaev/yarr/storage"
 )
 
-var routes []Route
+var routes []Route = []Route{
+	p("/", IndexHandler).ManualAuth(),
+	p("/static/*path", StaticHandler).ManualAuth(),
 
-var BasePathReady = make(chan bool)
-
-func init() {
-	go func() {
-		<-BasePathReady
-		routes = []Route{
-			p(BasePath+"/", IndexHandler).ManualAuth(),
-			p(BasePath+"/static/*path", StaticHandler).ManualAuth(),
-
-			p(BasePath+"/api/status", StatusHandler),
-			p(BasePath+"/api/folders", FolderListHandler),
-			p(BasePath+"/api/folders/:id", FolderHandler),
-			p(BasePath+"/api/feeds", FeedListHandler),
-			p(BasePath+"/api/feeds/find", FeedHandler),
-			p(BasePath+"/api/feeds/refresh", FeedRefreshHandler),
-			p(BasePath+"/api/feeds/errors", FeedErrorsHandler),
-			p(BasePath+"/api/feeds/:id/icon", FeedIconHandler),
-			p(BasePath+"/api/feeds/:id", FeedHandler),
-			p(BasePath+"/api/items", ItemListHandler),
-			p(BasePath+"/api/items/:id", ItemHandler),
-			p(BasePath+"/api/settings", SettingsHandler),
-			p(BasePath+"/opml/import", OPMLImportHandler),
-			p(BasePath+"/opml/export", OPMLExportHandler),
-			p(BasePath+"/page", PageCrawlHandler),
-		}
-		if BasePath != "" {
-			routes = append(routes, p(BasePath, RedirectBasePathHandler).ManualAuth())
-		}
-	}()
+	p("/api/status", StatusHandler),
+	p("/api/folders", FolderListHandler),
+	p("/api/folders/:id", FolderHandler),
+	p("/api/feeds", FeedListHandler),
+	p("/api/feeds/find", FeedHandler),
+	p("/api/feeds/refresh", FeedRefreshHandler),
+	p("/api/feeds/errors", FeedErrorsHandler),
+	p("/api/feeds/:id/icon", FeedIconHandler),
+	p("/api/feeds/:id", FeedHandler),
+	p("/api/items", ItemListHandler),
+	p("/api/items/:id", ItemHandler),
+	p("/api/settings", SettingsHandler),
+	p("/opml/import", OPMLImportHandler),
+	p("/opml/export", OPMLExportHandler),
+	p("/page", PageCrawlHandler),
 }
 
 type asset struct {
@@ -153,11 +140,6 @@ func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 
 func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 	path := Vars(req)["path"]
-
-	if BasePath != "" {
-		path = strings.TrimPrefix(path, BasePath)
-	}
-
 	ctype := mime.TypeByExtension(filepath.Ext(path))
 
 	if assets != nil {
@@ -545,8 +527,4 @@ func PageCrawlHandler(rw http.ResponseWriter, req *http.Request) {
 			}
 		}
 	}
-}
-
-func RedirectBasePathHandler(rw http.ResponseWriter, req *http.Request) {
-	http.Redirect(rw, req, req.URL.Path+"/", http.StatusFound)
 }

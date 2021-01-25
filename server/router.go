@@ -35,13 +35,13 @@ func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
 	}
 }
 
-func getRoute(req *http.Request) (*Route, map[string]string) {
+func getRoute(reqPath string) (*Route, map[string]string) {
 	vars := make(map[string]string)
 	for _, route := range routes {
-		if route.urlRegex.MatchString(req.URL.Path) {
-			matches := route.urlRegex.FindStringSubmatchIndex(req.URL.Path)
+		if route.urlRegex.MatchString(reqPath) {
+			matches := route.urlRegex.FindStringSubmatchIndex(reqPath)
 			for i, key := range route.urlRegex.SubexpNames()[1:] {
-				vars[key] = req.URL.Path[matches[i*2+2]:matches[i*2+3]]
+				vars[key] = reqPath[matches[i*2+2]:matches[i*2+3]]
 			}
 			return &route, vars
 		}

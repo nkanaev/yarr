@@ -44,8 +44,6 @@ func main() {
 		server.BasePath = strings.TrimSuffix(server.BasePath, "/")
 	}
 
-	server.BasePathReady <- true
-
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 
 	configPath, err := os.UserConfigDir()
