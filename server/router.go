@@ -5,10 +5,12 @@ import (
 	"regexp"
 )
 
+var BasePath string = ""
+
 type Route struct {
-	url      string
-	urlRegex *regexp.Regexp
-	handler  func(http.ResponseWriter, *http.Request)
+	url        string
+	urlRegex   *regexp.Regexp
+	handler    func(http.ResponseWriter, *http.Request)
 	manualAuth bool
 }
 
