@@ -69,6 +69,10 @@ func unsafeMethod(method string) bool {
 func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	reqPath := req.URL.Path
 	if BasePath != "" {
+		if !strings.HasPrefix(reqPath, BasePath) {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
 		reqPath = strings.TrimPrefix(req.URL.Path, BasePath)
 		if reqPath == "" {
 			http.Redirect(rw, req, BasePath+"/", http.StatusFound)
