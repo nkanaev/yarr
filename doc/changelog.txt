@@ -1,0 +1,21 @@
+# upcoming
+
+- (new) autorefresh rate
+- (new) reduced bandwidth usage via stateful http headers `last-modified/etag`
+- (new) show feed errors in feed management modal
+- (new) `-open` flag for automatically opening the server url
+- (new) `-base` flag for serving urls under non-root path
+- (new) `-auth-file` flag for authentication
+- (new) `-cert-file` & `-key-file` flags for TLS
+- (fix) wrapping long words in the ui to prevent vertical scroll
+
+# v1.1 (2020-10-05)
+
+- (new) responsive design
+- (fix) server crash on favicon fetch timeout (reported by @minioin)
+- (fix) handling byte order marks in feeds (reported by @ilaer)
+- (fix) deleting a feed raises exception in the ui if the feed's items are shown.
+
+# v1.0 (2020-09-24)
+
+Initial Release
