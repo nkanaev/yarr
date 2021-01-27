@@ -44,7 +44,7 @@ func (h *Handler) GetAddr() string {
 	if h.CertFile != "" && h.KeyFile != "" {
 		proto = "https"
 	}
-	return proto + "://" + h.Addr
+	return proto + "://" + h.Addr + BasePath
 }
 
 func (h *Handler) Start() {
