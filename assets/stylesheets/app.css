@@ -268,8 +268,8 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .toolbar {
-  min-height: 2rem !important;
-  max-height: 2rem !important;
+  min-height: 3rem !important;
+  max-height: 3rem !important;
 }
 
 .toolbar-item {
@@ -278,7 +278,7 @@ select.form-control:not([multiple]):not([size]) {
   text-decoration: none;
   user-select: none;
   border: 1px solid transparent;
-  padding: .25rem .5rem;
+  padding: .5rem;
   font-size: 1rem;
   border-radius: .25rem;
   line-height: 1;
