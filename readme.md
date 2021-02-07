@@ -11,6 +11,18 @@ Longer-term plans include a self-hosted solution for individuals.
 
 [download](https://github.com/nkanaev/yarr/releases/latest)
 
+## Building With Docker
+
+To build with Docker
+
+1. Clone this git repo to your machine and `cd` into that directory
+
+2. Run `docker build -t yarr .`
+
+3. Create a data directory to store persistent yarr data `mkdir $HOME/yarr-data`
+
+4. Run `docker run -p 7070:7070 -v $HOME/yarr-data:data yarr` (You'll need to replace "$HOME" with the full path)
+
 ## credits
 
 [Feather](http://feathericons.com/) for icons.
