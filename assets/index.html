@@ -161,7 +161,8 @@
                 </button>
                 <div class="input-icon flex-grow-1">
                     <span class="icon">{% inline "search.svg" %}</span>
-                    <input class="d-block toolbar-search" type="" v-model="itemSearch">
+                    <!-- id used by keybindings -->
+                    <input id="searchbar" class="d-block toolbar-search" type="" v-model="itemSearch">
                 </div>
                 <button class="toolbar-item ml-2"
                         @click="markItemsRead()"
