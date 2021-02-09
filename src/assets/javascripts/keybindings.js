@@ -49,6 +49,12 @@ const shortcutFunctions = {
       vm.toggleItemRead(vm.itemSelectedDetails)
     }
   },
+  markAllRead: function() {
+    // same condition as 'Mark all read button'
+    if(vm.filterSelected == 'unread'){
+      vm.markItemsRead()
+    }
+  },
   toggleItemStarred: function() {
     if(vm.itemSelected != null) {
       vm.toggleItemStarred(vm.itemSelectedDetails)
@@ -69,16 +75,29 @@ const shortcutFunctions = {
   previousFeed() {
     helperFunctions.navigateToFeed(-1)
   },
+  showAll() {
+    vm.filterSelected = ''
+  },
+  showUnread() {
+    vm.filterSelected = 'unread'
+  },
+  showStarred() {
+    vm.filterSelected = 'starred'
+  },
 }
 
 const keybindings = {
   "r": shortcutFunctions.toggleItemRead,
+  "R": shortcutFunctions.markAllRead,
   "s": shortcutFunctions.toggleItemStarred,
   "?": shortcutFunctions.focusSearch,
   "j": shortcutFunctions.nextItem,
   "k": shortcutFunctions.previousItem,
   "l": shortcutFunctions.nextFeed,
   "h": shortcutFunctions.previousFeed,
+  "A": shortcutFunctions.showAll,
+  "U": shortcutFunctions.showUnread,
+  "S": shortcutFunctions.showStarred,
 }
 
 function isTextBox(element) {
