@@ -1,7 +1,7 @@
 VERSION=1.1
 GITHASH=$(shell git rev-parse --short=8 HEAD)
 
-ASSETS = assets/javascripts/* assets/stylesheets/* assets/graphicarts/* assets/index.html
+ASSETS = assets/javascripts/* assets/stylesheets/* assets/graphicarts/* assets/index.html assets/manifest.json assets/serviceworker.js
 CGO_ENABLED=1
 
 GO_LDFLAGS  = -s -w
