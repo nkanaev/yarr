@@ -94,6 +94,11 @@
                         <span class="icon mr-1">{% inline "upload.svg" %}</span>
                         Export
                     </b-dropdown-item>
+                    <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-item-button @click="showSettings('shortcuts')">
+                        <span class="icon mr-1">{% inline "help-circle.svg" %}</span>
+                        Shortcuts
+                    </b-dropdown-item-button>
                     <b-dropdown-divider v-if="authenticated"></b-dropdown-divider>
                     <b-dropdown-item-button v-if="authenticated" @click="logout()">
                         <span class="icon mr-1">{% inline "log-out.svg" %}</span>
@@ -378,6 +383,65 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div v-else-if="settings=='shortcuts'">
+                <p class="cursor-default"><b>Keyboard shortuts (case-sensitive)</b></p>
+<div>
+  <b-table-simple striped bordered responsive>
+    <b-thead>
+      <b-tr>
+        <b-th>Key</b-th>
+        <b-th>Action</b-th>
+      </b-tr>
+    </b-thead>
+    <b-tbody>
+      <b-tr>
+        <b-td>r</b-td>
+        <b-td>toggle item as read / unread</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>R</b-td>
+          <b-td>mark all items as read</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>s</b-td>
+          <b-td>star / unstar item</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>?</b-td>
+          <b-td>focus the search bar</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>A</b-td>
+          <b-td>view All items</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>U</b-td>
+          <b-td>view Unread items</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>S</b-td>
+          <b-td>view Starred items</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>j</b-td>
+          <b-td>go to next feed item</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>k</b-td>
+          <b-td>go to previous feed item</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>l</b-td>
+          <b-td>go to next feed</b-td>
+      </b-tr>
+      <b-tr>
+          <b-td>h</b-td>
+          <b-td>go to previous feed</b-td>
+      </b-tr>
+    </b-tbody>
+  </b-table-simple>
+</div>
             </div>
         </div>
     </div>

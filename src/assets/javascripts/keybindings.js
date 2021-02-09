@@ -86,6 +86,7 @@ const shortcutFunctions = {
   },
 }
 
+// If you edit, make sure you update README.md and the help modal
 const keybindings = {
   "r": shortcutFunctions.toggleItemRead,
   "R": shortcutFunctions.markAllRead,
