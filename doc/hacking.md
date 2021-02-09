@@ -5,8 +5,8 @@
 Install `Go >= 1.14` and `gcc`. Get the source code:
 
 ```sh
-git clone https://github.com/nkanaev/yarr.git
-git clone https://github.com/nkanaev/gofeed.git
+git clone https://github.com/einschmidt/yarr.git
+git clone https://github.com/einschmidt/gofeed.git
 mv gofeed yarr
 cd yarr
 ```

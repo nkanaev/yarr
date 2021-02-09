@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mmcdole/gofeed"
-	"github.com/nkanaev/yarr/storage"
+	"github.com/einschmidt/yarr/storage"
 	"io/ioutil"
 	"net"
 	"net/http"

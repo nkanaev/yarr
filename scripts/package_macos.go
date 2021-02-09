@@ -21,7 +21,7 @@ var plist = `<?xml version="1.0" encoding="UTF-8"?>
 	<key>CFBundleDisplayName</key>
 	<string>yarr</string>
 	<key>CFBundleIdentifier</key>
-	<string>nkanaev.yarr</string>
+	<string>einschmidt.yarr</string>
 	<key>CFBundleVersion</key>
 	<string>VERSION</string>
 	<key>CFBundlePackageType</key>
@@ -42,7 +42,7 @@ var plist = `<?xml version="1.0" encoding="UTF-8"?>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2020 nkanaev. All rights reserved.</string>
+	<string>Copyright © 2020 einschmidt. All rights reserved.</string>
 </dict>
 </plist>
 `

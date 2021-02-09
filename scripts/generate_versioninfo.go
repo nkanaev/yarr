@@ -18,7 +18,7 @@ BEGIN
       VALUE "FileDescription", "Yet another RSS reader"
       VALUE "FileVersion", "{VERSION}"
       VALUE "InternalName", "yarr"
-      VALUE "LegalCopyright", "nkanaev"
+      VALUE "LegalCopyright", "einschmidt"
       VALUE "OriginalFilename", "yarr.exe"
       VALUE "ProductName", "yarr"
       VALUE "ProductVersion", "{VERSION}"

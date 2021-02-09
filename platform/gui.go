@@ -4,7 +4,7 @@ package platform
 
 import (
 	"github.com/getlantern/systray"
-	"github.com/nkanaev/yarr/server"
+	"github.com/einschmidt/yarr/server"
 	"github.com/skratchdot/open-golang/open"
 )
 

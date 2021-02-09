@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/nkanaev/yarr/storage"
+	"github.com/einschmidt/yarr/storage"
 	"html"
 	"html/template"
 	"io"

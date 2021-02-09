@@ -1,4 +1,4 @@
-module github.com/nkanaev/yarr
+module github.com/einschmidt/yarr
 
 go 1.14
 
