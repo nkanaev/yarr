@@ -392,5 +392,27 @@
     <!-- internal -->
     <script src="./static/javascripts/api.js"></script>
     <script src="./static/javascripts/app.js"></script>
+    <!-- service worker -->
+    <script> 
+        window.addEventListener('load', () => { 
+        registerSW(); 
+        }); 
+    
+        // Register the Service Worker 
+        async function registerSW() { 
+        if ('serviceWorker' in navigator) { 
+            try { 
+            await navigator 
+                    .serviceWorker 
+                    .register('serviceworker.js'); 
+            } 
+            catch (e) { 
+            console.log('SW registration failed'); 
+            } 
+        } 
+        } 
+    </script>
+    <!-- manifest -->
+    <link rel='manifest' href='./manifest.json'>
 </body>
 </html>

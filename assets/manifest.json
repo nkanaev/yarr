@@ -1,0 +1,7 @@
+{
+    "name": "yarr",
+    "short_name": "yarr",
+    "description": "Yet another rss reader",
+    "start_url": "/",
+    "display": "fullscreen"
+}
