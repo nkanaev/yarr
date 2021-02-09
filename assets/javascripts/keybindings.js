@@ -23,13 +23,14 @@ const helperFunctions = {
   navigateToFeed: function(relativePosition) {
     // create a list with feed and folders guids, ignore feeds in collapsed folders
     // Example result with folder 2 collapsed:
-    // ['folder:1','feed:1','feed:2','folder:2', 'folder:3','feed:3']
-    const navigationList = vm.foldersWithFeeds.map(
+    // ['','folder:1','feed:1','feed:2','folder:2', 'folder:3','feed:3']
+    // The empty string is the "All Feeds" option
+    const navigationList = [''].concat(vm.foldersWithFeeds.map(
       folder =>
         folder.is_expanded
         ? ['folder:'+folder.id].concat(folder.feeds.map(feed=>'feed:'+feed.id))
         : 'folder:'+folder.id
-    ).flat()
+    ).flat())
     const currentFeedPosition = navigationList.indexOf(vm.feedSelected)
     if(currentFeedPosition== -1){
       // feed not found error
