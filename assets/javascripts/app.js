@@ -48,14 +48,6 @@ var sanitize = function(content, base) {
   return sanitizer.sanitize(content, {FORBID_TAGS: ['style'], FORBID_ATTR: ['style', 'class']})
 }
 
-function extensions(details, content) {
-  const ytId = details.link.match(/youtube\.com\/watch\?v=(.*)$/)[1];
-  if(ytId) {
-    content+=`<iframe width="560" height="315" src="https://www.youtube.com/embed/${ytId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen></iframe>`;
-  }
-  return content;
-}
-
 Vue.use(VueLazyload)
 
 Vue.directive('scroll', {
@@ -222,7 +214,7 @@ var vm = new Vue({
       else if (this.itemSelectedDetails.description)
         content = this.itemSelectedDetails.description
 
-      return extensions(this.itemSelectedDetails,sanitize(content, this.itemSelectedDetails.link))
+      return sanitize(content, this.itemSelectedDetails.link)
     },
   },
   watch: {
