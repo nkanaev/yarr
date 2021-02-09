@@ -2,12 +2,14 @@ package server
 
 import (
 	"context"
-	"github.com/nkanaev/yarr/storage"
 	"log"
 	"net/http"
 	"runtime"
+	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/nkanaev/yarr/storage"
 )
 
 type Handler struct {
@@ -18,11 +20,11 @@ type Handler struct {
 	queueSize   *int32
 	refreshRate chan int64
 	// auth
-	Username    string
-	Password    string
+	Username string
+	Password string
 	// https
-	CertFile    string
-	KeyFile     string
+	CertFile string
+	KeyFile  string
 }
 
 func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
@@ -35,6 +37,14 @@ func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
 		Addr:        addr,
 		refreshRate: make(chan int64),
 	}
+}
+
+func (h *Handler) GetAddr() string {
+	proto := "http"
+	if h.CertFile != "" && h.KeyFile != "" {
+		proto = "https"
+	}
+	return proto + "://" + h.Addr + BasePath
 }
 
 func (h *Handler) Start() {
@@ -57,7 +67,19 @@ func unsafeMethod(method string) bool {
 }
 
 func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	route, vars := getRoute(req)
+	reqPath := req.URL.Path
+	if BasePath != "" {
+		if !strings.HasPrefix(reqPath, BasePath) {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
+		reqPath = strings.TrimPrefix(req.URL.Path, BasePath)
+		if reqPath == "" {
+			http.Redirect(rw, req, BasePath+"/", http.StatusFound)
+			return
+		}
+	}
+	route, vars := getRoute(reqPath)
 	if route == nil {
 		rw.WriteHeader(http.StatusNotFound)
 		return

@@ -177,6 +177,7 @@ select.form-control:not([multiple]):not([size]) {
 .selectgroup-label {
   padding: .375rem .5rem;
   border-radius: 4px;
+  overflow-wrap: break-word;
 }
 
 .selectgroup-label:hover {

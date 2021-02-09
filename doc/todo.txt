@@ -1,0 +1,11 @@
+- add: switch to `embed` once 1.16 is out
+  https://tip.golang.org/pkg/embed/
+- add: enclosures (podcasts etc)
+  https://github.com/shagr4th/yarr/commits/master
+- fix: moving newly added feed makes it disappear
+- fix: broken base link in https://applieddivinitystudies.com/
+- fix: migrate to cascade delete
+  https://sqlite.org/foreignkeys.html#fk_actions
+- fix: loading items (by scrolling down) is glitching while feeds are refreshing
+- doc: self-hosting instructions (including certificates)
+- etc: test gofeed against real-world feeds, compare results with https://pypi.org/project/feedparser/
