@@ -1,4 +1,4 @@
-# upcoming
+# v1.2 (2021-02-11)
 
 - (new) autorefresh rate
 - (new) reduced bandwidth usage via stateful http headers `last-modified/etag`
@@ -8,6 +8,7 @@
 - (new) `-auth-file` flag for authentication
 - (new) `-cert-file` & `-key-file` flags for TLS
 - (fix) wrapping long words in the ui to prevent vertical scroll
+- (fix) increased toolbar height in mobile/tablet layout (thanks to @einschmidt)
 
 # v1.1 (2020-10-05)
 
