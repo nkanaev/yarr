@@ -445,7 +445,8 @@ var vm = new Vue({
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         api.feeds.delete(feed.id).then(function() {
           // unselect feed to prevent reading properties of null in template
-          var isSelected = (vm.feedSelected === 'feed:'+feed.id
+          var isSelected = !vm.feedSelected
+            || (vm.feedSelected === 'feed:'+feed.id
             || (feed.folder_id && vm.feedSelected === 'folder:'+feed.folder_id));
           if (isSelected) vm.feedSelected = null
 
