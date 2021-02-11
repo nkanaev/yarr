@@ -1,4 +1,4 @@
-VERSION=1.1
+VERSION=1.2
 GITHASH=$(shell git rev-parse --short=8 HEAD)
 
 ASSETS = assets/javascripts/* assets/stylesheets/* assets/graphicarts/* assets/index.html
