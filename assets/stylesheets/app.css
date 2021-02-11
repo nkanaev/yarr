@@ -546,8 +546,6 @@ a,
   #app.item-selected #col-item {
     display: flex !important;
   }
-
-  .drag { cursor: default; }
 }
 
 @media (max-width: 767.98px) {
@@ -581,6 +579,20 @@ a,
   #app.item-selected #col-item {
     display: flex !important;
   }
+}
 
-  .drag { cursor: default; }
+/* styles for both mobile & tablet layout */
+
+@media (max-width: 991.98px) {
+  .drag {
+    cursor: default;
+  }
+  .toolbar {
+    min-height: 3rem !important;
+    max-height: 3rem !important;
+  }
+  .toolbar-item,
+  .toolbar-search {
+    padding: .5rem;
+  }
 }
