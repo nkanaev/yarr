@@ -39,6 +39,15 @@ func userAuthenticate(rw http.ResponseWriter, username, password string) {
 	http.SetCookie(rw, &cookie)
 }
 
+func userLogout(rw http.ResponseWriter) {
+	cookie := http.Cookie{
+		Name:    "auth",
+		Value:   "",
+		MaxAge:  -1,
+	}
+	http.SetCookie(rw, &cookie)
+}
+
 func stringsEqual(p1, p2 string) bool {
 	return subtle.ConstantTimeCompare([]byte(p1), []byte(p2)) == 1
 }

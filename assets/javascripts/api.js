@@ -92,6 +92,9 @@
         body: new FormData(form),
       })
     },
+    logout: function() {
+      return api('post', './logout')
+    },
     crawl: function(url) {
       return fetch('./page?url=' + url).then(function(res) {
         return res.text()

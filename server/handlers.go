@@ -40,6 +40,7 @@ var routes []Route = []Route{
 	p("/opml/import", OPMLImportHandler),
 	p("/opml/export", OPMLExportHandler),
 	p("/page", PageCrawlHandler),
+	p("/logout", LogoutHandler),
 }
 
 type asset struct {
@@ -527,4 +528,9 @@ func PageCrawlHandler(rw http.ResponseWriter, req *http.Request) {
 			}
 		}
 	}
+}
+
+func LogoutHandler(rw http.ResponseWriter, req *http.Request) {
+	userLogout(rw)
+	rw.WriteHeader(http.StatusNoContent)
 }

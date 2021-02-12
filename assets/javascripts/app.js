@@ -509,6 +509,11 @@ var vm = new Vue({
         vm.refreshStats()
       })
     },
+    logout: function() {
+      api.logout().then(function() {
+        document.location.reload()
+      })
+    },
     getReadable: function(item) {
       if (this.itemSelectedReadability) {
         this.itemSelectedReadability = null
