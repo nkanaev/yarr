@@ -2,7 +2,7 @@
 
 - (fix) log out functionality if authentication is set
 - (fix) import opml if authentication is set
-- (fix) login page if authentication is set
+- (fix) login page if authentication is set (thanks to @einschmidt)
 
 # v1.2 (2021-02-11)
 
