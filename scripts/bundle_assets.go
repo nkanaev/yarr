@@ -51,6 +51,7 @@ func encode(b []byte) string {
 func main() {
 	assets := make([]asset, 0)
 	filepatterns := []string{
+		"assets/login.html",
 		"assets/graphicarts/*.svg",
 		"assets/graphicarts/*.png",
 		"assets/javascripts/*.js",

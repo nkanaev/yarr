@@ -1,7 +1,7 @@
 VERSION=1.2
 GITHASH=$(shell git rev-parse --short=8 HEAD)
 
-ASSETS = assets/javascripts/* assets/stylesheets/* assets/graphicarts/* assets/index.html
+ASSETS = assets/javascripts/* assets/stylesheets/* assets/graphicarts/* assets/*.html
 CGO_ENABLED=1
 
 GO_LDFLAGS  = -s -w
