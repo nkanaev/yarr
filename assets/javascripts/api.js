@@ -1,11 +1,17 @@
 "use strict";
 
 (function() {
+  var xfetch = function(resource, init) {
+    init = init || {}
+    if (['post', 'put', 'delete'].indexOf(init.method) !== -1) {
+      init['headers'] = init['headers'] || {}
+      init['headers']['x-requested-by'] = 'yarr'
+    }
+    return fetch(resource, init)
+  }
   var api = function(method, endpoint, data) {
     var headers = {'Content-Type': 'application/json'}
-    if (['post', 'put', 'delete'].indexOf(method) !== -1)
-      headers['x-requested-by'] = 'yarr'
-    return fetch(endpoint, {
+    return xfetch(endpoint, {
       method: method,
       headers: headers,
       body: JSON.stringify(data),
@@ -87,7 +93,7 @@
       return api('get', './api/status').then(json)
     },
     upload_opml: function(form) {
-      return fetch('./opml/import', {
+      return xfetch('./opml/import', {
         method: 'post',
         body: new FormData(form),
       })
@@ -96,7 +102,7 @@
       return api('post', './logout')
     },
     crawl: function(url) {
-      return fetch('./page?url=' + url).then(function(res) {
+      return xfetch('./page?url=' + url).then(function(res) {
         return res.text()
       })
     }
