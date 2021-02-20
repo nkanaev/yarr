@@ -413,8 +413,13 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .content pre {
+  overflow-x: auto;
   color: inherit;
-  overflow-x: scroll;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  padding: 0.5rem;
 }
 
 .content a {
@@ -470,6 +475,7 @@ a,
   background-color: #f4f0e5;
 }
 .theme-sepia .content hr,
+.theme-sepia .content pre,
 .theme-sepia .border-right,
 .theme-sepia .border-top {
   border-color: #e0d6ba !important;
@@ -491,6 +497,7 @@ a,
 }
 
 .theme-night .content hr,
+.theme-night .content pre,
 .theme-night .border-right,
 .theme-night .border-top {
   border-color: #1a1a1a !important;
