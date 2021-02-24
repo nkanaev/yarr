@@ -389,6 +389,7 @@ var vm = new Vue({
       var folder_id = folder ? folder.id : null
       api.feeds.update(feed.id, {folder_id: folder_id}).then(function() {
         feed.folder_id = folder_id
+        vm.refreshStats()
       })
     },
     moveFeedToNewFolder: function(feed) {
@@ -396,7 +397,9 @@ var vm = new Vue({
       if (!title) return
       api.folders.create({'title': title}).then(function(folder) {
         api.feeds.update(feed.id, {folder_id: folder.id}).then(function() {
-          vm.refreshFeeds()
+          vm.refreshFeeds().then(function() {
+            vm.refreshStats()
+          })
         })
       })
     },

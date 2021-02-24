@@ -2,7 +2,6 @@
   https://tip.golang.org/pkg/embed/
 - add: enclosures (podcasts etc)
   https://github.com/shagr4th/yarr/commits/master
-- fix: moving newly added feed makes it disappear
 - fix: broken base link in https://applieddivinitystudies.com/
 - fix: migrate to cascade delete
   https://sqlite.org/foreignkeys.html#fk_actions
