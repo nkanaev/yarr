@@ -1,15 +1,22 @@
-# Linux desktop
+The latest binary releases for MacOS/Windows/Linux are available
+[here](https://github.com/nkanaev/yarr/releases/latest).
 
-Grab the latest linux binary, then run:
+## install (linux)
 
-```
-$ sudo mv /path/to/yarr /usr/local/bin
-$ sudo tee /usr/local/share/applications/yarr.desktop >/dev/null <<EOF
-[Desktop Entry]
-Name=yarr
-Exec=yarr -open
-Icon=rss
-Type=Application
-Categories=Internet;
-EOF
-```
+The Linux version doesn't come with the desktop environment integration.
+For easy access you can manually create a desktop menu entry by
+by following the steps below:
+
+    # get the latest linux binary zip
+    unzip -x yarr*.zip
+    sudo mv yarr /usr/local/bin/yarr
+    sudo nano /usr/local/share/applications/yarr.desktop
+
+and paste the content below:
+
+    [Desktop Entry]
+    Name=yarr
+    Exec=/usr/loca/bin -open
+    Icon=rss
+    Type=Application
+    Categories=Internet;
