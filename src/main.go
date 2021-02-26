@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nkanaev/yarr/platform"
-	"github.com/nkanaev/yarr/server"
-	"github.com/nkanaev/yarr/storage"
+	"github.com/nkanaev/yarr/src/platform"
+	"github.com/nkanaev/yarr/src/server"
+	"github.com/nkanaev/yarr/src/storage"
 	sdopen "github.com/skratchdot/open-golang/open"
 )
 

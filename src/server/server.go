@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/nkanaev/yarr/storage"
+	"github.com/nkanaev/yarr/src/storage"
 )
 
 type Handler struct {

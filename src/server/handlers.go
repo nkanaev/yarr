@@ -3,8 +3,8 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nkanaev/yarr/storage"
-	"github.com/nkanaev/yarr/assets"
+	"github.com/nkanaev/yarr/src/storage"
+	"github.com/nkanaev/yarr/src/assets"
 	"html"
 	"io/ioutil"
 	"math"
