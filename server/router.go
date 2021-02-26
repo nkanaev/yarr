@@ -19,7 +19,7 @@ func (r Route) ManualAuth() Route {
 	return r
 }
 
-func p(path string, handler func(http.ResponseWriter, *http.Request)) Route {
+func p(path string, handler http.HandlerFunc) Route {
 	var urlRegexp string
 	urlRegexp = regexp.MustCompile(`[\*\:]\w+`).ReplaceAllStringFunc(path, func(m string) string {
 		if m[0:1] == `*` {

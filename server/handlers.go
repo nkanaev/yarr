@@ -1,25 +1,21 @@
 package server
 
 import (
-	"bytes"
-	"compress/gzip"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/nkanaev/yarr/storage"
+	"github.com/nkanaev/yarr/assets"
 	"html"
-	"html/template"
-	"io"
 	"io/ioutil"
 	"math"
-	"mime"
 	"net/http"
-	"os"
-	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
 )
+
+// TODO: gzip?
+var StaticHandler = http.StripPrefix("/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP
 
 var routes []Route = []Route{
 	p("/", IndexHandler).ManualAuth(),
@@ -42,36 +38,6 @@ var routes []Route = []Route{
 	p("/page", PageCrawlHandler),
 	p("/logout", LogoutHandler),
 }
-
-type asset struct {
-	etag    string
-	body    string // base64(gzip(content))
-	gzipped *[]byte
-	decoded *string
-}
-
-func (a *asset) gzip() *[]byte {
-	if a.gzipped == nil {
-		gzipped, _ := base64.StdEncoding.DecodeString(a.body)
-		a.gzipped = &gzipped
-	}
-	return a.gzipped
-}
-
-func (a *asset) text() *string {
-	if a.decoded == nil {
-		gzipped, _ := base64.StdEncoding.DecodeString(a.body)
-		reader, _ := gzip.NewReader(bytes.NewBuffer(gzipped))
-		decoded, _ := ioutil.ReadAll(reader)
-		reader.Close()
-
-		decoded_string := string(decoded)
-		a.decoded = &decoded_string
-	}
-	return a.decoded
-}
-
-var assets map[string]asset
 
 type FolderCreateForm struct {
 	Title string `json:"title"`
@@ -104,43 +70,17 @@ func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 			}
 		}
 
-		if assets != nil {
-			asset := assets["login.html"]
-			rw.Header().Set("Content-Type", "text/html")
-			rw.Header().Set("Content-Encoding", "gzip")
-			rw.Write(*asset.gzip())
-			return
-		} else {
-			f, err := os.Open("assets/login.html")
-			if err != nil {
-				handler(req).log.Print(err)
-				return
-			}
-			io.Copy(rw, f)
-			return
-		}
-	}
-
-	if assets != nil {
-		asset := assets["index.html"]
-
 		rw.Header().Set("Content-Type", "text/html")
-		rw.Header().Set("Content-Encoding", "gzip")
-		rw.Write(*asset.gzip())
-	} else {
-		t := template.Must(template.New("index.html").Delims("{%", "%}").Funcs(template.FuncMap{
-			"inline": func(svg string) template.HTML {
-				content, _ := ioutil.ReadFile("assets/graphicarts/" + svg)
-				return template.HTML(content)
-			},
-		}).ParseFiles("assets/index.html"))
-		rw.Header().Set("Content-Type", "text/html")
-		t.Execute(rw, nil)
+		assets.Render("login.html", rw, nil)
+		return
 	}
+	rw.Header().Set("Content-Type", "text/html")
+	assets.Render("index.html", rw, nil)
 }
 
+/*
 func StaticHandler(rw http.ResponseWriter, req *http.Request) {
-	path := Vars(req)["path"]
+	http.StripPrefix("/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(rw, req)
 	ctype := mime.TypeByExtension(filepath.Ext(path))
 
 	if assets != nil {
@@ -164,6 +104,7 @@ func StaticHandler(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Set("Content-Type", ctype)
 	io.Copy(rw, f)
 }
+*/
 
 func StatusHandler(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, map[string]interface{}{

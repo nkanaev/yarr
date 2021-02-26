@@ -1,4 +1,4 @@
-Install `Go >= 1.14` and `gcc`. Get the source code:
+Install `Go >= 1.16` and `gcc`. Get the source code:
 
     git clone https://github.com/nkanaev/yarr.git
     git clone https://github.com/nkanaev/gofeed.git yarr/gofeed

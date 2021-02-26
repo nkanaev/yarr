@@ -1,6 +1,6 @@
 module github.com/nkanaev/yarr
 
-go 1.14
+go 1.16
 
 require (
 	github.com/PuerkitoBio/goquery v1.5.1
