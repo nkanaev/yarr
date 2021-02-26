@@ -20,7 +20,7 @@ build_macos:
 	set GOARCH=amd64
 	mkdir -p _output/macos
 	go build -tags "sqlite_foreign_keys release macos" -ldflags="$(GO_LDFLAGS)" -o _output/macos/yarr main.go
-	cp artwork/icon.png _output/macos/icon.png
+	cp platform/icon.png _output/macos/icon.png
 	go run scripts/package_macos.go -outdir _output/macos -version "$(VERSION)"
 
 build_linux:
@@ -33,6 +33,6 @@ build_windows:
 	set GOOS=windows
 	set GOARCH=386
 	mkdir -p _output/windows
-	go run scripts/generate_versioninfo.go -version "$(VERSION)" -outfile artwork/versioninfo.rc
-	windres -i artwork/versioninfo.rc -O coff -o platform/versioninfo.syso
+	go run scripts/generate_versioninfo.go -version "$(VERSION)" -outfile platform/versioninfo.rc
+	windres -i platform/versioninfo.rc -O coff -o platform/versioninfo.syso
 	go build -tags "sqlite_foreign_keys release windows" -ldflags="$(GO_LDFLAGS) -H windowsgui" -o _output/windows/yarr.exe main.go
