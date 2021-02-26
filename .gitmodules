@@ -1,0 +1,3 @@
+[submodule "src/gofeed"]
+	path = src/gofeed
+	url = http://github.com/mmcdole/gofeed
