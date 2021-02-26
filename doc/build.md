@@ -1,7 +1,6 @@
 Install `Go >= 1.16` and `gcc`. Get the source code:
 
-    git clone https://github.com/nkanaev/yarr.git
-    git clone https://github.com/nkanaev/gofeed.git yarr/gofeed
+    git clone --recurse-submodules https://github.com/nkanaev/yarr.git
 
 Then run one of the corresponding commands:
 
