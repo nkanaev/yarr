@@ -20,7 +20,7 @@ func (afs assetsfs) Open(name string) (fs.File, error) {
 	if afs.embedded != nil {
 		return afs.embedded.Open(name)
 	}
-	return os.DirFS("assets").Open(name)
+	return os.DirFS("src/assets").Open(name)
 }
 
 func Render(path string, writer io.Writer, data interface{}) {
