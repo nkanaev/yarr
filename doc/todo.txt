@@ -1,5 +1,3 @@
-- add: switch to `embed` once 1.16 is out
-  https://tip.golang.org/pkg/embed/
 - add: enclosures (podcasts etc)
   https://github.com/shagr4th/yarr/commits/master
 - fix: broken base link in https://applieddivinitystudies.com/
