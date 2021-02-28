@@ -1,6 +1,3 @@
-The latest binary releases for MacOS/Windows/Linux are available
-[here](https://github.com/nkanaev/yarr/releases/latest).
-
 ## install (linux)
 
 The Linux version doesn't come with the desktop environment integration.
