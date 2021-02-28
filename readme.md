@@ -8,7 +8,6 @@ It is written in Go with the frontend in Vue.js. The storage is backed by SQLite
 ![screenshot](etc/promo.png)
 
 [download](https://github.com/nkanaev/yarr/releases/latest)
-| [build](doc/build.md)
 
 ## build
 
@@ -18,7 +17,7 @@ Install `Go >= 1.16` and `gcc`. Get the source code:
 
 Then run one of the corresponding commands:
 
-    # create a binary for the host os
+    # create an executable for the host os
     make build_macos    # -> _output/macos/yarr.app
     make build_linux    # -> _output/linux/yarr
     make build_windows  # -> _output/windows/yarr.exe
