@@ -58,9 +58,11 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 }
 
 func (s *Storage) DeleteFeed(feedId int64) bool {
-	_, err1 := s.db.Exec(`delete from items where feed_id = ?`, feedId)
-	_, err2 := s.db.Exec(`delete from feeds where id = ?`, feedId)
-	return err1 == nil && err2 == nil
+	_, err := s.db.Exec(`delete from feeds where id = ?`, feedId)
+	if err != nil {
+		s.log.Print(err)
+	}
+	return err == nil
 }
 
 func (s *Storage) RenameFeed(feedId int64, newTitle string) bool {

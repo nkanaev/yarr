@@ -45,9 +45,11 @@ func (s *Storage) CreateFolder(title string) *Folder {
 }
 
 func (s *Storage) DeleteFolder(folderId int64) bool {
-	_, err1 := s.db.Exec(`update feeds set folder_id = null where folder_id = ?`, folderId)
-	_, err2 := s.db.Exec(`delete from folders where id = ?`, folderId)
-	return err1 == nil && err2 == nil
+	_, err := s.db.Exec(`delete from folders where id = ?`, folderId)
+	if err != nil {
+		s.log.Print(err)
+	}
+	return err == nil
 }
 
 func (s *Storage) RenameFolder(folderId int64, newTitle string) bool {

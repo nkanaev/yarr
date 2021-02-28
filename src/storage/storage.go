@@ -18,7 +18,7 @@ create unique index if not exists idx_folder_title on folders(title);
 
 create table if not exists feeds (
  id             integer primary key autoincrement,
- folder_id      references folders(id),
+ folder_id      references folders(id) on delete set null,
  title          text not null,
  description    text,
  link           text,
@@ -32,7 +32,7 @@ create unique index if not exists idx_feed_feed_link on feeds(feed_link);
 create table if not exists items (
  id             integer primary key autoincrement,
  guid           string not null,
- feed_id        references feeds(id),
+ feed_id        references feeds(id) on delete cascade,
  title          text,
  link           text,
  description    text,
@@ -63,7 +63,7 @@ create trigger if not exists del_item_search after delete on items begin
 end;
 
 create table if not exists http_states (
- feed_id        references feeds(id) unique,
+ feed_id        references feeds(id) on delete cascade unique,
  last_refreshed datetime not null,
 
  -- http header fields --
@@ -72,7 +72,7 @@ create table if not exists http_states (
 );
 
 create table if not exists feed_errors (
- feed_id        references feeds(id) unique,
+ feed_id        references feeds(id) on delete cascade unique,
  error          string
 );
 `
@@ -96,6 +96,7 @@ func New(path string, logger *log.Logger) (*Storage, error) {
 
 	db.SetMaxOpenConns(1)
 
+	// TODO: migration for 'on delete' actions
 	if _, err := db.Exec(initQuery); err != nil {
 		return nil, err
 	}
