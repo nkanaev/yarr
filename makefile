@@ -31,3 +31,6 @@ build_windows:
 	go run bin/generate_versioninfo.go -version "$(VERSION)" -outfile src/platform/versioninfo.rc
 	windres -i src/platform/versioninfo.rc -O coff -o src/platform/versioninfo.syso
 	go build -tags "sqlite_foreign_keys release windows" -ldflags="$(GO_LDFLAGS) -H windowsgui" -o _output/windows/yarr.exe main.go
+
+serve:
+	go run -tags "sqlite_foreign_keys" src/main.go
