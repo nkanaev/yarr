@@ -1,5 +1,6 @@
 - add: enclosures (podcasts etc)
-  https://github.com/shagr4th/yarr/commits/master
+  https://github.com/shagr4th/yarr/commit/2ca88637803c562380c7d2d009ae798ab98e6a85
+  https://github.com/shagr4th/yarr/commit/0374c92c284cee825d266c0378179616aa13f750
 - fix: broken base link in https://applieddivinitystudies.com/
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
 - doc: self-hosting instructions (including certificates)
