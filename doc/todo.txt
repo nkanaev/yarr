@@ -1,9 +1,6 @@
 - add: enclosures (podcasts etc)
   https://github.com/shagr4th/yarr/commits/master
 - fix: broken base link in https://applieddivinitystudies.com/
-- fix: migrate to cascade delete
-  https://sqlite.org/foreignkeys.html#fk_actions
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
-- fix: feed deleting is broken
 - doc: self-hosting instructions (including certificates)
 - etc: test gofeed against real-world feeds, compare results with https://pypi.org/project/feedparser/

@@ -1,3 +1,7 @@
+# upcoming
+
+- (fix) deleting feeds
+
 # v1.3 (2021-02-18)
 
 - (fix) log out functionality if authentication is set
