@@ -12,7 +12,6 @@ import (
 	"github.com/nkanaev/yarr/src/platform"
 	"github.com/nkanaev/yarr/src/server"
 	"github.com/nkanaev/yarr/src/storage"
-	sdopen "github.com/skratchdot/open-golang/open"
 )
 
 var Version string = "0.0"
@@ -104,7 +103,7 @@ func main() {
 
 	logger.Printf("starting server at %s", srv.GetAddr())
 	if open {
-		sdopen.Run(srv.GetAddr())
+		platform.Open(srv.GetAddr())
 	}
 	platform.Start(srv)
 }

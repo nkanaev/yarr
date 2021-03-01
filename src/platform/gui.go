@@ -5,7 +5,6 @@ package platform
 import (
 	"github.com/getlantern/systray"
 	"github.com/nkanaev/yarr/src/server"
-	"github.com/skratchdot/open-golang/open"
 )
 
 func Start(s *server.Handler) {
@@ -20,7 +19,7 @@ func Start(s *server.Handler) {
 			for {
 				select {
 				case <-menuOpen.ClickedCh:
-					open.Run(s.GetAddr())
+					Open(s.GetAddr())
 				case <-menuQuit.ClickedCh:
 					systray.Quit()
 				}
