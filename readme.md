@@ -9,7 +9,7 @@ It is written in Go with the frontend in Vue.js. The storage is backed by SQLite
 
 ## usage
 
-The latest prebuilt version for Linux/MacOS/Windows is available
+The latest prebuilt binaries for Linux/MacOS/Windows are available
 [here](https://github.com/nkanaev/yarr/releases/latest).
 
 ### macos
@@ -18,7 +18,7 @@ Download `yarr-*-macos64.zip`, unzip it, place `yarr.app` in `/Applications` fol
 
 The binaries are not signed, because the author doesn't want to buy a certificate.
 Apple hates cheapskate developers, therefore the OS will refuse to run the application.
-To bypass these measures, you can run the command below:
+To bypass these measures, you can run the command:
 
     xattr -d com.apple.quarantine /Applications/yarr.app
 
@@ -40,11 +40,11 @@ by following the steps below:
     sudo mv yarr /usr/local/bin/yarr
     sudo nano /usr/local/share/applications/yarr.desktop
 
-and paste the content below:
+and paste the content:
 
     [Desktop Entry]
     Name=yarr
-    Exec=/usr/loca/bin -open
+    Exec=/usr/local/bin/yarr -open
     Icon=rss
     Type=Application
     Categories=Internet;
