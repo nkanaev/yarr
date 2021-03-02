@@ -1,5 +1,6 @@
 # upcoming
 
+- (new) podcasts
 - (fix) deleting feeds
 
 # v1.3 (2021-02-18)
