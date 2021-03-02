@@ -108,6 +108,14 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
+.table-compact tr td:first-child {
+  padding-left: 0;
+}
+
+.table-compact tr td:last-child {
+  padding-right: 0;
+}
+
 /* custom elements */
 
 .icon {
