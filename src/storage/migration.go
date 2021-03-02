@@ -10,13 +10,14 @@ var migrations = []func(*sql.Tx)error{
 	m00_initial,
 	m01_feed_states_and_errors,
 	m02_on_delete_actions,
+	m03_item_podcasturl,
 }
 
 var maxVersion = int64(len(migrations))
 
 func migrate(db *sql.DB, log *log.Logger) error {
 	var version int64
-	db.QueryRow("pragma user_version").Scan(&version);	
+	db.QueryRow("pragma user_version").Scan(&version);
 
 	if version >= maxVersion {
 		return nil
@@ -37,7 +38,7 @@ func migrate(db *sql.DB, log *log.Logger) error {
 		if err = migratefunc(tx); err != nil {
 			log.Printf("[migration:%d] failed to migrate", v)
 			tx.Rollback()
-			return err	
+			return err
 		}
 		if _, err = tx.Exec(fmt.Sprintf("pragma user_version = %d", v + 1)); err != nil {
 			log.Printf("[migration:%d] failed to bump version", v)
@@ -109,7 +110,7 @@ func m00_initial(tx *sql.Tx) error {
 		  delete from search where rowid = old.search_rowid;
 		end;
 	`
-	_, err := tx.Exec(sql)	
+	_, err := tx.Exec(sql)
 	return err
 }
 
@@ -206,6 +207,14 @@ func m02_on_delete_actions(tx *sql.Tx) error {
 
 		pragma foreign_key_check;
 		pragma foreign_keys=on;
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m03_item_podcasturl(tx *sql.Tx) error {
+	sql := `
+		alter table items add column podcast_url text
 	`
 	_, err := tx.Exec(sql)
 	return err

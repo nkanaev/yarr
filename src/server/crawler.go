@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -237,6 +238,14 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 		if item.Author != nil {
 			author = item.Author.Name
 		}
+		podcastUrl := ""
+		if item.Enclosures != nil {
+			for _, enclosure := range item.Enclosures {
+				if strings.ToLower(enclosure.Type) == "audio/mpeg" {
+					podcastUrl = enclosure.URL
+				}
+			}
+		}
 		result[i] = storage.Item{
 			GUID:        item.GUID,
 			FeedId:      feed.Id,
@@ -249,6 +258,7 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 			DateUpdated: item.UpdatedParsed,
 			Status:      storage.UNREAD,
 			Image:       imageURL,
+			PodcastURL:  podcastUrl,
 		}
 	}
 	return result

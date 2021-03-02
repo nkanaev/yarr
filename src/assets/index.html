@@ -272,6 +272,7 @@
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
+                <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
                 <div v-html="itemSelectedContent"></div>
             </div>
         </div>

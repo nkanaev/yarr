@@ -55,6 +55,7 @@ type Item struct {
 	DateUpdated *time.Time `json:"date_updated"`
 	Status      ItemStatus `json:"status"`
 	Image       string     `json:"image"`
+	PodcastURL  string     `json:"podcast_url"`
 }
 
 type ItemFilter struct {
@@ -91,15 +92,15 @@ func (s *Storage) CreateItems(items []Item) bool {
 				guid, feed_id, title, link, description,
 				content, author,
 				date, date_updated, date_arrived,
-				status, image
+				status, image, podcast_url
 			)
-			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			on conflict (feed_id, guid) do update set
 			date_updated = ?, date_arrived = ?`,
 			item.GUID, item.FeedId, html.UnescapeString(item.Title), item.Link, item.Description,
 			item.Content, item.Author,
 			item.Date, item.DateUpdated, now,
-			UNREAD, item.Image,
+			UNREAD, item.Image, item.PodcastURL,
 			// upsert values
 			item.DateUpdated, now,
 		)
@@ -165,7 +166,7 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 	query := fmt.Sprintf(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.description,
-			i.content, i.author, i.date, i.date_updated, i.status, i.image
+			i.content, i.author, i.date, i.date_updated, i.status, i.image, i.podcast_url
 		from items i
 		join feeds f on f.id = i.feed_id
 		where %s
@@ -192,6 +193,7 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 			&x.DateUpdated,
 			&x.Status,
 			&x.Image,
+			&x.PodcastURL,
 		)
 		if err != nil {
 			s.log.Print(err)
