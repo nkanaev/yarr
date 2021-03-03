@@ -35,7 +35,9 @@ func Render(path string, writer io.Writer, data interface{}) {
 				return template.HTML(content)
 			},
 		}).ParseFS(FS, path))
-		FS.templates[path] = tmpl
+		if FS.embedded != nil {
+			FS.templates[path] = tmpl
+		}
 	}
 	tmpl.Execute(writer, data)
 }
