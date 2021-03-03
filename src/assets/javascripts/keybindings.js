@@ -1,46 +1,78 @@
+function scrollto(target, scroll) {
+  var padding = 10
+  var targetRect = target.getBoundingClientRect()
+  var scrollRect = scroll.getBoundingClientRect()
+
+  // target
+  var relativeOffset = targetRect.y - scrollRect.y
+  var absoluteOffset = relativeOffset + scroll.scrollTop
+
+  if (padding <= relativeOffset && relativeOffset + targetRect.height <= scrollRect.height - padding) return
+
+  var newPos = scroll.scrollTop
+  if (relativeOffset < padding) {
+    newPos = absoluteOffset - padding
+  } else {
+    newPos = absoluteOffset - scrollRect.height + targetRect.height + padding
+  }
+  scroll.scrollTop = Math.round(newPos)
+}
+
 const helperFunctions = {
   // navigation helper, navigate relative to selected item
   navigateToItem: function(relativePosition) {
-    if(vm.itemSelected == null){
-      if(vm.items.length !== 0) {
-        // if no item is selected, select first
-        vm.itemSelected = vm.items[0].id
-      }
+    if (vm.itemSelected == null) {
+      // if no item is selected, select first
+      if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
       return
     }
-    const itemPosition = vm.items.findIndex(x=>x.id==vm.itemSelected)
-    if(itemPosition == -1){
-      // Item not found error
+
+    var itemPosition = vm.items.findIndex(function(x) { return x.id === vm.itemSelected })
+    if (itemPosition === -1) {
+      if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
       return
     }
-    const newPosition = itemPosition+relativePosition
-    if(newPosition < 0 || newPosition >= vm.items.length){
-      return
-    }
+
+    var newPosition = itemPosition + relativePosition
+    if (newPosition < 0 || newPosition >= vm.items.length) return
+
     vm.itemSelected = vm.items[newPosition].id
+
+    vm.$nextTick(function() {
+      var scroll = document.querySelector('#item-list-scroll')
+
+      var handle = scroll.querySelector('input[type=radio]:checked')
+      var target = handle && handle.parentElement
+
+      if (target && scroll) scrollto(target, scroll)
+    })
   },
   // navigation helper, navigate relative to selected feed
   navigateToFeed: function(relativePosition) {
-    // create a list with feed and folders guids, ignore feeds in collapsed folders
-    // Example result with folder 2 collapsed:
-    // ['','folder:1','feed:1','feed:2','folder:2', 'folder:3','feed:3']
-    // The empty string is the "All Feeds" option
-    const navigationList = [''].concat(vm.foldersWithFeeds.map(
-      folder =>
-        folder.is_expanded
-        ? ['folder:'+folder.id].concat(folder.feeds.map(feed=>'feed:'+feed.id))
-        : 'folder:'+folder.id
-    ).flat())
-    const currentFeedPosition = navigationList.indexOf(vm.feedSelected)
-    if(currentFeedPosition== -1){
-      // feed not found error
+    var navigationList = Array.from(document.querySelectorAll('#col-feed-list input[name=feed]'))
+      .filter(function(r) { return r.offsetParent !== null && r.value !== 'folder:null' })
+      .map(function(r) { return r.value })
+
+    var currentFeedPosition = navigationList.indexOf(vm.feedSelected)
+
+    if (currentFeedPosition == -1) {
+      vm.feedSelected = ''
       return
     }
-    const newPosition = currentFeedPosition+relativePosition
-    if(newPosition < 0 || newPosition >= navigationList.length){
-      return
-    }
-    vm.feedSelected = navigationList[newPosition];
+
+    var newPosition = currentFeedPosition+relativePosition
+    if (newPosition < 0 || newPosition >= navigationList.length) return
+
+    vm.feedSelected = navigationList[newPosition]
+
+    vm.$nextTick(function() {
+      var scroll = document.querySelector('#feed-list-scroll')
+
+      var handle = scroll.querySelector('input[type=radio]:checked')
+      var target = handle && handle.parentElement
+
+      if (target && scroll) scrollto(target, scroll)
+    })
   }
 }
 const shortcutFunctions = {
@@ -91,14 +123,14 @@ const keybindings = {
   "r": shortcutFunctions.toggleItemRead,
   "R": shortcutFunctions.markAllRead,
   "s": shortcutFunctions.toggleItemStarred,
-  "?": shortcutFunctions.focusSearch,
+  "/": shortcutFunctions.focusSearch,
   "j": shortcutFunctions.nextItem,
   "k": shortcutFunctions.previousItem,
   "l": shortcutFunctions.nextFeed,
   "h": shortcutFunctions.previousFeed,
-  "A": shortcutFunctions.showAll,
-  "U": shortcutFunctions.showUnread,
-  "S": shortcutFunctions.showStarred,
+  "1": shortcutFunctions.showUnread,
+  "2": shortcutFunctions.showStarred,
+  "3": shortcutFunctions.showAll,
 }
 
 function isTextBox(element) {
