@@ -106,7 +106,7 @@
                     </b-dropdown-item-button>
                 </b-dropdown>
             </div>
-            <div class="p-2 overflow-auto border-top flex-grow-1">
+            <div id="feed-list-scroll" class="p-2 overflow-auto border-top flex-grow-1">
                 <label class="selectgroup">
                     <input type="radio" name="feed" value="" v-model="feedSelected">
                     <div class="selectgroup-label d-flex align-items-center w-100">
@@ -176,7 +176,7 @@
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
             </div>
-            <div class="p-2 overflow-auto border-top flex-grow-1" v-scroll="loadMoreItems" ref="itemlist">
+            <div id="item-list-scroll" class="p-2 overflow-auto border-top flex-grow-1" v-scroll="loadMoreItems" ref="itemlist">
                 <label v-for="item in items" :key="item.id"
                        class="selectgroup">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
@@ -385,59 +385,52 @@
                 </div>
             </div>
             <div v-else-if="settings=='shortcuts'">
-                <p class="cursor-default"><b>Keyboard shortuts (case-sensitive)</b></p>
+                <p class="cursor-default"><b>Keyboard Shortcuts</b></p>
 
                 <table class="table table-borderless table-sm table-compact m-0">
-                    <tr><td colspan=2>Show:</td></tr>
                     <tr>
-                        <td><kbd>1</kbd></td>
-                        <td>unread feeds</td>
+                        <td>
+                            <kbd>1</kbd> /
+                            <kbd>2</kbd> /
+                            <kbd>3</kbd>
+                        </td>
+                        <td>show unread / starred / all feeds</td>
                     </tr>
-                    <tr>
-                        <td><kbd>2</kbd></td>
-                        <td>starred feeds</td>
-                    </tr>
-                    <tr>
-                        <td><kbd>3</kbd></td>
-                        <td>all feeds</td>
-                    </tr>
-
-                    <tr><td colspan=2>Navigate:</td></tr>
-                    <tr>
-                        <td><kbd>j</kbd></td>
-                        <td>next article</td>
-                    </tr>
-                    <tr>
-                        <td><kbd>k</kbd></td>
-                        <td>previous article</td>
-                    </tr>
-                    <tr>
-                        <td><kbd>l</kbd></td>
-                        <td>next feed </td>
-                    </tr>
-                    <tr>
-                        <td><kbd>h</kbd></td>
-                        <td>previos feed</td>
-                    </tr>
-
-                    <tr><td colspan=2>Mark</td></tr>
-                    <tr>
-                        <td><kbd>R</kbd></td>
-                        <td>all articles as read</td>
-                    </tr>
-                    <tr>
-                        <td><kbd>r</kbd></td>
-                        <td>an article as read/unread</td>
-                    </tr>
-                    <tr>
-                        <td><kbd>s</kbd></td>
-                        <td>an article as starred/unstarred</td>
-                    </tr>
-
-                    <tr><td colspan=2>Misc</td></tr>
                     <tr>
                         <td><kbd>/</kbd></td>
                         <td>focus the search bar</td>
+                    </tr>
+
+                    <tr><td colspan=2>&nbsp;</td></tr>
+                    <tr>
+                        <td>
+                            <kbd>j</kbd>
+                            <kbd>k</kbd>
+                        </td>
+                        <td>next / prev article</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <kbd>l</kbd>
+                            <kbd>h</kbd>
+                        </td>
+                        <td>next / prev feed</td>
+                    </tr>
+
+                    <tr><td colspan=2>&nbsp;</td></tr>
+                    <tr>
+                        <td><kbd>R</kbd></td>
+                        <td>mark all articles as read</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <kbd>r</kbd>
+                        </td>
+                        <td>toggle an article as read / unread</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>s</kbd></td>
+                        <td>toggle an article as starred / unstarred</td>
                     </tr>
                 </table>
             </div>
