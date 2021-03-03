@@ -1,5 +1,6 @@
 # upcoming
 
+- (new) keyboard shortcuts
 - (new) podcasts
 - (fix) deleting feeds
 
