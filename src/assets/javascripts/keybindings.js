@@ -18,7 +18,7 @@ function scrollto(target, scroll) {
   scroll.scrollTop = Math.round(newPos)
 }
 
-const helperFunctions = {
+var helperFunctions = {
   // navigation helper, navigate relative to selected item
   navigateToItem: function(relativePosition) {
     if (vm.itemSelected == null) {
@@ -75,20 +75,20 @@ const helperFunctions = {
     })
   }
 }
-const shortcutFunctions = {
+var shortcutFunctions = {
   toggleItemRead: function() {
-    if(vm.itemSelected != null) {
+    if (vm.itemSelected != null) {
       vm.toggleItemRead(vm.itemSelectedDetails)
     }
   },
   markAllRead: function() {
     // same condition as 'Mark all read button'
-    if(vm.filterSelected == 'unread'){
+    if (vm.filterSelected == 'unread'){
       vm.markItemsRead()
     }
   },
   toggleItemStarred: function() {
-    if(vm.itemSelected != null) {
+    if (vm.itemSelected != null) {
       vm.toggleItemStarred(vm.itemSelectedDetails)
     }
   },
@@ -118,8 +118,8 @@ const shortcutFunctions = {
   },
 }
 
-// If you edit, make sure you update README.md and the help modal
-const keybindings = {
+// If you edit, make sure you update the help modal
+var keybindings = {
   "r": shortcutFunctions.toggleItemRead,
   "R": shortcutFunctions.markAllRead,
   "s": shortcutFunctions.toggleItemStarred,
@@ -136,22 +136,22 @@ const keybindings = {
 function isTextBox(element) {
   var tagName = element.tagName.toLowerCase()
   // Input elements that aren't text
-  const inputBlocklist = ['button','checkbox','color','file','hidden','image','radio','range','reset','search','submit']
+  var inputBlocklist = ['button','checkbox','color','file','hidden','image','radio','range','reset','search','submit']
 
   return tagName === 'textarea' ||
     ( tagName === 'input'
-      && !inputBlocklist.includes(element.getAttribute('type').toLowerCase())
+      && inputBlocklist.indexOf(element.getAttribute('type').toLowerCase()) == -1
     )
 }
 
 document.addEventListener('keydown',function(event) {
   // Ignore while focused on text or
   // when using modifier keys (to not clash with browser behaviour)
-  if(isTextBox(event.target) || event.metaKey || event.ctrlKey) {
+  if (isTextBox(event.target) || event.metaKey || event.ctrlKey) {
     return
   }
-  const keybindFunction = keybindings[event.key]
-  if(keybindFunction) {
+  var keybindFunction = keybindings[event.key]
+  if (keybindFunction) {
     event.preventDefault()
     keybindFunction()
   }
