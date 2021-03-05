@@ -1,7 +1,7 @@
 # yarr
 
 **yarr** (yet another rss reader) is a web-based feed aggregator which can be used both
-as a desktop application and a self-hosted server.
+as a desktop application and a personal self-hosted server.
 
 It is written in Go with the frontend in Vue.js. The storage is backed by SQLite.
 
@@ -33,14 +33,14 @@ but might only gently warn you about that, which you can safely ignore.
 ### linux
 
 The Linux version doesn't come with the desktop environment integration.
-For easy access you can manually create a desktop menu entry by
+For easy access on DE it is recommended to create a desktop menu entry by
 by following the steps below:
 
     unzip -x yarr*.zip
     sudo mv yarr /usr/local/bin/yarr
     sudo nano /usr/local/share/applications/yarr.desktop
 
-and paste the content:
+and pasting the content:
 
     [Desktop Entry]
     Name=yarr
@@ -48,6 +48,8 @@ and paste the content:
     Icon=rss
     Type=Application
     Categories=Internet;
+
+For self-hosting, see `yarr -h` for auth, tls & server configuration flags.
 
 ## build
 
