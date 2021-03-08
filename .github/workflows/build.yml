@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    tags: [v*]
+    tags: ['v*', 'test*']
 
 jobs:
   build_macos:
@@ -89,6 +89,7 @@ jobs:
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
+    if: !contains(github.ref, 'test')
     needs: [build_macos, build_windows, build_linux]
     steps:
     - name: Create Release
