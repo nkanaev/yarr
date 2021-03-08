@@ -1,5 +1,7 @@
 // +build windows
 
+package platform
+
 import (
 	"os"
 	"os/exec"
