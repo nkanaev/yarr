@@ -4,6 +4,7 @@
 
 body {
   font-size: 15px !important;
+  overscroll-behavior: none;
 }
 
 /* bootstrap customizations */
