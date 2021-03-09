@@ -1,0 +1,63 @@
+# goal
+
+The goal is to ship a (subjectively ergonomic) software for reading feeds.
+*yarr* is not designed/intended to be used as an archiving tool.
+
+The initial goal was to serve the author's needs:
+a desktop application accessible via web browser
+(because keeping 2 apps running, feed reader & browser, was annoying).
+
+# interface
+
+The UI aesthetics were inspired by the works of:
+
+- Antoine Plu
+  https://dribbble.com/antoineplu
+- Pawel Kuna
+  https://github.com/codecalm
+  https://github.com/tabler/tabler
+- Pawel Kadysz
+  https://dribbble.com/pawelkadysz
+- Palantir
+  https://github.com/palantir/blueprint
+- Yan Zhu
+  https://github.com/picturepan2/spectre
+
+The 3-column layout (feeds + items + read) & certain UI/navigation
+elements were based on & largely inspired by `Reeder 3`, `NetNewsWire` & `Feedbin`.
+
+Alternative layouts *might* be introduced in the future, but are not guaranteed.
+
+Ideas for 1-column layout:
+- stringer
+  https://github.com/swanson/stringer
+- headline
+  https://github.com/zserge/headline
+- miniflux
+  https://miniflux.app/
+
+Ideas for 2-column layout:
+- feedly
+  https://feedly.com/
+- vienna (classic `|-` shaped layout)
+  https://github.com/ViennaRSS/vienna-rss
+
+# frontend
+
+ES5 is preferred over ES6 until js transpilers (babeljs)
+become a thing of the past.
+
+The project won't introduce node/npm ecosystem,
+3rd party js code is directly included into the project.
+
+# backend
+
+The reasons for Go:
+- concurrency primitives
+- networking libraries
+- single binary compilation
+- availability of 3rd party libraries
+
+The reasons for SQLite:
+- lack of need for db setup (huge plus for desktop)
+- SQL is boring & practical
