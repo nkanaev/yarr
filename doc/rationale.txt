@@ -53,10 +53,9 @@ The project won't introduce node/npm ecosystem,
 # backend
 
 The reasons for Go:
-- concurrency primitives
-- networking libraries
 - single binary compilation
 - availability of 3rd party libraries
+- the author's excuse to learn go
 
 The reasons for SQLite:
 - lack of need for db setup (huge plus for desktop)
