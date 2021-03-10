@@ -55,7 +55,7 @@ type Item struct {
 	DateUpdated *time.Time `json:"date_updated"`
 	Status      ItemStatus `json:"status"`
 	Image       string     `json:"image"`
-	PodcastURL  string     `json:"podcast_url"`
+	PodcastURL  *string    `json:"podcast_url"`
 }
 
 type ItemFilter struct {

@@ -238,11 +238,11 @@ func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 		if item.Author != nil {
 			author = item.Author.Name
 		}
-		podcastUrl := ""
+		var podcastUrl *string
 		if item.Enclosures != nil {
 			for _, enclosure := range item.Enclosures {
 				if strings.ToLower(enclosure.Type) == "audio/mpeg" {
-					podcastUrl = enclosure.URL
+					podcastUrl = &enclosure.URL
 				}
 			}
 		}
