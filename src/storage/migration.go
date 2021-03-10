@@ -7,10 +7,10 @@ import (
 )
 
 var migrations = []func(*sql.Tx)error{
-	m00_initial,
-	m01_feed_states_and_errors,
-	m02_on_delete_actions,
-	m03_item_podcasturl,
+	m01_initial,
+	m02_feed_states_and_errors,
+	m03_on_delete_actions,
+	m04_item_podcasturl,
 }
 
 var maxVersion = int64(len(migrations))
@@ -23,10 +23,10 @@ func migrate(db *sql.DB, log *log.Logger) error {
 		return nil
 	}
 
-	log.Printf("db version is %d. migrating to %d", version, len(migrations))
+	log.Printf("db version is %d. migrating to %d", version, maxVersion)
 
-	for v := version; v < maxVersion; v++ {
-		migratefunc := migrations[v]
+	for v := version + 1; v <= maxVersion; v++ {
+		migratefunc := migrations[v - 1]
 		var tx *sql.Tx
 		var err error
 
@@ -40,7 +40,7 @@ func migrate(db *sql.DB, log *log.Logger) error {
 			tx.Rollback()
 			return err
 		}
-		if _, err = tx.Exec(fmt.Sprintf("pragma user_version = %d", v + 1)); err != nil {
+		if _, err = tx.Exec(fmt.Sprintf("pragma user_version = %d", v)); err != nil {
 			log.Printf("[migration:%d] failed to bump version", v)
 			tx.Rollback()
 			return err
@@ -54,7 +54,7 @@ func migrate(db *sql.DB, log *log.Logger) error {
 	return nil
 }
 
-func m00_initial(tx *sql.Tx) error {
+func m01_initial(tx *sql.Tx) error {
 	sql := `
 		create table if not exists folders (
 		 id             integer primary key autoincrement,
@@ -114,7 +114,7 @@ func m00_initial(tx *sql.Tx) error {
 	return err
 }
 
-func m01_feed_states_and_errors(tx *sql.Tx) error {
+func m02_feed_states_and_errors(tx *sql.Tx) error {
 	sql := `
 		create table if not exists http_states (
 		 feed_id        references feeds(id) unique,
@@ -134,7 +134,7 @@ func m01_feed_states_and_errors(tx *sql.Tx) error {
 	return err
 }
 
-func m02_on_delete_actions(tx *sql.Tx) error {
+func m03_on_delete_actions(tx *sql.Tx) error {
 	sql := `
 		-- 01. disable foreignkey constraint
 		pragma foreign_keys=off;
@@ -212,7 +212,7 @@ func m02_on_delete_actions(tx *sql.Tx) error {
 	return err
 }
 
-func m03_item_podcasturl(tx *sql.Tx) error {
+func m04_item_podcasturl(tx *sql.Tx) error {
 	sql := `
 		alter table items add column podcast_url text
 	`
