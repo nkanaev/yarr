@@ -33,4 +33,4 @@ build_windows:
 	go build -tags "sqlite_foreign_keys release windows" -ldflags="$(GO_LDFLAGS) -H windowsgui" -o _output/windows/yarr.exe src/main.go
 
 serve:
-	go run -tags "sqlite_foreign_keys" src/main.go
+	go run -tags "sqlite_foreign_keys" src/main.go -db local.db
