@@ -1,8 +1,9 @@
-# upcoming
+# v1.4 (2021-03-11)
 
 - (new) keyboard shortcuts (thanks to @Duarte-Dias)
-- (new) podcasts
+- (new) show podcast audio
 - (fix) deleting feeds
+- (etc) minor ui tweaks & changes
 
 # v1.3 (2021-02-18)
 
