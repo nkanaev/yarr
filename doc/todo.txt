@@ -1,4 +1,8 @@
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
+
 - ref: switch to the standard logger
-- ref: drop goquery, switch to cascadia
 - ref: organize "server" package using KonMari method
+
+- ref: drop goquery, switch to cascadia (or `x/net`)
+- ref: `getlantern/systray` has too many indirect deps, include+rewrite the code
+- ref: `mmcdole/gofeed` has too many indirect deps, drop it
