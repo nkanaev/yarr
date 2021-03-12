@@ -1,3 +1,7 @@
+- new: show image inside content
+- new: update the parser to use the first media content
+       if the primary content is missing (youtube feeds)
+
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
 
 - ref: switch to the standard logger
