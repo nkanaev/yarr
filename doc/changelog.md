@@ -1,3 +1,7 @@
+# upcoming
+
+- (fix) `-base` not serving static files (thanks to @vfaronov)
+
 # v1.4 (2021-03-11)
 
 - (new) keyboard shortcuts (thanks to @Duarte-Dias)
