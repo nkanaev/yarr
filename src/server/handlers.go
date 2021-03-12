@@ -14,9 +14,6 @@ import (
 	"strings"
 )
 
-// TODO: gzip?
-var StaticHandler = http.StripPrefix("/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP
-
 var routes []Route = []Route{
 	p("/", IndexHandler).ManualAuth(),
 	p("/static/*path", StaticHandler).ManualAuth(),
@@ -78,33 +75,10 @@ func IndexHandler(rw http.ResponseWriter, req *http.Request) {
 	assets.Render("index.html", rw, nil)
 }
 
-/*
 func StaticHandler(rw http.ResponseWriter, req *http.Request) {
-	http.StripPrefix("/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(rw, req)
-	ctype := mime.TypeByExtension(filepath.Ext(path))
-
-	if assets != nil {
-		if asset, ok := assets[path]; ok {
-			if req.Header.Get("if-none-match") == asset.etag {
-				rw.WriteHeader(http.StatusNotModified)
-				return
-			}
-			rw.Header().Set("Content-Type", ctype)
-			rw.Header().Set("Content-Encoding", "gzip")
-			rw.Header().Set("Etag", asset.etag)
-			rw.Write(*asset.gzip())
-		}
-	}
-
-	f, err := os.Open("assets/" + path)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-	rw.Header().Set("Content-Type", ctype)
-	io.Copy(rw, f)
+	// TODO: gzip?
+	http.StripPrefix(BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(rw, req)
 }
-*/
 
 func StatusHandler(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, map[string]interface{}{
