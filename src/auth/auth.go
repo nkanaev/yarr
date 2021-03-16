@@ -1,4 +1,4 @@
-package server
+package auth
 
 import (
 	"crypto/hmac"
@@ -10,23 +10,24 @@ import (
 	"time"
 )
 
-func userIsAuthenticated(req *http.Request, username, password string) bool {
+func IsAuthenticated(req *http.Request, username, password string) bool {
 	cookie, _ := req.Cookie("auth")
 	if cookie == nil {
 		return false
 	}
 	parts := strings.Split(cookie.Value, ":")
-	if len(parts) != 2 || !stringsEqual(parts[0], username) {
+	if len(parts) != 2 || !StringsEqual(parts[0], username) {
 		return false
 	}
-	return stringsEqual(parts[1], secret(username, password))
+	return StringsEqual(parts[1], secret(username, password))
 }
 
-func userAuthenticate(rw http.ResponseWriter, username, password string) {
+func Authenticate(rw http.ResponseWriter, username, password, basepath string) {
 	expires := time.Now().Add(time.Hour * 24 * 7) // 1 week
+
 	var cookiePath string
-	if BasePath != "" {
-		cookiePath = BasePath
+	if basepath != "" {
+		cookiePath = basepath
 	} else {
 		cookiePath = "/"
 	}
@@ -39,7 +40,7 @@ func userAuthenticate(rw http.ResponseWriter, username, password string) {
 	http.SetCookie(rw, &cookie)
 }
 
-func userLogout(rw http.ResponseWriter) {
+func Logout(rw http.ResponseWriter) {
 	cookie := http.Cookie{
 		Name:    "auth",
 		Value:   "",
@@ -48,7 +49,7 @@ func userLogout(rw http.ResponseWriter) {
 	http.SetCookie(rw, &cookie)
 }
 
-func stringsEqual(p1, p2 string) bool {
+func StringsEqual(p1, p2 string) bool {
 	return subtle.ConstantTimeCompare([]byte(p1), []byte(p2)) == 1
 }
 

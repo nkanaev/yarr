@@ -3,9 +3,10 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/assets"
+	"github.com/nkanaev/yarr/src/auth"
 	"github.com/nkanaev/yarr/src/router"
+	"github.com/nkanaev/yarr/src/storage"
 	"html"
 	"io/ioutil"
 	"log"
@@ -43,12 +44,12 @@ func (s *Server) handler() http.Handler {
 }
 
 func (s *Server) handleIndex(c *router.Context) {
-	if s.requiresAuth() && !userIsAuthenticated(c.Req, s.Username, s.Password) {
+	if s.requiresAuth() && !auth.IsAuthenticated(c.Req, s.Username, s.Password) {
 		if c.Req.Method == "POST" {
 			username := c.Req.FormValue("username")
 			password := c.Req.FormValue("password")
-			if stringsEqual(username, s.Username) && stringsEqual(password, s.Password) {
-				userAuthenticate(c.Out, username, password)
+			if auth.StringsEqual(username, s.Username) && auth.StringsEqual(password, s.Password) {
+				auth.Authenticate(c.Out, username, password, BasePath)
 				http.Redirect(c.Out, c.Req, c.Req.URL.Path, http.StatusFound)
 				return
 			}
@@ -433,6 +434,6 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 }
 
 func (s *Server) handleLogout(c *router.Context) {
-	userLogout(c.Out)
+	auth.Logout(c.Out)
 	c.Out.WriteHeader(http.StatusNoContent)
 }
