@@ -1,16 +1,16 @@
 package server
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"runtime"
-	"strings"
 	"sync/atomic"
 	"time"
 
 	"github.com/nkanaev/yarr/src/storage"
 )
+
+var BasePath string = ""
 
 type Server struct {
 	Addr        string
@@ -45,16 +45,16 @@ func (h *Server) GetAddr() string {
 	return proto + "://" + h.Addr + BasePath
 }
 
-func (h *Server) Start() {
-	h.startJobs()
+func (s *Server) Start() {
+	s.startJobs()
 
-	s := &http.Server{Addr: h.Addr, Handler: h}
+	httpserver := &http.Server{Addr: s.Addr, Handler: s.handler()}
 
 	var err error
-	if h.CertFile != "" && h.KeyFile != "" {
-		err = s.ListenAndServeTLS(h.CertFile, h.KeyFile)
+	if s.CertFile != "" && s.KeyFile != "" {
+		err = httpserver.ListenAndServeTLS(s.CertFile, s.KeyFile)
 	} else {
-		err = s.ListenAndServe()
+		err = httpserver.ListenAndServe()
 	}
 	if err != http.ErrServerClosed {
 		log.Fatal(err)
@@ -65,6 +65,7 @@ func unsafeMethod(method string) bool {
 	return method == "POST" || method == "PUT" || method == "DELETE"
 }
 
+/*
 func (h Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	reqPath := req.URL.Path
 	if BasePath != "" {
@@ -99,6 +100,7 @@ func (h Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, ctxVars, vars)
 	route.handler(rw, req.WithContext(ctx))
 }
+*/
 
 func (h *Server) startJobs() {
 	delTicker := time.NewTicker(time.Hour * 24)
@@ -200,26 +202,3 @@ func (h *Server) fetchFeed(feed storage.Feed) {
 	atomic.AddInt32(h.queueSize, 1)
 	h.feedQueue <- feed
 }
-
-func Vars(req *http.Request) map[string]string {
-	if rv := req.Context().Value(ctxVars); rv != nil {
-		return rv.(map[string]string)
-	}
-	return nil
-}
-
-func db(req *http.Request) *storage.Storage {
-	if h := handler(req); h != nil {
-		return h.db
-	}
-	return nil
-}
-
-func handler(req *http.Request) *Server {
-	return req.Context().Value(ctxHandler).(*Server)
-}
-
-const (
-	ctxVars    = 2
-	ctxHandler = 3
-)

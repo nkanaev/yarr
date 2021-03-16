@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/assets"
+	"github.com/nkanaev/yarr/src/router"
 	"html"
 	"io/ioutil"
 	"log"
@@ -15,272 +16,257 @@ import (
 	"strings"
 )
 
-var routes []Route = []Route{
-	p("/", IndexHandler).ManualAuth(),
-	p("/static/*path", StaticHandler).ManualAuth(),
+func (s *Server) handler() http.Handler {
+	r := router.NewRouter()
 
-	p("/api/status", StatusHandler),
-	p("/api/folders", FolderListHandler),
-	p("/api/folders/:id", FolderHandler),
-	p("/api/feeds", FeedListHandler),
-	p("/api/feeds/find", FeedHandler),
-	p("/api/feeds/refresh", FeedRefreshHandler),
-	p("/api/feeds/errors", FeedErrorsHandler),
-	p("/api/feeds/:id/icon", FeedIconHandler),
-	p("/api/feeds/:id", FeedHandler),
-	p("/api/items", ItemListHandler),
-	p("/api/items/:id", ItemHandler),
-	p("/api/settings", SettingsHandler),
-	p("/opml/import", OPMLImportHandler),
-	p("/opml/export", OPMLExportHandler),
-	p("/page", PageCrawlHandler),
-	p("/logout", LogoutHandler),
+	// TODO: auth, base, security
+
+	r.For("/", s.handleIndex)
+	r.For("/static/*path", s.handleStatic)
+	r.For("/api/status", s.handleStatus)
+	r.For("/api/folders", s.handleFolderList)
+	r.For("/api/folders/:id", s.handleFolder)
+	r.For("/api/feeds", s.handleFeedList)
+	r.For("/api/feeds/refresh", s.handleFeedRefresh)
+	r.For("/api/feeds/errors", s.handleFeedErrors)
+	r.For("/api/feeds/:id/icon", s.handleFeedIcon)
+	r.For("/api/feeds/:id", s.handleFeed)
+	r.For("/api/items", s.handleItemList)
+	r.For("/api/items/:id", s.handleItem)
+	r.For("/api/settings", s.handleSettings)
+	r.For("/opml/import", s.handleOPMLImport)
+	r.For("/opml/export", s.handleOPMLExport)
+	r.For("/page", s.handlePageCrawl)
+	r.For("/logout", s.handleLogout)
+
+	return r
 }
 
-type FolderCreateForm struct {
-	Title string `json:"title"`
-}
-
-type FolderUpdateForm struct {
-	Title      *string `json:"title,omitempty"`
-	IsExpanded *bool   `json:"is_expanded,omitempty"`
-}
-
-type FeedCreateForm struct {
-	Url      string `json:"url"`
-	FolderID *int64 `json:"folder_id,omitempty"`
-}
-
-type ItemUpdateForm struct {
-	Status *storage.ItemStatus `json:"status,omitempty"`
-}
-
-func IndexHandler(rw http.ResponseWriter, req *http.Request) {
-	h := handler(req)
-	if h.requiresAuth() && !userIsAuthenticated(req, h.Username, h.Password) {
-		if req.Method == "POST" {
-			username := req.FormValue("username")
-			password := req.FormValue("password")
-			if stringsEqual(username, h.Username) && stringsEqual(password, h.Password) {
-				userAuthenticate(rw, username, password)
-				http.Redirect(rw, req, req.URL.Path, http.StatusFound)
+func (s *Server) handleIndex(c *router.Context) {
+	if s.requiresAuth() && !userIsAuthenticated(c.Req, s.Username, s.Password) {
+		if c.Req.Method == "POST" {
+			username := c.Req.FormValue("username")
+			password := c.Req.FormValue("password")
+			if stringsEqual(username, s.Username) && stringsEqual(password, s.Password) {
+				userAuthenticate(c.Out, username, password)
+				http.Redirect(c.Out, c.Req, c.Req.URL.Path, http.StatusFound)
 				return
 			}
 		}
 
-		rw.Header().Set("Content-Type", "text/html")
-		assets.Render("login.html", rw, nil)
+		c.Out.Header().Set("Content-Type", "text/html")
+		assets.Render("login.html", c.Out, nil)
 		return
 	}
-	rw.Header().Set("Content-Type", "text/html")
-	assets.Render("index.html", rw, nil)
+	c.Out.Header().Set("Content-Type", "text/html")
+	assets.Render("index.html", c.Out, nil)
 }
 
-func StaticHandler(rw http.ResponseWriter, req *http.Request) {
+func (s *Server) handleStatic(c *router.Context) {
 	// TODO: gzip?
-	http.StripPrefix(BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(rw, req)
+	http.StripPrefix(BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(c.Out, c.Req)
 }
 
-func StatusHandler(rw http.ResponseWriter, req *http.Request) {
-	writeJSON(rw, map[string]interface{}{
-		"running": *handler(req).queueSize,
-		"stats":   db(req).FeedStats(),
+func (s *Server) handleStatus(c *router.Context) {
+	writeJSON(c.Out, map[string]interface{}{
+		"running": *s.queueSize,
+		"stats":   s.db.FeedStats(),
 	})
 }
 
-func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		list := db(req).ListFolders()
-		writeJSON(rw, list)
-	} else if req.Method == "POST" {
+func (s *Server) handleFolderList(c *router.Context) {
+	if c.Req.Method == "GET" {
+		list := s.db.ListFolders()
+		writeJSON(c.Out, list)
+	} else if c.Req.Method == "POST" {
 		var body FolderCreateForm
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+		if err := json.NewDecoder(c.Req.Body).Decode(&body); err != nil {
 			log.Print(err)
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		if len(body.Title) == 0 {
-			rw.WriteHeader(http.StatusBadRequest)
-			writeJSON(rw, map[string]string{"error": "Folder title missing."})
+			c.Out.WriteHeader(http.StatusBadRequest)
+			writeJSON(c.Out, map[string]string{"error": "Folder title missing."})
 			return
 		}
-		folder := db(req).CreateFolder(body.Title)
-		rw.WriteHeader(http.StatusCreated)
-		writeJSON(rw, folder)
+		folder := s.db.CreateFolder(body.Title)
+		c.Out.WriteHeader(http.StatusCreated)
+		writeJSON(c.Out, folder)
 	} else {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-func FolderHandler(rw http.ResponseWriter, req *http.Request) {
-	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+func (s *Server) handleFolder(c *router.Context) {
+	id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
 	if err != nil {
-		rw.WriteHeader(http.StatusBadRequest)
+		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if req.Method == "PUT" {
+	if c.Req.Method == "PUT" {
 		var body FolderUpdateForm
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+		if err := json.NewDecoder(c.Req.Body).Decode(&body); err != nil {
 			log.Print(err)
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		if body.Title != nil {
-			db(req).RenameFolder(id, *body.Title)
+			s.db.RenameFolder(id, *body.Title)
 		}
 		if body.IsExpanded != nil {
-			db(req).ToggleFolderExpanded(id, *body.IsExpanded)
+			s.db.ToggleFolderExpanded(id, *body.IsExpanded)
 		}
-		rw.WriteHeader(http.StatusOK)
-	} else if req.Method == "DELETE" {
-		db(req).DeleteFolder(id)
-		rw.WriteHeader(http.StatusNoContent)
+		c.Out.WriteHeader(http.StatusOK)
+	} else if c.Req.Method == "DELETE" {
+		s.db.DeleteFolder(id)
+		c.Out.WriteHeader(http.StatusNoContent)
 	}
 }
 
-func FeedRefreshHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
-		handler(req).fetchAllFeeds()
-		rw.WriteHeader(http.StatusOK)
+func (s *Server) handleFeedRefresh(c *router.Context) {
+	if c.Req.Method == "POST" {
+		s.fetchAllFeeds()
+		c.Out.WriteHeader(http.StatusOK)
 	} else {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-func FeedErrorsHandler(rw http.ResponseWriter, req *http.Request) {
-	errors := db(req).GetFeedErrors()
-	writeJSON(rw, errors)
+func (s *Server) handleFeedErrors(c *router.Context) {
+	errors := s.db.GetFeedErrors()
+	writeJSON(c.Out, errors)
 }
 
-func FeedIconHandler(rw http.ResponseWriter, req *http.Request) {
-	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+func (s *Server) handleFeedIcon(c *router.Context) {
+	id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
 	if err != nil {
-		rw.WriteHeader(http.StatusBadRequest)
+		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	feed := db(req).GetFeed(id)
+	feed := s.db.GetFeed(id)
 	if feed != nil && feed.Icon != nil {
-		rw.Header().Set("Content-Type", http.DetectContentType(*feed.Icon))
-		rw.Header().Set("Content-Length", strconv.Itoa(len(*feed.Icon)))
-		rw.Write(*feed.Icon)
+		c.Out.Header().Set("Content-Type", http.DetectContentType(*feed.Icon))
+		c.Out.Header().Set("Content-Length", strconv.Itoa(len(*feed.Icon)))
+		c.Out.Write(*feed.Icon)
 	} else {
-		rw.WriteHeader(http.StatusNotFound)
+		c.Out.WriteHeader(http.StatusNotFound)
 	}
 }
 
-func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		list := db(req).ListFeeds()
-		writeJSON(rw, list)
-	} else if req.Method == "POST" {
+func (s *Server) handleFeedList(c *router.Context) {
+	if c.Req.Method == "GET" {
+		list := s.db.ListFeeds()
+		writeJSON(c.Out, list)
+	} else if c.Req.Method == "POST" {
 		var form FeedCreateForm
-		if err := json.NewDecoder(req.Body).Decode(&form); err != nil {
+		if err := json.NewDecoder(c.Req.Body).Decode(&form); err != nil {
 			log.Print(err)
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		feed, sources, err := discoverFeed(form.Url)
 		if err != nil {
 			log.Print(err)
-			writeJSON(rw, map[string]string{"status": "notfound"})
+			writeJSON(c.Out, map[string]string{"status": "notfound"})
 			return
 		}
 
 		if feed != nil {
-			storedFeed := db(req).CreateFeed(
+			storedFeed := s.db.CreateFeed(
 				feed.Title,
 				feed.Description,
 				feed.Link,
 				feed.FeedLink,
 				form.FolderID,
 			)
-			db(req).CreateItems(convertItems(feed.Items, *storedFeed))
+			s.db.CreateItems(convertItems(feed.Items, *storedFeed))
 
 			icon, err := findFavicon(storedFeed.Link, storedFeed.FeedLink)
 			if icon != nil {
-				db(req).UpdateFeedIcon(storedFeed.Id, icon)
+				s.db.UpdateFeedIcon(storedFeed.Id, icon)
 			}
 			if err != nil {
 				log.Printf("Failed to find favicon for %s (%d): %s", storedFeed.FeedLink, storedFeed.Id, err)
 			}
 
-			writeJSON(rw, map[string]string{"status": "success"})
+			writeJSON(c.Out, map[string]string{"status": "success"})
 		} else if sources != nil {
-			writeJSON(rw, map[string]interface{}{"status": "multiple", "choice": sources})
+			writeJSON(c.Out, map[string]interface{}{"status": "multiple", "choice": sources})
 		} else {
-			writeJSON(rw, map[string]string{"status": "notfound"})
+			writeJSON(c.Out, map[string]string{"status": "notfound"})
 		}
 	}
 }
 
-func FeedHandler(rw http.ResponseWriter, req *http.Request) {
-	id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+func (s *Server) handleFeed(c *router.Context) {
+	id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
 	if err != nil {
-		rw.WriteHeader(http.StatusBadRequest)
+		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if req.Method == "PUT" {
-		feed := db(req).GetFeed(id)
+	if c.Req.Method == "PUT" {
+		feed := s.db.GetFeed(id)
 		if feed == nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		body := make(map[string]interface{})
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+		if err := json.NewDecoder(c.Req.Body).Decode(&body); err != nil {
 			log.Print(err)
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		if title, ok := body["title"]; ok {
 			if reflect.TypeOf(title).Kind() == reflect.String {
-				db(req).RenameFeed(id, title.(string))
+				s.db.RenameFeed(id, title.(string))
 			}
 		}
 		if f_id, ok := body["folder_id"]; ok {
 			if f_id == nil {
-				db(req).UpdateFeedFolder(id, nil)
+				s.db.UpdateFeedFolder(id, nil)
 			} else if reflect.TypeOf(f_id).Kind() == reflect.Float64 {
 				folderId := int64(f_id.(float64))
-				db(req).UpdateFeedFolder(id, &folderId)
+				s.db.UpdateFeedFolder(id, &folderId)
 			}
 		}
-		rw.WriteHeader(http.StatusOK)
-	} else if req.Method == "DELETE" {
-		db(req).DeleteFeed(id)
-		rw.WriteHeader(http.StatusNoContent)
+		c.Out.WriteHeader(http.StatusOK)
+	} else if c.Req.Method == "DELETE" {
+		s.db.DeleteFeed(id)
+		c.Out.WriteHeader(http.StatusNoContent)
 	} else {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-func ItemHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "PUT" {
-		id, err := strconv.ParseInt(Vars(req)["id"], 10, 64)
+func (s *Server) handleItem(c *router.Context) {
+	if c.Req.Method == "PUT" {
+		id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
 		if err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		var body ItemUpdateForm
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+		if err := json.NewDecoder(c.Req.Body).Decode(&body); err != nil {
 			log.Print(err)
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		if body.Status != nil {
-			db(req).UpdateItemStatus(id, *body.Status)
+			s.db.UpdateItemStatus(id, *body.Status)
 		}
-		rw.WriteHeader(http.StatusOK)
+		c.Out.WriteHeader(http.StatusOK)
 	} else {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
+func (s *Server) handleItemList(c *router.Context) {
+	if c.Req.Method == "GET" {
 		perPage := 20
 		curPage := 1
-		query := req.URL.Query()
+		query := c.Req.URL.Query()
 		if page, err := strconv.ParseInt(query.Get("page"), 10, 64); err == nil {
 			curPage = int(page)
 		}
@@ -299,17 +285,17 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 			filter.Search = &search
 		}
 		newestFirst := query.Get("oldest_first") != "true"
-		items := db(req).ListItems(filter, (curPage-1)*perPage, perPage, newestFirst)
-		count := db(req).CountItems(filter)
-		writeJSON(rw, map[string]interface{}{
+		items := s.db.ListItems(filter, (curPage-1)*perPage, perPage, newestFirst)
+		count := s.db.CountItems(filter)
+		writeJSON(c.Out, map[string]interface{}{
 			"page": map[string]int{
 				"cur": curPage,
 				"num": int(math.Ceil(float64(count) / float64(perPage))),
 			},
 			"list": items,
 		})
-	} else if req.Method == "PUT" {
-		query := req.URL.Query()
+	} else if c.Req.Method == "PUT" {
+		query := c.Req.URL.Query()
 		filter := storage.MarkFilter{}
 		if folderID, err := strconv.ParseInt(query.Get("folder_id"), 10, 64); err == nil {
 			filter.FolderID = &folderID
@@ -317,36 +303,36 @@ func ItemListHandler(rw http.ResponseWriter, req *http.Request) {
 		if feedID, err := strconv.ParseInt(query.Get("feed_id"), 10, 64); err == nil {
 			filter.FeedID = &feedID
 		}
-		db(req).MarkItemsRead(filter)
-		rw.WriteHeader(http.StatusOK)
+		s.db.MarkItemsRead(filter)
+		c.Out.WriteHeader(http.StatusOK)
 	} else {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-func SettingsHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		writeJSON(rw, db(req).GetSettings())
-	} else if req.Method == "PUT" {
+func (s *Server) handleSettings(c *router.Context) {
+	if c.Req.Method == "GET" {
+		writeJSON(c.Out, s.db.GetSettings())
+	} else if c.Req.Method == "PUT" {
 		settings := make(map[string]interface{})
-		if err := json.NewDecoder(req.Body).Decode(&settings); err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
+		if err := json.NewDecoder(c.Req.Body).Decode(&settings); err != nil {
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if db(req).UpdateSettings(settings) {
+		if s.db.UpdateSettings(settings) {
 			if _, ok := settings["refresh_rate"]; ok {
-				handler(req).refreshRate <- db(req).GetSettingsValueInt64("refresh_rate")
+				s.refreshRate <- s.db.GetSettingsValueInt64("refresh_rate")
 			}
-			rw.WriteHeader(http.StatusOK)
+			c.Out.WriteHeader(http.StatusOK)
 		} else {
-			rw.WriteHeader(http.StatusBadRequest)
+			c.Out.WriteHeader(http.StatusBadRequest)
 		}
 	}
 }
 
-func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
-		file, _, err := req.FormFile("opml")
+func (s *Server) handleOPMLImport(c *router.Context) {
+	if c.Req.Method == "POST" {
+		file, _, err := c.Req.FormFile("opml")
 		if err != nil {
 			log.Print(err)
 			return
@@ -358,25 +344,25 @@ func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		for _, outline := range doc.Outlines {
 			if outline.Type == "rss" {
-				db(req).CreateFeed(outline.Title, outline.Description, outline.SiteURL, outline.FeedURL, nil)
+				s.db.CreateFeed(outline.Title, outline.Description, outline.SiteURL, outline.FeedURL, nil)
 			} else {
-				folder := db(req).CreateFolder(outline.Title)
+				folder := s.db.CreateFolder(outline.Title)
 				for _, o := range outline.AllFeeds() {
-					db(req).CreateFeed(o.Title, o.Description, o.SiteURL, o.FeedURL, &folder.Id)
+					s.db.CreateFeed(o.Title, o.Description, o.SiteURL, o.FeedURL, &folder.Id)
 				}
 			}
 		}
-		handler(req).fetchAllFeeds()
-		rw.WriteHeader(http.StatusOK)
+		s.fetchAllFeeds()
+		c.Out.WriteHeader(http.StatusOK)
 	} else {
-		rw.WriteHeader(http.StatusMethodNotAllowed)
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		rw.Header().Set("Content-Type", "application/xml; charset=utf-8")
-		rw.Header().Set("Content-Disposition", `attachment; filename="subscriptions.opml"`)
+func (s *Server) handleOPMLExport(c *router.Context) {
+	if c.Req.Method == "GET" {
+		c.Out.Header().Set("Content-Type", "application/xml; charset=utf-8")
+		c.Out.Header().Set("Content-Disposition", `attachment; filename="subscriptions.opml"`)
 
 		builder := strings.Builder{}
 
@@ -407,7 +393,7 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 		line(`</head>`)
 		line(`<body>`)
 		feedsByFolderID := make(map[int64][]storage.Feed)
-		for _, feed := range db(req).ListFeeds() {
+		for _, feed := range s.db.ListFeeds() {
 			var folderId = int64(0)
 			if feed.FolderId != nil {
 				folderId = *feed.FolderId
@@ -417,7 +403,7 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 			}
 			feedsByFolderID[folderId] = append(feedsByFolderID[folderId], feed)
 		}
-		for _, folder := range db(req).ListFolders() {
+		for _, folder := range s.db.ListFolders() {
 			line(`  <outline text="%s">`, folder.Title)
 			for _, feed := range feedsByFolderID[folder.Id] {
 				feedline(feed, 4)
@@ -429,24 +415,24 @@ func OPMLExportHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		line(`</body>`)
 		line(`</opml>`)
-		rw.Write([]byte(builder.String()))
+		c.Out.Write([]byte(builder.String()))
 	}
 }
 
-func PageCrawlHandler(rw http.ResponseWriter, req *http.Request) {
-	query := req.URL.Query()
+func (s *Server) handlePageCrawl(c *router.Context) {
+	query := c.Req.URL.Query()
 	if url := query.Get("url"); len(url) > 0 {
 		res, err := http.Get(url)
 		if err == nil {
 			body, err := ioutil.ReadAll(res.Body)
 			if err == nil {
-				rw.Write(body)
+				c.Out.Write(body)
 			}
 		}
 	}
 }
 
-func LogoutHandler(rw http.ResponseWriter, req *http.Request) {
-	userLogout(rw)
-	rw.WriteHeader(http.StatusNoContent)
+func (s *Server) handleLogout(c *router.Context) {
+	userLogout(c.Out)
+	c.Out.WriteHeader(http.StatusNoContent)
 }
