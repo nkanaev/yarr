@@ -73,6 +73,15 @@ var helperFunctions = {
 
       if (target && scroll) scrollto(target, scroll)
     })
+  },
+  scrollContent: function(direction) {
+    var padding = 40
+    var scroll = document.querySelector('.content')
+    if (!scroll) return
+
+    var height = scroll.getBoundingClientRect().height
+
+    scroll.scrollTop += (height - padding) * direction
   }
 }
 var shortcutFunctions = {
@@ -112,6 +121,12 @@ var shortcutFunctions = {
   previousFeed() {
     helperFunctions.navigateToFeed(-1)
   },
+  scrollForward: function() {
+    helperFunctions.scrollContent(+1)
+  },
+  scrollBackward: function() {
+    helperFunctions.scrollContent(-1)
+  },
   showAll() {
     vm.filterSelected = ''
   },
@@ -134,6 +149,8 @@ var keybindings = {
   "k": shortcutFunctions.previousItem,
   "l": shortcutFunctions.nextFeed,
   "h": shortcutFunctions.previousFeed,
+  "f": shortcutFunctions.scrollForward,
+  "b": shortcutFunctions.scrollBackward,
   "1": shortcutFunctions.showUnread,
   "2": shortcutFunctions.showStarred,
   "3": shortcutFunctions.showAll,
