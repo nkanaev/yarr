@@ -2,19 +2,17 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/auth"
 	"github.com/nkanaev/yarr/src/router"
 	"github.com/nkanaev/yarr/src/storage"
-	"html"
+	"github.com/nkanaev/yarr/src/opml"
 	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
 	"reflect"
 	"strconv"
-	"strings"
 )
 
 func (s *Server) handler() http.Handler {
@@ -338,7 +336,7 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 			log.Print(err)
 			return
 		}
-		doc, err := parseOPML(file)
+		doc, err := opml.Parse(file)
 		if err != nil {
 			log.Print(err)
 			return
@@ -365,57 +363,36 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 		c.Out.Header().Set("Content-Type", "application/xml; charset=utf-8")
 		c.Out.Header().Set("Content-Disposition", `attachment; filename="subscriptions.opml"`)
 
-		builder := strings.Builder{}
-
-		line := func(s string, args ...string) {
-			if len(args) > 0 {
-				escapedargs := make([]interface{}, len(args))
-				for idx, arg := range args {
-					escapedargs[idx] = html.EscapeString(arg)
-				}
-				s = fmt.Sprintf(s, escapedargs...)
-			}
-			builder.WriteString(s)
-			builder.WriteString("\n")
-		}
-
-		feedline := func(feed storage.Feed, indent int) {
-			line(
-				strings.Repeat(" ", indent)+
-					`<outline type="rss" text="%s" description="%s" xmlUrl="%s" htmlUrl="%s"/>`,
-				feed.Title, feed.Description,
-				feed.FeedLink, feed.Link,
-			)
-		}
-		line(`<?xml version="1.0" encoding="UTF-8"?>`)
-		line(`<opml version="1.1">`)
-		line(`<head>`)
-		line(`  <title>subscriptions.opml</title>`)
-		line(`</head>`)
-		line(`<body>`)
-		feedsByFolderID := make(map[int64][]storage.Feed)
+		rootFeeds := make([]*storage.Feed, 0)
+		feedsByFolderID := make(map[int64][]*storage.Feed)
 		for _, feed := range s.db.ListFeeds() {
-			var folderId = int64(0)
-			if feed.FolderId != nil {
-				folderId = *feed.FolderId
+			feed := feed
+			if feed.FolderId == nil {
+				rootFeeds = append(rootFeeds, &feed)
+			} else {
+				id := *feed.FolderId
+				if feedsByFolderID[id] == nil {
+					feedsByFolderID[id] = make([]*storage.Feed, 0)
+				}
+				feedsByFolderID[id] = append(feedsByFolderID[id], &feed)
 			}
-			if feedsByFolderID[folderId] == nil {
-				feedsByFolderID[folderId] = make([]storage.Feed, 0)
-			}
-			feedsByFolderID[folderId] = append(feedsByFolderID[folderId], feed)
+		}
+		builder := opml.NewBuilder()
+		
+		for _, feed := range rootFeeds {
+			builder.AddFeed(feed.Title, feed.Description, feed.FeedLink, feed.Link)
 		}
 		for _, folder := range s.db.ListFolders() {
-			line(`  <outline text="%s">`, folder.Title)
-			for _, feed := range feedsByFolderID[folder.Id] {
-				feedline(feed, 4)
+			folderFeeds := feedsByFolderID[folder.Id]
+			if len(folderFeeds) == 0 {
+				continue
 			}
-			line(`  </outline>`)
+			feedFolder := builder.AddFolder(folder.Title)
+			for _, feed := range folderFeeds {
+				feedFolder.AddFeed(feed.Title, feed.Description, feed.FeedLink, feed.Link)
+			}
 		}
-		for _, feed := range feedsByFolderID[0] {
-			feedline(feed, 2)
-		}
-		line(`</body>`)
-		line(`</opml>`)
+
 		c.Out.Write([]byte(builder.String()))
 	}
 }
