@@ -15,7 +15,7 @@ var migrations = []func(*sql.Tx)error{
 
 var maxVersion = int64(len(migrations))
 
-func migrate(db *sql.DB, log *log.Logger) error {
+func migrate(db *sql.DB) error {
 	var version int64
 	db.QueryRow("pragma user_version").Scan(&version);
 

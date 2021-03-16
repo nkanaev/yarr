@@ -18,6 +18,9 @@ var Version string = "0.0"
 var GitHash string = "unknown"
 
 func main() {
+	log.SetOutput(os.Stdout)
+	log.SetFlags(log.Ldate|log.Ltime|log.Lshortfile)
+
 	var addr, db, authfile, certfile, keyfile string
 	var ver, open bool
 	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
@@ -43,28 +46,26 @@ func main() {
 		server.BasePath = strings.TrimSuffix(server.BasePath, "/")
 	}
 
-	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
-
 	configPath, err := os.UserConfigDir()
 	if err != nil {
-		logger.Fatal("Failed to get config dir: ", err)
+		log.Fatal("Failed to get config dir: ", err)
 	}
 
 	if db == "" {
 		storagePath := filepath.Join(configPath, "yarr")
 		if err := os.MkdirAll(storagePath, 0755); err != nil {
-			logger.Fatal("Failed to create app config dir: ", err)
+			log.Fatal("Failed to create app config dir: ", err)
 		}
 		db = filepath.Join(storagePath, "storage.db")
 	}
 
-	logger.Printf("using db file %s", db)
+	log.Printf("using db file %s", db)
 
 	var username, password string
 	if authfile != "" {
 		f, err := os.Open(authfile)
 		if err != nil {
-			logger.Fatal("Failed to open auth file: ", err)
+			log.Fatal("Failed to open auth file: ", err)
 		}
 		defer f.Close()
 		scanner := bufio.NewScanner(f)
@@ -72,7 +73,7 @@ func main() {
 			line := scanner.Text()
 			parts := strings.Split(line, ":")
 			if len(parts) != 2 {
-				logger.Fatalf("Invalid auth: %v (expected `username:password`)", line)
+				log.Fatalf("Invalid auth: %v (expected `username:password`)", line)
 			}
 			username = parts[0]
 			password = parts[1]
@@ -81,15 +82,15 @@ func main() {
 	}
 
 	if (certfile != "" || keyfile != "") && (certfile == "" || keyfile == "") {
-		logger.Fatalf("Both cert & key files are required")
+		log.Fatalf("Both cert & key files are required")
 	}
 
-	store, err := storage.New(db, logger)
+	store, err := storage.New(db)
 	if err != nil {
-		logger.Fatal("Failed to initialise database: ", err)
+		log.Fatal("Failed to initialise database: ", err)
 	}
 
-	srv := server.New(store, logger, addr)
+	srv := server.New(store, addr)
 
 	if certfile != "" && keyfile != "" {
 		srv.CertFile = certfile
@@ -101,7 +102,7 @@ func main() {
 		srv.Password = password
 	}
 
-	logger.Printf("starting server at %s", srv.GetAddr())
+	log.Printf("starting server at %s", srv.GetAddr())
 	if open {
 		platform.Open(srv.GetAddr())
 	}

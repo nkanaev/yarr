@@ -7,6 +7,7 @@ import (
 	"github.com/nkanaev/yarr/src/assets"
 	"html"
 	"io/ioutil"
+	"log"
 	"math"
 	"net/http"
 	"reflect"
@@ -94,7 +95,7 @@ func FolderListHandler(rw http.ResponseWriter, req *http.Request) {
 	} else if req.Method == "POST" {
 		var body FolderCreateForm
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -120,7 +121,7 @@ func FolderHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "PUT" {
 		var body FolderUpdateForm
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -174,14 +175,14 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 	} else if req.Method == "POST" {
 		var form FeedCreateForm
 		if err := json.NewDecoder(req.Body).Decode(&form); err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		feed, sources, err := discoverFeed(form.Url)
 		if err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			writeJSON(rw, map[string]string{"status": "notfound"})
 			return
 		}
@@ -201,7 +202,7 @@ func FeedListHandler(rw http.ResponseWriter, req *http.Request) {
 				db(req).UpdateFeedIcon(storedFeed.Id, icon)
 			}
 			if err != nil {
-				handler(req).log.Printf("Failed to find favicon for %s (%d): %s", storedFeed.FeedLink, storedFeed.Id, err)
+				log.Printf("Failed to find favicon for %s (%d): %s", storedFeed.FeedLink, storedFeed.Id, err)
 			}
 
 			writeJSON(rw, map[string]string{"status": "success"})
@@ -227,7 +228,7 @@ func FeedHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		body := make(map[string]interface{})
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -262,7 +263,7 @@ func ItemHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 		var body ItemUpdateForm
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			rw.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -347,12 +348,12 @@ func OPMLImportHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		file, _, err := req.FormFile("opml")
 		if err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			return
 		}
 		doc, err := parseOPML(file)
 		if err != nil {
-			handler(req).log.Print(err)
+			log.Print(err)
 			return
 		}
 		for _, outline := range doc.Outlines {

@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"log"
 	"time"
 )
 
@@ -16,7 +17,7 @@ func (s *Storage) ListHTTPStates() map[int64]HTTPState {
 	result := make(map[int64]HTTPState)	
 	rows, err := s.db.Query(`select feed_id, last_refreshed, last_modified, etag from http_states`)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return result
 	}
 	for rows.Next() {
@@ -28,7 +29,7 @@ func (s *Storage) ListHTTPStates() map[int64]HTTPState {
 			&state.Etag,
 		)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return result
 		}
 		result[state.FeedID] = state
@@ -67,6 +68,6 @@ func (s *Storage) SetHTTPState(feedID int64, lastModified, etag string) {
 		lastModified, etag,
 	)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 	}
 }

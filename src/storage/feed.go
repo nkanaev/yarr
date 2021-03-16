@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"log"
 	"html"
 	"net/url"
 )
@@ -60,7 +61,7 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 func (s *Storage) DeleteFeed(feedId int64) bool {
 	_, err := s.db.Exec(`delete from feeds where id = ?`, feedId)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 	}
 	return err == nil
 }
@@ -89,7 +90,7 @@ func (s *Storage) ListFeeds() []Feed {
 		order by title collate nocase
 	`)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return result
 	}
 	for rows.Next() {
@@ -104,7 +105,7 @@ func (s *Storage) ListFeeds() []Feed {
 			&f.HasIcon,
 		)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return result
 		}
 		result = append(result, f)
@@ -137,7 +138,7 @@ func (s *Storage) GetFeed(id int64) *Feed {
 
 func (s *Storage) ResetFeedErrors() {
 	if _, err := s.db.Exec(`delete from feed_errors`); err != nil {
-		s.log.Print(err)
+		log.Print(err)
 	}
 }
 
@@ -149,7 +150,7 @@ func (s *Storage) SetFeedError(feedID int64, lastError error) {
 		feedID, lastError.Error(),
 	)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 	}
 }
 
@@ -158,7 +159,7 @@ func (s *Storage) GetFeedErrors() map[int64]string {
 
 	rows, err := s.db.Query(`select feed_id, error from feed_errors`)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return errors
 	}
 
@@ -166,7 +167,7 @@ func (s *Storage) GetFeedErrors() map[int64]string {
 		var id int64
 		var error string
 		if err = rows.Scan(&id, &error); err != nil {
-			s.log.Print(err)
+			log.Print(err)
 		}
 		errors[id] = error
 	}

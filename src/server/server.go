@@ -15,7 +15,6 @@ import (
 type Handler struct {
 	Addr        string
 	db          *storage.Storage
-	log         *log.Logger
 	feedQueue   chan storage.Feed
 	queueSize   *int32
 	refreshRate chan int64
@@ -27,11 +26,10 @@ type Handler struct {
 	KeyFile  string
 }
 
-func New(db *storage.Storage, logger *log.Logger, addr string) *Handler {
+func New(db *storage.Storage, addr string) *Handler {
 	queueSize := int32(0)
 	return &Handler{
 		db:          db,
-		log:         logger,
 		feedQueue:   make(chan storage.Feed, 3000),
 		queueSize:   &queueSize,
 		Addr:        addr,
@@ -58,7 +56,7 @@ func (h *Handler) Start() {
 		err = s.ListenAndServe()
 	}
 	if err != http.ErrServerClosed {
-		h.log.Fatal(err)
+		log.Fatal(err)
 	}
 }
 
@@ -124,7 +122,7 @@ func (h *Handler) startJobs() {
 				items, err := listItems(feed, h.db)
 				atomic.AddInt32(h.queueSize, -1)
 				if err != nil {
-					h.log.Printf("Failed to fetch %s (%d): %s", feed.FeedLink, feed.Id, err)
+					log.Printf("Failed to fetch %s (%d): %s", feed.FeedLink, feed.Id, err)
 					h.db.SetFeedError(feed.Id, err)
 					continue
 				}
@@ -136,7 +134,7 @@ func (h *Handler) startJobs() {
 						h.db.UpdateFeedIcon(feed.Id, icon)
 					}
 					if err != nil {
-						h.log.Printf("Failed to search favicon for %s (%s): %s", feed.Link, feed.FeedLink, err)
+						log.Printf("Failed to search favicon for %s (%s): %s", feed.Link, feed.FeedLink, err)
 					}
 				}
 			case <-delTicker.C:
@@ -190,7 +188,7 @@ func (h Handler) requiresAuth() bool {
 }
 
 func (h *Handler) fetchAllFeeds() {
-	h.log.Print("Refreshing all feeds")
+	log.Print("Refreshing all feeds")
 	h.db.ResetFeedErrors()
 	for _, feed := range h.db.ListFeeds() {
 		h.fetchFeed(feed)

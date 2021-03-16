@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"log"
 	"strings"
 	"time"
 	xhtml "golang.org/x/net/html"
@@ -73,7 +74,7 @@ type MarkFilter struct {
 func (s *Storage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return false
 	}
 	now := time.Now()
@@ -105,16 +106,16 @@ func (s *Storage) CreateItems(items []Item) bool {
 			item.DateUpdated, now,
 		)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			if err = tx.Rollback(); err != nil {
-				s.log.Print(err)
+				log.Print(err)
 				return false
 			}
 			return false
 		}
 	}
 	if err = tx.Commit(); err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return false
 	}
 	return true
@@ -175,7 +176,7 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 		`, predicate, order, limit, offset)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return result
 	}
 	for rows.Next() {
@@ -196,7 +197,7 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 			&x.PodcastURL,
 		)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return result
 		}
 		result = append(result, x)
@@ -251,7 +252,7 @@ func (s *Storage) MarkItemsRead(filter MarkFilter) bool {
 		`, READ, predicate, STARRED)
 	_, err := s.db.Exec(query, args...)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 	}
 	return err == nil
 }
@@ -273,7 +274,7 @@ func (s *Storage) FeedStats() []FeedStat {
 		group by feed_id
 	`, UNREAD, STARRED))
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return result
 	}
 	for rows.Next() {
@@ -310,7 +311,7 @@ func (s *Storage) SyncSearch() {
 		where search_rowid is null;
 	`)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return
 	}
 
@@ -327,7 +328,7 @@ func (s *Storage) SyncSearch() {
 			item.Title, HTMLText(item.Description), HTMLText(item.Content),
 		)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return
 		}
 		if numrows, err := result.RowsAffected(); err == nil && numrows == 1 {
@@ -351,7 +352,7 @@ func (s *Storage) DeleteOldItems() {
 	`, STARRED))
 
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return
 	}
 
@@ -370,16 +371,16 @@ func (s *Storage) DeleteOldItems() {
 			time.Now().Add(-time.Hour*24*90), // 90 days
 		)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return
 		}
 		num, err := result.RowsAffected()
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return
 		}
 		if num > 0 {
-			s.log.Printf("Deleted %d old items (%d)", num, feedId)
+			log.Printf("Deleted %d old items (%d)", num, feedId)
 		}
 	}
 }

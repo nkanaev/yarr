@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"log"
 )
 
 type Folder struct {
@@ -25,19 +26,19 @@ func (s *Storage) CreateFolder(title string) *Folder {
 	var id int64
 	numrows, err := result.RowsAffected()
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return nil
 	}
 	if numrows == 1 {
 		id, err = result.LastInsertId()
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return nil
 		}
 	} else {
 		err = s.db.QueryRow(`select id, is_expanded from folders where title=?`, title).Scan(&id, &expanded)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return nil
 		}
 	}
@@ -47,7 +48,7 @@ func (s *Storage) CreateFolder(title string) *Folder {
 func (s *Storage) DeleteFolder(folderId int64) bool {
 	_, err := s.db.Exec(`delete from folders where id = ?`, folderId)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 	}
 	return err == nil
 }
@@ -70,14 +71,14 @@ func (s *Storage) ListFolders() []Folder {
 		order by title collate nocase
 	`)
 	if err != nil {
-		s.log.Print(err)
+		log.Print(err)
 		return result
 	}
 	for rows.Next() {
 		var f Folder
 		err = rows.Scan(&f.Id, &f.Title, &f.IsExpanded)
 		if err != nil {
-			s.log.Print(err)
+			log.Print(err)
 			return result
 		}
 		result = append(result, f)

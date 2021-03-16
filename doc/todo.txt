@@ -6,7 +6,6 @@
 
 - fix: scrollTo/scrollBy with smooth behavior instead of scrollTop
 
-- ref: switch to the standard logger
 - ref: organize "server" package using KonMari method
   https://github.com/gin-gonic/gin : nice example of router api
 
