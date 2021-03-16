@@ -67,7 +67,7 @@ func (s *Server) handleStatic(c *router.Context) {
 }
 
 func (s *Server) handleStatus(c *router.Context) {
-	writeJSON(c.Out, map[string]interface{}{
+	c.JSON(http.StatusOK, map[string]interface{}{
 		"running": *s.queueSize,
 		"stats":   s.db.FeedStats(),
 	})
@@ -76,7 +76,7 @@ func (s *Server) handleStatus(c *router.Context) {
 func (s *Server) handleFolderList(c *router.Context) {
 	if c.Req.Method == "GET" {
 		list := s.db.ListFolders()
-		writeJSON(c.Out, list)
+		c.JSON(http.StatusOK, list)
 	} else if c.Req.Method == "POST" {
 		var body FolderCreateForm
 		if err := json.NewDecoder(c.Req.Body).Decode(&body); err != nil {
@@ -85,13 +85,11 @@ func (s *Server) handleFolderList(c *router.Context) {
 			return
 		}
 		if len(body.Title) == 0 {
-			c.Out.WriteHeader(http.StatusBadRequest)
-			writeJSON(c.Out, map[string]string{"error": "Folder title missing."})
+			c.JSON(http.StatusBadRequest, map[string]string{"error": "Folder title missing."})
 			return
 		}
 		folder := s.db.CreateFolder(body.Title)
-		c.Out.WriteHeader(http.StatusCreated)
-		writeJSON(c.Out, folder)
+		c.JSON(http.StatusCreated, folder)
 	} else {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -134,7 +132,7 @@ func (s *Server) handleFeedRefresh(c *router.Context) {
 
 func (s *Server) handleFeedErrors(c *router.Context) {
 	errors := s.db.GetFeedErrors()
-	writeJSON(c.Out, errors)
+	c.JSON(http.StatusOK, errors)
 }
 
 func (s *Server) handleFeedIcon(c *router.Context) {
@@ -156,7 +154,7 @@ func (s *Server) handleFeedIcon(c *router.Context) {
 func (s *Server) handleFeedList(c *router.Context) {
 	if c.Req.Method == "GET" {
 		list := s.db.ListFeeds()
-		writeJSON(c.Out, list)
+		c.JSON(http.StatusOK, list)
 	} else if c.Req.Method == "POST" {
 		var form FeedCreateForm
 		if err := json.NewDecoder(c.Req.Body).Decode(&form); err != nil {
@@ -168,7 +166,7 @@ func (s *Server) handleFeedList(c *router.Context) {
 		feed, sources, err := discoverFeed(form.Url)
 		if err != nil {
 			log.Print(err)
-			writeJSON(c.Out, map[string]string{"status": "notfound"})
+			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
 			return
 		}
 
@@ -190,11 +188,11 @@ func (s *Server) handleFeedList(c *router.Context) {
 				log.Printf("Failed to find favicon for %s (%d): %s", storedFeed.FeedLink, storedFeed.Id, err)
 			}
 
-			writeJSON(c.Out, map[string]string{"status": "success"})
+			c.JSON(http.StatusOK, map[string]string{"status": "success"})
 		} else if sources != nil {
-			writeJSON(c.Out, map[string]interface{}{"status": "multiple", "choice": sources})
+			c.JSON(http.StatusOK, map[string]interface{}{"status": "multiple", "choice": sources})
 		} else {
-			writeJSON(c.Out, map[string]string{"status": "notfound"})
+			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
 		}
 	}
 }
@@ -286,7 +284,7 @@ func (s *Server) handleItemList(c *router.Context) {
 		newestFirst := query.Get("oldest_first") != "true"
 		items := s.db.ListItems(filter, (curPage-1)*perPage, perPage, newestFirst)
 		count := s.db.CountItems(filter)
-		writeJSON(c.Out, map[string]interface{}{
+		c.JSON(http.StatusOK, map[string]interface{}{
 			"page": map[string]int{
 				"cur": curPage,
 				"num": int(math.Ceil(float64(count) / float64(perPage))),
@@ -311,7 +309,7 @@ func (s *Server) handleItemList(c *router.Context) {
 
 func (s *Server) handleSettings(c *router.Context) {
 	if c.Req.Method == "GET" {
-		writeJSON(c.Out, s.db.GetSettings())
+		c.JSON(http.StatusOK, s.db.GetSettings())
 	} else if c.Req.Method == "PUT" {
 		settings := make(map[string]interface{})
 		if err := json.NewDecoder(c.Req.Body).Decode(&settings); err != nil {

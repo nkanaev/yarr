@@ -22,14 +22,12 @@ func (c *Context) Next() {
 }
 
 func (c *Context) JSON(status int, data interface{}) {
-	reply, err := json.Marshal(data)
+	body, err := json.Marshal(data)
 	if err != nil {
 		log.Fatal(err)
-		c.Out.WriteHeader(http.StatusInternalServerError)
-		return
 	}
 	c.Out.WriteHeader(status)
 	c.Out.Header().Set("Content-Type", "application/json; charset=utf-8")
-	c.Out.Write(reply)
+	c.Out.Write(body)
 	c.Out.Write([]byte("\n"))
 }
