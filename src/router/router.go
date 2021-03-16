@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"regexp"
 )
 
@@ -35,13 +36,31 @@ func (r *Router) For(path string, handler Handler) {
 	r.routes = append(r.routes, x)
 }
 
-func (r *Router) resolve(path string) *route {
+func (r *Router) resolve(path string) *Route {
 	for _, r := range r.routes {
 		if r.regex.MatchString(path) {
 			return &r
 		}
 	}
 	return nil
+}
+
+func (r *Router) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	path := req.Url.Path
+
+	route := r.resolve(path)
+	if route == nil {
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	context := &Context{}
+	context.Req = req
+	context.Out = rw
+	context.vars = regexGroups(path, route.regex)
+	context.index = -1
+	context.chain = route.chain
+	context.Next()
 }
 
 func regexGroups(input string, regex *regexp.Regexp) map[string]string {
