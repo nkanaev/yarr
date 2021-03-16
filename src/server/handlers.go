@@ -12,7 +12,6 @@ import (
 	"math"
 	"net/http"
 	"reflect"
-	"strconv"
 )
 
 func (s *Server) handler() http.Handler {
@@ -96,7 +95,7 @@ func (s *Server) handleFolderList(c *router.Context) {
 }
 
 func (s *Server) handleFolder(c *router.Context) {
-	id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
+	id, err := c.VarInt64("id")
 	if err != nil {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
@@ -136,7 +135,7 @@ func (s *Server) handleFeedErrors(c *router.Context) {
 }
 
 func (s *Server) handleFeedIcon(c *router.Context) {
-	id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
+	id, err := c.VarInt64("id")
 	if err != nil {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
@@ -144,7 +143,6 @@ func (s *Server) handleFeedIcon(c *router.Context) {
 	feed := s.db.GetFeed(id)
 	if feed != nil && feed.Icon != nil {
 		c.Out.Header().Set("Content-Type", http.DetectContentType(*feed.Icon))
-		c.Out.Header().Set("Content-Length", strconv.Itoa(len(*feed.Icon)))
 		c.Out.Write(*feed.Icon)
 	} else {
 		c.Out.WriteHeader(http.StatusNotFound)
@@ -198,7 +196,7 @@ func (s *Server) handleFeedList(c *router.Context) {
 }
 
 func (s *Server) handleFeed(c *router.Context) {
-	id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
+	id, err := c.VarInt64("id")
 	if err != nil {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
@@ -239,7 +237,7 @@ func (s *Server) handleFeed(c *router.Context) {
 
 func (s *Server) handleItem(c *router.Context) {
 	if c.Req.Method == "PUT" {
-		id, err := strconv.ParseInt(c.Vars["id"], 10, 64)
+		id, err := c.VarInt64("id")
 		if err != nil {
 			c.Out.WriteHeader(http.StatusBadRequest)
 			return
@@ -264,14 +262,14 @@ func (s *Server) handleItemList(c *router.Context) {
 		perPage := 20
 		curPage := 1
 		query := c.Req.URL.Query()
-		if page, err := strconv.ParseInt(query.Get("page"), 10, 64); err == nil {
+		if page, err := c.QueryInt64("page"); err == nil {
 			curPage = int(page)
 		}
 		filter := storage.ItemFilter{}
-		if folderID, err := strconv.ParseInt(query.Get("folder_id"), 10, 64); err == nil {
+		if folderID, err := c.QueryInt64("folder_id"); err == nil {
 			filter.FolderID = &folderID
 		}
-		if feedID, err := strconv.ParseInt(query.Get("feed_id"), 10, 64); err == nil {
+		if feedID, err := c.QueryInt64("feed_id"); err == nil {
 			filter.FeedID = &feedID
 		}
 		if status := query.Get("status"); len(status) != 0 {
@@ -292,12 +290,12 @@ func (s *Server) handleItemList(c *router.Context) {
 			"list": items,
 		})
 	} else if c.Req.Method == "PUT" {
-		query := c.Req.URL.Query()
 		filter := storage.MarkFilter{}
-		if folderID, err := strconv.ParseInt(query.Get("folder_id"), 10, 64); err == nil {
+
+		if folderID, err := c.QueryInt64("folder_id"); err == nil {
 			filter.FolderID = &folderID
 		}
-		if feedID, err := strconv.ParseInt(query.Get("feed_id"), 10, 64); err == nil {
+		if feedID, err := c.QueryInt64("feed_id"); err == nil {
 			filter.FeedID = &feedID
 		}
 		s.db.MarkItemsRead(filter)

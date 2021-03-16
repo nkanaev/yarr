@@ -2,8 +2,10 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Context struct {
@@ -30,4 +32,16 @@ func (c *Context) JSON(status int, data interface{}) {
 	c.Out.Header().Set("Content-Type", "application/json; charset=utf-8")
 	c.Out.Write(body)
 	c.Out.Write([]byte("\n"))
+}
+
+func (c *Context) VarInt64(key string) (int64, error) {
+	if val, ok := c.Vars[key]; ok {
+		return strconv.ParseInt(val, 10, 64)
+	}
+	return 0, fmt.Errorf("no such var: %s", key)
+}
+
+func (c *Context) QueryInt64(key string) (int64, error) {
+	query := c.Req.URL.Query()
+	return strconv.ParseInt(query.Get("page"), 10, 64)
 }
