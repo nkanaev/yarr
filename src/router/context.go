@@ -1,6 +1,8 @@
 package router
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -16,7 +18,7 @@ type Context struct {
 
 func (c *Context) Next() {
 	c.index++
-	c.handlers[c.index](c)
+	c.chain[c.index](c)
 }
 
 func (c *Context) JSON(status int, data interface{}) {
