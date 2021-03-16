@@ -90,7 +90,7 @@ func main() {
 		log.Fatal("Failed to initialise database: ", err)
 	}
 
-	srv := server.New(store, addr)
+	srv := server.NewServer(store, addr)
 
 	if certfile != "" && keyfile != "" {
 		srv.CertFile = certfile

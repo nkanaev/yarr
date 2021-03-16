@@ -12,7 +12,7 @@ import (
 	"github.com/nkanaev/yarr/src/storage"
 )
 
-type Handler struct {
+type Server struct {
 	Addr        string
 	db          *storage.Storage
 	feedQueue   chan storage.Feed
@@ -26,9 +26,9 @@ type Handler struct {
 	KeyFile  string
 }
 
-func New(db *storage.Storage, addr string) *Handler {
+func NewServer(db *storage.Storage, addr string) *Server {
 	queueSize := int32(0)
-	return &Handler{
+	return &Server{
 		db:          db,
 		feedQueue:   make(chan storage.Feed, 3000),
 		queueSize:   &queueSize,
@@ -37,7 +37,7 @@ func New(db *storage.Storage, addr string) *Handler {
 	}
 }
 
-func (h *Handler) GetAddr() string {
+func (h *Server) GetAddr() string {
 	proto := "http"
 	if h.CertFile != "" && h.KeyFile != "" {
 		proto = "https"
@@ -45,8 +45,9 @@ func (h *Handler) GetAddr() string {
 	return proto + "://" + h.Addr + BasePath
 }
 
-func (h *Handler) Start() {
+func (h *Server) Start() {
 	h.startJobs()
+
 	s := &http.Server{Addr: h.Addr, Handler: h}
 
 	var err error
@@ -64,7 +65,7 @@ func unsafeMethod(method string) bool {
 	return method == "POST" || method == "PUT" || method == "DELETE"
 }
 
-func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (h Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	reqPath := req.URL.Path
 	if BasePath != "" {
 		if !strings.HasPrefix(reqPath, BasePath) {
@@ -99,7 +100,7 @@ func (h Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	route.handler(rw, req.WithContext(ctx))
 }
 
-func (h *Handler) startJobs() {
+func (h *Server) startJobs() {
 	delTicker := time.NewTicker(time.Hour * 24)
 
 	syncSearchChannel := make(chan bool, 10)
@@ -183,11 +184,11 @@ func (h *Handler) startJobs() {
 	}
 }
 
-func (h Handler) requiresAuth() bool {
+func (h Server) requiresAuth() bool {
 	return h.Username != "" && h.Password != ""
 }
 
-func (h *Handler) fetchAllFeeds() {
+func (h *Server) fetchAllFeeds() {
 	log.Print("Refreshing all feeds")
 	h.db.ResetFeedErrors()
 	for _, feed := range h.db.ListFeeds() {
@@ -195,7 +196,7 @@ func (h *Handler) fetchAllFeeds() {
 	}
 }
 
-func (h *Handler) fetchFeed(feed storage.Feed) {
+func (h *Server) fetchFeed(feed storage.Feed) {
 	atomic.AddInt32(h.queueSize, 1)
 	h.feedQueue <- feed
 }
@@ -214,8 +215,8 @@ func db(req *http.Request) *storage.Storage {
 	return nil
 }
 
-func handler(req *http.Request) *Handler {
-	return req.Context().Value(ctxHandler).(*Handler)
+func handler(req *http.Request) *Server {
+	return req.Context().Value(ctxHandler).(*Server)
 }
 
 const (
