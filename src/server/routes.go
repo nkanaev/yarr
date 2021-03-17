@@ -19,6 +19,15 @@ func (s *Server) handler() http.Handler {
 	r := router.NewRouter()
 
 	// TODO: auth, base, security
+	if s.Username != "" && s.Password != "" {
+		a := &authMiddleware{
+			username: s.Username,
+			password: s.Password,
+			basepath: BasePath,
+			public: BasePath + "/static",
+		}
+		r.Use(a.handler)
+	}
 
 	r.For("/", s.handleIndex)
 	r.For("/static/*path", s.handleStatic)
@@ -42,21 +51,6 @@ func (s *Server) handler() http.Handler {
 }
 
 func (s *Server) handleIndex(c *router.Context) {
-	if s.requiresAuth() && !auth.IsAuthenticated(c.Req, s.Username, s.Password) {
-		if c.Req.Method == "POST" {
-			username := c.Req.FormValue("username")
-			password := c.Req.FormValue("password")
-			if auth.StringsEqual(username, s.Username) && auth.StringsEqual(password, s.Password) {
-				auth.Authenticate(c.Out, username, password, BasePath)
-				http.Redirect(c.Out, c.Req, c.Req.URL.Path, http.StatusFound)
-				return
-			}
-		}
-
-		c.Out.Header().Set("Content-Type", "text/html")
-		assets.Render("login.html", c.Out, nil)
-		return
-	}
 	c.Out.Header().Set("Content-Type", "text/html")
 	assets.Render("index.html", c.Out, nil)
 }

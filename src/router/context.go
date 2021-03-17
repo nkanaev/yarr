@@ -45,3 +45,10 @@ func (c *Context) QueryInt64(key string) (int64, error) {
 	query := c.Req.URL.Query()
 	return strconv.ParseInt(query.Get("page"), 10, 64)
 }
+
+func (c *Context) Redirect(url string) {
+	if url == "" {
+		url = "/"
+	}
+	http.Redirect(c.Out, c.Req, url, http.StatusFound)
+}
