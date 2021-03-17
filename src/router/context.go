@@ -50,7 +50,7 @@ func (c *Context) VarInt64(key string) (int64, error) {
 
 func (c *Context) QueryInt64(key string) (int64, error) {
 	query := c.Req.URL.Query()
-	return strconv.ParseInt(query.Get("page"), 10, 64)
+	return strconv.ParseInt(query.Get(key), 10, 64)
 }
 
 func (c *Context) Redirect(url string) {
