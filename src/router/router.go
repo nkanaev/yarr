@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 type Handler func(*Context)
@@ -10,6 +11,7 @@ type Handler func(*Context)
 type Router struct {
 	middle []Handler
 	routes []Route
+	base   string
 }
 
 type Route struct {
@@ -17,10 +19,11 @@ type Route struct {
 	chain []Handler
 }
 
-func NewRouter() *Router {
+func NewRouter(base string) *Router {
 	router := &Router{}
 	router.middle = make([]Handler, 0)
 	router.routes = make([]Route, 0)
+	router.base = base
 	return router
 }
 
@@ -37,16 +40,22 @@ func (r *Router) For(path string, handler Handler) {
 }
 
 func (r *Router) resolve(path string) *Route {
-	for _, r := range r.routes {
-		if r.regex.MatchString(path) {
-			return &r
+	for _, route := range r.routes {
+		if route.regex.MatchString(path) {
+			return &route
 		}
 	}
 	return nil
 }
 
 func (r *Router) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	path := req.URL.Path
+	// autoclose open base url
+	if r.base != "" && r.base == req.URL.Path {
+		http.Redirect(rw, req, r.base + "/", http.StatusFound)
+		return
+	}
+
+	path := strings.TrimPrefix(req.URL.Path, r.base)
 
 	route := r.resolve(path)
 	if route == nil {

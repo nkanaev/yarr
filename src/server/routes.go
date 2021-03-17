@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) handler() http.Handler {
-	r := router.NewRouter()
+	r := router.NewRouter(BasePath)
 
 	// TODO: auth, base, security
 	if s.Username != "" && s.Password != "" {
