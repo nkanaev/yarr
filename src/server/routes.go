@@ -7,6 +7,7 @@ import (
 	"github.com/nkanaev/yarr/src/router"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/opml"
+	"github.com/nkanaev/yarr/src/worker"
 	"io/ioutil"
 	"log"
 	"math"
@@ -67,7 +68,7 @@ func (s *Server) handleStatic(c *router.Context) {
 
 func (s *Server) handleStatus(c *router.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"running": *s.queueSize,
+		"running": s.worker.FeedsPending(),
 		"stats":   s.db.FeedStats(),
 	})
 }
@@ -122,7 +123,7 @@ func (s *Server) handleFolder(c *router.Context) {
 
 func (s *Server) handleFeedRefresh(c *router.Context) {
 	if c.Req.Method == "POST" {
-		s.fetchAllFeeds()
+		s.worker.FetchAllFeeds()
 		c.Out.WriteHeader(http.StatusOK)
 	} else {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)
@@ -161,7 +162,7 @@ func (s *Server) handleFeedList(c *router.Context) {
 			return
 		}
 
-		feed, sources, err := discoverFeed(form.Url)
+		feed, sources, err := worker.DiscoverFeed(form.Url)
 		if err != nil {
 			log.Print(err)
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
@@ -176,9 +177,9 @@ func (s *Server) handleFeedList(c *router.Context) {
 				feed.FeedLink,
 				form.FolderID,
 			)
-			s.db.CreateItems(convertItems(feed.Items, *storedFeed))
+			s.db.CreateItems(worker.ConvertItems(feed.Items, *storedFeed))
 
-			icon, err := findFavicon(storedFeed.Link, storedFeed.FeedLink)
+			icon, err := worker.FindFavicon(storedFeed.Link, storedFeed.FeedLink)
 			if icon != nil {
 				s.db.UpdateFeedIcon(storedFeed.Id, icon)
 			}
@@ -316,7 +317,7 @@ func (s *Server) handleSettings(c *router.Context) {
 		}
 		if s.db.UpdateSettings(settings) {
 			if _, ok := settings["refresh_rate"]; ok {
-				s.refreshRate <- s.db.GetSettingsValueInt64("refresh_rate")
+				s.worker.SetRefreshRate(s.db.GetSettingsValueInt64("refresh_rate"))
 			}
 			c.Out.WriteHeader(http.StatusOK)
 		} else {
@@ -347,7 +348,7 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 				}
 			}
 		}
-		s.fetchAllFeeds()
+		s.worker.FetchAllFeeds()
 		c.Out.WriteHeader(http.StatusOK)
 	} else {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)

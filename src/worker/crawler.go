@@ -1,4 +1,4 @@
-package server
+package worker
 
 import (
 	"bytes"
@@ -106,7 +106,7 @@ func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
 	return sources, nil
 }
 
-func discoverFeed(candidateUrl string) (*gofeed.Feed, *[]FeedSource, error) {
+func DiscoverFeed(candidateUrl string) (*gofeed.Feed, *[]FeedSource, error) {
 	// Query URL
 	res, err := defaultClient.get(candidateUrl)
 	if err != nil {
@@ -153,12 +153,12 @@ func discoverFeed(candidateUrl string) (*gofeed.Feed, *[]FeedSource, error) {
 		if sources[0].Url == candidateUrl {
 			return nil, nil, errors.New("Recursion!")
 		}
-		return discoverFeed(sources[0].Url)
+		return DiscoverFeed(sources[0].Url)
 	}
 	return nil, &sources, nil
 }
 
-func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
+func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	candidateUrls := make([]string, 0)
 
 	favicon := func(link string) string {
@@ -227,7 +227,7 @@ func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	return nil, nil
 }
 
-func convertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
+func ConvertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 	result := make([]storage.Item, len(items))
 	for i, item := range items {
 		imageURL := ""
@@ -300,7 +300,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	if err != nil {
 		return nil, err
 	}
-	return convertItems(feed.Items, f), nil
+	return ConvertItems(feed.Items, f), nil
 }
 
 func init() {
