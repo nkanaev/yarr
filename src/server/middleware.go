@@ -33,11 +33,7 @@ func (m *authMiddleware) handler(c *router.Context) {
 	rootUrl := m.basepath + "/"
 
 	if c.Req.URL.Path != rootUrl {
-		if unsafeMethod(c.Req.Method) && c.Req.Header.Get("X-Requested-By") != "yarr" {
-			c.Out.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		c.Redirect(rootUrl)
+		c.Out.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
