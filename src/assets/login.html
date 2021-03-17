@@ -24,13 +24,17 @@
 <body>
     <form action="" method="post">
         <img src="./static/graphicarts/anchor.svg" alt="">
+        {% if .error %}
+            <div class="text-danger text-center my-3">{% .error %}</div>
+        {% end %}
         <div class="form-group">
             <label for="username">Username</label>
-            <input name="username" class="form-control" id="username" autocomplete="off">
+            <input name="username" class="form-control" id="username" autocomplete="off"
+                   value="{% if .username %}{% .username %}{% end %}" required>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input name="password" class="form-control" id="password" type="password">
+            <input name="password" class="form-control" id="password" type="password" required>
         </div>
         <button class="btn btn-block btn-default" type="submit">Login</button>
     </form>

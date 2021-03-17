@@ -3,6 +3,7 @@ package router
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -32,6 +33,12 @@ func (c *Context) JSON(status int, data interface{}) {
 	c.Out.Header().Set("Content-Type", "application/json; charset=utf-8")
 	c.Out.Write(body)
 	c.Out.Write([]byte("\n"))
+}
+
+func (c *Context) HTML(status int, tmpl *template.Template, data interface{}) {
+	c.Out.WriteHeader(status)
+	c.Out.Header().Set("Content-Type", "text/html")
+	tmpl.Execute(c.Out, data)
 }
 
 func (c *Context) VarInt64(key string) (int64, error) {

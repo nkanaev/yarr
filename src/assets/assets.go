@@ -4,8 +4,8 @@ import (
 	"embed"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"io/fs"
+	"io/ioutil"
 	"os"
 )
 
@@ -23,7 +23,7 @@ func (afs assetsfs) Open(name string) (fs.File, error) {
 	return os.DirFS("src/assets").Open(name)
 }
 
-func Render(path string, writer io.Writer, data interface{}) {
+func Template(path string) *template.Template {
 	var tmpl *template.Template
 	tmpl, found := FS.templates[path]
 	if !found {
@@ -39,6 +39,11 @@ func Render(path string, writer io.Writer, data interface{}) {
 			FS.templates[path] = tmpl
 		}
 	}
+	return tmpl
+}
+
+func Render(path string, writer io.Writer, data interface{}) {
+	tmpl := Template(path)
 	tmpl.Execute(writer, data)
 }
 

@@ -51,8 +51,7 @@ func (s *Server) handler() http.Handler {
 }
 
 func (s *Server) handleIndex(c *router.Context) {
-	c.Out.Header().Set("Content-Type", "text/html")
-	assets.Render("index.html", c.Out, nil)
+	c.HTML(http.StatusOK, assets.Template("index.html"), nil)
 }
 
 func (s *Server) handleStatic(c *router.Context) {

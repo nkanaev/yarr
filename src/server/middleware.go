@@ -41,12 +41,12 @@ func (m *authMiddleware) handler(c *router.Context) {
 			return
 		} else {
 			// TODO: show error
-			c.Out.Header().Set("Content-Type", "text/html")
-			assets.Render("login.html", c.Out, nil)
+			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]string{
+				"username": username,
+				"error": "Invalid username/password",
+			})
 			return
 		}
 	}
-
-	c.Out.Header().Set("Content-Type", "text/html")
-	assets.Render("login.html", c.Out, nil)
+	c.HTML(http.StatusOK, assets.Template("login.html"), nil)
 }
