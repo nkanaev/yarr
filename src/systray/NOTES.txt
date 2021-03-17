@@ -1,0 +1,11 @@
+taken from:
+
+repo:
+https://github.com/getlantern/systray
+
+hash:
+2c0986dda9aea361e925f90e848d9036be7b5367
+
+changes:
+
+-removed `getlantern/golog` dependency

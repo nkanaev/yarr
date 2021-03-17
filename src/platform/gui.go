@@ -3,7 +3,7 @@
 package platform
 
 import (
-	"github.com/getlantern/systray"
+	"github.com/nkanaev/yarr/src/systray"
 	"github.com/nkanaev/yarr/src/server"
 )
 
