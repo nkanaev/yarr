@@ -17,11 +17,6 @@ type authMiddleware struct {
 }
 
 func (m *authMiddleware) handler(c *router.Context) {
-	basepath := m.basepath
-	if basepath == "" {
-		basepath = "/"
-	}
-
 	if strings.HasPrefix(c.Req.URL.Path, m.public) {
 		c.Next()
 		return
@@ -31,7 +26,7 @@ func (m *authMiddleware) handler(c *router.Context) {
 		return
 	}
 
-	if c.Req.URL.Path != basepath {
+	if c.Req.URL.Path != m.basepath {
 		// TODO: check ajax
 		c.Out.WriteHeader(http.StatusForbidden)
 		return

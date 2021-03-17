@@ -23,7 +23,7 @@ func (s *Server) handler() http.Handler {
 		a := &authMiddleware{
 			username: s.Username,
 			password: s.Password,
-			basepath: BasePath,
+			basepath: BasePath + "/",
 			public: BasePath + "/static",
 		}
 		r.Use(a.handler)
