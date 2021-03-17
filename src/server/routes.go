@@ -21,10 +21,10 @@ func (s *Server) handler() http.Handler {
 	// TODO: auth, base, security
 	if s.Username != "" && s.Password != "" {
 		a := &authMiddleware{
+			basepath: BasePath,
 			username: s.Username,
 			password: s.Password,
-			basepath: BasePath + "/",
-			public: BasePath + "/static",
+			public:   "/static",
 		}
 		r.Use(a.handler)
 	}
@@ -401,6 +401,6 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 }
 
 func (s *Server) handleLogout(c *router.Context) {
-	auth.Logout(c.Out)
+	auth.Logout(c.Out, BasePath)
 	c.Out.WriteHeader(http.StatusNoContent)
 }

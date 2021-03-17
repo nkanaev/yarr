@@ -16,8 +16,12 @@ type authMiddleware struct {
 	public   string
 }
 
+func unsafeMethod(method string) bool {
+	return method == "POST" || method == "PUT" || method == "DELETE"
+}
+
 func (m *authMiddleware) handler(c *router.Context) {
-	if strings.HasPrefix(c.Req.URL.Path, m.public) {
+	if strings.HasPrefix(c.Req.URL.Path, m.basepath + m.public) {
 		c.Next()
 		return
 	}
@@ -26,9 +30,14 @@ func (m *authMiddleware) handler(c *router.Context) {
 		return
 	}
 
-	if c.Req.URL.Path != m.basepath {
-		// TODO: check ajax
-		c.Out.WriteHeader(http.StatusForbidden)
+	rootUrl := m.basepath + "/"
+
+	if c.Req.URL.Path != rootUrl {
+		if unsafeMethod(c.Req.Method) && c.Req.Header.Get("X-Requested-By") != "yarr" {
+			c.Out.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		c.Redirect(rootUrl)
 		return
 	}
 
@@ -37,10 +46,9 @@ func (m *authMiddleware) handler(c *router.Context) {
 		password := c.Req.FormValue("password")
 		if auth.StringsEqual(username, m.username) && auth.StringsEqual(password, m.password) {
 			auth.Authenticate(c.Out, m.username, m.password, m.basepath)
-			c.Redirect(m.basepath)
+			c.Redirect(rootUrl)
 			return
 		} else {
-			// TODO: show error
 			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]string{
 				"username": username,
 				"error": "Invalid username/password",

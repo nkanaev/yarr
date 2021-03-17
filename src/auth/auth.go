@@ -23,30 +23,21 @@ func IsAuthenticated(req *http.Request, username, password string) bool {
 }
 
 func Authenticate(rw http.ResponseWriter, username, password, basepath string) {
-	expires := time.Now().Add(time.Hour * 24 * 7) // 1 week
-
-	var cookiePath string
-	if basepath != "" {
-		cookiePath = basepath
-	} else {
-		cookiePath = "/"
-	}
-	cookie := http.Cookie{
+	http.SetCookie(rw, &http.Cookie{
 		Name:    "auth",
 		Value:   username + ":" + secret(username, password),
-		Expires: expires,
-		Path:    cookiePath,
-	}
-	http.SetCookie(rw, &cookie)
+		Expires: time.Now().Add(time.Hour * 24 * 7), // 1 week,
+		Path:    basepath,
+	})
 }
 
-func Logout(rw http.ResponseWriter) {
-	cookie := http.Cookie{
+func Logout(rw http.ResponseWriter, basepath string) {
+	http.SetCookie(rw, &http.Cookie{
 		Name:    "auth",
 		Value:   "",
 		MaxAge:  -1,
-	}
-	http.SetCookie(rw, &cookie)
+		Path:    basepath,
+	})
 }
 
 func StringsEqual(p1, p2 string) bool {

@@ -54,9 +54,6 @@ func (s *Server) Start() {
 	}
 }
 
-func unsafeMethod(method string) bool {
-	return method == "POST" || method == "PUT" || method == "DELETE"
-}
 
 /*
 func (h Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
