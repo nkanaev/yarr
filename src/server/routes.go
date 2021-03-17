@@ -18,15 +18,14 @@ import (
 func (s *Server) handler() http.Handler {
 	r := router.NewRouter(BasePath)
 
-	// TODO: auth, base, security
 	if s.Username != "" && s.Password != "" {
-		a := &authMiddleware{
-			basepath: BasePath,
-			username: s.Username,
-			password: s.Password,
-			public:   "/static",
+		a := &auth.Middleware{
+			BasePath: BasePath,
+			Username: s.Username,
+			Password: s.Password,
+			Public:   "/static",
 		}
-		r.Use(a.handler)
+		r.Use(a.Handler)
 	}
 
 	r.For("/", s.handleIndex)
