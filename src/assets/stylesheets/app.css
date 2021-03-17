@@ -13,8 +13,8 @@ body {
   color: inherit;
 }
 
-.form-control {
-  box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.07);
+.form-control, .form-control:focus {
+  box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.07) !important;
 }
 
 select.form-control {
@@ -28,7 +28,7 @@ select.form-control:not([multiple]):not([size]) {
   cursor: pointer;
 }
 
-.form-control:focus, .btn:focus {
+.btn:focus {
   box-shadow: none !important;
 }
 
