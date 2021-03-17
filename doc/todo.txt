@@ -10,7 +10,6 @@
   https://github.com/gin-gonic/gin : nice example of router api
 
 - ref: drop goquery, switch to cascadia (or `x/net`)
-- ref: `getlantern/systray` has too many indirect deps, include+rewrite the code
 - ref: `mmcdole/gofeed` has too many indirect deps, drop it
 
 - ref: convert `.content` to `#content`
