@@ -7,5 +7,3 @@
 - fix: scrollTo/scrollBy with smooth behavior instead of scrollTop
 
 - ref: `mmcdole/gofeed` has too many indirect deps, drop it
-
-- ref: convert `.content` to `#content`
