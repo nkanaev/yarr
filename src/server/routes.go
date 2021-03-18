@@ -328,18 +328,20 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 		doc, err := opml.Parse(file)
 		if err != nil {
 			log.Print(err)
+			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		for _, outline := range doc.Outlines {
-			if outline.Type == "rss" {
-				s.db.CreateFeed(outline.Title, outline.Description, outline.SiteURL, outline.FeedURL, nil)
-			} else {
-				folder := s.db.CreateFolder(outline.Title)
-				for _, o := range outline.AllFeeds() {
-					s.db.CreateFeed(o.Title, o.Description, o.SiteURL, o.FeedURL, &folder.Id)
-				}
+
+		for _, f := range doc.Feeds {
+			s.db.CreateFeed(f.Title, "", f.SiteUrl, f.FeedUrl, nil)
+		}
+		for _, f := range doc.Folders {
+			folder := s.db.CreateFolder(f.Title)
+			for _, ff := range f.AllFeeds() {
+				s.db.CreateFeed(f.Title, "", ff.SiteUrl, ff.FeedUrl, &folder.Id)
 			}
 		}
+
 		s.worker.FetchAllFeeds()
 		c.Out.WriteHeader(http.StatusOK)
 	} else {
@@ -352,37 +354,39 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 		c.Out.Header().Set("Content-Type", "application/xml; charset=utf-8")
 		c.Out.Header().Set("Content-Disposition", `attachment; filename="subscriptions.opml"`)
 
-		rootFeeds := make([]*storage.Feed, 0)
+		doc := opml.NewFolder("")
+
 		feedsByFolderID := make(map[int64][]*storage.Feed)
 		for _, feed := range s.db.ListFeeds() {
 			feed := feed
 			if feed.FolderId == nil {
-				rootFeeds = append(rootFeeds, &feed)
+				doc.Feeds = append(doc.Feeds, &opml.Feed{
+					Title: feed.Title,
+					FeedUrl: feed.FeedLink,
+					SiteUrl: feed.Link,
+				})
 			} else {
 				id := *feed.FolderId
-				if feedsByFolderID[id] == nil {
-					feedsByFolderID[id] = make([]*storage.Feed, 0)
-				}
 				feedsByFolderID[id] = append(feedsByFolderID[id], &feed)
 			}
 		}
-		builder := opml.NewBuilder()
 		
-		for _, feed := range rootFeeds {
-			builder.AddFeed(feed.Title, feed.Description, feed.FeedLink, feed.Link)
-		}
 		for _, folder := range s.db.ListFolders() {
 			folderFeeds := feedsByFolderID[folder.Id]
 			if len(folderFeeds) == 0 {
 				continue
 			}
-			feedFolder := builder.AddFolder(folder.Title)
+			opmlfolder := opml.NewFolder(folder.Title)
 			for _, feed := range folderFeeds {
-				feedFolder.AddFeed(feed.Title, feed.Description, feed.FeedLink, feed.Link)
+				opmlfolder.Feeds = append(opmlfolder.Feeds, &opml.Feed{
+					Title: feed.Title,
+					FeedUrl: feed.FeedLink,
+					SiteUrl: feed.Link,
+				})
 			}
 		}
 
-		c.Out.Write([]byte(builder.String()))
+		c.Out.Write([]byte(doc.OPML()))
 	}
 }
 
