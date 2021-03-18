@@ -317,7 +317,7 @@
             </div>
             <div v-else-if="settings=='manage'">
                 <p class="cursor-default"><b>Manage Feeds</b></p>
-                <div v-for="folder in foldersWithFeeds" class="mt-4" :key="folder.id">
+                <div v-for="folder in foldersWithFeeds" :key="folder.id">
                     <div class="list-row d-flex align-items-center">
                         <div class="w-100 text-truncate" v-if="folder.id">
                             <span class="icon mr-2">{% inline "folder.svg" %}</span>
@@ -338,7 +338,10 @@
                             </b-dropdown>
                         </div>
                     </div>
-                    <div v-for="feed in folder.feeds" class="list-row d-flex align-items-center" :key="feed.id">
+                    <div v-for="feed in folder.feeds"
+                         class="list-row d-flex align-items-center"
+                         :class="{'ml-2': folder.id}"
+                         :key="feed.id">
                         <div class="w-100 text-truncate">
                             <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
                             <span class="icon mr-2" v-else><img v-lazy="'./api/feeds/'+feed.id+'/icon'" alt=""></span>
