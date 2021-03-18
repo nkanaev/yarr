@@ -4,6 +4,4 @@
 
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
 
-- fix: scrollTo/scrollBy with smooth behavior instead of scrollTop
-
 - ref: `mmcdole/gofeed` has too many indirect deps, drop it
