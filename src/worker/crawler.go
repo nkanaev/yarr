@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"github.com/mmcdole/gofeed"
 	"github.com/nkanaev/yarr/src/storage"
+	"github.com/nkanaev/yarr/src/crawler"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -63,44 +63,7 @@ var defaultClient *Client
 
 func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
 	sources := make([]FeedSource, 0, 0)
-
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(html))
-	if err != nil {
-		return sources, err
-	}
-	base, err := url.Parse(siteurl)
-	if err != nil {
-		return sources, err
-	}
-
-	// feed {url: title} map
-	feeds := make(map[string]string)
-
-	doc.Find(feedLinks).Each(func(i int, s *goquery.Selection) {
-		// Unlikely to happen, but don't get more than N links
-		if len(feeds) > 10 {
-			return
-		}
-		if href, ok := s.Attr("href"); ok {
-			feedUrl, err := url.Parse(href)
-			if err != nil {
-				return
-			}
-
-			title := s.AttrOr("title", "")
-			url := base.ResolveReference(feedUrl).String()
-
-			if _, alreadyExists := feeds[url]; alreadyExists {
-				if feeds[url] == "" {
-					feeds[url] = title
-				}
-			} else {
-				feeds[url] = title
-			}
-		}
-	})
-
-	for url, title := range feeds {
+	for url, title := range crawler.FindFeeds(string(html), siteurl) {
 		sources = append(sources, FeedSource{Title: title, Url: url})
 	}
 	return sources, nil
@@ -170,29 +133,16 @@ func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	}
 
 	if len(websiteUrl) != 0 {
-		base, err := url.Parse(websiteUrl)
-		if err != nil {
-			return nil, err
-		}
 		res, err := defaultClient.get(websiteUrl)
 		if err != nil {
 			return nil, err
 		}
+		body, err := ioutil.ReadAll(res.Body)
 		defer res.Body.Close()
-		doc, err := goquery.NewDocumentFromReader(res.Body)
 		if err != nil {
 			return nil, err
 		}
-		doc.Find(`link[rel=icon]`).EachWithBreak(func(i int, s *goquery.Selection) bool {
-			if href, ok := s.Attr("href"); ok {
-				if hrefUrl, err := url.Parse(href); err == nil {
-					faviconUrl := base.ResolveReference(hrefUrl).String()
-					candidateUrls = append(candidateUrls, faviconUrl)
-				}
-			}
-			return true
-		})
-
+		candidateUrls = append(candidateUrls, crawler.FindIcons(string(body), websiteUrl)...)
 		if c := favicon(websiteUrl); len(c) != 0 {
 			candidateUrls = append(candidateUrls, c)
 		}
