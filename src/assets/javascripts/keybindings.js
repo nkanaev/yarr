@@ -80,8 +80,13 @@ var helperFunctions = {
     if (!scroll) return
 
     var height = scroll.getBoundingClientRect().height
+    var newpos = scroll.scrollTop + (height - padding) * direction
 
-    scroll.scrollTop += (height - padding) * direction
+    if (typeof scroll.scrollTo == 'function') {
+      scroll.scrollTo({top: newpos, left: 0, behavior: 'smooth'})
+    } else {
+      scroll.scrollTop = newpos
+    }
   }
 }
 var shortcutFunctions = {
