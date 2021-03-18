@@ -46,7 +46,7 @@ func TestFindFeedsLinks(t *testing.T) {
 }
 
 func TestFindFeedsGuess(t *testing.T) {
-	x := `
+	body := `
 		<!DOCTYPE html>
 		<html lang="en">
 		<body>
@@ -60,15 +60,38 @@ func TestFindFeedsGuess(t *testing.T) {
 		</body>
 		</html>
 	`
-	r := FindFeeds(x, base)
-
-	e := map[string]string{
+	have := FindFeeds(body, base)
+	want := map[string]string{
 		base + "/feed.xml": "",
 		base + "/news": "",
 	}
-	if !reflect.DeepEqual(e, r) {
-		t.Logf("want: %#v", e)
-		t.Logf("have: %#v", r)
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid result")
+	}
+}
+
+func TestFindIcons(t *testing.T) {
+	body := `
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<title></title>
+			<link rel="icon favicon" href="/favicon.ico">
+			<link rel="icon macicon" href="path/to/favicon.png">
+		</head>
+		<body>
+			
+		</body>
+		</html>
+	`
+	have := FindIcons(body, base)
+	want := []string{base + "/favicon.ico", base + "/path/to/favicon.png"}
+	if !reflect.DeepEqual(have, want) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
 		t.Fatal("invalid result")
 	}
 }
