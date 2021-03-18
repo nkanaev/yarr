@@ -6,7 +6,6 @@
 
 - fix: scrollTo/scrollBy with smooth behavior instead of scrollTop
 
-- ref: drop goquery, switch to cascadia (or `x/net`)
 - ref: `mmcdole/gofeed` has too many indirect deps, drop it
 
 - ref: convert `.content` to `#content`
