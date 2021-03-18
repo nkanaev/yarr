@@ -1,7 +1,6 @@
 package opml
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -48,7 +47,6 @@ func TestOPML(t *testing.T) {
 </body>
 </opml>
 `
-	fmt.Println(have)
 	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %s", want)
 		t.Logf("have: %s", have)
