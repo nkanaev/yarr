@@ -1,0 +1,58 @@
+# model
+
+- feed:
+  - title
+  - site_link
+  - feed_link
+
+- item:
+  - guid
+  - date
+  - link
+  - title
+  - content
+  - image_url
+  - podcast_url
+
+# specs
+
+- rss
+  https://en.wikipedia.org/wiki/RSS
+  - 0.90:
+    https://www.rssboard.org/rss-0-9-0
+    https://web.archive.org/web/20001208063100/http://my.netscape.com/publish/help/quickstart.html
+  - 0.91 (netscape)
+    https://www.rssboard.org/rss-0-9-1-netscape
+  - 0.91 (userland)
+    https://www.rssboard.org/rss-0-9-1
+  - 0.92
+    https://www.rssboard.org/rss-0-9-2
+  - 0.93 (withdrawn)
+    http://backend.userland.com/rss093
+  - 0.94 (withdrawn)
+  - 1.0
+    https://web.resource.org/rss/1.0/
+  - 2.0
+    https://cyber.harvard.edu/rss/rss.html
+    https://www.rssboard.org/rss-2-0
+
+- atom
+  https://en.wikipedia.org/wiki/Atom_(Web_standard)
+  - 0.3
+    https://support.google.com/merchants/answer/160598?hl=en
+  - 1.0
+    https://tools.ietf.org/html/rfc4287
+
+- json
+  https://en.wikipedia.org/wiki/JSON_Feed
+  - 1.0
+    https://jsonfeed.org/version/1
+  - 1.1
+    https://jsonfeed.org/version/1.1
+
+# parsers
+
+https://feedparser.readthedocs.io/en/latest/
+https://github.com/mmcdole/gofeed
+https://github.com/miniflux/v2/tree/2.0.28/reader/
+https://github.com/Ranchero-Software/RSParser
