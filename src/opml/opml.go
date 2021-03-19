@@ -8,8 +8,8 @@ import (
 
 type Folder struct {
 	Title   string
-	Folders []*Folder
-	Feeds   []*Feed
+	Folders []Folder
+	Feeds   []Feed
 }
 
 type Feed struct {
@@ -18,16 +18,8 @@ type Feed struct {
 	SiteUrl string
 }
 
-func NewFolder(title string) *Folder {
-	return &Folder{
-		Title: title,
-		Folders: make([]*Folder, 0),
-		Feeds: make([]*Feed, 0),
-	}
-}
-
-func (f *Folder) AllFeeds() []*Feed {
-	feeds := make([]*Feed, 0)
+func (f Folder) AllFeeds() []Feed {
+	feeds := make([]Feed, 0)
 	feeds = append(feeds, f.Feeds...)
 	for _, subfolder := range f.Folders {
 		feeds = append(feeds, subfolder.AllFeeds()...)
@@ -39,7 +31,7 @@ var e = html.EscapeString
 var indent = "  "
 var nl = "\n"
 
-func (f *Folder) outline(level int) string {
+func (f Folder) outline(level int) string {
 	builder := strings.Builder{}
 	prefix := strings.Repeat(indent, level)
 
@@ -58,14 +50,14 @@ func (f *Folder) outline(level int) string {
 	return builder.String()
 }
 
-func (f *Feed) outline(level int) string {
+func (f Feed) outline(level int) string {
 	return strings.Repeat(indent, level) + fmt.Sprintf(
 		`<outline type="rss" text="%s" xmlUrl="%s" htmlUrl="%s"/>` + nl,
 		e(f.Title), e(f.FeedUrl), e(f.SiteUrl),
 	)
 }
 
-func (f *Folder) OPML() string {
+func (f Folder) OPML() string {
 	builder := strings.Builder{}
 	builder.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + nl)
 	builder.WriteString(`<opml version="1.1">` + nl)

@@ -7,31 +7,31 @@ import (
 
 
 func TestOPML(t *testing.T) {
-	have := (&Folder{
+	have := (Folder{
 		Title: "",
-		Feeds: []*Feed{
-			&Feed{
+		Feeds: []Feed{
+			Feed{
 				Title: "title1",
 				FeedUrl: "https://baz.com/feed.xml",
 				SiteUrl: "https://baz.com/",
 			},
 		},
-		Folders: []*Folder{
-			&Folder{
+		Folders: []Folder{
+			Folder{
 				Title: "sub",
-				Feeds: []*Feed{
-					&Feed{
+				Feeds: []Feed{
+					Feed{
 						Title: "subtitle1",
 						FeedUrl: "https://foo.com/feed.xml",
 						SiteUrl: "https://foo.com/",
 					},
-					&Feed{
+					Feed{
 						Title: "&>",
 						FeedUrl: "https://bar.com/feed.xml",
 						SiteUrl: "https://bar.com/",
 					},
 				},
-				Folders: []*Folder{},
+				Folders: []Folder{},
 			},
 		},
 	}).OPML()

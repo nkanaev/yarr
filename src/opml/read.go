@@ -18,11 +18,11 @@ type outline struct {
 	Outlines    []outline `xml:"outline,omitempty"`
 }
 
-func buildFolder(title string, outlines []outline) *Folder {
-	folder := NewFolder(title)
+func buildFolder(title string, outlines []outline) Folder {
+	folder := Folder{Title: title}
 	for _, outline := range outlines {
 		if outline.Type == "rss" {
-			folder.Feeds = append(folder.Feeds, &Feed{
+			folder.Feeds = append(folder.Feeds, Feed{
 				Title:   outline.Title,
 				FeedUrl: outline.FeedUrl,
 				SiteUrl: outline.SiteUrl,
@@ -35,7 +35,7 @@ func buildFolder(title string, outlines []outline) *Folder {
 	return folder
 }
 
-func Parse(r io.Reader) (*Folder, error) {
+func Parse(r io.Reader) (Folder, error) {
 	val := new(opml)
 	decoder := xml.NewDecoder(r)
 	decoder.Entity = xml.HTMLEntity
@@ -43,7 +43,7 @@ func Parse(r io.Reader) (*Folder, error) {
 
 	err := decoder.Decode(&val)
 	if err != nil {
-		return nil, err
+		return Folder{}, err
 	}
 	return buildFolder("", val.Outlines), nil
 }
