@@ -2,13 +2,13 @@
 
 - feed:
   - title
-  - site_link
-  - feed_link
+  - site_url
+  - feed_url
 
 - item:
   - guid
   - date
-  - link
+  - url
   - title
   - content
   - image_url
