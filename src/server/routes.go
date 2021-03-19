@@ -361,7 +361,7 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 			feed := feed
 			if feed.FolderId == nil {
 				doc.Feeds = append(doc.Feeds, opml.Feed{
-					Title: feed.Title,
+					Title:   feed.Title,
 					FeedUrl: feed.FeedLink,
 					SiteUrl: feed.Link,
 				})
@@ -370,7 +370,7 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 				feedsByFolderID[id] = append(feedsByFolderID[id], &feed)
 			}
 		}
-		
+
 		for _, folder := range s.db.ListFolders() {
 			folderFeeds := feedsByFolderID[folder.Id]
 			if len(folderFeeds) == 0 {
@@ -379,7 +379,7 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 			opmlfolder := opml.Folder{Title: folder.Title}
 			for _, feed := range folderFeeds {
 				opmlfolder.Feeds = append(opmlfolder.Feeds, opml.Feed{
-					Title: feed.Title,
+					Title:   feed.Title,
 					FeedUrl: feed.FeedLink,
 					SiteUrl: feed.Link,
 				})

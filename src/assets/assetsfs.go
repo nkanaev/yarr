@@ -11,5 +11,5 @@ import "embed"
 var embedded embed.FS
 
 func init() {
-	FS.embedded = &embedded			
+	FS.embedded = &embedded
 }

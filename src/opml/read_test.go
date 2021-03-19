@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-
 func TestParse(t *testing.T) {
 	have, _ := Parse(strings.NewReader(`
 		<?xml version="1.0" encoding="UTF-8"?>
@@ -27,30 +26,30 @@ func TestParse(t *testing.T) {
 	want := Folder{
 		Title: "",
 		Feeds: []Feed{
-			Feed{
-				Title: "title1",
+			{
+				Title:   "title1",
 				FeedUrl: "https://baz.com/feed.xml",
 				SiteUrl: "https://baz.com/",
 			},
 		},
 		Folders: []Folder{
-			Folder{
+			{
 				Title: "sub",
 				Feeds: []Feed{
-					Feed{
-						Title: "subtitle1",
+					{
+						Title:   "subtitle1",
 						FeedUrl: "https://foo.com/feed.xml",
 						SiteUrl: "https://foo.com/",
 					},
-					Feed{
-						Title: "&>",
+					{
+						Title:   "&>",
 						FeedUrl: "https://bar.com/feed.xml",
 						SiteUrl: "https://bar.com/",
 					},
 				},
 			},
 		},
-	}	
+	}
 	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)

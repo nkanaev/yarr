@@ -19,7 +19,7 @@ var GitHash string = "unknown"
 
 func main() {
 	log.SetOutput(os.Stdout)
-	log.SetFlags(log.Ldate|log.Ltime|log.Lshortfile)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	var addr, db, authfile, certfile, keyfile string
 	var ver, open bool

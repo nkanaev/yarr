@@ -51,7 +51,7 @@ func (r *Router) resolve(path string) *Route {
 func (r *Router) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// autoclose open base url
 	if r.base != "" && r.base == req.URL.Path {
-		http.Redirect(rw, req, r.base + "/", http.StatusFound)
+		http.Redirect(rw, req, r.base+"/", http.StatusFound)
 		return
 	}
 

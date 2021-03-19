@@ -1,9 +1,9 @@
 package opml
 
 import (
-	"strings"
-	"html"
 	"fmt"
+	"html"
+	"strings"
 )
 
 type Folder struct {
@@ -36,7 +36,7 @@ func (f Folder) outline(level int) string {
 	prefix := strings.Repeat(indent, level)
 
 	if level > 0 {
-		builder.WriteString(prefix + fmt.Sprintf(`<outline text="%s">` + nl, e(f.Title)))
+		builder.WriteString(prefix + fmt.Sprintf(`<outline text="%s">`+nl, e(f.Title)))
 	}
 	for _, folder := range f.Folders {
 		builder.WriteString(folder.outline(level + 1))
@@ -52,7 +52,7 @@ func (f Folder) outline(level int) string {
 
 func (f Feed) outline(level int) string {
 	return strings.Repeat(indent, level) + fmt.Sprintf(
-		`<outline type="rss" text="%s" xmlUrl="%s" htmlUrl="%s"/>` + nl,
+		`<outline type="rss" text="%s" xmlUrl="%s" htmlUrl="%s"/>`+nl,
 		e(f.Title), e(f.FeedUrl), e(f.SiteUrl),
 	)
 }

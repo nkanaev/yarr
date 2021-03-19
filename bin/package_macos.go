@@ -85,9 +85,9 @@ func main() {
 	for _, res := range []int{1024, 512, 256, 128, 64, 32, 16} {
 		outfile := fmt.Sprintf("icon_%dx%d.png", res, res)
 		if res == 1024 || res == 64 {
-			outfile = fmt.Sprintf("icon_%dx%d@2x.png", res / 2, res / 2)
+			outfile = fmt.Sprintf("icon_%dx%d@2x.png", res/2, res/2)
 		}
-		cmd := []string {
+		cmd := []string{
 			"sips", "-s", "format", "png", "--resampleWidth", strconv.Itoa(res),
 			iconFile, "--out", path.Join(iconsetDir, outfile),
 		}

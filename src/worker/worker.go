@@ -3,8 +3,8 @@ package worker
 import (
 	"github.com/nkanaev/yarr/src/storage"
 	"log"
-	"sync/atomic"
 	"runtime"
+	"sync/atomic"
 	"time"
 )
 
@@ -19,7 +19,7 @@ type Worker struct {
 func NewWorker(db *storage.Storage) *Worker {
 	queueSize := int32(0)
 	return &Worker{
-		db: db,
+		db:          db,
 		feedQueue:   make(chan storage.Feed, 3000),
 		queueSize:   &queueSize,
 		refreshRate: make(chan int64),

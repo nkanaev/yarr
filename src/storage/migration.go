@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-var migrations = []func(*sql.Tx)error{
+var migrations = []func(*sql.Tx) error{
 	m01_initial,
 	m02_feed_states_and_errors,
 	m03_on_delete_actions,
@@ -17,7 +17,7 @@ var maxVersion = int64(len(migrations))
 
 func migrate(db *sql.DB) error {
 	var version int64
-	db.QueryRow("pragma user_version").Scan(&version);
+	db.QueryRow("pragma user_version").Scan(&version)
 
 	if version >= maxVersion {
 		return nil
@@ -29,7 +29,7 @@ func migrate(db *sql.DB) error {
 		// Migrations altering schema using a sequence of steps due to SQLite limitations.
 		// Must come with `pragma foreign_key_check` at the end. See:
 		// "Making Other Kinds Of Table Schema Changes"
-	    // https://www.sqlite.org/lang_altertable.html
+		// https://www.sqlite.org/lang_altertable.html
 		trickyAlteration := (v == 3)
 
 		log.Printf("[migration:%d] starting", v)
@@ -56,7 +56,7 @@ func migrate(db *sql.DB) error {
 func migrateVersion(v int64, db *sql.DB) error {
 	var err error
 	var tx *sql.Tx
-	migratefunc := migrations[v - 1]
+	migratefunc := migrations[v-1]
 	if tx, err = db.Begin(); err != nil {
 		log.Printf("[migration:%d] failed to start transaction", v)
 		return err

@@ -11,11 +11,11 @@ type opml struct {
 }
 
 type outline struct {
-	Type       string    `xml:"type,attr,omitempty"`
-	Title       string    `xml:"text,attr"`
-	FeedUrl     string    `xml:"xmlUrl,attr,omitempty"`
-	SiteUrl     string    `xml:"htmlUrl,attr,omitempty"`
-	Outlines    []outline `xml:"outline,omitempty"`
+	Type     string    `xml:"type,attr,omitempty"`
+	Title    string    `xml:"text,attr"`
+	FeedUrl  string    `xml:"xmlUrl,attr,omitempty"`
+	SiteUrl  string    `xml:"htmlUrl,attr,omitempty"`
+	Outlines []outline `xml:"outline,omitempty"`
 }
 
 func buildFolder(title string, outlines []outline) Folder {

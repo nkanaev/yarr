@@ -1,12 +1,12 @@
 package main
 
 import (
-	"io/ioutil"
 	"flag"
+	"io/ioutil"
 	"strings"
 )
 
-var rsrc  = `1 VERSIONINFO
+var rsrc = `1 VERSIONINFO
 FILEVERSION     {VERSION_COMMA},0,0
 PRODUCTVERSION  {VERSION_COMMA},0,0
 BEGIN

@@ -6,7 +6,7 @@ import (
 )
 
 type Storage struct {
-	db  *sql.DB
+	db *sql.DB
 }
 
 func New(path string) (*Storage, error) {

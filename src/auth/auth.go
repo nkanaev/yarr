@@ -33,10 +33,10 @@ func Authenticate(rw http.ResponseWriter, username, password, basepath string) {
 
 func Logout(rw http.ResponseWriter, basepath string) {
 	http.SetCookie(rw, &http.Cookie{
-		Name:    "auth",
-		Value:   "",
-		MaxAge:  -1,
-		Path:    basepath,
+		Name:   "auth",
+		Value:  "",
+		MaxAge: -1,
+		Path:   basepath,
 	})
 }
 

@@ -55,7 +55,7 @@ func TestRouteRegexpStar(t *testing.T) {
 
 func TestRegexGroupsPart(t *testing.T) {
 	re := routeRegexp("/foo/:bar/1/:baz")
-	
+
 	expect := map[string]string{"bar": "one", "baz": "two"}
 	actual := regexGroups("/foo/one/1/two", re)
 
@@ -66,7 +66,7 @@ func TestRegexGroupsPart(t *testing.T) {
 
 func TestRegexGroupsStar(t *testing.T) {
 	re := routeRegexp("/foo/*bar")
-	
+
 	expect := map[string]string{"bar": "bar/baz/"}
 	actual := regexGroups("/foo/bar/baz/", re)
 

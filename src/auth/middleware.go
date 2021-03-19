@@ -20,7 +20,7 @@ func unsafeMethod(method string) bool {
 }
 
 func (m *Middleware) Handler(c *router.Context) {
-	if strings.HasPrefix(c.Req.URL.Path, m.BasePath + m.Public) {
+	if strings.HasPrefix(c.Req.URL.Path, m.BasePath+m.Public) {
 		c.Next()
 		return
 	}
@@ -46,7 +46,7 @@ func (m *Middleware) Handler(c *router.Context) {
 		} else {
 			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]string{
 				"username": username,
-				"error": "Invalid username/password",
+				"error":    "Invalid username/password",
 			})
 			return
 		}

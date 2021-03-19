@@ -11,9 +11,9 @@ import (
 var BasePath string = ""
 
 type Server struct {
-	Addr        string
-	db          *storage.Storage
-	worker      *worker.Worker
+	Addr   string
+	db     *storage.Storage
+	worker *worker.Worker
 	// auth
 	Username string
 	Password string

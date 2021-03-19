@@ -10,10 +10,10 @@ import (
 )
 
 type Context struct {
-	Req   *http.Request
-	Out   http.ResponseWriter
+	Req *http.Request
+	Out http.ResponseWriter
 
-	Vars  map[string]string
+	Vars map[string]string
 
 	chain []Handler
 	index int

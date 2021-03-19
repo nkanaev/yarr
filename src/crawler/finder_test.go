@@ -1,8 +1,8 @@
 package crawler
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 const base = "http://example.com"
@@ -11,7 +11,7 @@ func TestFindFeedsInvalidHTML(t *testing.T) {
 	x := `some nonsense`
 	r := FindFeeds(x, base)
 	if len(r) != 0 {
-		t.Fatal("not expecting results")	
+		t.Fatal("not expecting results")
 	}
 }
 
@@ -34,8 +34,8 @@ func TestFindFeedsLinks(t *testing.T) {
 	have := FindFeeds(x, base)
 
 	want := map[string]string{
-		base + "/feed.xml": "rss with title",
-		base + "/atom.xml": "",
+		base + "/feed.xml":  "rss with title",
+		base + "/atom.xml":  "",
 		base + "/feed.json": "",
 	}
 	if !reflect.DeepEqual(have, want) {
@@ -63,7 +63,7 @@ func TestFindFeedsGuess(t *testing.T) {
 	have := FindFeeds(body, base)
 	want := map[string]string{
 		base + "/feed.xml": "",
-		base + "/news": "",
+		base + "/news":     "",
 	}
 	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %#v", want)

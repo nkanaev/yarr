@@ -14,7 +14,7 @@ type HTTPState struct {
 }
 
 func (s *Storage) ListHTTPStates() map[int64]HTTPState {
-	result := make(map[int64]HTTPState)	
+	result := make(map[int64]HTTPState)
 	rows, err := s.db.Query(`select feed_id, last_refreshed, last_modified, etag from http_states`)
 	if err != nil {
 		log.Print(err)

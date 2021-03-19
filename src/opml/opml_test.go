@@ -5,28 +5,27 @@ import (
 	"testing"
 )
 
-
 func TestOPML(t *testing.T) {
 	have := (Folder{
 		Title: "",
 		Feeds: []Feed{
-			Feed{
-				Title: "title1",
+			{
+				Title:   "title1",
 				FeedUrl: "https://baz.com/feed.xml",
 				SiteUrl: "https://baz.com/",
 			},
 		},
 		Folders: []Folder{
-			Folder{
+			{
 				Title: "sub",
 				Feeds: []Feed{
-					Feed{
-						Title: "subtitle1",
+					{
+						Title:   "subtitle1",
 						FeedUrl: "https://foo.com/feed.xml",
 						SiteUrl: "https://foo.com/",
 					},
-					Feed{
-						Title: "&>",
+					{
+						Title:   "&>",
 						FeedUrl: "https://bar.com/feed.xml",
 						SiteUrl: "https://bar.com/",
 					},
