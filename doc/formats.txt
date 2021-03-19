@@ -40,8 +40,10 @@
   https://en.wikipedia.org/wiki/Atom_(Web_standard)
   - 0.3
     https://support.google.com/merchants/answer/160598?hl=en
+    http://web.archive.org/web/20060811235523/http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html
   - 1.0
     https://tools.ietf.org/html/rfc4287
+    https://validator.w3.org/feed/docs/atom.html
 
 - json
   https://en.wikipedia.org/wiki/JSON_Feed
