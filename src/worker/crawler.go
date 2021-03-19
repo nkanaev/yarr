@@ -20,20 +20,6 @@ type FeedSource struct {
 	Url   string `json:"url"`
 }
 
-const feedLinks = `
-	link[type='application/rss+xml'],
-	link[type='application/atom+xml'],
-	a[href$="/feed"],
-	a[href$="/feed/"],
-	a[href$="feed.xml"],
-	a[href$="atom.xml"],
-	a[href$="rss.xml"],
-	a:contains("rss"),
-	a:contains("RSS"),
-	a:contains("feed"),
-	a:contains("FEED")
-`
-
 type Client struct {
 	httpClient *http.Client
 	userAgent  string
