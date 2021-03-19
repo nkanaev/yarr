@@ -49,14 +49,14 @@ func (f *jsonFeed) convert(base string) *Feed {
 		FeedURL: f.FeedURL,
 	}
 	for _, item := range f.Items {
-		//date := item.DatePublished
+		date, _ := dateParse(first(item.DatePublished, item.DateModified))
 		content := first(item.HTML, item.Text, item.Summary)
 		imageUrl := ""
 		podcastUrl := ""
 	
 		feed.Items = append(feed.Items, Item{
 			GUID: item.ID,
-			Date: nil,
+			Date: date,
 			URL:  item.URL,
 			Title: item.Title,
 			Content: content,
