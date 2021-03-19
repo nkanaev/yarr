@@ -42,7 +42,7 @@ func first(vals ...string) string {
 	return ""
 }
 
-func (f *jsonFeed) convert(base string) *Feed {
+func (f *jsonFeed) convert() *Feed {
 	feed := &Feed{
 		Title: f.Title,
 		SiteURL: f.SiteURL,
@@ -67,11 +67,11 @@ func (f *jsonFeed) convert(base string) *Feed {
 	return feed
 }
 
-func ParseJSON(data io.Reader, base string) (*Feed, error) {
+func ParseJSON(data io.Reader) (*Feed, error) {
 	feed := new(jsonFeed)
 	decoder := json.NewDecoder(data)
 	if err := decoder.Decode(&feed); err != nil {
 		return nil, err
 	}
-	return feed.convert(base), nil
+	return feed.convert(), nil
 }

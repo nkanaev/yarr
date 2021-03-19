@@ -24,7 +24,7 @@ func TestJSONFeed(t *testing.T) {
 				"url": "https://example.org/initial-post"
 			}
 		]
-	}`), "https://example.com")
+	}`))
 	want := &Feed{
 		Title: "My Example Feed",
 		SiteURL: "https://example.org/",
