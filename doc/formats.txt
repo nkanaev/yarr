@@ -58,3 +58,4 @@ https://feedparser.readthedocs.io/en/latest/
 https://github.com/mmcdole/gofeed
 https://github.com/miniflux/v2/tree/2.0.28/reader/
 https://github.com/Ranchero-Software/RSParser
+https://github.com/feederco/feeder-parser
