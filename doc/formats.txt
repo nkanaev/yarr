@@ -113,8 +113,10 @@
 
 # parsers
 
-https://feedparser.readthedocs.io/en/latest/
+https://github.com/kurtmckee/feedparser
 https://github.com/mmcdole/gofeed
 https://github.com/miniflux/v2/tree/2.0.28/reader/
 https://github.com/Ranchero-Software/RSParser
 https://github.com/feederco/feeder-parser
+
+https://github.com/mmcdole/gofeed/commit/9665eb31016cef3d15ab85574bc6fdbe890cd252
