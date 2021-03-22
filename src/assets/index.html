@@ -276,6 +276,14 @@
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
+                    <div>
+                        Original link:
+                        <a
+                            target="_blank"
+                            :href="feedsById[itemSelectedDetails.feed_id].link">
+                                {{ feedsById[itemSelectedDetails.feed_id].link }}
+                        </a>
+                    </div>
                 </div>
                 <hr>
                 <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
