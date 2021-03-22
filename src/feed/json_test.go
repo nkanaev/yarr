@@ -26,7 +26,7 @@ func TestJSONFeed(t *testing.T) {
 		]
 	}`))
 	want := &Feed{
-		Title: "My Example Feed",
+		Title:   "My Example Feed",
 		SiteURL: "https://example.org/",
 		Items: []Item{
 			{GUID: "2", Content: "This is a second item.", URL: "https://example.org/second-item"},

@@ -9,12 +9,12 @@ type Feed struct {
 }
 
 type Item struct {
-	GUID string
-	Date time.Time
-	URL  string
+	GUID  string
+	Date  time.Time
+	URL   string
 	Title string
 
-	Content string
-	ImageURL string
+	Content    string
+	ImageURL   string
 	PodcastURL string
 }

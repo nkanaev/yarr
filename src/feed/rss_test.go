@@ -30,19 +30,19 @@ func TestRSSFeed(t *testing.T) {
 		</rss>
 	`))
 	want := &Feed{
-		Title: "Scripting News",
+		Title:   "Scripting News",
 		SiteURL: "http://www.scripting.com/",
 		Items: []Item{
 			{
-				GUID: "http://www.scripting.com/one/",
-				URL: "http://www.scripting.com/one/",
-				Title: "Title 1",
+				GUID:    "http://www.scripting.com/one/",
+				URL:     "http://www.scripting.com/one/",
+				Title:   "Title 1",
 				Content: "Description 1",
 			},
 			{
-				GUID: "http://www.scripting.com/two/",
-				URL: "http://www.scripting.com/two/",
-				Title: "Title 2",
+				GUID:    "http://www.scripting.com/two/",
+				URL:     "http://www.scripting.com/two/",
+				Title:   "Title 2",
 				Content: "Description 2",
 			},
 		},
