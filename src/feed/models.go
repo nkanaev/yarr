@@ -5,7 +5,6 @@ import "time"
 type Feed struct {
 	Title   string
 	SiteURL string
-	FeedURL string
 	Items   []Item
 }
 

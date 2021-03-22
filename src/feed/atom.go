@@ -67,7 +67,6 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 	feed := &Feed{
 		Title:   f.Title.String(),
 		SiteURL: first(f.Links.First("alternate"), f.Links.First("")),
-		FeedURL: f.Links.First("self"),
 	}
 	for _, e := range f.Entries {
 		date, _ := dateParse(first(e.Published, e.Updated))

@@ -10,7 +10,6 @@ type jsonFeed struct {
 	Version string     `json:"version"`
 	Title   string     `json:"title"`
 	SiteURL string     `json:"home_page_url"`
-	FeedURL string     `json:"feed_url"`
 	Items   []jsonItem `json:"items"`
 }
 
@@ -47,7 +46,6 @@ func (f *jsonFeed) convert() *Feed {
 	feed := &Feed{
 		Title: f.Title,
 		SiteURL: f.SiteURL,
-		FeedURL: f.FeedURL,
 	}
 	for _, item := range f.Items {
 		date, _ := dateParse(first(item.DatePublished, item.DateModified))

@@ -38,7 +38,6 @@ func TestAtom(t *testing.T) {
 	want := &Feed{
 		Title:   "Example Feed",
 		SiteURL: "http://example.org/",
-		FeedURL: "http://example.org/feed/",
 		Items: []Item{
 			{
 				GUID:       "urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a",
