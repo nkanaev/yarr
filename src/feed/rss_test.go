@@ -7,7 +7,7 @@ import (
 )
 
 func TestRSSFeed(t *testing.T) {
-	have, _ := ParseRSS(strings.NewReader(`
+	have, _ := Parse(strings.NewReader(`
 		<?xml version="1.0"?>
 		<!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd">
 		<rss version="0.91">

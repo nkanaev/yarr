@@ -28,7 +28,7 @@ func sniff(lookup string) (string, processor) {
 				case "rss":
 					return "rss", ParseRSS
 				case "RDF":
-					return "rss", ParseRDF
+					return "rdf", ParseRDF
 				case "feed":
 					return "atom", ParseAtom
 				}
@@ -41,11 +41,9 @@ func sniff(lookup string) (string, processor) {
 }
 
 func Parse(r io.Reader) (*Feed, error) {
-	chunk := make([]byte, 64)
-	numread, err := r.Read(chunk)
-	fmt.Println(numread, err)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read: %s", err)
+	chunk := make([]byte, 1024)
+	if _, err := r.Read(chunk); err != nil {
+		return nil, fmt.Errorf("Failed to read input: %s", err)
 	}
 
 	_, callback := sniff(string(chunk))

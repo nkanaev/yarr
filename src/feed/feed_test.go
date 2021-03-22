@@ -6,7 +6,7 @@ func TestSniff(t *testing.T) {
 	testcases := [][2]string{
 		{
 			`<?xml version="1.0"?><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"></rdf:RDF>`,
-			"rss",
+			"rdf",
 		},
 		{
 			`<?xml version="1.0"?><rss version="2.0"><channel></channel></rss>`,

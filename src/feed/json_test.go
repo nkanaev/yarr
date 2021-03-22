@@ -7,7 +7,7 @@ import (
 )
 
 func TestJSONFeed(t *testing.T) {
-	have, _ := ParseJSON(strings.NewReader(`{
+	have, _ := Parse(strings.NewReader(`{
 		"version": "https://jsonfeed.org/version/1",
 		"title": "My Example Feed",
 		"home_page_url": "https://example.org/",
