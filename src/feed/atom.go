@@ -1,3 +1,4 @@
+// Atom 1.0 parser
 package feed
 
 import (

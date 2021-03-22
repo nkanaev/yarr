@@ -1,3 +1,7 @@
+// Parser for RSS versions:
+// - 0.91 netscape
+// - 0.91 userland
+// - 2.0
 package feed
 
 import (
