@@ -6,21 +6,23 @@ package feed
 
 import (
 	"encoding/xml"
+	"fmt"
+	"io"
 )
 
 type rssFeed struct {
 	XMLName xml.Name  `xml:"rss"`
 	Version string    `xml:"version,attr"`
 	Title   string    `xml:"channel>title"`
-	Links   []rssLink `xml:"channel>link"`
+	Link    string    `xml:"channel>link"`
 	Items   []rssItem `xml:"channel>item"`
 }
 
 type rssItem struct {
 	GUID           string         `xml:"guid"`
-	Title          []rssTitle     `xml:"title"`
-	Links          []rssLink      `xml:"link"`
-	Description    string         `xml:"description"`
+	Title          string         `xml:"title"`
+	Link           string         `xml:"link"`
+	Description    string         `xml:"rss description"`
 	PubDate        string         `xml:"pubDate"`
 	EnclosureLinks []rssEnclosure `xml:"enclosure"`
 
@@ -52,4 +54,32 @@ type rssEnclosure struct {
 	URL    string `xml:"url,attr"`
 	Type   string `xml:"type,attr"`
 	Length string `xml:"length,attr"`
+}
+
+func ParseRSS(r io.Reader) (*Feed, error) {
+	f := rssFeed{}
+
+	decoder := xml.NewDecoder(r)
+	decoder.DefaultSpace = "rss"
+	if err := decoder.Decode(&f); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	feed := &Feed{
+		Title:   f.Title,
+		SiteURL: f.Link,
+	}
+	for _, e := range f.Items {
+		date, _ := dateParse(first(e.DublinCoreDate, e.PubDate))
+
+		feed.Items = append(feed.Items, Item{
+			GUID:       first(e.GUID, e.Link),
+			Date:       date,
+			URL:        e.Link,
+			Title:      e.Title,
+			Content:    e.Description,
+		})
+	}
+	return feed, nil
 }
