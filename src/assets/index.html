@@ -287,6 +287,16 @@
                 </div>
                 <hr>
                 <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
+                <div v-if="itemSelectedDetails.guid.indexOf('yt:video:') > -1">
+                    <iframe
+                        width="960"
+                        height="540"
+                        v-bind:src="'https://www.youtube.com/embed/' + itemSelectedDetails.guid.split('yt:video:')[1]"
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
                 <div v-html="itemSelectedContent"></div>
             </div>
         </div>
