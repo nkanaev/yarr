@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 )
 
@@ -53,4 +54,24 @@ func Parse(r io.Reader) (*Feed, error) {
 
 	r = io.MultiReader(bytes.NewReader(chunk), r)
 	return callback(r)
+}
+
+func FixURLs(feed *Feed, base string) error {
+	baseUrl, err := url.Parse(base)
+	if err != nil {
+		return fmt.Errorf("failed to parse base url: %#v", base)
+	}
+	siteUrl, err := url.Parse(feed.SiteURL)
+	if err != nil {
+		return fmt.Errorf("failed to parse feed url: %#v", feed.SiteURL)
+	}
+	feed.SiteURL = baseUrl.ResolveReference(siteUrl).String()
+	for _, item := range feed.Items {
+		itemUrl, err := url.Parse(item.URL)
+		if err != nil {
+			return fmt.Errorf("failed to parse item url: %#v", item.URL)
+		}
+		item.URL = siteUrl.ResolveReference(itemUrl).String()
+	}
+	return nil
 }
