@@ -2,7 +2,7 @@ package feed
 
 import "testing"
 
-func TestDetect(t *testing.T) {
+func TestSniff(t *testing.T) {
 	testcases := [][2]string{
 		{
 			`<?xml version="1.0"?><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"></rdf:RDF>`,
@@ -26,7 +26,7 @@ func TestDetect(t *testing.T) {
 		},
 	}
 	for _, testcase := range testcases {
-		have, _ := detect(testcase[0])
+		have, _ := sniff(testcase[0])
 		want := testcase[1]
 		if want != have {
 			t.Log(testcase[0])

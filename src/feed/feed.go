@@ -1,6 +1,7 @@
 package feed
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -12,42 +13,46 @@ var UnknownFormat = errors.New("unknown feed format")
 
 type processor func(r io.Reader) (*Feed, error)
 
-func detect(lookup string) (string, processor) {
+func sniff(lookup string) (string, processor) {
 	lookup = strings.TrimSpace(lookup)
-	if lookup[0] == '{' {
-		return "json", ParseJSON
-	}
-	decoder := xml.NewDecoder(strings.NewReader(lookup))	
-	for {
-		token, _ := decoder.Token()
-		if token == nil {
-			break
-		}
-		if el, ok := token.(xml.StartElement); ok {
-			switch el.Name.Local {
-			case "rss":
-				return "rss", ParseRSS
-			case "RDF":
-				return "rss", ParseRDF
-			case "feed":
-				return "atom", ParseAtom
+	switch lookup[0] {
+	case '<':
+		decoder := xml.NewDecoder(strings.NewReader(lookup))
+		for {
+			token, _ := decoder.Token()
+			if token == nil {
+				break
+			}
+			if el, ok := token.(xml.StartElement); ok {
+				switch el.Name.Local {
+				case "rss":
+					return "rss", ParseRSS
+				case "RDF":
+					return "rss", ParseRDF
+				case "feed":
+					return "atom", ParseAtom
+				}
 			}
 		}
+	case '{':
+		return "json", ParseJSON
 	}
 	return "", nil
 }
 
 func Parse(r io.Reader) (*Feed, error) {
-	var x [1024]byte
-	numread, err := r.Read(x[:])
+	chunk := make([]byte, 64)
+	numread, err := r.Read(chunk)
 	fmt.Println(numread, err)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read: %s", err)
 	}
 
-	_, callback := detect(string(x[:]))
+	_, callback := sniff(string(chunk))
 	if callback == nil {
 		return nil, UnknownFormat
 	}
+
+	r = io.MultiReader(bytes.NewReader(chunk), r)
 	return callback(r)
 }
