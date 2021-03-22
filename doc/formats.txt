@@ -36,25 +36,27 @@
 
     rdf>item>link                  (rss 0.90)
     rdf>item>link                  (rss 1.0)
-    rss>item>link                  (rss 0.91 netscape)
-    rss>item>link                  (rss 0.91 userland)
+    rss>channel>item>link          (rss 0.91 netscape)
+    rss>channel>item>link          (rss 0.91 userland)
+    rss>channel>item>link          (rss 2.0)
     feed>entry>link[rel=alternate] (atom 1.0)
 
   - title
 
-    rdf>item>title   (rss 0.90)
-    rdf>item>title   (rss 1.0)
-    rss>item>title   (rss 0.91 netscape)
-    rss>item>title   (rss 0.91 userland)
-    feed>entry>title (atom 1.0
+    rdf>item>title         (rss 0.90)
+    rdf>item>title         (rss 1.0)
+    rss>channel>item>title (rss 0.91 netscape)
+    rss>channel>item>title (rss 0.91 userland)
+    rss>channel>item>title (rss 2.0)
+    feed>entry>title       (atom 1.0)
 
   - content
 
-    rss>item>description     (rss 0.91 netscape)
-    rss>item>description     (rss 2.0)
-    rdf>item>description     (rss 1.0)
-    rdf>item>content:encoded (rss 1.0)
-    feed>entry>content       (atom 1.0)
+    rss>channel>item>description (rss 0.91 netscape)
+    rss>channel>item>description (rss 2.0)
+    rdf>item>description         (rss 1.0)
+    rdf>item>content:encoded     (rss 1.0)
+    feed>entry>content           (atom 1.0)
 
   - image_url
 
