@@ -9,9 +9,6 @@ type rssFeed struct {
 	Version     string    `xml:"version,attr"`
 	Title       string    `xml:"channel>title"`
 	Links       []rssLink `xml:"channel>link"`
-	Language    string    `xml:"channel>language"`
-	Description string    `xml:"channel>description"`
-	PubDate     string    `xml:"channel>pubDate"`
 	Items       []rssItem `xml:"channel>item"`
 }
 
