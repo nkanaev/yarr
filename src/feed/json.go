@@ -33,44 +33,25 @@ type jsonAttachment struct {
 	Duration int    `json:"duration_in_seconds"`
 }
 
-func first(vals ...string) string {
-	for _, val := range vals {
-		if len(val) > 0 {
-			return val
-		}
-	}
-	return ""
-}
-
-func (f *jsonFeed) convert() *Feed {
-	feed := &Feed{
-		Title: f.Title,
-		SiteURL: f.SiteURL,
-	}
-	for _, item := range f.Items {
-		date, _ := dateParse(first(item.DatePublished, item.DateModified))
-		content := first(item.HTML, item.Text, item.Summary)
-		imageUrl := ""
-		podcastUrl := ""
-	
-		feed.Items = append(feed.Items, Item{
-			GUID: item.ID,
-			Date: date,
-			URL:  item.URL,
-			Title: item.Title,
-			Content: content,
-			ImageURL: imageUrl,
-			PodcastURL: podcastUrl,
-		})
-	}
-	return feed
-}
-
 func ParseJSON(data io.Reader) (*Feed, error) {
-	feed := new(jsonFeed)
+	srcfeed := new(jsonFeed)
 	decoder := json.NewDecoder(data)
-	if err := decoder.Decode(&feed); err != nil {
+	if err := decoder.Decode(&srcfeed); err != nil {
 		return nil, err
 	}
-	return feed.convert(), nil
+
+	dstfeed := &Feed{
+		Title: srcfeed.Title,
+		SiteURL: srcfeed.SiteURL,
+	}
+	for _, srcitem := range srcfeed.Items {
+		dstfeed.Items = append(dstfeed.Items, Item{
+			GUID: srcitem.ID,
+			Date: dateParse(firstNonEmpty(srcitem.DatePublished, srcitem.DateModified)),
+			URL:  srcitem.URL,
+			Title: srcitem.Title,
+			Content: firstNonEmpty(srcitem.HTML, srcitem.Text, srcitem.Summary),
+		})
+	}
+	return dstfeed, nil
 }

@@ -57,31 +57,30 @@ func (links atomLinks) First(rel string) string {
 }
 
 func ParseAtom(r io.Reader) (*Feed, error) {
-	f := atomFeed{}
+	srcfeed := atomFeed{}
 
 	decoder := xml.NewDecoder(r)
-	if err := decoder.Decode(&f); err != nil {
+	if err := decoder.Decode(&srcfeed); err != nil {
 		return nil, err
 	}
 
-	feed := &Feed{
-		Title:   f.Title.String(),
-		SiteURL: first(f.Links.First("alternate"), f.Links.First("")),
+	dstfeed := &Feed{
+		Title:   srcfeed.Title.String(),
+		SiteURL: firstNonEmpty(srcfeed.Links.First("alternate"), srcfeed.Links.First("")),
 	}
-	for _, e := range f.Entries {
-		date, _ := dateParse(first(e.Published, e.Updated))
+	for _, srcitem := range srcfeed.Entries {
 		imageUrl := ""
 		podcastUrl := ""
 
-		feed.Items = append(feed.Items, Item{
-			GUID:       first(e.ID),
-			Date:       date,
-			URL:        first(e.Links.First("alternate"), f.Links.First("")),
-			Title:      e.Title.String(),
-			Content:    e.Content.String(),
+		dstfeed.Items = append(dstfeed.Items, Item{
+			GUID:       firstNonEmpty(srcitem.ID),
+			Date:       dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
+			URL:        firstNonEmpty(srcitem.Links.First("alternate"), srcfeed.Links.First("")),
+			Title:      srcitem.Title.String(),
+			Content:    srcitem.Content.String(),
 			ImageURL:   imageUrl,
 			PodcastURL: podcastUrl,
 		})
 	}
-	return feed, nil
+	return dstfeed, nil
 }

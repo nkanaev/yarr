@@ -57,29 +57,27 @@ type rssEnclosure struct {
 }
 
 func ParseRSS(r io.Reader) (*Feed, error) {
-	f := rssFeed{}
+	srcfeed := rssFeed{}
 
 	decoder := xml.NewDecoder(r)
 	decoder.DefaultSpace = "rss"
-	if err := decoder.Decode(&f); err != nil {
+	if err := decoder.Decode(&srcfeed); err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
-	feed := &Feed{
-		Title:   f.Title,
-		SiteURL: f.Link,
+	dstfeed := &Feed{
+		Title:   srcfeed.Title,
+		SiteURL: srcfeed.Link,
 	}
-	for _, e := range f.Items {
-		date, _ := dateParse(first(e.DublinCoreDate, e.PubDate))
-
-		feed.Items = append(feed.Items, Item{
-			GUID:       first(e.GUID, e.Link),
-			Date:       date,
-			URL:        e.Link,
-			Title:      e.Title,
-			Content:    e.Description,
+	for _, srcitem := range srcfeed.Items {
+		dstfeed.Items = append(dstfeed.Items, Item{
+			GUID:    firstNonEmpty(srcitem.GUID, srcitem.Link),
+			Date:    dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
+			URL:     srcitem.Link,
+			Title:   srcitem.Title,
+			Content: srcitem.Description,
 		})
 	}
-	return feed, nil
+	return dstfeed, nil
 }

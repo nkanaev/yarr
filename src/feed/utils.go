@@ -1,12 +1,19 @@
 package feed
 
 import (
-	"fmt"
 	"time"
 )
 
-// dateformats taken from somewhere
-// which where originally taken from github.com/mjibson/goread
+func firstNonEmpty(vals ...string) string {
+	for _, val := range vals {
+		if len(val) > 0 {
+			return val
+		}
+	}
+	return ""
+}
+
+// taken from github.com/mjibson/goread
 var dateFormats = []string{
 	time.RFC822,  // RSS
 	time.RFC822Z, // RSS
@@ -207,11 +214,16 @@ var dateFormats = []string{
 	"2 January, 2006",
 }
 
-func dateParse(line string) (time.Time, error) {
+var defaultTime = time.Time{}
+
+func dateParse(line string) time.Time {
+	if line == "" {
+		return defaultTime
+	}
 	for _, layout := range dateFormats {
 		if t, err := time.Parse(layout, line); err == nil {
-			return t, nil
+			return t
 		}
 	}
-	return time.Time{}, fmt.Errorf("failed to parse date: %s", line)
+	return defaultTime
 }

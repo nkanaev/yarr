@@ -25,23 +25,23 @@ type rdfItem struct {
 }
 
 func ParseRDF(r io.Reader) (*Feed, error) {
-	f := rdfFeed{}
+	srcfeed := rdfFeed{}
 
 	decoder := xml.NewDecoder(r)
-	if err := decoder.Decode(&f); err != nil {
+	if err := decoder.Decode(&srcfeed); err != nil {
 		return nil, err
 	}
 
-	feed := &Feed{
-		Title:   f.Title,
-		SiteURL: f.Link,
+	dstfeed := &Feed{
+		Title:   srcfeed.Title,
+		SiteURL: srcfeed.Link,
 	}
-	for _, e := range f.Items {
-		feed.Items = append(feed.Items, Item{
-			GUID:  e.Link,
-			URL:   e.Link,
-			Title: e.Title,
+	for _, srcitem := range srcfeed.Items {
+		dstfeed.Items = append(dstfeed.Items, Item{
+			GUID:  srcitem.Link,
+			URL:   srcitem.Link,
+			Title: srcitem.Title,
 		})
 	}
-	return feed, nil
+	return dstfeed, nil
 }
