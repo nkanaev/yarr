@@ -2,17 +2,68 @@
 
 - feed:
   - title
+
+    rdf>channel>title (rss 0.90)
+    rdf>channel>title (rss 1.0)
+    rss>channel>title (rss 0.91 netscape)
+    rss>channel>title (rss 0.91 userland)
+    rss>channel>title (rss 2.0)
+    feed>title        (atom 1.0)
+
   - site_url
-  - feed_url
+
+    rdf>channel>link (rss 0.90)
+    rdf>channel>link (rss 1.0)
+    rss>channel>link (rss 0.91 netscape)
+    rss>channel>link (rss 0.91 userland)
+    rss>channel>link (rss 2.0)
+    feed>link        (atom 1.0)
 
 - item:
   - guid
+
+    rss>channel>guid (rss 2.0)
+    feed>entry>id    (atom 1.0)
+
   - date
+
+    rdf>item>dc:date     (rss 1.0)
+    rss>channel>pubDate  (rss 2.0)
+    feed>entry>updated   (atom 1.0)
+    feed>entry>published (atom 1.0)
+
   - url
+
+    rdf>item>link                  (rss 0.90)
+    rdf>item>link                  (rss 1.0)
+    rss>item>link                  (rss 0.91 netscape)
+    rss>item>link                  (rss 0.91 userland)
+    feed>entry>link[rel=alternate] (atom 1.0)
+
   - title
+
+    rdf>item>title   (rss 0.90)
+    rdf>item>title   (rss 1.0)
+    rss>item>title   (rss 0.91 netscape)
+    rss>item>title   (rss 0.91 userland)
+    feed>entry>title (atom 1.0
+
   - content
+
+    rss>item>description     (rss 0.91 netscape)
+    rss>item>description     (rss 2.0)
+    rdf>item>description     (rss 1.0)
+    rdf>item>content:encoded (rss 1.0)
+    feed>entry>content       (atom 1.0)
+
   - image_url
+
+    feed>entry>enclosure[rel='image/*'] (atom 1.0) ???
+
   - podcast_url
+
+    rss>item>enclosure attr(url)        (rss 2.0)
+    feed>entry>enclosure[rel='audio/*'] (atom 1.0) ???
 
 # specs
 
@@ -27,11 +78,17 @@
     https://www.rssboard.org/rss-0-9-1
   - 0.92
     https://www.rssboard.org/rss-0-9-2
+    by userland, no significant changes from 0.91
   - 0.93 (withdrawn)
     http://backend.userland.com/rss093
   - 0.94 (withdrawn)
   - 1.0
     https://web.resource.org/rss/1.0/
+    https://web.archive.org/web/20021014094554/https://web.resource.org/rss/1.0/spec
+    reintroduced rdf from 0.90, added dublincore namespaces etc
+    namespaces:
+        content: http://purl.org/rss/1.0/modules/content/
+        dc: http://purl.org/dc/elements/1.1/
   - 2.0
     https://cyber.harvard.edu/rss/rss.html
     https://www.rssboard.org/rss-2-0

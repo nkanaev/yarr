@@ -5,11 +5,11 @@ import (
 )
 
 type rssFeed struct {
-	XMLName     xml.Name  `xml:"rss"`
-	Version     string    `xml:"version,attr"`
-	Title       string    `xml:"channel>title"`
-	Links       []rssLink `xml:"channel>link"`
-	Items       []rssItem `xml:"channel>item"`
+	XMLName xml.Name  `xml:"rss"`
+	Version string    `xml:"version,attr"`
+	Title   string    `xml:"channel>title"`
+	Links   []rssLink `xml:"channel>link"`
+	Items   []rssItem `xml:"channel>item"`
 }
 
 type rssItem struct {
@@ -20,8 +20,8 @@ type rssItem struct {
 	PubDate        string         `xml:"pubDate"`
 	EnclosureLinks []rssEnclosure `xml:"enclosure"`
 
-	DublinCoreDate    string `xml:"http://purl.org/dc/elements/1.1/ date"`
-	DublinCoreContent string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
+	DublinCoreDate string `xml:"http://purl.org/dc/elements/1.1/ date"`
+	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
 
 	FeedBurnerLink          string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origLink"`
 	FeedBurnerEnclosureLink string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origEnclosureLink"`
