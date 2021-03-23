@@ -14,6 +14,7 @@ import (
 	"github.com/nkanaev/yarr/src/crawler"
 	feedparser "github.com/nkanaev/yarr/src/feed"
 	"github.com/nkanaev/yarr/src/storage"
+	"golang.org/x/net/html/charset"
 )
 
 type FeedSource struct {
@@ -41,8 +42,12 @@ func (c *Client) getConditional(url, lastModified, etag string) (*http.Response,
 		return nil, err
 	}
 	req.Header.Set("User-Agent", c.userAgent)
-	req.Header.Set("If-Modified-Since", lastModified)
-	req.Header.Set("If-None-Match", etag)
+	if lastModified != "" {
+		req.Header.Set("If-Modified-Since", lastModified)
+	}
+	if etag != "" {
+		req.Header.Set("If-None-Match", etag)
+	}
 	return c.httpClient.Do(req)
 }
 
@@ -215,28 +220,31 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to get: %s", err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode/100 == 4 || res.StatusCode/100 == 5 {
-		errmsg := fmt.Sprintf("Failed to list feed items for %s (status: %d)", f.FeedLink, res.StatusCode)
-		return nil, errors.New(errmsg)
+		return nil, fmt.Errorf("status code %d", res.StatusCode)
 	}
 
 	if res.StatusCode == 304 {
 		return nil, nil
 	}
 
+	body, err := charset.NewReader(res.Body, res.Header.Get("Content-Type"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to init response body: %s", err)
+	}
+	feed, err := feedparser.Parse(body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse: %s", err)
+	}
+
 	lastModified := res.Header.Get("Last-Modified")
 	etag := res.Header.Get("Etag")
 	if lastModified != "" || etag != "" {
 		db.SetHTTPState(f.Id, lastModified, etag)
-	}
-
-	feed, err := feedparser.Parse(res.Body)
-	if err != nil {
-		return nil, err
 	}
 	return ConvertItems(feed.Items, f), nil
 }
