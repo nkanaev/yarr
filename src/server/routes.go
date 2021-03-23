@@ -155,7 +155,7 @@ func (s *Server) handleFeedList(c *router.Context) {
 			return
 		}
 
-		feed, sources, err := worker.DiscoverFeed(form.Url)
+		feed, feedUrl, sources, err := worker.DiscoverFeed(form.Url)
 		if err != nil {
 			log.Print(err)
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
@@ -165,9 +165,9 @@ func (s *Server) handleFeedList(c *router.Context) {
 		if feed != nil {
 			storedFeed := s.db.CreateFeed(
 				feed.Title,
-				feed.Description,
-				feed.Link,
-				feed.FeedLink,
+				"",
+				feed.SiteURL,
+				feedUrl,
 				form.FolderID,
 			)
 			s.db.CreateItems(worker.ConvertItems(feed.Items, *storedFeed))

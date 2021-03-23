@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mmcdole/gofeed"
-	"github.com/nkanaev/yarr/src/crawler"
-	"github.com/nkanaev/yarr/src/storage"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
+
+	"github.com/nkanaev/yarr/src/crawler"
+	feedparser "github.com/nkanaev/yarr/src/feed"
+	"github.com/nkanaev/yarr/src/storage"
 )
 
 type FeedSource struct {
@@ -55,32 +56,34 @@ func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
 	return sources, nil
 }
 
-func DiscoverFeed(candidateUrl string) (*gofeed.Feed, *[]FeedSource, error) {
+func DiscoverFeed(candidateUrl string) (*feedparser.Feed, string, *[]FeedSource, error) {
 	// Query URL
 	res, err := defaultClient.get(candidateUrl)
 	if err != nil {
-		return nil, nil, err
+		return nil, "", nil, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		errmsg := fmt.Sprintf("Failed to fetch feed %s (status: %d)", candidateUrl, res.StatusCode)
-		return nil, nil, errors.New(errmsg)
+		return nil, "", nil, errors.New(errmsg)
 	}
 	content, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, nil, err
+		return nil, "", nil, err
 	}
 
 	// Try to feed into parser
-	feedparser := gofeed.NewParser()
 	feed, err := feedparser.Parse(bytes.NewReader(content))
 	if err == nil {
+		/*
 		// WILD: feeds may not always have link to themselves
 		if len(feed.FeedLink) == 0 {
 			feed.FeedLink = candidateUrl
 		}
+		*/
 
 		// WILD: resolve relative links (path, without host)
+		/*
 		base, _ := url.Parse(candidateUrl)
 		if link, err := url.Parse(feed.Link); err == nil && link.Host == "" {
 			feed.Link = base.ResolveReference(link).String()
@@ -88,23 +91,28 @@ func DiscoverFeed(candidateUrl string) (*gofeed.Feed, *[]FeedSource, error) {
 		if link, err := url.Parse(feed.FeedLink); err == nil && link.Host == "" {
 			feed.FeedLink = base.ResolveReference(link).String()
 		}
+		*/
+		err := feed.TranslateURLs(candidateUrl)
+		if err != nil {
+			log.Printf("Failed to translate feed urls: %s", err)
+		}
 
-		return feed, nil, nil
+		return feed, candidateUrl, nil, nil
 	}
 
 	// Possibly an html link. Search for feed links
 	sources, err := searchFeedLinks(content, candidateUrl)
 	if err != nil {
-		return nil, nil, err
+		return nil, "", nil, err
 	} else if len(sources) == 0 {
-		return nil, nil, errors.New("No feeds found at the given url")
+		return nil, "", nil, errors.New("No feeds found at the given url")
 	} else if len(sources) == 1 {
 		if sources[0].Url == candidateUrl {
-			return nil, nil, errors.New("Recursion!")
+			return nil, "", nil, errors.New("Recursion!")
 		}
 		return DiscoverFeed(sources[0].Url)
 	}
-	return nil, &sources, nil
+	return nil, "", &sources, nil
 }
 
 func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
@@ -163,17 +171,12 @@ func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	return nil, nil
 }
 
-func ConvertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
+func ConvertItems(items []feedparser.Item, feed storage.Feed) []storage.Item {
 	result := make([]storage.Item, len(items))
 	for i, item := range items {
-		imageURL := ""
-		if item.Image != nil {
-			imageURL = item.Image.URL
-		}
-		author := ""
-		if item.Author != nil {
-			author = item.Author.Name
-		}
+		podcastUrl := item.PodcastURL
+
+		/*
 		var podcastUrl *string
 		if item.Enclosures != nil {
 			for _, enclosure := range item.Enclosures {
@@ -182,19 +185,19 @@ func ConvertItems(items []*gofeed.Item, feed storage.Feed) []storage.Item {
 				}
 			}
 		}
+		*/
 		result[i] = storage.Item{
 			GUID:        item.GUID,
 			FeedId:      feed.Id,
 			Title:       item.Title,
-			Link:        item.Link,
-			Description: item.Description,
+			Link:        item.URL,
+			Description: "",
 			Content:     item.Content,
-			Author:      author,
-			Date:        item.PublishedParsed,
-			DateUpdated: item.UpdatedParsed,
+			Author:      "",
+			Date:        &item.Date,
 			Status:      storage.UNREAD,
-			Image:       imageURL,
-			PodcastURL:  podcastUrl,
+			Image:       item.ImageURL,
+			PodcastURL:  &podcastUrl,
 		}
 	}
 	return result
@@ -231,7 +234,6 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 		db.SetHTTPState(f.Id, lastModified, etag)
 	}
 
-	feedparser := gofeed.NewParser()
 	feed, err := feedparser.Parse(res.Body)
 	if err != nil {
 		return nil, err
