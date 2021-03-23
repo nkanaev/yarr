@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/nkanaev/yarr/src/feed"
+	"github.com/nkanaev/yarr/src/parser"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get url %s: %s", url, err)
 	}
-	feed, err := feed.Parse(res.Body)
+	feed, err := parser.Parse(res.Body)
 	if err != nil {
 		log.Fatalf("failed to parse feed: %s", err)
 	}
