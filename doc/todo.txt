@@ -3,5 +3,3 @@
        if the primary content is missing (youtube feeds)
 
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
-
-- ref: `mmcdole/gofeed` has too many indirect deps, drop it
