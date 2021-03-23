@@ -1,6 +1,9 @@
 package feed
 
 import (
+	"encoding/xml"
+	"io"
+	"golang.org/x/net/html/charset"
 	"time"
 )
 
@@ -11,6 +14,13 @@ func firstNonEmpty(vals ...string) string {
 		}
 	}
 	return ""
+}
+
+func xmlDecoder(r io.Reader) *xml.Decoder {
+	decoder := xml.NewDecoder(r)
+	decoder.Strict = false
+	decoder.CharsetReader = charset.NewReaderLabel
+	return decoder
 }
 
 // taken from github.com/mjibson/goread

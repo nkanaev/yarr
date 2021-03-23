@@ -59,7 +59,7 @@ func (links atomLinks) First(rel string) string {
 func ParseAtom(r io.Reader) (*Feed, error) {
 	srcfeed := atomFeed{}
 
-	decoder := xml.NewDecoder(r)
+	decoder := xmlDecoder(r)
 	if err := decoder.Decode(&srcfeed); err != nil {
 		return nil, err
 	}

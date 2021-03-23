@@ -6,7 +6,6 @@ package feed
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io"
 )
 
@@ -59,10 +58,9 @@ type rssEnclosure struct {
 func ParseRSS(r io.Reader) (*Feed, error) {
 	srcfeed := rssFeed{}
 
-	decoder := xml.NewDecoder(r)
+	decoder := xmlDecoder(r)
 	decoder.DefaultSpace = "rss"
 	if err := decoder.Decode(&srcfeed); err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

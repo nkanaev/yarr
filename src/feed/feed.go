@@ -19,7 +19,7 @@ func sniff(lookup string) (string, processor) {
 	lookup = strings.TrimSpace(lookup)
 	switch lookup[0] {
 	case '<':
-		decoder := xml.NewDecoder(strings.NewReader(lookup))
+		decoder := xmlDecoder(strings.NewReader(lookup))
 		for {
 			token, _ := decoder.Token()
 			if token == nil {

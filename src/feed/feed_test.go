@@ -13,6 +13,10 @@ func TestSniff(t *testing.T) {
 			"rdf",
 		},
 		{
+			`<?xml version="1.0" encoding="ISO-8859-1"?><rss version="2.0"><channel></channel></rss>`,
+			"rss",
+		},
+		{
 			`<?xml version="1.0"?><rss version="2.0"><channel></channel></rss>`,
 			"rss",
 		},

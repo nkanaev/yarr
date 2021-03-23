@@ -27,7 +27,7 @@ type rdfItem struct {
 func ParseRDF(r io.Reader) (*Feed, error) {
 	srcfeed := rdfFeed{}
 
-	decoder := xml.NewDecoder(r)
+	decoder := xmlDecoder(r)
 	if err := decoder.Decode(&srcfeed); err != nil {
 		return nil, err
 	}
