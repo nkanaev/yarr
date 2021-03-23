@@ -179,6 +179,7 @@ func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 func ConvertItems(items []feedparser.Item, feed storage.Feed) []storage.Item {
 	result := make([]storage.Item, len(items))
 	for i, item := range items {
+		item := item
 		podcastUrl := item.PodcastURL
 
 		/*
