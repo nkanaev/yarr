@@ -1,5 +1,5 @@
 // Atom 1.0 parser
-package feed
+package parser
 
 import (
 	"encoding/xml"

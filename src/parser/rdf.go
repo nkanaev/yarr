@@ -1,7 +1,7 @@
 // Parser for RSS versions:
 // - 0.90
 // - 1.0
-package feed
+package parser
 
 import (
 	"encoding/xml"

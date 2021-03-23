@@ -2,7 +2,7 @@
 // - 0.91 netscape
 // - 0.91 userland
 // - 2.0
-package feed
+package parser
 
 import (
 	"encoding/xml"

@@ -11,8 +11,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/nkanaev/yarr/src/crawler"
-	feedparser "github.com/nkanaev/yarr/src/feed"
+	"github.com/nkanaev/yarr/src/scraper"
+	"github.com/nkanaev/yarr/src/parser"
 	"github.com/nkanaev/yarr/src/storage"
 	"golang.org/x/net/html/charset"
 )
@@ -55,13 +55,13 @@ var defaultClient *Client
 
 func searchFeedLinks(html []byte, siteurl string) ([]FeedSource, error) {
 	sources := make([]FeedSource, 0, 0)
-	for url, title := range crawler.FindFeeds(string(html), siteurl) {
+	for url, title := range scraper.FindFeeds(string(html), siteurl) {
 		sources = append(sources, FeedSource{Title: title, Url: url})
 	}
 	return sources, nil
 }
 
-func DiscoverFeed(candidateUrl string) (*feedparser.Feed, string, *[]FeedSource, error) {
+func DiscoverFeed(candidateUrl string) (*parser.Feed, string, *[]FeedSource, error) {
 	// Query URL
 	res, err := defaultClient.get(candidateUrl)
 	if err != nil {
@@ -78,7 +78,7 @@ func DiscoverFeed(candidateUrl string) (*feedparser.Feed, string, *[]FeedSource,
 	}
 
 	// Try to feed into parser
-	feed, err := feedparser.Parse(bytes.NewReader(content))
+	feed, err := parser.Parse(bytes.NewReader(content))
 	if err == nil {
 		/*
 		// WILD: feeds may not always have link to themselves
@@ -141,7 +141,7 @@ func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		candidateUrls = append(candidateUrls, crawler.FindIcons(string(body), websiteUrl)...)
+		candidateUrls = append(candidateUrls, scraper.FindIcons(string(body), websiteUrl)...)
 		if c := favicon(websiteUrl); len(c) != 0 {
 			candidateUrls = append(candidateUrls, c)
 		}
@@ -176,7 +176,7 @@ func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	return nil, nil
 }
 
-func ConvertItems(items []feedparser.Item, feed storage.Feed) []storage.Item {
+func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 	result := make([]storage.Item, len(items))
 	for i, item := range items {
 		item := item
@@ -237,7 +237,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to init response body: %s", err)
 	}
-	feed, err := feedparser.Parse(body)
+	feed, err := parser.Parse(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse: %s", err)
 	}
