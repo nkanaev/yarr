@@ -1,6 +1,10 @@
 package feed
 
-import "testing"
+import (
+	"reflect"
+	"strings"
+	"testing"
+)
 
 func TestSniff(t *testing.T) {
 	testcases := [][2]string{
@@ -32,5 +36,40 @@ func TestSniff(t *testing.T) {
 			t.Log(testcase[0])
 			t.Errorf("Invalid format: want=%#v have=%#v", want, have)
 		}
+	}
+}
+
+func TestParse(t *testing.T) {
+	have, _ := Parse(strings.NewReader(`
+		<?xml version="1.0"?>
+		<rss version="2.0">
+		   <channel>
+			  <title>
+				 Title
+			  </title>
+			  <item>
+				 <title>
+				  Item 1
+				 </title>
+				 <description>
+					<![CDATA[<div>content</div>]]>
+				 </description>
+			  </item>
+		   </channel>
+		</rss>
+	`))
+	want := &Feed{
+		Title: "Title",
+		Items: []Item{
+			{
+				Title: "Item 1",
+				Content: "<div>content</div>",
+			},
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid content")
 	}
 }

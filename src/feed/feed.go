@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/url"
 	"strings"
+	"time"
 )
 
 var UnknownFormat = errors.New("unknown feed format")
@@ -42,21 +43,43 @@ func sniff(lookup string) (string, processor) {
 }
 
 func Parse(r io.Reader) (*Feed, error) {
-	chunk := make([]byte, 1024)
-	if _, err := r.Read(chunk); err != nil {
+	lookup := make([]byte, 1024)
+	if _, err := r.Read(lookup); err != nil {
 		return nil, fmt.Errorf("Failed to read input: %s", err)
 	}
 
-	_, callback := sniff(string(chunk))
+	_, callback := sniff(string(lookup))
 	if callback == nil {
 		return nil, UnknownFormat
 	}
 
-	r = io.MultiReader(bytes.NewReader(chunk), r)
-	return callback(r)
+	feed, err := callback(io.MultiReader(bytes.NewReader(lookup), r))
+	if feed != nil {
+		feed.cleanup()
+	}
+	return feed, err
 }
 
-func FixURLs(feed *Feed, base string) error {
+func (feed *Feed) cleanup() {
+	feed.Title = strings.TrimSpace(feed.Title)
+	feed.SiteURL = strings.TrimSpace(feed.SiteURL)
+	for i, item := range feed.Items {
+		feed.Items[i].GUID = strings.TrimSpace(item.GUID)
+		feed.Items[i].URL = strings.TrimSpace(item.URL)
+		feed.Items[i].Title = strings.TrimSpace(item.Title)
+		feed.Items[i].Content = strings.TrimSpace(item.Content)
+	}
+}
+
+func (feed *Feed) SetMissingDatesTo(newdate time.Time) {
+	for i, item := range feed.Items {
+		if item.Date.Equal(defaultTime) {
+			feed.Items[i].Date = newdate
+		}
+	}
+}
+
+func (feed *Feed) TranslateURLs(base string) error {
 	baseUrl, err := url.Parse(base)
 	if err != nil {
 		return fmt.Errorf("failed to parse base url: %#v", base)
