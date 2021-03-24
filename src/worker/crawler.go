@@ -187,6 +187,6 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	if lmod != "" || etag != "" {
 		db.SetHTTPState(f.Id, lmod, etag)
 	}
-
+	feed.TranslateURLs(f.FeedLink)
 	return ConvertItems(feed.Items, f), nil
 }
