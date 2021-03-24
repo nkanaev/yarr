@@ -44,8 +44,15 @@ func sniff(lookup string) (string, processor) {
 
 func Parse(r io.Reader) (*Feed, error) {
 	lookup := make([]byte, 1024)
-	if _, err := r.Read(lookup); err != nil {
-		return nil, fmt.Errorf("Failed to read input: %s", err)
+	n, err := io.ReadFull(r, lookup)
+	switch {
+	case err != nil:
+		return nil, err
+	case err == io.ErrUnexpectedEOF:
+		lookup = lookup[:n]
+		r = bytes.NewReader(lookup)
+	default:
+		r = io.MultiReader(bytes.NewReader(lookup), r)
 	}
 
 	_, callback := sniff(string(lookup))
@@ -53,7 +60,7 @@ func Parse(r io.Reader) (*Feed, error) {
 		return nil, UnknownFormat
 	}
 
-	feed, err := callback(io.MultiReader(bytes.NewReader(lookup), r))
+	feed, err := callback(r)
 	if feed != nil {
 		feed.cleanup()
 	}
