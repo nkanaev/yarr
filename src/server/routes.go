@@ -155,35 +155,32 @@ func (s *Server) handleFeedList(c *router.Context) {
 			return
 		}
 
-		feed, feedUrl, sources, err := worker.DiscoverFeed(form.Url)
-		if err != nil {
-			log.Print(err)
+		result, err := worker.DiscoverFeed(form.Url)
+		switch {
+		case err != nil:
+			log.Printf("Faild to discover feed for %s: %s", form.Url, err)
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
-			return
-		}
-
-		if feed != nil {
-			storedFeed := s.db.CreateFeed(
-				feed.Title,
+		case len(result.Sources) > 0:
+			c.JSON(http.StatusOK, map[string]interface{}{"status": "multiple", "choice": result.Sources})
+		case result.Feed != nil:
+			feed := s.db.CreateFeed(
+				result.Feed.Title,
 				"",
-				feed.SiteURL,
-				feedUrl,
+				result.Feed.SiteURL,
+				result.FeedLink,
 				form.FolderID,
 			)
-			s.db.CreateItems(worker.ConvertItems(feed.Items, *storedFeed))
+			s.db.CreateItems(worker.ConvertItems(result.Feed.Items, *feed))
 
-			icon, err := worker.FindFavicon(storedFeed.Link, storedFeed.FeedLink)
+			icon, err := worker.FindFavicon(feed.Link, feed.FeedLink)
 			if icon != nil {
-				s.db.UpdateFeedIcon(storedFeed.Id, icon)
+				s.db.UpdateFeedIcon(feed.Id, icon)
 			}
 			if err != nil {
-				log.Printf("Failed to find favicon for %s (%d): %s", storedFeed.FeedLink, storedFeed.Id, err)
+				log.Printf("Failed to find favicon for %s (%d): %s", feed.FeedLink, feed.Id, err)
 			}
-
 			c.JSON(http.StatusOK, map[string]string{"status": "success"})
-		} else if sources != nil {
-			c.JSON(http.StatusOK, map[string]interface{}{"status": "multiple", "choice": sources})
-		} else {
+		default:
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
 		}
 	}
