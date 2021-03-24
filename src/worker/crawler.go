@@ -36,7 +36,12 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	if res.StatusCode != 200 {
 		return nil, fmt.Errorf("status code %d", res.StatusCode)
 	}
-	content, err := ioutil.ReadAll(res.Body)
+
+	body, err := charset.NewReader(res.Body, res.Header.Get("Content-Type"))
+	if err != nil {
+		return nil, err
+	}
+	content, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
