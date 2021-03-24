@@ -39,7 +39,12 @@ func (h *Server) GetAddr() string {
 }
 
 func (s *Server) Start() {
-	s.worker.Start()
+	refreshRate := s.db.GetSettingsValueInt64("refresh_rate")
+	s.worker.StartFeedCleaner()
+	s.worker.SetRefreshRate(refreshRate)
+	if refreshRate > 0 {
+		s.worker.RefreshFeeds()
+	}
 
 	httpserver := &http.Server{Addr: s.Addr, Handler: s.handler()}
 

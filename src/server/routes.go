@@ -116,7 +116,7 @@ func (s *Server) handleFolder(c *router.Context) {
 
 func (s *Server) handleFeedRefresh(c *router.Context) {
 	if c.Req.Method == "POST" {
-		s.worker.FetchAllFeeds()
+		s.worker.RefreshFeeds()
 		c.Out.WriteHeader(http.StatusOK)
 	} else {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)
@@ -342,7 +342,7 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 			}
 		}
 
-		s.worker.FetchAllFeeds()
+		s.worker.RefreshFeeds()
 		c.Out.WriteHeader(http.StatusOK)
 	} else {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)
