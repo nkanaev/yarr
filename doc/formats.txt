@@ -112,6 +112,12 @@
   - 1.1
     https://jsonfeed.org/version/1.1
 
+- media
+  https://www.rssboard.org/media-rss
+  xml namespace for:
+  - rss 2.0
+  - atom 1.0
+
 # parsers
 
 https://github.com/kurtmckee/feedparser
