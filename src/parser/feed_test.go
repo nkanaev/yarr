@@ -66,7 +66,7 @@ func TestParse(t *testing.T) {
 		Title: "Title",
 		Items: []Item{
 			{
-				Title: "Item 1",
+				Title:   "Item 1",
 				Content: "<div>content</div>",
 			},
 		},

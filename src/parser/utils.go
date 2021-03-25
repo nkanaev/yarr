@@ -3,8 +3,11 @@ package parser
 import (
 	"encoding/xml"
 	"io"
-	"golang.org/x/net/html/charset"
+	"regexp"
+	"strings"
 	"time"
+
+	"golang.org/x/net/html/charset"
 )
 
 func firstNonEmpty(vals ...string) string {
@@ -14,6 +17,14 @@ func firstNonEmpty(vals ...string) string {
 		}
 	}
 	return ""
+}
+
+var linkRe = regexp.MustCompile(`(https?:\/\/\S+)`)
+
+func plain2html(text string) string {
+	text = linkRe.ReplaceAllString(text, `<a href="$1">$1</a>`)
+	text = strings.ReplaceAll(text, "\n", "<br>")
+	return text
 }
 
 func xmlDecoder(r io.Reader) *xml.Decoder {

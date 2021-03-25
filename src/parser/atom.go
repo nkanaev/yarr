@@ -24,6 +24,7 @@ type atomEntry struct {
 	Updated   string    `xml:"updated"`
 	Links     atomLinks `xml:"link"`
 	Content   atomText  `xml:"content"`
+	media
 }
 
 type atomText struct {
@@ -69,17 +70,14 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 		SiteURL: firstNonEmpty(srcfeed.Links.First("alternate"), srcfeed.Links.First("")),
 	}
 	for _, srcitem := range srcfeed.Entries {
-		imageUrl := ""
-		podcastUrl := ""
-
 		dstfeed.Items = append(dstfeed.Items, Item{
 			GUID:       firstNonEmpty(srcitem.ID),
 			Date:       dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
 			URL:        firstNonEmpty(srcitem.Links.First("alternate"), srcfeed.Links.First("")),
 			Title:      srcitem.Title.String(),
-			Content:    srcitem.Content.String(),
-			ImageURL:   imageUrl,
-			PodcastURL: podcastUrl,
+			Content:    firstNonEmpty(srcitem.Content.String(), srcitem.firstMediaDescription()),
+			ImageURL:   srcitem.firstMediaThumbnail(),
+			PodcastURL: "",
 		})
 	}
 	return dstfeed, nil
