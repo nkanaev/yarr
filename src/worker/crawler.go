@@ -134,6 +134,10 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 	result := make([]storage.Item, len(items))
 	for i, item := range items {
 		item := item
+		var podcastURL *string = nil
+		if item.AudioURL != "" {
+			podcastURL = &item.AudioURL
+		}
 		result[i] = storage.Item{
 			GUID:        item.GUID,
 			FeedId:      feed.Id,
@@ -145,7 +149,7 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 			Date:        &item.Date,
 			Status:      storage.UNREAD,
 			Image:       item.ImageURL,
-			PodcastURL:  nil,
+			PodcastURL:  podcastURL,
 		}
 	}
 	return result
