@@ -82,7 +82,7 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			Date:     dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
 			URL:      srcitem.Link,
 			Title:    srcitem.Title,
-			Content:  srcitem.Description,
+			Content:  firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
 			AudioURL: podcastURL,
 		})
 	}
