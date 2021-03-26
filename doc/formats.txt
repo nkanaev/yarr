@@ -118,6 +118,19 @@
   - rss 2.0
   - atom 1.0
 
+# extensions
+
+- media
+  https://www.rssboard.org/media-rss
+  initially for rss 2.0, used in atom 1.0 as well (youtube)
+
+- itunes podcasts
+  https://help.apple.com/itc/podcasts_connect/#/itcb54353390
+  https://github.com/simplepie/simplepie-ng/wiki/Spec:-iTunes-Podcast-RSS
+
+- google podcasts
+  https://support.google.com/podcast-publishers/answer/9889544?visit_id=637523492443301715-1225759684&rd=1
+
 # parsers
 
 https://github.com/kurtmckee/feedparser
@@ -127,3 +140,25 @@ https://github.com/Ranchero-Software/RSParser
 https://github.com/feederco/feeder-parser
 
 https://github.com/mmcdole/gofeed/commit/9665eb31016cef3d15ab85574bc6fdbe890cd252
+
+# platforms
+
+A list of centralized content providers worth keeping track of.
+The parser should be reasonably handle content provided by them.
+Delete any from the list in case they drop support of web feeds.
+
+- blogger
+- flickr
+- hatenablog
+- livejournal
+- medium
+- posthaven
+- reddit
+- tumblr
+- wordpress
+- youtube
+
+# links
+
+https://indieweb.org/feed#Criticism
+https://inessential.com/2013/03/18/brians_stupid_feed_tricks
