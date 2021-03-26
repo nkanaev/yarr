@@ -1,8 +1,8 @@
 package parser
 
 type media struct {
-	MediaGroups []mediaGroup `xml:"http://search.yahoo.com/mrss/ group"`
-
+	MediaGroups       []mediaGroup       `xml:"http://search.yahoo.com/mrss/ group"`
+	MediaContents     []mediaContent     `xml:"http://search.yahoo.com/mrss/ content"`
 	MediaThumbnails   []mediaThumbnail   `xml:"http://search.yahoo.com/mrss/ thumbnail"`
 	MediaDescriptions []mediaDescription `xml:"http://search.yahoo.com/mrss/ description"`
 }
@@ -10,6 +10,10 @@ type media struct {
 type mediaGroup struct {
 	MediaThumbnails   []mediaThumbnail   `xml:"http://search.yahoo.com/mrss/ thumbnail"`
 	MediaDescriptions []mediaDescription `xml:"http://search.yahoo.com/mrss/ description"`
+}
+
+type mediaContent struct {
+	MediaThumbnails []mediaThumbnail `xml:"http://search.yahoo.com/mrss/ thumbnail"`
 }
 
 type mediaThumbnail struct {
@@ -22,6 +26,11 @@ type mediaDescription struct {
 }
 
 func (m *media) firstMediaThumbnail() string {
+	for _, c := range m.MediaContents {
+		for _, t := range c.MediaThumbnails {
+			return t.URL
+		}
+	}
 	for _, t := range m.MediaThumbnails {
 		return t.URL
 	}

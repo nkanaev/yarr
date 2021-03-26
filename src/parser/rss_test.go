@@ -54,3 +54,32 @@ func TestRSSFeed(t *testing.T) {
 		t.Fatal("invalid rss")
 	}
 }
+
+func TestRSSMediaContentThumbnail(t *testing.T) {
+	// see: https://vimeo.com/channels/staffpicks/videos/rss
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0"
+			xmlns:atom="http://www.w3.org/2005/Atom"
+			xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
+			<channel>
+				<item>
+					<title></title>
+					<media:content>
+						<media:player url="https://player.vimeo.com/video/527877676"/>
+						<media:credit role="author" scheme="urn:ebu"></media:credit>
+						<media:thumbnail height="540" width="960" url="https://i.vimeocdn.com/video/1092705247_960.jpg"/>
+						<media:title></media:title>
+					</media:content>
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := feed.Items[0].ImageURL
+	want := "https://i.vimeocdn.com/video/1092705247_960.jpg"
+	if have != want {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}

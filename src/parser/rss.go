@@ -34,6 +34,7 @@ type rssItem struct {
 	ItunesSubtitle    string `xml:"http://www.itunes.com/dtds/podcast-1.0.dtd subtitle"`
 	ItunesSummary     string `xml:"http://www.itunes.com/dtds/podcast-1.0.dtd summary"`
 	GoogleDescription string `xml:"http://www.google.com/schemas/play-podcasts/1.0 description"`
+	media
 }
 
 type rssLink struct {
@@ -84,6 +85,7 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			Title:    srcitem.Title,
 			Content:  firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
 			AudioURL: podcastURL,
+			ImageURL: srcitem.firstMediaThumbnail(),
 		})
 	}
 	return dstfeed, nil
