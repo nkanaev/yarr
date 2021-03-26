@@ -120,6 +120,9 @@
 
 # extensions
 
+- feedburner
+  https://en.wikipedia.org/wiki/FeedBurner
+
 - media
   https://www.rssboard.org/media-rss
   initially for rss 2.0, used in atom 1.0 as well (youtube)
