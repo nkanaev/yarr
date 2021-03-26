@@ -56,3 +56,24 @@ func TestAtom(t *testing.T) {
 		t.Fatal("invalid atom")
 	}
 }
+
+func TestAtomClashingNamespaces(t *testing.T) {
+	have, err := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom">
+			<entry>
+				<content>atom content</content>
+				<media:content xmlns:media="http://search.yahoo.com/mrss/" />
+			</entry>
+		</feed>
+	`))
+	want := &Feed{Items: []Item{{Content: "atom content"}}}
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}

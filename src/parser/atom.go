@@ -23,7 +23,7 @@ type atomEntry struct {
 	Published string    `xml:"published"`
 	Updated   string    `xml:"updated"`
 	Links     atomLinks `xml:"link"`
-	Content   atomText  `xml:"content"`
+	Content   atomText  `xml:"http://www.w3.org/2005/Atom content"`
 	media
 }
 

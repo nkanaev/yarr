@@ -12,13 +12,6 @@ type mediaGroup struct {
 	MediaDescriptions []mediaDescription `xml:"http://search.yahoo.com/mrss/ description"`
 }
 
-type mediaContent struct {
-	URL      string `xml:"url,attr"`
-	Type     string `xml:"type,attr"`
-	FileSize string `xml:"fileSize,attr"`
-	Medium   string `xml:"medium,attr"`
-}
-
 type mediaThumbnail struct {
 	URL string `xml:"url,attr"`
 }

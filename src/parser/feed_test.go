@@ -77,3 +77,18 @@ func TestParse(t *testing.T) {
 		t.Fatal("invalid content")
 	}
 }
+
+func TestParseShortFeed(t *testing.T) {
+	have, err := Parse(strings.NewReader(
+		`<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"></feed>`,
+	))
+	want := &Feed{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}

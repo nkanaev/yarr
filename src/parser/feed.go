@@ -46,11 +46,11 @@ func Parse(r io.Reader) (*Feed, error) {
 	lookup := make([]byte, 1024)
 	n, err := io.ReadFull(r, lookup)
 	switch {
-	case err != nil:
-		return nil, err
 	case err == io.ErrUnexpectedEOF:
 		lookup = lookup[:n]
 		r = bytes.NewReader(lookup)
+	case err != nil:
+		return nil, err
 	default:
 		r = io.MultiReader(bytes.NewReader(lookup), r)
 	}
