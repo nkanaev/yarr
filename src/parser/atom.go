@@ -71,13 +71,13 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 	}
 	for _, srcitem := range srcfeed.Entries {
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:       firstNonEmpty(srcitem.ID),
-			Date:       dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
-			URL:        firstNonEmpty(srcitem.Links.First("alternate"), srcfeed.Links.First("")),
-			Title:      srcitem.Title.String(),
-			Content:    firstNonEmpty(srcitem.Content.String(), srcitem.firstMediaDescription()),
-			ImageURL:   srcitem.firstMediaThumbnail(),
-			PodcastURL: "",
+			GUID:     firstNonEmpty(srcitem.ID),
+			Date:     dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
+			URL:      firstNonEmpty(srcitem.Links.First("alternate"), srcfeed.Links.First("")),
+			Title:    srcitem.Title.String(),
+			Content:  firstNonEmpty(srcitem.Content.String(), srcitem.firstMediaDescription()),
+			ImageURL: srcitem.firstMediaThumbnail(),
+			AudioURL: "",
 		})
 	}
 	return dstfeed, nil

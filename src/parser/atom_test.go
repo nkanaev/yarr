@@ -40,13 +40,13 @@ func TestAtom(t *testing.T) {
 		SiteURL: "http://example.org/",
 		Items: []Item{
 			{
-				GUID:       "urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a",
-				Date:       time.Unix(1071340202, 0).UTC(),
-				URL:        "http://example.org/2003/12/13/atom03.html",
-				Title:      "Atom-Powered Robots Run Amok",
-				Content:    `<div xmlns="http://www.w3.org/1999/xhtml"><p>This is the entry content.</p></div>`,
-				ImageURL:   "",
-				PodcastURL: "",
+				GUID:     "urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a",
+				Date:     time.Unix(1071340202, 0).UTC(),
+				URL:      "http://example.org/2003/12/13/atom03.html",
+				Title:    "Atom-Powered Robots Run Amok",
+				Content:  `<div xmlns="http://www.w3.org/1999/xhtml"><p>This is the entry content.</p></div>`,
+				ImageURL: "",
+				AudioURL: "",
 			},
 		},
 	}

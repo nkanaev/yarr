@@ -18,12 +18,12 @@ type rssFeed struct {
 }
 
 type rssItem struct {
-	GUID           string         `xml:"guid"`
-	Title          string         `xml:"title"`
-	Link           string         `xml:"link"`
-	Description    string         `xml:"rss description"`
-	PubDate        string         `xml:"pubDate"`
-	EnclosureLinks []rssEnclosure `xml:"enclosure"`
+	GUID        string         `xml:"guid"`
+	Title       string         `xml:"title"`
+	Link        string         `xml:"link"`
+	Description string         `xml:"rss description"`
+	PubDate     string         `xml:"pubDate"`
+	Enclosures  []rssEnclosure `xml:"enclosure"`
 
 	DublinCoreDate string `xml:"http://purl.org/dc/elements/1.1/ date"`
 	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
@@ -69,12 +69,21 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 		SiteURL: srcfeed.Link,
 	}
 	for _, srcitem := range srcfeed.Items {
+		podcastURL := ""
+		for _, e := range srcitem.Enclosures {
+			if e.Type == "audio/mpeg" || e.Type == "audio/x-m4a" {
+				podcastURL = e.URL
+				break
+			}
+		}
+
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:    firstNonEmpty(srcitem.GUID, srcitem.Link),
-			Date:    dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
-			URL:     srcitem.Link,
-			Title:   srcitem.Title,
-			Content: srcitem.Description,
+			GUID:     firstNonEmpty(srcitem.GUID, srcitem.Link),
+			Date:     dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
+			URL:      srcitem.Link,
+			Title:    srcitem.Title,
+			Content:  srcitem.Description,
+			AudioURL: podcastURL,
 		})
 	}
 	return dstfeed, nil
