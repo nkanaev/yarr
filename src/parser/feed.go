@@ -43,7 +43,7 @@ func sniff(lookup string) (string, processor) {
 }
 
 func Parse(r io.Reader) (*Feed, error) {
-	lookup := make([]byte, 1024)
+	lookup := make([]byte, 2048)
 	n, err := io.ReadFull(r, lookup)
 	switch {
 	case err == io.ErrUnexpectedEOF:

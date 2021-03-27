@@ -83,3 +83,35 @@ func TestRSSMediaContentThumbnail(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestRSSWithLotsOfSpaces(t *testing.T) {
+	// https://pxlnv.com/: https://feedpress.me/pxlnv
+	feed, err := Parse(strings.NewReader(strings.ReplaceAll(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<?xml-stylesheet type="text/xsl" media="screen" href="/~files/feed-premium.xsl"?>
+		<lotsofspaces>
+		<rss xmlns:content="http://purl.org/rss/1.0/modules/content/"
+		     xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+			 xmlns:dc="http://purl.org/dc/elements/1.1/"
+			 xmlns:atom="http://www.w3.org/2005/Atom"
+			 xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+			 xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+			 xmlns:feedpress="https://feed.press/xmlns"
+			 xmlns:media="http://search.yahoo.com/mrss/"
+			 version="2.0">
+			<channel>
+				<title>finally</title>
+			</channel>
+		</rss>
+	`, "<lotsofspaces>", strings.Repeat(" ", 500))))
+	if err != nil {
+		t.Fatal(err)
+	}
+	have := feed.Title
+	want := "finally"
+	if have != want {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
