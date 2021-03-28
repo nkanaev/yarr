@@ -355,51 +355,6 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
-.themepicker {
-  position: relative;
-  background: none;
-  border: none;
-  width: 100%;
-  margin-bottom: 0;
-}
-
-.themepicker input {
-  opacity: 0;
-  position: absolute;
-  z-index: -1;
-  top: 0; left: 0;
-}
-
-.themepicker-label {
-  height: 1.75rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.themepicker input[value=light] + .themepicker-label {
-  box-shadow: inset 0 0 0px 1px #dee2e6;
-  background: #fff;
-}
-
-.themepicker + .themepicker {
-  margin-left: .5rem;
-}
-
-.themepicker-label:hover {
-  box-shadow: inset 0 0 0 2px rgb(1, 123, 254, .6) !important;
-}
-
-.themepicker input:checked + .themepicker-label {
-  box-shadow: inset 0 0 0px 2px #017bfe !important;
-}
-
-.appearance-option {
-  height: 2rem;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  line-height: 2rem;
-}
-
 #opml-import-form input[type="file"]::-webkit-file-upload-button {
   position: absolute;
   top: -999px;
@@ -461,6 +416,7 @@ a,
   color: #0080d4;
 }
 
+.theme-light.dropdown-item:hover,
 .dropdown-item.active,
 .dropdown-item:active,
 .selectgroup input:checked + .selectgroup-label {
@@ -475,8 +431,8 @@ a,
 
 /* theme: sepia */
 
-.themepicker input[value=sepia] + .themepicker-label,
 .theme-sepia,
+.theme-sepia.dropdown-item:hover,
 .theme-sepia .toolbar-search {
   background-color: #f4f0e5;
 }
@@ -486,7 +442,6 @@ a,
 .theme-sepia .border-top {
   border-color: #e0d6ba !important;
 }
-.theme-sepia .selectgroup-label:not(.appearance-option):hover,
 .theme-sepia .toolbar-item:hover,
 .theme-sepia .toolbar-search:hover,
 .theme-sepia .toolbar-search:focus {
@@ -495,8 +450,8 @@ a,
 
 /* theme: night */
 
-.themepicker input[value=night] + .themepicker-label,
 .theme-night,
+.theme-night.dropdown-item:hover,
 .theme-night .toolbar-search {
   color: #d1d1d1;
   background-color: #0e0e0e;
@@ -509,7 +464,6 @@ a,
   border-color: #1a1a1a !important;
 }
 
-.theme-night .selectgroup-label:not(.appearance-option):hover,
 .theme-night .toolbar-item:hover,
 .theme-night .toolbar-search:hover,
 .theme-night .toolbar-search:focus {

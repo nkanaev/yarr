@@ -209,45 +209,27 @@
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
-                <dropdown toggle-class="toolbar-item" drop="center">
+                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center">
                     <template v-slot:button>
                         <span class="icon">{% inline "sliders.svg" %}</span>
                     </template>
-                    <div class="px-2" style="width: 200px;">
-                        <div class="d-flex">
-                            <label class="themepicker">
-                                <input type="radio" name="settingsTheme" value="light" v-model="theme.name">
-                                <div class="themepicker-label appearance-option"></div>
-                            </label>
-                            <label class="themepicker">
-                                <input type="radio" name="settingsTheme" value="sepia" v-model="theme.name">
-                                <div class="themepicker-label appearance-option"></div>
-                            </label>
-                            <label class="themepicker">
-                                <input type="radio" name="settingsTheme" value="night" v-model="theme.name">
-                                <div class="themepicker-label appearance-option"></div>
-                            </label>
-                        </div>
-                        <div class="mt-2">
-                            <label class="selectgroup">
-                                <input type="radio" name="font" value="" v-model="theme.font">
-                                <div class="selectgroup-label appearance-option">
-                                    System Default
-                                </div>
-                            </label>
-                            <label class="selectgroup" v-for="f in fonts" :key="f">
-                                <input type="radio" name="font" :value="f" v-model="theme.font">
-                                <div class="selectgroup-label appearance-option":style="{'font-family': f}">
-                                    {{ f }}
-                                </div>
-                            </label>
-                        </div>
-                        <div class="btn-group d-flex mt-2">
-                            <button class="btn btn-outline appearance-option"
-                                    style="font-size: 0.8rem" @click="incrFont(-1)">A</button>
-                            <button class="btn btn-outline appearance-option"
-                                    style="font-size: 1.2rem" @click="incrFont(1)">A</button>
-                        </div>
+                    <div class="row text-center m-0">
+                        <button class="dropdown-item col-4 px-0"
+                                :class="'theme-'+t"
+                                @click.stop="theme.name = t"
+                                v-for="t in ['light', 'sepia', 'night']">
+                            <span class="icon" v-if="theme.name == t">{% inline "check.svg" %}</span>
+                        </button>
+                    </div>
+
+                    <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">System Default</button>
+                    <button class="dropdown-item" :class="{active: theme.font == f}" v-for="f in fonts" :key="f" @click.stop="theme.font = f">
+                        {{ f }}
+                    </button>
+
+                    <div class="d-flex text-center">
+                        <button class="dropdown-item" style="font-size: 0.8rem" @click.stop="incrFont(-1)">A</button>
+                        <button class="dropdown-item" style="font-size: 1.2rem" @click.stop="incrFont(1)">A</button>
                     </div>
                 </dropdown>
                 <button class="toolbar-item"
