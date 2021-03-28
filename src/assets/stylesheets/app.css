@@ -53,17 +53,18 @@ select.form-control:not([multiple]):not([size]) {
   padding-right: 0;
 }
 
-.dropdown-menu {
+.settings-dropdown .dropdown-menu {
   padding: 0;
   box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
   overflow: hidden;
 }
 
-.dropdown-item, .dropdown-header {
+.settings-dropdown .dropdown-item,
+.settings-dropdown .dropdown-header {
   padding: .375rem 1rem;
 }
 
-.dropdown-divider {
+.settings-dropdown .dropdown-divider {
   margin: 0;
 }
 
@@ -71,16 +72,16 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
+.settings-dropdown .dropdown-item {
+  cursor: pointer;
+}
+
 .settings-dropdown .dropdown-item:focus {
   outline: none;
 }
 
-.settings-dropdown.large .dropdown-item {
-  padding: .5rem 1rem;
-}
-
-.dropdown-danger .dropdown-item {
-  color: #dc3545!important;
+.settings-dropdown form:focus {
+  outline: none;
 }
 
 .modal-backdrop {
@@ -90,10 +91,6 @@ select.form-control:not([multiple]):not([size]) {
 .modal.fade .modal-dialog {
   transition: none !important;
   transform: none !important;
-}
-
-.b-dropdown-form:focus {
-  outline: none;
 }
 
 .popover:focus {

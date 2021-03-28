@@ -83,6 +83,55 @@ Vue.component('drag', {
   },
 })
 
+Vue.component('dropdown', {
+  props: ['class', 'toggle-class', 'ref'],
+  data: function() {
+    return {open: false, openClass: ''}
+  },
+  template: `
+    <div class="dropdown" :class="$attrs.class">
+      <button ref="btn" @click="toggle" :class="btnToggleClass"
+              class="dropdown-toggle-no-caret dropdown-toggle"><slot name="button"></slot></button>
+      <div ref="menu" class="dropdown-menu" :class="openClass"><slot v-if="open"></slot></div>
+    </div>
+  `,
+  computed: {
+    btnToggleClass: function() {
+      var c = this.$props.toggleClass || ''
+      c += ' dropdown-toggle dropdown-toggle-no-caret'
+      c += this.open ? ' open' : ''
+      return c.trim()
+    }
+  },
+  methods: {
+    toggle: function(e) {
+      if (this.open) {
+        this.hide()
+      } else {
+        e.stopPropagation()
+        this.show()
+      }
+    },
+    show: function(e) {
+      this.open = true
+      this.openClass = ' show'
+      this.$refs.menu.style.right = '0'
+      this.$refs.menu.style.left = 'auto'
+      this.$refs.menu.style.top = (this.$refs.btn.offsetHeight) + 'px'
+      document.addEventListener('click', this.clickHandler)
+    },
+    hide: function() {
+      this.open = false
+      this.openClass = ''
+      document.removeEventListener('click', this.clickHandler)
+    },
+    clickHandler: function(e) {
+      if (e.target.closest('.dropdown') == null) this.hide()
+      if (e.target.closest('.dropdown-item') != null) this.hide()
+    }
+  },
+})
+
 function dateRepr(d) {
   var sec = (new Date().getTime() - d.getTime()) / 1000
   var neg = sec < 0

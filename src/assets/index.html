@@ -35,76 +35,73 @@
                     <span class="icon">{% inline "assorted.svg" %}</span>
                 </button>
                 <div class="flex-grow-1"></div>
-                <b-dropdown
-                        right no-caret lazy variant="link"
-                        class="settings-dropdown"
-                        toggle-class="toolbar-item px-2"
-                        ref="menuDropdown">
-                    <template v-slot:button-content class="toolbar-item">
+                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown">
+                    <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
-                    <b-dropdown-item-button @click="showSettings('create')">
+
+                    <button class="dropdown-item" @click="showSettings('create')">
                         <span class="icon mr-1">{% inline "plus.svg" %}</span>
                         New Feed
-                    </b-dropdown-item-button>
-                    <b-dropdown-item-button @click.stop="showSettings('manage')">
+                    </button>
+                    <button class="dropdown-item" @click="showSettings('manage')">
                         <span class="icon mr-1">{% inline "list.svg" %}</span>
                         Manage Feeds
-                    </b-dropdown-item-button>
-                    <b-dropdown-divider></b-dropdown-divider>
-                    <b-dropdown-item-button @click.stop="fetchAllFeeds()">
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" @click="fetchAllFeeds()">
                         <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
                         Refresh Feeds
-                    </b-dropdown-item-button>
+                    </button>
 
-                    <b-dropdown-divider></b-dropdown-divider>
+                    <div class="dropdown-divider"></div>
 
-                    <b-dropdown-header>Refresh</b-dropdown-header>
-                    <b-dropdown-item-button @click.stop="refreshRate = min" v-for="min in [0, 60]">
+                    <header class="dropdown-header">Refresh</header>
+                    <button class="dropdown-item" @click.stop="refreshRate = min" v-for="min in [0, 60]">
                         <span class="icon mr-1" :class="{invisible: refreshRate != min}">{% inline "check.svg" %}</span>
                         <span v-if="min ==  0">Manually</span>
                         <span v-if="min == 60">Every hour</span>
-                    </b-dropdown-item-button>
+                    </button>
 
-                    <b-dropdown-divider></b-dropdown-divider>
+                    <div class="dropdown-divider"></div>
 
-                    <b-dropdown-header>Sort by</b-dropdown-header>
-                    <b-dropdown-item-button @click.stop="itemSortNewestFirst=true">
+                    <header class="dropdown-header">Sort by</header>
+                    <button class="dropdown-item" @click.stop="itemSortNewestFirst=true">
                         <span class="icon mr-1" :class="{invisible: !itemSortNewestFirst}">{% inline "check.svg" %}</span>
                         Newest First
-                    </b-dropdown-item-button>
-                    <b-dropdown-item-button @click="itemSortNewestFirst=false">
+                    </button>
+                    <button class="dropdown-item" @click.stop="itemSortNewestFirst=false">
                         <span class="icon mr-1" :class="{invisible: itemSortNewestFirst}">{% inline "check.svg" %}</span>
                         Oldest First
-                    </b-dropdown-item-button>
-                    <b-dropdown-divider></b-dropdown-divider>
-                    <b-dropdown-header>Subscriptions</b-dropdown-header>
-                    <b-dropdown-form id="opml-import-form" enctype="multipart/form-data">
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <header class="dropdown-header">Subscriptions</header>
+                    <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
                         <input type="file"
                                id="opml-import"
                                @change="importOPML"
                                name="opml"
                                style="opacity: 0; width: 1px; height: 0; position: absolute; z-index: -1;">
-                        <label class="dropdown-item mb-0 cursor-pointer" for="opml-import">
+                        <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" @click.stop="">
                             <span class="icon mr-1">{% inline "download.svg" %}</span>
                             Import
                         </label>
-                    </b-dropdown-form>
-                    <b-dropdown-item href="./opml/export">
+                    </form>
+                    <a class="dropdown-item" href="./opml/export">
                         <span class="icon mr-1">{% inline "upload.svg" %}</span>
                         Export
-                    </b-dropdown-item>
-                    <b-dropdown-divider></b-dropdown-divider>
-                    <b-dropdown-item-button @click="showSettings('shortcuts')">
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" @click="showSettings('shortcuts')">
                         <span class="icon mr-1">{% inline "help-circle.svg" %}</span>
                         Shortcuts
-                    </b-dropdown-item-button>
-                    <b-dropdown-divider v-if="authenticated"></b-dropdown-divider>
-                    <b-dropdown-item-button v-if="authenticated" @click="logout()">
+                    </button>
+                    <div class="dropdown-divider" v-if="authenticated"></div>
+                    <button class="dropdown-item" v-if="authenticated" @click="logout()">
                         <span class="icon mr-1">{% inline "log-out.svg" %}</span>
                         Log out
-                    </b-dropdown-item-button>
-                </b-dropdown>
+                    </button>
+                </dropdown>
             </div>
             <div id="feed-list-scroll" class="p-2 overflow-auto border-top flex-grow-1">
                 <label class="selectgroup">
@@ -325,18 +322,15 @@
                             {{ folder.title }}
                         </div>
                         <div class="flex-shrink-0" v-if="folder.id">
-                            <b-dropdown right no-caret lazy variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
-                                <template v-slot:button-content>
+                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none">
+                                <template v-slot:button>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>
-                                <b-dropdown-header>{{ folder.title }}</b-dropdown-header>
-                                <b-dropdown-item @click.prevent="renameFolder(folder)">Rename</b-dropdown-item>
-                                <b-dropdown-divider></b-dropdown-divider>
-                                <b-dropdown-item class="dropdown-danger"
-                                   @click.prevent="deleteFolder(folder)">
-                                    Delete
-                                </b-dropdown-item>
-                            </b-dropdown>
+                                <header class="dropdown-header">{{ folder.title }}</header>
+                                <button class="dropdown-item" @click="renameFolder(folder)">Rename</button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item text-danger" @click="deleteFolder(folder)">Delete</button>
+                            </dropdown>
                         </div>
                     </div>
                     <div v-for="feed in folder.feeds"
@@ -354,36 +348,36 @@
                             {% inline "alert-circle.svg" %}
                         </span>
                         <div class="flex-shrink-0">
-                            <b-dropdown right no-caret lazy variant="link" class="settings-dropdown" toggle-class="text-decoration-none">
-                                <template v-slot:button-content>
+                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none">
+                                <template v-slot:button>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>
-                                <b-dropdown-header>{{ feed.title }}</b-dropdown-header>
-                                <b-dropdown-item :href="feed.link" target="_blank" v-if="feed.link">Visit Website</b-dropdown-item>
-                                <b-dropdown-divider v-if="feed.link"></b-dropdown-divider>
-                                <b-dropdown-item @click.prevent="renameFeed(feed)">Rename</b-dropdown-item>
-                                <b-dropdown-divider v-if="folders.length"></b-dropdown-divider>
-                                <b-dropdown-header v-if="folders.length">Move to...</b-dropdown-header>
-                                <b-dropdown-item @click="moveFeed(feed, null)" v-if="feed.folder_id">
+                                <header class="dropdown-header">{{ feed.title }}</header>
+                                <a class="dropdown-item" :href="feed.link" target="_blank" v-if="feed.link">Visit Website</a>
+                                <div class="dropdown-divider" v-if="feed.link"></div>
+                                <button class="dropdown-item" @click="renameFeed(feed)">Rename</button>
+                                <div class="dropdown-divider" v-if="folders.length"></div>
+                                <header class="dropdown-header" v-if="folders.length">Move to...</header>
+                                <button class="dropdown-item" @click="moveFeed(feed, null)" v-if="feed.folder_id">
                                     ---
-                                </b-dropdown-item>
-                                <b-dropdown-item-button
+                                </button>
+                                <button class="dropdown-item"
                                     v-if="folder.id != feed.folder_id"
                                     v-for="folder in folders"
                                     @click="moveFeed(feed, folder)">
                                     <span class="icon mr-1">{% inline "folder.svg" %}</span>
                                     {{ folder.title }}
-                                </b-dropdown-item-button>
-                                <b-dropdown-item-button @click="moveFeedToNewFolder(feed)">
+                                </button>
+                                <button class="dropdown-item" @click="moveFeedToNewFolder(feed)">
                                     <span class="text-muted icon mr-1">{% inline "plus.svg" %}</span>
                                     <span class="text-muted">New Folder</span>
-                                </b-dropdown-item-button>
-                                <b-dropdown-divider></b-dropdown-divider>
-                                <b-dropdown-item class="dropdown-danger"
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item text-danger"
                                    @click.prevent="deleteFeed(feed)">
                                     Delete
-                                </b-dropdown-item>
-                            </b-dropdown>
+                                </button>
+                            </dropdown>
                         </div>
                     </div>
                 </div>
