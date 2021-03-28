@@ -56,24 +56,23 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header">Refresh</header>
-                    <button class="dropdown-item" @click.stop="refreshRate = min" v-for="min in [0, 60]">
-                        <span class="icon mr-1" :class="{invisible: refreshRate != min}">{% inline "check.svg" %}</span>
-                        <span v-if="min ==  0">Manually</span>
-                        <span v-if="min == 60">Every hour</span>
-                    </button>
+                    <header class="dropdown-header">Auto Refresh</header>
+                    <div class="row text-center m-0">
+                        <button class="dropdown-item col-4 px-0" :class="{active: !refreshRate}" @click.stop="refreshRate = 0">0</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 10}" @click.stop="refreshRate =10">10m</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 30}" @click.stop="refreshRate = 30">30m</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 60}" @click.stop="refreshRate = 60">1h</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 120}" @click.stop="refreshRate = 120">2h</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 240}" @click.stop="refreshRate = 240">4h</button>
+                    </div>
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header">Sort by</header>
-                    <button class="dropdown-item" @click.stop="itemSortNewestFirst=true">
-                        <span class="icon mr-1" :class="{invisible: !itemSortNewestFirst}">{% inline "check.svg" %}</span>
-                        Newest First
-                    </button>
-                    <button class="dropdown-item" @click.stop="itemSortNewestFirst=false">
-                        <span class="icon mr-1" :class="{invisible: itemSortNewestFirst}">{% inline "check.svg" %}</span>
-                        Oldest First
-                    </button>
+                    <header class="dropdown-header">Show first</header>
+                    <div class="d-flex text-center">
+                        <button class="dropdown-item px-0" :class="{active: itemSortNewestFirst}" @click.stop="itemSortNewestFirst=true">New</button>
+                        <button class="dropdown-item px-0" :class="{active: !itemSortNewestFirst}" @click.stop="itemSortNewestFirst=false">Old</button>
+                    </div>
                     <div class="dropdown-divider"></div>
                     <header class="dropdown-header">Subscriptions</header>
                     <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
