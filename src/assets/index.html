@@ -35,7 +35,7 @@
                     <span class="icon">{% inline "assorted.svg" %}</span>
                 </button>
                 <div class="flex-grow-1"></div>
-                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown">
+                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right">
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
@@ -210,20 +210,11 @@
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
-                <a class="toolbar-item" id="content-appearance" v-b-tooltip.hover.bottom="'Appearance'" tabindex="0">
-                    <span class="icon">{% inline "sliders.svg" %}</span>
-                </a>
-                <button class="toolbar-item"
-                        :class="{active: itemSelectedReadability}"
-                        @click="getReadable(itemSelectedDetails)"
-                        v-b-tooltip.hover.bottom="'Read Here'">
-                    <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
-                </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open Link'">
-                    <span class="icon">{% inline "external-link.svg" %}</span>
-                </a>
-                <b-popover target="content-appearance" triggers="focus" placement="bottom">
-                    <div class="p-1" style="width: 200px;">
+                <dropdown toggle-class="toolbar-item" drop="center">
+                    <template v-slot:button>
+                        <span class="icon">{% inline "sliders.svg" %}</span>
+                    </template>
+                    <div class="px-2" style="width: 200px;">
                         <div class="d-flex">
                             <label class="themepicker">
                                 <input type="radio" name="settingsTheme" value="light" v-model="theme.name">
@@ -259,7 +250,16 @@
                                     style="font-size: 1.2rem" @click="incrFont(1)">A</button>
                         </div>
                     </div>
-                </b-popover>
+                </dropdown>
+                <button class="toolbar-item"
+                        :class="{active: itemSelectedReadability}"
+                        @click="getReadable(itemSelectedDetails)"
+                        v-b-tooltip.hover.bottom="'Read Here'">
+                    <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
+                </button>
+                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open Link'">
+                    <span class="icon">{% inline "external-link.svg" %}</span>
+                </a>
                 <div class="flex-grow-1"></div>
                 <button class="toolbar-item" @click="itemSelected=null" v-b-tooltip.hover.bottom="'Close Article'">
                     <span class="icon">{% inline "x.svg" %}</span>
@@ -322,7 +322,7 @@
                             {{ folder.title }}
                         </div>
                         <div class="flex-shrink-0" v-if="folder.id">
-                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none">
+                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none" drop="right">
                                 <template v-slot:button>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>
@@ -348,7 +348,7 @@
                             {% inline "alert-circle.svg" %}
                         </span>
                         <div class="flex-shrink-0">
-                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none">
+                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none" drop="right">
                                 <template v-slot:button>
                                     <span class="icon">{% inline "more-vertical.svg" %}</span>
                                 </template>

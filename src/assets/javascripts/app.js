@@ -84,22 +84,21 @@ Vue.component('drag', {
 })
 
 Vue.component('dropdown', {
-  props: ['class', 'toggle-class', 'ref'],
+  props: ['class', 'toggle-class', 'ref', 'drop'],
   data: function() {
-    return {open: false, openClass: ''}
+    return {open: false}
   },
   template: `
     <div class="dropdown" :class="$attrs.class">
-      <button ref="btn" @click="toggle" :class="btnToggleClass"
-              class="dropdown-toggle-no-caret dropdown-toggle"><slot name="button"></slot></button>
-      <div ref="menu" class="dropdown-menu" :class="openClass"><slot v-if="open"></slot></div>
+      <button ref="btn" @click="toggle" :class="btnToggleClass"><slot name="button"></slot></button>
+      <div ref="menu" class="dropdown-menu" :class="{show: open}"><slot v-if="open"></slot></div>
     </div>
   `,
   computed: {
     btnToggleClass: function() {
       var c = this.$props.toggleClass || ''
       c += ' dropdown-toggle dropdown-toggle-no-caret'
-      c += this.open ? ' open' : ''
+      c += this.open ? ' show' : ''
       return c.trim()
     }
   },
@@ -114,15 +113,24 @@ Vue.component('dropdown', {
     },
     show: function(e) {
       this.open = true
-      this.openClass = ' show'
-      this.$refs.menu.style.right = '0'
-      this.$refs.menu.style.left = 'auto'
-      this.$refs.menu.style.top = (this.$refs.btn.offsetHeight) + 'px'
+      this.$refs.menu.style.top = this.$refs.btn.offsetHeight + 'px'
+      var drop = this.$props.drop
+
+      if (drop === 'right') {
+        this.$refs.menu.style.left = 'auto'
+        this.$refs.menu.style.right = '0'
+      } else if (drop === 'center') {
+        this.$nextTick(function() {
+          var btnWidth = this.$refs.btn.getBoundingClientRect().width
+          var menuWidth = this.$refs.menu.getBoundingClientRect().width
+          this.$refs.menu.style.left = '-' + ((menuWidth - btnWidth) / 2) + 'px'
+        }.bind(this))
+      }
+
       document.addEventListener('click', this.clickHandler)
     },
     hide: function() {
       this.open = false
-      this.openClass = ''
       document.removeEventListener('click', this.clickHandler)
     },
     clickHandler: function(e) {
