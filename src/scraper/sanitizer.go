@@ -15,10 +15,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-var (
-	youtubeEmbedRegex = regexp.MustCompile(`//www\.youtube\.com/embed/(.*)`)
-	splitSrcsetRegex  = regexp.MustCompile(`,\s+`)
-)
+var splitSrcsetRegex  = regexp.MustCompile(`,\s+`)
 
 // Sanitize returns safe HTML.
 func Sanitize(baseURL, input string) string {
@@ -56,7 +53,7 @@ func Sanitize(baseURL, input string) string {
 			tagName := token.DataAtom.String()
 			parentTag = tagName
 
-			if !isPixelTracker(tagName, token.Attr) && isValidTag(tagName) {
+			if isValidTag(tagName) {
 				attrNames, htmlAttributes := sanitizeAttributes(baseURL, tagName, token.Attr)
 
 				if hasRequiredAttributes(tagName, attrNames) {
@@ -80,7 +77,7 @@ func Sanitize(baseURL, input string) string {
 			}
 		case html.SelfClosingTagToken:
 			tagName := token.DataAtom.String()
-			if !isPixelTracker(tagName, token.Attr) && isValidTag(tagName) {
+			if isValidTag(tagName) {
 				attrNames, htmlAttributes := sanitizeAttributes(baseURL, tagName, token.Attr)
 
 				if hasRequiredAttributes(tagName, attrNames) {
@@ -112,7 +109,7 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 		if isExternalResourceAttribute(attribute.Key) {
 			if tagName == "iframe" {
 				if isValidIframeSource(baseURL, attribute.Val) {
-					value = rewriteIframeURL(attribute.Val)
+					value = attribute.Val
 				} else {
 					continue
 				}
@@ -187,27 +184,6 @@ func isExternalResourceAttribute(attribute string) bool {
 	default:
 		return false
 	}
-}
-
-func isPixelTracker(tagName string, attributes []html.Attribute) bool {
-	if tagName == "img" {
-		hasHeight := false
-		hasWidth := false
-
-		for _, attribute := range attributes {
-			if attribute.Key == "height" && attribute.Val == "1" {
-				hasHeight = true
-			}
-
-			if attribute.Key == "width" && attribute.Val == "1" {
-				hasWidth = true
-			}
-		}
-
-		return hasHeight && hasWidth
-	}
-
-	return false
 }
 
 func hasRequiredAttributes(tagName string, attributes []string) bool {
@@ -305,34 +281,27 @@ func isBlockedResource(src string) bool {
 
 func isValidIframeSource(baseURL, src string) bool {
 	whitelist := []string{
-		"https://invidio.us",
-		"//www.youtube.com",
-		"http://www.youtube.com",
-		"https://www.youtube.com",
-		"https://www.youtube-nocookie.com",
-		"http://player.vimeo.com",
-		"https://player.vimeo.com",
-		"http://www.dailymotion.com",
-		"https://www.dailymotion.com",
-		"http://vk.com",
-		"https://vk.com",
-		"http://soundcloud.com",
-		"https://soundcloud.com",
-		"http://w.soundcloud.com",
-		"https://w.soundcloud.com",
-		"http://bandcamp.com",
-		"https://bandcamp.com",
-		"https://cdn.embedly.com",
-		"https://player.bilibili.com",
+		"bandcamp.com",
+		"cdn.embedly.com",
+		"invidio.us",
+		"player.bilibili.com",
+		"player.vimeo.com",
+		"soundcloud.com",
+		"vk.com",
+		"w.soundcloud.com",
+		"www.dailymotion.com",
+		"www.youtube-nocookie.com",
+		"www.youtube.com",
 	}
 
+	domain := urlDomain(src)
 	// allow iframe from same origin
-	if urlDomain(baseURL) == urlDomain(src) {
+	if urlDomain(baseURL) == domain {
 		return true
 	}
 
-	for _, prefix := range whitelist {
-		if strings.HasPrefix(src, prefix) {
+	for _, safeDomain := range whitelist {
+		if safeDomain == domain {
 			return true
 		}
 	}
@@ -408,15 +377,6 @@ func inList(needle string, haystack []string) bool {
 	}
 
 	return false
-}
-
-func rewriteIframeURL(link string) string {
-	matches := youtubeEmbedRegex.FindStringSubmatch(link)
-	if len(matches) == 2 {
-		return `https://www.youtube-nocookie.com/embed/` + matches[1]
-	}
-
-	return link
 }
 
 func isBlockedTag(tagName string) bool {
