@@ -163,7 +163,7 @@
                 <div class="input-icon flex-grow-1">
                     <span class="icon">{% inline "search.svg" %}</span>
                     <!-- id used by keybindings -->
-                    <input id="searchbar" class="d-block toolbar-search" type="" v-model="itemSearch">
+                    <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" @keydown.enter="$event.target.blur()">
                 </div>
                 <button class="toolbar-item ml-2"
                         @click="markItemsRead()"
