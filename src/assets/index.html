@@ -18,24 +18,24 @@
                 <div class="flex-grow-1"></div>
                 <button class="toolbar-item"
                         :class="{active: filterSelected == 'unread'}"
-                        v-b-tooltip.hover.bottom="'Unread'"
+                        title="Unread"
                         @click="filterSelected = 'unread'">
                     <span class="icon">{% inline "circle-full.svg" %}</span>
                 </button>
                 <button class="toolbar-item"
                         :class="{active: filterSelected == 'starred'}"
-                        v-b-tooltip.hover.bottom="'Starred'"
+                        title="Starred"
                         @click="filterSelected = 'starred'">
                     <span class="icon">{% inline "star-full.svg" %}</span>
                 </button>
                 <button class="toolbar-item"
                         :class="{active: filterSelected == ''}"
-                        v-b-tooltip.hover.bottom="'All'"
+                        title="All"
                         @click="filterSelected = ''">
                     <span class="icon">{% inline "assorted.svg" %}</span>
                 </button>
                 <div class="flex-grow-1"></div>
-                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right">
+                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" title="Settings">
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
@@ -157,7 +157,7 @@
             <div class="px-2 toolbar d-flex align-items-center">
                 <button class="toolbar-item mr-2 d-block d-md-none"
                         @click="feedSelected = null"
-                        v-b-tooltip.hover.bottom="'Show Feeds'">
+                        title="Show Feeds">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
                 <div class="input-icon flex-grow-1">
@@ -168,7 +168,7 @@
                 <button class="toolbar-item ml-2"
                         @click="markItemsRead()"
                         v-if="filterSelected == 'unread'"
-                        v-b-tooltip.hover.bottom="'Mark All Read'">
+                        title="Mark All Read">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
             </div>
@@ -198,17 +198,17 @@
             <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelected">
                 <button class="toolbar-item"
                         @click="toggleItemStarred(itemSelectedDetails)"
-                        v-b-tooltip.hover.bottom="'Mark Starred'">
+                        title="Mark Starred">
                     <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
                     <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
                 </button>
                 <button class="toolbar-item"
-                        v-b-tooltip.hover.bottom="'Mark Unread'"
+                        title="Mark Unread"
                         @click="toggleItemRead(itemSelectedDetails)">
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
-                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center">
+                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" title="Appearance">
                     <template v-slot:button>
                         <span class="icon">{% inline "sliders.svg" %}</span>
                     </template>
@@ -234,14 +234,14 @@
                 <button class="toolbar-item"
                         :class="{active: itemSelectedReadability}"
                         @click="getReadable(itemSelectedDetails)"
-                        v-b-tooltip.hover.bottom="'Read Here'">
+                        title="Read Here">
                     <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
                 </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" v-b-tooltip.hover.bottom="'Open Link'">
+                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" title="Open Link">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
                 <div class="flex-grow-1"></div>
-                <button class="toolbar-item" @click="itemSelected=null" v-b-tooltip.hover.bottom="'Close Article'">
+                <button class="toolbar-item" @click="itemSelected=null" title="Close Article">
                     <span class="icon">{% inline "x.svg" %}</span>
                 </button>
             </div>
@@ -322,8 +322,8 @@
                             <span class="icon mr-2" v-else><img v-lazy="'./api/feeds/'+feed.id+'/icon'" alt=""></span>
                             {{ feed.title }}
                         </div>
-                        <span class="icon flex-shrink-0 mx-2"
-                              v-b-tooltip.hover.top="feed_errors[feed.id]"
+                        <span class="icon flex-shrink-0 mx-2 info"
+                              :data-info="feed_errors[feed.id]"
                               v-if="feed_errors[feed.id]">
                             {% inline "alert-circle.svg" %}
                         </span>
