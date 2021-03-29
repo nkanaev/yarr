@@ -84,10 +84,6 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
 .modal.fade .modal-dialog {
   transition: none !important;
   transform: none !important;
@@ -382,6 +378,12 @@ select.form-control:not([multiple]):not([size]) {
   position: absolute;
   top: -999px;
   left: -999px;
+}
+
+.custom-modal {
+  background-color: rgba(0, 0, 0, 0.9);
+  overflow-y: auto;
+  display: block !important;
 }
 
 /* content */

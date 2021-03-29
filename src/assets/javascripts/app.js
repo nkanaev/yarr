@@ -136,6 +136,43 @@ Vue.component('dropdown', {
   },
 })
 
+Vue.component('modal', {
+  props: ['open'],
+  template: `
+    <div class="modal custom-modal" tabindex="-1" v-if="$props.open">
+      <div class="modal-dialog">
+        <div class="modal-content" ref="content">
+          <div class="modal-body">
+            <slot v-if="$props.open"></slot>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  data: function() {
+    return {opening: false}
+  },
+  watch: {
+    'open': function(newVal) {
+      if (newVal) {
+        this.opening = true
+        document.addEventListener('click', this.handleClick)
+      } else {
+        document.removeEventListener('click', this.handleClick)
+      }
+    },
+  },
+  methods: {
+    handleClick: function(e) {
+      if (this.opening) {
+        this.opening = false
+        return
+      }
+      if (e.target.closest('.modal-content') == null) this.$emit('hide')
+    },
+  },
+})
+
 function dateRepr(d) {
   var sec = (new Date().getTime() - d.getTime()) / 1000
   var neg = sec < 0
@@ -181,14 +218,6 @@ var vm = new Vue({
     this.refreshFeeds()
     this.refreshStats()
   },
-  mounted: function() {
-    this.$root.$on('bv::modal::hidden', function(bvEvent, modalId) {
-      if (vm.settings == 'create') {
-        vm.feedNewChoice = []
-        vm.feedNewChoiceSelected = ''
-      }
-    })
-  },
   data: function() {
     return {
       'filterSelected': undefined,
@@ -214,7 +243,7 @@ var vm = new Vue({
       'filteredFolderStats': {},
       'filteredTotalStats': null,
 
-      'settings': 'create',
+      'settings': '',
       'loading': {
         'feeds': 0,
         'newfeed': false,
@@ -525,7 +554,7 @@ var vm = new Vue({
         if (result.status === 'success') {
           vm.refreshFeeds()
           vm.refreshStats()
-          vm.$bvModal.hide('settings-modal')
+          vm.settings = ''
         } else if (result.status === 'multiple') {
           vm.feedNewChoice = result.choice
           vm.feedNewChoiceSelected = result.choice[0].url
@@ -597,8 +626,11 @@ var vm = new Vue({
     },
     showSettings: function(settings) {
       this.settings = settings
-      this.$bvModal.show('settings-modal')
 
+      if (settings === 'create') {
+        vm.feedNewChoice = []
+        vm.feedNewChoiceSelected = ''
+      }
       if (settings === 'manage') {
         api.feeds.list_errors().then(function(errors) {
           vm.feed_errors = errors
