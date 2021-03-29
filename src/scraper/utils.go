@@ -65,3 +65,10 @@ func absoluteUrl(href, base string) string {
 	}
 	return baseUrl.ResolveReference(hrefUrl).String()
 }
+
+func urlDomain(val string) string {
+	if u, err := url.Parse(val); err == nil {
+		return u.Host
+	}
+	return val
+}
