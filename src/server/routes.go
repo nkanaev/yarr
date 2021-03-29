@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"github.com/nkanaev/yarr/src/auth"
 	"github.com/nkanaev/yarr/src/opml"
 	"github.com/nkanaev/yarr/src/router"
+	"github.com/nkanaev/yarr/src/scraper"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/worker"
 )
@@ -389,16 +389,32 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 }
 
 func (s *Server) handlePageCrawl(c *router.Context) {
-	query := c.Req.URL.Query()
-	if url := query.Get("url"); len(url) > 0 {
-		res, err := http.Get(url)
-		if err == nil {
-			body, err := ioutil.ReadAll(res.Body)
-			if err == nil {
-				c.Out.Write(body)
-			}
-		}
+	if c.Req.Method != "POST" {
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
 	}
+	url := c.Req.URL.Query().Get("url")
+	if url == "" {
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	res, err := http.Get(url)
+	if err != nil {
+		log.Print(err)
+		c.Out.WriteHeader(http.StatusNoContent)
+		return
+	}
+	defer res.Body.Close()
+	content, err := scraper.ExtractContent(res.Body)
+	if err != nil {
+		log.Print(err)
+		c.Out.WriteHeader(http.StatusNoContent)
+		return
+	}
+	content = scraper.Sanitize(url, content)
+	c.JSON(http.StatusOK, map[string]string{
+		"content": content,
+	})
 }
 
 func (s *Server) handleLogout(c *router.Context) {

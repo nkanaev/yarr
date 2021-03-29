@@ -612,15 +612,9 @@ var vm = new Vue({
       }
       if (item.link) {
         this.loading.readability = true
-        api.crawl(item.link).then(function(body) {
+        api.crawl(item.link).then(function(data) {
+          vm.itemSelectedReadability = data && data.content
           vm.loading.readability = false
-          if (!body.length) return
-          var bodyClean = sanitize(body, item.link)
-          var doc = new DOMParser().parseFromString(bodyClean, 'text/html')
-          var parsed = new Readability(doc).parse()
-          if (parsed && parsed.content) {
-            vm.itemSelectedReadability = parsed.content
-          }
         })
       }
     },

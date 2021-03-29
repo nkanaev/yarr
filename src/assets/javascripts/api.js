@@ -102,9 +102,7 @@
       return api('post', './logout')
     },
     crawl: function(url) {
-      return xfetch('./page?url=' + url).then(function(res) {
-        return res.text()
-      })
+      return api('post', './page?url=' + url).then(json)
     }
   }
 })()
