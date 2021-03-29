@@ -104,12 +104,7 @@ Vue.component('dropdown', {
   },
   methods: {
     toggle: function(e) {
-      if (this.open) {
-        this.hide()
-      } else {
-        e.stopPropagation()
-        this.show()
-      }
+      this.open ? this.hide() : this.show()
     },
     show: function(e) {
       this.open = true
@@ -134,8 +129,9 @@ Vue.component('dropdown', {
       document.removeEventListener('click', this.clickHandler)
     },
     clickHandler: function(e) {
-      if (e.target.closest('.dropdown') == null) this.hide()
-      if (e.target.closest('.dropdown-item') != null) this.hide()
+      var dropdown = e.target.closest('.dropdown')
+      if (dropdown == null || dropdown != this.$el) return this.hide()
+      if (e.target.closest('.dropdown-item') != null) return this.hide()
     }
   },
 })
