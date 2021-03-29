@@ -44,10 +44,6 @@ select.form-control:not([multiple]):not([size]) {
   display: none;
 }
 
-#settings-modal {
-  color: #212529 !important;
-}
-
 .settings-dropdown .dropdown-toggle {
   padding-left: 0;
   padding-right: 0;
@@ -84,21 +80,7 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
-.modal.fade .modal-dialog {
-  transition: none !important;
-  transform: none !important;
-}
-
 .popover:focus {
-  outline: none;
-}
-
-.b-tooltip {
-  opacity: 1;
-  font-size: .7rem;
-}
-
-.b-tooltip:focus {
   outline: none;
 }
 
