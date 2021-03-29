@@ -71,6 +71,9 @@
       }
     },
     items: {
+      get: function(id) {
+        return api('get', './api/items/' + id).then(json)
+      },
       list: function(query) {
         return api('get', './api/items' + param(query)).then(json)
       },

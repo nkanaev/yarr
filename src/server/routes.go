@@ -227,12 +227,22 @@ func (s *Server) handleFeed(c *router.Context) {
 }
 
 func (s *Server) handleItem(c *router.Context) {
-	if c.Req.Method == "PUT" {
-		id, err := c.VarInt64("id")
-		if err != nil {
+	id, err := c.VarInt64("id")
+	if err != nil {
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if c.Req.Method == "GET" {
+		item := s.db.GetItem(id)
+		if item == nil {
 			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		item.Content = scraper.Sanitize(item.Link, item.Content)
+		item.Description = scraper.Sanitize(item.Link, item.Description)
+
+		c.JSON(http.StatusOK, item)
+	} else if c.Req.Method == "PUT" {
 		var body ItemUpdateForm
 		if err := json.NewDecoder(c.Req.Body).Decode(&body); err != nil {
 			log.Print(err)

@@ -117,7 +117,7 @@
                     <label class="selectgroup mt-1"
                            :class="{'d-none': filterSelected
                                               && !filteredFolderStats[folder.id]
-                                              && (!itemSelected || feedsById[itemSelectedDetails.feed_id].folder_id != folder.id)}">
+                                              && (!itemSelectedDetails || feedsById[itemSelectedDetails.feed_id].folder_id != folder.id)}">
                         <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
                         <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
                             <span class="icon mr-2"
@@ -133,7 +133,7 @@
                         <label class="selectgroup"
                               :class="{'d-none': filterSelected
                                                  && !filteredFeedStats[feed.id]
-                                                 && (!itemSelected || itemSelectedDetails.feed_id != feed.id)}"
+                                                 && (!itemSelectedDetails || itemSelectedDetails.feed_id != feed.id)}"
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                             <div class="selectgroup-label d-flex align-items-center w-100">
@@ -195,7 +195,7 @@
         </div>
         <!-- item show -->
         <div id="col-item" class="vh-100 d-flex flex-column w-100" style="min-width: 0;">
-            <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelected">
+            <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
                 <button class="toolbar-item"
                         @click="toggleItemStarred(itemSelectedDetails)"
                         title="Mark Starred">
@@ -245,7 +245,7 @@
                     <span class="icon">{% inline "x.svg" %}</span>
                 </button>
             </div>
-            <div v-if="itemSelected"
+            <div v-if="itemSelectedDetails"
                  ref="content"
                  class="content px-4 pt-3 pb-5 border-top overflow-auto"
                  :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">

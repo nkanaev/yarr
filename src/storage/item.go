@@ -3,7 +3,6 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	xhtml "golang.org/x/net/html"
 	"html"
 	"log"
 	"strings"
@@ -49,8 +48,8 @@ type Item struct {
 	FeedId      int64      `json:"feed_id"`
 	Title       string     `json:"title"`
 	Link        string     `json:"link"`
-	Description string     `json:"description"`
-	Content     string     `json:"content"`
+	Description string     `json:"description,omitempty"`
+	Content     string     `json:"content,omitempty"`
 	Author      string     `json:"author"`
 	Date        *time.Time `json:"date"`
 	DateUpdated *time.Time `json:"date_updated"`
@@ -166,8 +165,8 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 
 	query := fmt.Sprintf(`
 		select
-			i.id, i.guid, i.feed_id, i.title, i.link, i.description,
-			i.content, i.author, i.date, i.date_updated, i.status, i.image, i.podcast_url
+			i.id, i.guid, i.feed_id, i.title, i.link,
+			i.author, i.date, i.date_updated, i.status, i.image, i.podcast_url
 		from items i
 		join feeds f on f.id = i.feed_id
 		where %s
@@ -187,8 +186,6 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 			&x.FeedId,
 			&x.Title,
 			&x.Link,
-			&x.Description,
-			&x.Content,
 			&x.Author,
 			&x.Date,
 			&x.DateUpdated,
@@ -203,6 +200,25 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 		result = append(result, x)
 	}
 	return result
+}
+
+func (s *Storage) GetItem(id int64) *Item {
+	i := &Item{}
+	err := s.db.QueryRow(`
+		select
+			i.id, i.guid, i.feed_id, i.title, i.link, i.content, i.description,
+			i.author, i.date, i.date_updated, i.status, i.image, i.podcast_url
+		from items i
+		where i.id = ?
+	`, id).Scan(
+		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content, &i.Description,
+		&i.Author, &i.Date, &i.DateUpdated, &i.Status, &i.Image, &i.PodcastURL,
+	)
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+	return i
 }
 
 func (s *Storage) CountItems(filter ItemFilter) int64 {
@@ -283,24 +299,6 @@ func (s *Storage) FeedStats() []FeedStat {
 		result = append(result, stat)
 	}
 	return result
-}
-
-func HTMLText(s string) string {
-	tokenizer := xhtml.NewTokenizer(strings.NewReader(s))
-	contents := make([]string, 0)
-	for {
-		token := tokenizer.Next()
-		if token == xhtml.ErrorToken {
-			break
-		}
-		if token == xhtml.TextToken {
-			content := strings.TrimSpace(xhtml.UnescapeString(string(tokenizer.Text())))
-			if len(content) > 0 {
-				contents = append(contents, content)
-			}
-		}
-	}
-	return strings.Join(contents, " ")
 }
 
 func (s *Storage) SyncSearch() {

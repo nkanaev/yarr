@@ -233,7 +233,7 @@ var vm = new Vue({
         'num': 1,
       },
       'itemSelected': null,
-      'itemSelectedDetails': {},
+      'itemSelectedDetails': null,
       'itemSelectedReadability': '',
       'itemSearch': '',
       'itemSortNewestFirst': undefined,
@@ -281,9 +281,6 @@ var vm = new Vue({
     feedsById: function() {
       return this.feeds.reduce(function(acc, feed) { acc[feed.id] = feed; return acc }, {})
     },
-    itemsById: function() {
-      return this.items.reduce(function(acc, item) { acc[item.id] = item; return acc }, {})
-    },
     itemSelectedContent: function() {
       if (!this.itemSelected) return ''
 
@@ -296,7 +293,7 @@ var vm = new Vue({
       else if (this.itemSelectedDetails.description)
         content = this.itemSelectedDetails.description
 
-      return sanitize(content, this.itemSelectedDetails.link)
+      return content
     },
   },
   watch: {
@@ -345,12 +342,14 @@ var vm = new Vue({
       }
       if (this.$refs.content) this.$refs.content.scrollTop = 0
 
-      this.itemSelectedDetails = this.itemsById[newVal]
-      if (this.itemSelectedDetails.status == 'unread') {
-        this.itemSelectedDetails.status = 'read'
-        this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
-        api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
-      }
+      api.items.get(newVal).then(function(item) {
+        this.itemSelectedDetails = item
+        if (this.itemSelectedDetails.status == 'unread') {
+          this.itemSelectedDetails.status = 'read'
+          this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
+          api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
+        }
+      }.bind(this))
     },
     'itemSearch': debounce(function(newVal) {
       this.refreshItems()
