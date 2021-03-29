@@ -536,6 +536,9 @@ var vm = new Vue({
       })
     },
     toggleItemStarred: function(item) {
+      if (item.status == 'unread') {
+        this.feedStats[item.feed_id].unread -= 1
+      }
       if (item.status == 'starred') {
         item.status = 'read'
         this.feedStats[item.feed_id].starred -= 1
@@ -546,10 +549,13 @@ var vm = new Vue({
       api.items.update(item.id, {status: item.status})
     },
     toggleItemRead: function(item) {
+      if (item.status == 'starred') {
+        this.feedStats[item.feed_id].starred -= 1
+      }
       if (item.status == 'unread') {
         item.status = 'read'
         this.feedStats[item.feed_id].unread -= 1
-      } else if (item.status == 'read') {
+      } else if (item.status != 'unread') {
         item.status = 'unread'
         this.feedStats[item.feed_id].unread += 1
       }

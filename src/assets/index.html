@@ -203,7 +203,6 @@
                     <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
                 </button>
                 <button class="toolbar-item"
-                        :disabled="itemSelectedDetails.status=='starred'"
                         v-b-tooltip.hover.bottom="'Mark Unread'"
                         @click="toggleItemRead(itemSelectedDetails)">
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
