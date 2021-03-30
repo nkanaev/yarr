@@ -22,7 +22,7 @@ func InnerHTML(node *html.Node) string {
 
 func Attr(node *html.Node, key string) string {
 	for _, a := range node.Attr {
-		if a.Key == key {
+		if strings.EqualFold(a.Key, key) {
 			return a.Val
 		}
 	}

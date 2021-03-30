@@ -248,7 +248,7 @@ func scoreNode(s *goquery.Selection) *candidate {
 		c.score -= 5
 	}
 
-	c.score += getClassWeight(s)
+	c.score += getClassWeight(s.Get(0))
 	return c
 }
 
@@ -267,10 +267,10 @@ func getLinkDensity(s *goquery.Selection) float32 {
 
 // Get an elements class/id weight. Uses regular expressions to tell if this
 // element looks good or bad.
-func getClassWeight(s *goquery.Selection) float32 {
+func getClassWeight(node *html.Node) float32 {
 	weight := 0
-	class, _ := s.Attr("class")
-	id, _ := s.Attr("id")
+	class := htmlutil.Attr(node, "class")
+	id := htmlutil.Attr(node, "id")
 
 	if class != "" {
 		if negativeRegexp.MatchString(class) {
