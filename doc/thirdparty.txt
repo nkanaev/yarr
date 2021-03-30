@@ -1,0 +1,14 @@
+Below is the list of 3-rd party code directly included & rewritten
+to suit the author's needs & preferences.
+The licenses are included, and the authorship comments are left intact.
+
+- readability
+  https://github.com/miniflux/v2 (commit:31435ef) Apache 2.0
+
+  removed goquery dependency
+  removed assisting utility structs (need another way to debug node scores)
+
+- systray
+  https://github.com/getlantern/systray (commit:2c0986d) Apache 2.0
+
+  removed golog dependency
