@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/nkanaev/yarr/src/htmlutil"
-	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
 )
 
@@ -34,51 +33,15 @@ var (
 	positiveRegexp = regexp.MustCompile(`(?i)article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story`)
 )
 
-type candidate struct {
-	selection *goquery.Selection
-	score     float32
-}
-
-func (c *candidate) Node() *html.Node {
-	return c.selection.Get(0)
-}
-
-type scorelist map[*html.Node]float32
-
-func (c *candidate) String() string {
-	id, _ := c.selection.Attr("id")
-	class, _ := c.selection.Attr("class")
-
-	if id != "" && class != "" {
-		return fmt.Sprintf("%s#%s.%s => %f", c.Node().DataAtom, id, class, c.score)
-	} else if id != "" {
-		return fmt.Sprintf("%s#%s => %f", c.Node().DataAtom, id, c.score)
-	} else if class != "" {
-		return fmt.Sprintf("%s.%s => %f", c.Node().DataAtom, class, c.score)
-	}
-
-	return fmt.Sprintf("%s => %f", c.Node().DataAtom, c.score)
-}
-
-type candidateList map[*html.Node]*candidate
-
-func (c candidateList) String() string {
-	var output []string
-	for _, candidate := range c {
-		output = append(output, candidate.String())
-	}
-
-	return strings.Join(output, ", ")
-}
+type nodeScores map[*html.Node]float32
 
 // ExtractContent returns relevant content.
 func ExtractContent(page io.Reader) (string, error) {
-	document, err := goquery.NewDocumentFromReader(page)
+	root, err := html.Parse(page)
 	if err != nil {
 		return "", err
 	}
 
-	root := document.Get(0)
 	for _, trash := range htmlutil.Query(root, "script,style") {
 		if trash.Parent != nil {
 			trash.Parent.RemoveChild(trash)
@@ -97,50 +60,56 @@ func ExtractContent(page io.Reader) (string, error) {
 	}
 	//log.Printf("[Readability] TopCandidate: %v", topCandidate)
 
-	output := getArticle(root, best, scores)
+	output := getArticle(best, scores)
 	return output, nil
 }
 
 // Now that we have the top candidate, look through its siblings for content that might also be related.
 // Things like preambles, content split by ads that we removed, etc.
-func getArticle(root, best *html.Node, scores scorelist) string {
-	selection := goquery.NewDocumentFromNode(root).FindNodes(best)
-	topCandidate := &candidate{selection: selection, score: scores[best]}
+func getArticle(best *html.Node, scores nodeScores) string {
 	output := bytes.NewBufferString("<div>")
-	siblingScoreThreshold := float32(math.Max(10, float64(topCandidate.score*.2)))
+	siblingScoreThreshold := float32(math.Max(10, float64(scores[best]*.2)))
 
-	topCandidate.selection.Siblings().Union(topCandidate.selection).Each(func(i int, s *goquery.Selection) {
+	nodelist := make([]*html.Node, 0)
+	nodelist = append(nodelist, best)
+
+	// Get the candidate's siblings
+	for n := best.NextSibling; n != nil; n = n.NextSibling {
+		nodelist = append(nodelist, n)
+	}
+	for n := best.PrevSibling; n != nil; n = n.PrevSibling {
+		nodelist = append(nodelist, n)
+	}
+
+	for _, node := range nodelist {
 		append := false
-		node := s.Get(0)
+		isP := node.Data == "p"
 
-		if node == topCandidate.Node() {
+		if node == best {
 			append = true
-		} else if score, ok := scores[node]; ok && score >= siblingScoreThreshold {
+		} else if scores[node] >= siblingScoreThreshold {
 			append = true
-		}
+		} else {
+			if isP {
+				linkDensity := getLinkDensity(node)
+				content := htmlutil.Text(node)
+				contentLength := len(content)
 
-		if s.Is("p") {
-			linkDensity := getLinkDensity(s.Get(0))
-			content := s.Text()
-			contentLength := len(content)
-
-			if contentLength >= 80 && linkDensity < .25 {
-				append = true
-			} else if contentLength < 80 && linkDensity == 0 && sentenceRegexp.MatchString(content) {
-				append = true
+				if contentLength >= 80 && linkDensity < .25 {
+					append = true
+				} else if contentLength < 80 && linkDensity == 0 && sentenceRegexp.MatchString(content) {
+					append = true
+				}
 			}
 		}
-
 		if append {
 			tag := "div"
-			if s.Is("p") {
-				tag = node.Data
+			if isP {
+				tag = "p"
 			}
-
-			html, _ := s.Html()
-			fmt.Fprintf(output, "<%s>%s</%s>", tag, html, tag)
+			fmt.Fprintf(output, "<%s>%s</%s>", tag, htmlutil.InnerHTML(node), tag)
 		}
-	})
+	}
 
 	output.Write([]byte("</div>"))
 	return output.String()
@@ -164,26 +133,26 @@ func removeUnlikelyCandidates(root *html.Node) {
 	}
 }
 
-func getTopCandidate(scores scorelist) *html.Node {
-	var best *html.Node
-	var maxScore float32
+func getTopCandidate(scores nodeScores) *html.Node {
+	var top *html.Node
+	var max float32
 
 	for node, score := range scores {
-		if score > maxScore {
-			best = node
-			maxScore = score
+		if score > max {
+			top = node
+			max = score
 		}
 	}
 
-	return best
+	return top
 }
 
 // Loop through all paragraphs, and assign a score to them based on how content-y they look.
 // Then add their score to their parent node.
 // A score is determined by things like number of commas, class names, etc.
 // Maybe eventually link density.
-func getCandidates(root *html.Node) scorelist {
-	scores := make(scorelist)
+func getCandidates(root *html.Node) nodeScores {
+	scores := make(nodeScores)
 	for _, node := range htmlutil.Query(root, defaultTagsToScore) {
 		text := htmlutil.Text(node)
 

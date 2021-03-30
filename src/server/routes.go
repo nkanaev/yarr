@@ -10,6 +10,7 @@ import (
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/auth"
 	"github.com/nkanaev/yarr/src/opml"
+	"github.com/nkanaev/yarr/src/reader"
 	"github.com/nkanaev/yarr/src/router"
 	"github.com/nkanaev/yarr/src/scraper"
 	"github.com/nkanaev/yarr/src/storage"
@@ -415,7 +416,7 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		return
 	}
 	defer res.Body.Close()
-	content, err := scraper.ExtractContent(res.Body)
+	content, err := reader.ExtractContent(res.Body)
 	if err != nil {
 		log.Print(err)
 		c.Out.WriteHeader(http.StatusNoContent)
