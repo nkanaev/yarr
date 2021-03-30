@@ -8,6 +8,11 @@ The licenses are included, and the authorship comments are left intact.
   removed goquery dependency
   removed assisting utility structs (need another way to debug node scores)
 
+- sanitizer
+  https://github.com/miniflux/v2 (commit:3cb04b2) Apache 2.0
+
+  no changes
+
 - systray
   https://github.com/getlantern/systray (commit:2c0986d) Apache 2.0
 
