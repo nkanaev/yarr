@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-var nodeNameRegex = regexp.MustCompile(`\w+`)
+var nodeNameRegex = regexp.MustCompile(`\w+|\*`)
 
 func FindNodes(node *html.Node, match func(*html.Node) bool) []*html.Node {
 	nodes := make([]*html.Node, 0)
@@ -40,7 +40,7 @@ func NewMatcher(sel string) Matcher {
 		if nodeNameRegex.MatchString(part) {
 			multi.Add(ElementMatch{Name: part})
 		} else {
-			panic("unsupported selector")
+			panic("unsupported selector: " + part)
 		}
 	}
 	return multi
@@ -55,7 +55,7 @@ type ElementMatch struct {
 }
 
 func (m ElementMatch) Match(n *html.Node) bool {
-	return n.Type == html.ElementNode && n.Data == m.Name
+	return n.Type == html.ElementNode && (n.Data == m.Name || m.Name == "*")
 }
 
 type MultiMatch struct {

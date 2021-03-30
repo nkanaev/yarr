@@ -83,8 +83,8 @@ func ExtractContent(page io.Reader) (string, error) {
 		}
 	}
 
-	transformMisusedDivsIntoParagraphs(document)
-	removeUnlikelyCandidates(document)
+	transformMisusedDivsIntoParagraphs(root)
+	removeUnlikelyCandidates(root)
 
 	candidates := getCandidates(document)
 	//log.Printf("[Readability] Candidates: %v", candidates)
@@ -139,19 +139,22 @@ func getArticle(topCandidate *candidate, candidates candidateList) string {
 	return output.String()
 }
 
-func removeUnlikelyCandidates(document *goquery.Document) {
-	document.Find("*").Not("html,body").Each(func(i int, s *goquery.Selection) {
-		class, _ := s.Attr("class")
-		id, _ := s.Attr("id")
-		str := class + id
+func removeUnlikelyCandidates(root *html.Node) {
+	body := htmlutil.Query(root, "body")
+	if len(body) == 0 {
+		return
+	}
+	for _, node := range htmlutil.Query(body[0], "*") {
+		str := htmlutil.Attr(node, "class") + htmlutil.Attr(node, "id")
 
-		if blacklistCandidatesRegexp.MatchString(str) || (unlikelyCandidatesRegexp.MatchString(str) && !okMaybeItsACandidateRegexp.MatchString(str)) {
-			node := s.Get(0)
-			if node.Parent != nil {
-				node.Parent.RemoveChild(node)
-			}
+		blacklisted := (
+			blacklistCandidatesRegexp.MatchString(str) ||
+			(unlikelyCandidatesRegexp.MatchString(str) &&
+			 !okMaybeItsACandidateRegexp.MatchString(str)))
+		if blacklisted && node.Parent != nil {
+			node.Parent.RemoveChild(node)
 		}
-	})
+	}
 }
 
 func getTopCandidate(document *goquery.Document, candidates candidateList) *candidate {
@@ -292,12 +295,10 @@ func getClassWeight(s *goquery.Selection) float32 {
 	return float32(weight)
 }
 
-func transformMisusedDivsIntoParagraphs(document *goquery.Document) {
-	document.Find("div").Each(func(i int, s *goquery.Selection) {
-		html, _ := s.Html()
-		if !divToPElementsRegexp.MatchString(html) {
-			node := s.Get(0)
+func transformMisusedDivsIntoParagraphs(root *html.Node) {
+	for _, node := range htmlutil.Query(root, "div") {
+		if !divToPElementsRegexp.MatchString(htmlutil.InnerHTML(node)) {
 			node.Data = "p"
 		}
-	})
+	}
 }

@@ -12,6 +12,14 @@ func HTML(node *html.Node) string {
 	return writer.String()
 }
 
+func InnerHTML(node *html.Node) string {
+	writer := strings.Builder{}
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
+		html.Render(&writer, c)
+	}
+	return writer.String()
+}
+
 func Attr(node *html.Node, key string) string {
 	for _, a := range node.Attr {
 		if a.Key == key {
