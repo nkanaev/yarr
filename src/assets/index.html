@@ -59,7 +59,7 @@
                     <header class="dropdown-header">Auto Refresh</header>
                     <div class="row text-center m-0">
                         <button class="dropdown-item col-4 px-0" :class="{active: !refreshRate}" @click.stop="refreshRate = 0">0</button>
-                        <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 10}" @click.stop="refreshRate =10">10m</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 10}" @click.stop="refreshRate = 10">10m</button>
                         <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 30}" @click.stop="refreshRate = 30">30m</button>
                         <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 60}" @click.stop="refreshRate = 60">1h</button>
                         <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 120}" @click.stop="refreshRate = 120">2h</button>
