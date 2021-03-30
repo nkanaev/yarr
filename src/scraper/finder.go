@@ -3,6 +3,7 @@ package scraper
 import (
 	"strings"
 
+	"github.com/nkanaev/yarr/src/htmlutil"
 	"golang.org/x/net/html"
 )
 
@@ -19,7 +20,7 @@ func FindFeeds(body string, base string) map[string]string {
 	linkTypes := []string{"application/atom+xml", "application/rss+xml", "application/json"}
 	isFeedLink := func(n *html.Node) bool {
 		if n.Type == html.ElementNode && n.Data == "link" {
-			t := getAttr(n, "type")
+			t := htmlutil.Attr(n, "type")
 			for _, tt := range linkTypes {
 				if tt == t {
 					return true
@@ -28,9 +29,9 @@ func FindFeeds(body string, base string) map[string]string {
 		}
 		return false
 	}
-	for _, node := range getNodes(doc, isFeedLink) {
-		href := getAttr(node, "href")
-		name := getAttr(node, "title")
+	for _, node := range htmlutil.FindNodes(doc, isFeedLink) {
+		href := htmlutil.Attr(node, "href")
+		name := htmlutil.Attr(node, "title")
 		link := absoluteUrl(href, base)
 		if link != "" {
 			candidates[link] = name
@@ -45,17 +46,23 @@ func FindFeeds(body string, base string) map[string]string {
 		feedTexts := []string{"rss", "feed"}
 		isFeedHyperLink := func(n *html.Node) bool {
 			if n.Type == html.ElementNode && n.Data == "a" {
-				if any(feedHrefs, strings.Trim(getAttr(n, "href"), "/"), strings.HasSuffix) {
-					return true
+				href := strings.Trim(htmlutil.Attr(n, "href"), "/")
+				for _, feedHref := range feedHrefs {
+					if strings.HasSuffix(href, feedHref) {
+						return true
+					}
 				}
-				if any(feedTexts, getText(n), strings.EqualFold) {
-					return true
+				text := htmlutil.Text(n)
+				for _, feedText := range feedTexts {
+					if strings.EqualFold(text, feedText) {
+						return true
+					}
 				}
 			}
 			return false
 		}
-		for _, node := range getNodes(doc, isFeedHyperLink) {
-			href := getAttr(node, "href")
+		for _, node := range htmlutil.FindNodes(doc, isFeedHyperLink) {
+			href := htmlutil.Attr(node, "href")
 			link := absoluteUrl(href, base)
 			if link != "" {
 				candidates[link] = ""
@@ -78,9 +85,12 @@ func FindIcons(body string, base string) []string {
 	isLink := func(n *html.Node) bool {
 		return n.Type == html.ElementNode && n.Data == "link"
 	}
-	for _, node := range getNodes(doc, isLink) {
-		if any(strings.Split(getAttr(node, "rel"), " "), "icon", strings.EqualFold) {
-			icons = append(icons, absoluteUrl(getAttr(node, "href"), base))
+	for _, node := range htmlutil.FindNodes(doc, isLink) {
+		rels := strings.Split(htmlutil.Attr(node, "rel"), " ")
+		for _, rel := range rels {
+			if strings.EqualFold(rel, "icon") {
+				icons = append(icons, absoluteUrl(htmlutil.Attr(node, "href"), base))
+			}
 		}
 	}
 	return icons

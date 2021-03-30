@@ -2,7 +2,7 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
-package scraper
+package reader
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/nkanaev/yarr/src/htmlutil"
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
 )
@@ -75,9 +76,12 @@ func ExtractContent(page io.Reader) (string, error) {
 		return "", err
 	}
 
-	document.Find("script,style").Each(func(i int, s *goquery.Selection) {
-		removeNodes(s)
-	})
+	root := document.Get(0)
+	for _, trash := range htmlutil.Query(root, "script,style") {
+		if trash.Parent != nil {
+			trash.Parent.RemoveChild(trash)
+		}
+	}
 
 	transformMisusedDivsIntoParagraphs(document)
 	removeUnlikelyCandidates(document)
@@ -142,7 +146,10 @@ func removeUnlikelyCandidates(document *goquery.Document) {
 		str := class + id
 
 		if blacklistCandidatesRegexp.MatchString(str) || (unlikelyCandidatesRegexp.MatchString(str) && !okMaybeItsACandidateRegexp.MatchString(str)) {
-			removeNodes(s)
+			node := s.Get(0)
+			if node.Parent != nil {
+				node.Parent.RemoveChild(node)
+			}
 		}
 	})
 }
@@ -291,15 +298,6 @@ func transformMisusedDivsIntoParagraphs(document *goquery.Document) {
 		if !divToPElementsRegexp.MatchString(html) {
 			node := s.Get(0)
 			node.Data = "p"
-		}
-	})
-}
-
-func removeNodes(s *goquery.Selection) {
-	s.Each(func(i int, s *goquery.Selection) {
-		parent := s.Parent()
-		if parent.Length() > 0 {
-			parent.Get(0).RemoveChild(s.Get(0))
 		}
 	})
 }

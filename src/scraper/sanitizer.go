@@ -15,7 +15,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-var splitSrcsetRegex  = regexp.MustCompile(`,\s+`)
+var splitSrcsetRegex = regexp.MustCompile(`,\s+`)
 
 // Sanitize returns safe HTML.
 func Sanitize(baseURL, input string) string {
