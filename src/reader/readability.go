@@ -43,6 +43,8 @@ func (c *candidate) Node() *html.Node {
 	return c.selection.Get(0)
 }
 
+type scorelist map[*html.Node]float32
+
 func (c *candidate) String() string {
 	id, _ := c.selection.Attr("id")
 	class, _ := c.selection.Attr("class")
@@ -86,19 +88,24 @@ func ExtractContent(page io.Reader) (string, error) {
 	transformMisusedDivsIntoParagraphs(root)
 	removeUnlikelyCandidates(root)
 
-	candidates := getCandidates(document)
+	scores := getCandidates(root)
 	//log.Printf("[Readability] Candidates: %v", candidates)
 
-	topCandidate := getTopCandidate(document, candidates)
+	best := getTopCandidate(scores)
+	if best == nil {
+		best = root
+	}
 	//log.Printf("[Readability] TopCandidate: %v", topCandidate)
 
-	output := getArticle(topCandidate, candidates)
+	output := getArticle(root, best, scores)
 	return output, nil
 }
 
 // Now that we have the top candidate, look through its siblings for content that might also be related.
 // Things like preambles, content split by ads that we removed, etc.
-func getArticle(topCandidate *candidate, candidates candidateList) string {
+func getArticle(root, best *html.Node, scores scorelist) string {
+	selection := goquery.NewDocumentFromNode(root).FindNodes(best)
+	topCandidate := &candidate{selection: selection, score: scores[best]}
 	output := bytes.NewBufferString("<div>")
 	siblingScoreThreshold := float32(math.Max(10, float64(topCandidate.score*.2)))
 
@@ -108,12 +115,12 @@ func getArticle(topCandidate *candidate, candidates candidateList) string {
 
 		if node == topCandidate.Node() {
 			append = true
-		} else if c, ok := candidates[node]; ok && c.score >= siblingScoreThreshold {
+		} else if score, ok := scores[node]; ok && score >= siblingScoreThreshold {
 			append = true
 		}
 
 		if s.Is("p") {
-			linkDensity := getLinkDensity(s)
+			linkDensity := getLinkDensity(s.Get(0))
 			content := s.Text()
 			contentLength := len(content)
 
@@ -157,19 +164,15 @@ func removeUnlikelyCandidates(root *html.Node) {
 	}
 }
 
-func getTopCandidate(document *goquery.Document, candidates candidateList) *candidate {
-	var best *candidate
+func getTopCandidate(scores scorelist) *html.Node {
+	var best *html.Node
+	var maxScore float32
 
-	for _, c := range candidates {
-		if best == nil {
-			best = c
-		} else if best.score < c.score {
-			best = c
+	for node, score := range scores {
+		if score > maxScore {
+			best = node
+			maxScore = score
 		}
-	}
-
-	if best == nil {
-		best = &candidate{document.Find("body"), 0}
 	}
 
 	return best
@@ -179,33 +182,26 @@ func getTopCandidate(document *goquery.Document, candidates candidateList) *cand
 // Then add their score to their parent node.
 // A score is determined by things like number of commas, class names, etc.
 // Maybe eventually link density.
-func getCandidates(document *goquery.Document) candidateList {
-	candidates := make(candidateList)
-
-	document.Find(defaultTagsToScore).Each(func(i int, s *goquery.Selection) {
-		text := s.Text()
+func getCandidates(root *html.Node) scorelist {
+	scores := make(scorelist)
+	for _, node := range htmlutil.Query(root, defaultTagsToScore) {
+		text := htmlutil.Text(node)
 
 		// If this paragraph is less than 25 characters, don't even count it.
 		if len(text) < 25 {
-			return
+			continue
 		}
 
-		parent := s.Parent()
-		parentNode := parent.Get(0)
+		parentNode := node.Parent
+		grandParentNode := parentNode.Parent
 
-		grandParent := parent.Parent()
-		var grandParentNode *html.Node
-		if grandParent.Length() > 0 {
-			grandParentNode = grandParent.Get(0)
-		}
-
-		if _, found := candidates[parentNode]; !found {
-			candidates[parentNode] = scoreNode(parent)
+		if _, found := scores[parentNode]; !found {
+			scores[parentNode] = scoreNode(parentNode)
 		}
 
 		if grandParentNode != nil {
-			if _, found := candidates[grandParentNode]; !found {
-				candidates[grandParentNode] = scoreNode(grandParent)
+			if _, found := scores[grandParentNode]; !found {
+				scores[grandParentNode] = scoreNode(grandParentNode)
 			}
 		}
 
@@ -218,48 +214,50 @@ func getCandidates(document *goquery.Document) candidateList {
 		// For every 100 characters in this paragraph, add another point. Up to 3 points.
 		contentScore += float32(math.Min(float64(int(len(text)/100.0)), 3))
 
-		candidates[parentNode].score += contentScore
+		scores[parentNode] += contentScore
 		if grandParentNode != nil {
-			candidates[grandParentNode].score += contentScore / 2.0
+			scores[grandParentNode] += contentScore / 2.0
 		}
-	})
+	}
 
 	// Scale the final candidates score based on link density. Good content
 	// should have a relatively small link density (5% or less) and be mostly
 	// unaffected by this operation
-	for _, candidate := range candidates {
-		candidate.score = candidate.score * (1 - getLinkDensity(candidate.selection))
+	for node, _ := range scores {
+		scores[node] *= (1 - getLinkDensity(node))
 	}
 
-	return candidates
+	return scores
 }
 
-func scoreNode(s *goquery.Selection) *candidate {
-	c := &candidate{selection: s, score: 0}
+func scoreNode(node *html.Node) float32 {
+	var score float32
 
-	switch s.Get(0).DataAtom.String() {
+	switch node.Data {
 	case "div":
-		c.score += 5
+		score += 5
 	case "pre", "td", "blockquote", "img":
-		c.score += 3
+		score += 3
 	case "address", "ol", "ul", "dl", "dd", "dt", "li", "form":
-		c.score -= 3
+		score -= 3
 	case "h1", "h2", "h3", "h4", "h5", "h6", "th":
-		c.score -= 5
+		score -= 5
 	}
 
-	c.score += getClassWeight(s.Get(0))
-	return c
+	return score + getClassWeight(node)
 }
 
 // Get the density of links as a percentage of the content
 // This is the amount of text that is inside a link divided by the total text in the node.
-func getLinkDensity(s *goquery.Selection) float32 {
-	linkLength := len(s.Find("a").Text())
-	textLength := len(s.Text())
-
+func getLinkDensity(n *html.Node) float32 {
+	textLength := len(htmlutil.Text(n))
 	if textLength == 0 {
 		return 0
+	}
+
+	linkLength := 0.0
+	for _, a := range htmlutil.Query(n, "a") {
+		linkLength += float64(len(htmlutil.Text(a)))
 	}
 
 	return float32(linkLength) / float32(textLength)
