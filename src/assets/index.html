@@ -13,7 +13,7 @@
         window.app.authenticated = {% .authenticated %}
     </script>
 </head>
-<body class="theme-light">
+<body class="theme-{% .settings.theme_name %}">
     <div id="app" class="d-flex" :class="{'feed-selected': feedSelected !== null, 'item-selected': itemSelected !== null}" v-cloak>
         <!-- feed list -->
         <div id="col-feed-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">

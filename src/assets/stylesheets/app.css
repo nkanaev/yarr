@@ -23,7 +23,6 @@ select.form-control {
 
 select.form-control:not([multiple]):not([size]) {
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23667189'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") no-repeat right .35rem center/.6rem .6rem;
   padding-right: 1.2rem;
   cursor: pointer;
 }
@@ -247,7 +246,6 @@ select.form-control:not([multiple]):not([size]) {
   border: 1px solid #ced4da;
   border-radius: .25rem;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  background: linear-gradient(#fff, #f5f7f9);
 }
 
 .btn-default:active {
@@ -417,6 +415,10 @@ select.form-control:not([multiple]):not([size]) {
 
 /* theme: light */
 
+button.theme-light {
+  background-color: #fff !important;
+}
+
 a,
 .btn-link:hover,
 .toolbar-item.active {
@@ -438,8 +440,12 @@ a,
 /* theme: sepia */
 
 .theme-sepia,
+.theme-sepia .btn-default,
+.theme-sepia .dropdown-menu,
+.theme-sepia .form-control,
+.theme-sepia .modal-content,
 .theme-sepia .toolbar-search {
-  background-color: #f4f0e5;
+  background-color: #f4f0e5 !important;
 }
 .theme-sepia .content hr,
 .theme-sepia .content pre,
@@ -450,6 +456,8 @@ a,
 .theme-sepia .selectgroup-label:hover,
 .theme-sepia .toolbar-item:hover,
 .theme-sepia .toolbar-search:hover,
+.theme-sepia .dropdown-item:hover,
+.theme-sepia .list-row:hover,
 .theme-sepia .toolbar-search:focus {
   background-color: #e0d6ba;
 }
@@ -457,6 +465,11 @@ a,
 /* theme: night */
 
 .theme-night,
+.theme-night .btn-default,
+.theme-night .dropdown-menu,
+.theme-night .dropdown-item,
+.theme-night .form-control,
+.theme-night .modal-content,
 .theme-night .toolbar-search {
   color: #d1d1d1;
   background-color: #0e0e0e;
@@ -464,14 +477,22 @@ a,
 .theme-night .content hr,
 .theme-night .content pre,
 .theme-night .border-right,
-.theme-night .border-top {
+.theme-night .border-top,
+.theme-night .dropdown-divider {
   border-color: #1a1a1a !important;
 }
+.theme-night .list-row:hover,
 .theme-night .selectgroup-label:hover,
+.theme-night .dropdown-item:hover,
 .theme-night .toolbar-item:hover,
 .theme-night .toolbar-search:hover,
 .theme-night .toolbar-search:focus {
   background-color: #1a1a1a;
+}
+
+.theme-night .dropdown-menu,
+.theme-night .modal-content {
+  border-color: #1a1a1a;
 }
 
 /* animation */
