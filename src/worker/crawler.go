@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/nkanaev/yarr/src/scraper"
+	"github.com/nkanaev/yarr/src/content/scraper"
 	"github.com/nkanaev/yarr/src/parser"
 	"github.com/nkanaev/yarr/src/storage"
 	"golang.org/x/net/html/charset"

@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"golang.org/x/net/html"
 )
 
@@ -116,7 +117,7 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 			} else if tagName == "img" && attribute.Key == "src" && isValidDataAttribute(attribute.Val) {
 				value = attribute.Val
 			} else {
-				value = absoluteUrl(value, baseURL)
+				value = htmlutil.AbsoluteUrl(value, baseURL)
 				if value == "" {
 					continue
 				}
@@ -294,9 +295,9 @@ func isValidIframeSource(baseURL, src string) bool {
 		"www.youtube.com",
 	}
 
-	domain := urlDomain(src)
+	domain := htmlutil.URLDomain(src)
 	// allow iframe from same origin
-	if urlDomain(baseURL) == domain {
+	if htmlutil.URLDomain(baseURL) == domain {
 		return true
 	}
 
@@ -416,7 +417,7 @@ func sanitizeSrcsetAttr(baseURL, value string) string {
 		if nbParts > 0 {
 			sanitizedSource := parts[0]
 			if !strings.HasPrefix(parts[0], "data:") {
-				sanitizedSource = absoluteUrl(parts[0], baseURL)
+				sanitizedSource = htmlutil.AbsoluteUrl(parts[0], baseURL)
 				if sanitizedSource == "" {
 					continue
 				}

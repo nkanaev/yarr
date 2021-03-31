@@ -2,7 +2,7 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
-package reader
+package readability
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/nkanaev/yarr/src/htmlutil"
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"golang.org/x/net/html"
 )
 

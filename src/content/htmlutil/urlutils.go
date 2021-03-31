@@ -1,10 +1,10 @@
-package scraper
+package htmlutil
 
 import (
 	"net/url"
 )
 
-func any(els []string, el string, match func(string, string) bool) bool {
+func Any(els []string, el string, match func(string, string) bool) bool {
 	for _, x := range els {
 		if match(x, el) {
 			return true
@@ -13,7 +13,7 @@ func any(els []string, el string, match func(string, string) bool) bool {
 	return false
 }
 
-func absoluteUrl(href, base string) string {
+func AbsoluteUrl(href, base string) string {
 	baseUrl, err := url.Parse(base)
 	if err != nil {
 		return ""
@@ -25,7 +25,7 @@ func absoluteUrl(href, base string) string {
 	return baseUrl.ResolveReference(hrefUrl).String()
 }
 
-func urlDomain(val string) string {
+func URLDomain(val string) string {
 	if u, err := url.Parse(val); err == nil {
 		return u.Host
 	}

@@ -3,7 +3,7 @@ package scraper
 import (
 	"strings"
 
-	"github.com/nkanaev/yarr/src/htmlutil"
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"golang.org/x/net/html"
 )
 
@@ -32,7 +32,7 @@ func FindFeeds(body string, base string) map[string]string {
 	for _, node := range htmlutil.FindNodes(doc, isFeedLink) {
 		href := htmlutil.Attr(node, "href")
 		name := htmlutil.Attr(node, "title")
-		link := absoluteUrl(href, base)
+		link := htmlutil.AbsoluteUrl(href, base)
 		if link != "" {
 			candidates[link] = name
 		}
@@ -63,7 +63,7 @@ func FindFeeds(body string, base string) map[string]string {
 		}
 		for _, node := range htmlutil.FindNodes(doc, isFeedHyperLink) {
 			href := htmlutil.Attr(node, "href")
-			link := absoluteUrl(href, base)
+			link := htmlutil.AbsoluteUrl(href, base)
 			if link != "" {
 				candidates[link] = ""
 			}
@@ -89,7 +89,7 @@ func FindIcons(body string, base string) []string {
 		rels := strings.Split(htmlutil.Attr(node, "rel"), " ")
 		for _, rel := range rels {
 			if strings.EqualFold(rel, "icon") {
-				icons = append(icons, absoluteUrl(htmlutil.Attr(node, "href"), base))
+				icons = append(icons, htmlutil.AbsoluteUrl(htmlutil.Attr(node, "href"), base))
 			}
 		}
 	}
