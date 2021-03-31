@@ -2,11 +2,6 @@
 
 var TITLE = document.title
 
-function authenticated() {
-  return /auth=.+/g.test(document.cookie)
-
-}
-
 var FONTS = [
   "Arial",
   "Courier New",
@@ -192,17 +187,21 @@ Vue.component('relative-time', {
 })
 
 var vm = new Vue({
+  mounted: function() {
+    this.refreshItems()
+  },
   created: function() {
     this.refreshFeeds()
     this.refreshStats()
   },
   data: function() {
+    var s = app.settings
     return {
-      'filterSelected': undefined,
+      'filterSelected': s.filter,
       'folders': [],
       'feeds': [],
-      'feedSelected': undefined,
-      'feedListWidth': undefined,
+      'feedSelected': s.feed,
+      'feedListWidth': s.feed_list_width || 300,
       'feedNewChoice': [],
       'feedNewChoiceSelected': '',
       'items': [],
@@ -214,8 +213,8 @@ var vm = new Vue({
       'itemSelectedDetails': null,
       'itemSelectedReadability': '',
       'itemSearch': '',
-      'itemSortNewestFirst': undefined,
-      'itemListWidth': undefined,
+      'itemSortNewestFirst': s.sort_newest_first,
+      'itemListWidth': s.item_list_width || 300,
 
       'filteredFeedStats': {},
       'filteredFolderStats': {},
@@ -231,12 +230,12 @@ var vm = new Vue({
       'fonts': FONTS,
       'feedStats': {},
       'theme': {
-        'name': 'light',
-        'font': '',
-        'size': 1,
+        'name': s.theme_name,
+        'font': s.theme_font,
+        'size': s.theme_size,
       },
-      'refreshRate': undefined,
-      'authenticated': authenticated(),
+      'refreshRate': s.refresh_rate,
+      'authenticated': app.authenticated,
       'feed_errors': {},
     }
   },
@@ -657,16 +656,4 @@ var vm = new Vue({
   }
 })
 
-api.settings.get().then(function(data) {
-  vm.feedSelected = data.feed
-  vm.filterSelected = data.filter
-  vm.itemSortNewestFirst = data.sort_newest_first
-  vm.feedListWidth = data.feed_list_width || 300
-  vm.itemListWidth = data.item_list_width || 300
-  vm.theme.name = data.theme_name
-  vm.theme.font = data.theme_font
-  vm.theme.size = data.theme_size
-  vm.refreshRate = data.refresh_rate
-  vm.refreshItems()
-  vm.$mount('#app')
-})
+vm.$mount('#app')
