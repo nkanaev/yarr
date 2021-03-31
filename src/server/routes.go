@@ -8,11 +8,11 @@ import (
 	"reflect"
 
 	"github.com/nkanaev/yarr/src/assets"
-	"github.com/nkanaev/yarr/src/auth"
 	"github.com/nkanaev/yarr/src/content/readability"
 	"github.com/nkanaev/yarr/src/content/sanitizer"
-	"github.com/nkanaev/yarr/src/opml"
-	"github.com/nkanaev/yarr/src/router"
+	"github.com/nkanaev/yarr/src/server/router"
+	"github.com/nkanaev/yarr/src/server/auth"
+	"github.com/nkanaev/yarr/src/server/opml"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/worker"
 )

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/nkanaev/yarr/src/assets"
-	"github.com/nkanaev/yarr/src/router"
+	"github.com/nkanaev/yarr/src/server/router"
 )
 
 type Middleware struct {
