@@ -323,9 +323,12 @@ var vm = new Vue({
       api.items.get(newVal).then(function(item) {
         this.itemSelectedDetails = item
         if (this.itemSelectedDetails.status == 'unread') {
-          this.itemSelectedDetails.status = 'read'
-          this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
-          api.items.update(this.itemSelectedDetails.id, {status: this.itemSelectedDetails.status})
+          api.items.update(this.itemSelectedDetails.id, {status: 'read'}).then(function() {
+            this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
+            var itemInList = this.items.find(function(i) { return i.id == item.id })
+            if (itemInList) itemInList.status = 'read'
+            this.itemSelectedDetails.status = 'read'
+          }.bind(this))
         }
       }.bind(this))
     },
@@ -541,31 +544,30 @@ var vm = new Vue({
         vm.loading.newfeed = false
       })
     },
+    toggleItemStatus: function(item, targetstatus, fallbackstatus) {
+      var oldstatus = item.status
+      var newstatus = item.status !== targetstatus ? targetstatus : fallbackstatus
+
+      var updateStats = function(status, incr) {
+        if ((status == 'unread') || (status == 'starred')) {
+          this.feedStats[item.feed_id][status] += incr
+        }
+      }.bind(this)
+
+      api.items.update(item.id, {status: newstatus}).then(function() {
+        updateStats(oldstatus, -1)
+        updateStats(newstatus, +1)
+
+        var itemInList = this.items.find(function(i) { return i.id == item.id })
+        if (itemInList) itemInList.status = newstatus
+        item.status = newstatus
+      }.bind(this))
+    },
     toggleItemStarred: function(item) {
-      if (item.status == 'unread') {
-        this.feedStats[item.feed_id].unread -= 1
-      }
-      if (item.status == 'starred') {
-        item.status = 'read'
-        this.feedStats[item.feed_id].starred -= 1
-      } else if (item.status != 'starred') {
-        item.status = 'starred'
-        this.feedStats[item.feed_id].starred += 1
-      }
-      api.items.update(item.id, {status: item.status})
+      this.toggleItemStatus(item, 'starred', 'read')
     },
     toggleItemRead: function(item) {
-      if (item.status == 'starred') {
-        this.feedStats[item.feed_id].starred -= 1
-      }
-      if (item.status == 'unread') {
-        item.status = 'read'
-        this.feedStats[item.feed_id].unread -= 1
-      } else if (item.status != 'unread') {
-        item.status = 'unread'
-        this.feedStats[item.feed_id].unread += 1
-      }
-      api.items.update(item.id, {status: item.status})
+      this.toggleItemStatus(item, 'unread', 'read')
     },
     importOPML: function(event) {
       var input = event.target
