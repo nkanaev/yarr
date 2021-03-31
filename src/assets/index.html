@@ -226,10 +226,9 @@
                         </button>
                     </div>
 
-                    <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">System Default</button>
-                    <button class="dropdown-item" :class="{active: theme.font == f}" v-for="f in fonts" :key="f" @click.stop="theme.font = f">
-                        {{ f }}
-                    </button>
+                    <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">sans-serif</button>
+                    <button class="dropdown-item font-serif" :class="{active: theme.font == 'serif'}" @click.stop="theme.font = 'serif'">serif</button>
+                    <button class="dropdown-item font-monospace" :class="{active: theme.font == 'monospace'}" @click.stop="theme.font = 'monospace'">monospace</button>
 
                     <div class="d-flex text-center">
                         <button class="dropdown-item" style="font-size: 0.8rem" @click.stop="incrFont(-1)">A</button>
@@ -253,7 +252,8 @@
             <div v-if="itemSelectedDetails"
                  ref="content"
                  class="content px-4 pt-3 pb-5 border-top overflow-auto"
-                 :style="{'font-family': theme.font, 'font-size': theme.size + 'rem'}">
+                 :class="{'font-serif': theme.font == 'serif', 'font-monospace': theme.font == 'monospace'}"
+                 :style="{'font-size': theme.size + 'rem'}">
                 <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>

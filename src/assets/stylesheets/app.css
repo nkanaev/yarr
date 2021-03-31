@@ -93,6 +93,14 @@ select.form-control:not([multiple]):not([size]) {
 
 /* custom elements */
 
+.font-serif {
+  font-family: Georgia, serif;
+}
+
+.font-monospace {
+  font-family: SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 .icon {
   height: 1rem;
   width: 1rem;

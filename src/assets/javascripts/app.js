@@ -2,14 +2,6 @@
 
 var TITLE = document.title
 
-var FONTS = [
-  "Arial",
-  "Courier New",
-  "Georgia",
-  "Times New Roman",
-  "Verdana",
-]
-
 var debounce = function(callback, wait) {
   var timeout
   return function() {
@@ -227,7 +219,7 @@ var vm = new Vue({
         'items': false,
         'readability': false,
       },
-      'fonts': FONTS,
+      'fonts': ['', 'serif', 'monospace'],
       'feedStats': {},
       'theme': {
         'name': s.theme_name,
