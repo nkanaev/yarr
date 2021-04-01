@@ -13,8 +13,6 @@ var debounce = function(callback, wait) {
   }
 }
 
-Vue.use(VueLazyload)
-
 Vue.directive('scroll', {
   inserted: function(el, binding) {
     el.addEventListener('scroll', debounce(function(event) {
