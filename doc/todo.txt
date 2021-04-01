@@ -1,3 +1,2 @@
 - etc: test new parser extensively
-- fix: extend sanitizer allowlist
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
