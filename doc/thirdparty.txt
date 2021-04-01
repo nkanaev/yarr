@@ -11,7 +11,8 @@ The licenses are included, and the authorship comments are left intact.
 - sanitizer
   https://github.com/miniflux/v2 (commit:3cb04b2) Apache 2.0
 
-  no changes
+  changed allowed tags to the one from https://github.com/cure53/DOMPurify
+  changed allowed uri schemes to the one from https://github.com/cure53/DOMPurify
 
 - systray
   https://github.com/getlantern/systray (commit:2c0986d) Apache 2.0
