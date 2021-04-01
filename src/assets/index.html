@@ -260,8 +260,10 @@
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                 </div>
                 <hr>
-                <img :src="itemSelectedDetails.image" v-if="itemSelectedDetails.image" class="mb-3">
-                <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
+                <div v-if="!itemSelectedReadability">
+                    <img :src="itemSelectedDetails.image" v-if="itemSelectedDetails.image" class="mb-3">
+                    <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
+                </div>
                 <div v-html="itemSelectedContent"></div>
             </div>
         </div>

@@ -10,6 +10,7 @@ import (
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/content/readability"
 	"github.com/nkanaev/yarr/src/content/sanitizer"
+	"github.com/nkanaev/yarr/src/content/silo"
 	"github.com/nkanaev/yarr/src/server/router"
 	"github.com/nkanaev/yarr/src/server/auth"
 	"github.com/nkanaev/yarr/src/server/opml"
@@ -403,19 +404,19 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 }
 
 func (s *Server) handlePageCrawl(c *router.Context) {
-	if c.Req.Method != "POST" {
-		c.Out.WriteHeader(http.StatusBadRequest)
-		return
-	}
 	url := c.Req.URL.Query().Get("url")
-	if url == "" {
-		c.Out.WriteHeader(http.StatusBadRequest)
+
+	if content := silo.VideoIFrame(url); content != "" {
+		c.JSON(http.StatusOK, map[string]string{
+			"content": content,
+		})
 		return
 	}
+
 	res, err := http.Get(url)
 	if err != nil {
 		log.Print(err)
-		c.Out.WriteHeader(http.StatusNoContent)
+		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	defer res.Body.Close()

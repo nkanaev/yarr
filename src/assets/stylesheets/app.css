@@ -386,6 +386,12 @@ select.form-control:not([multiple]):not([size]) {
   height: auto;
 }
 
+.content iframe {
+  display: block;
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+}
+
 .content pre {
   overflow-x: auto;
   color: inherit;
