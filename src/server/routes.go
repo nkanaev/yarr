@@ -242,8 +242,8 @@ func (s *Server) handleItem(c *router.Context) {
 			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		item.Content = scraper.Sanitize(item.Link, item.Content)
-		item.Description = scraper.Sanitize(item.Link, item.Description)
+		item.Content = sanitizer.Sanitize(item.Link, item.Content)
+		item.Description = sanitizer.Sanitize(item.Link, item.Description)
 
 		c.JSON(http.StatusOK, item)
 	} else if c.Req.Method == "PUT" {
@@ -425,7 +425,7 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		c.Out.WriteHeader(http.StatusNoContent)
 		return
 	}
-	content = scraper.Sanitize(url, content)
+	content = sanitizer.Sanitize(url, content)
 	c.JSON(http.StatusOK, map[string]string{
 		"content": content,
 	})
