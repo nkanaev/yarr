@@ -1,2 +1,4 @@
 - etc: test new parser extensively
+- etc: check feedburner
+- new: youtube/vimeo iframe generator in "read here"
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
