@@ -157,24 +157,13 @@ func getExtraAttributes(tagName string) ([]string, []string) {
 }
 
 func isValidTag(tagName string) bool {
-	for element := range getTagAllowList() {
-		if tagName == element {
-			return true
-		}
-	}
-
-	return false
+	return allowedTags.has(tagName)
 }
 
 func isValidAttribute(tagName, attributeName string) bool {
-	for element, attributes := range getTagAllowList() {
-		if tagName == element {
-			if inList(attributeName, attributes) {
-				return true
-			}
-		}
+	if attrs, ok := allowedAttrs[tagName]; ok {
+		return attrs.has(attributeName)
 	}
-
 	return false
 }
 
@@ -213,52 +202,8 @@ func hasRequiredAttributes(tagName string, attributes []string) bool {
 
 // See https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 func hasValidURIScheme(src string) bool {
-	whitelist := []string{
-		"apt:",
-		"bitcoin:",
-		"callto:",
-		"dav:",
-		"davs:",
-		"ed2k://",
-		"facetime://",
-		"feed:",
-		"ftp://",
-		"geo:",
-		"gopher://",
-		"git://",
-		"http://",
-		"https://",
-		"irc://",
-		"irc6://",
-		"ircs://",
-		"itms://",
-		"itms-apps://",
-		"magnet:",
-		"mailto:",
-		"news:",
-		"nntp:",
-		"rtmp://",
-		"sip:",
-		"sips:",
-		"skype:",
-		"spotify:",
-		"ssh://",
-		"sftp://",
-		"steam://",
-		"svn://",
-		"svn+ssh://",
-		"tel:",
-		"webcal://",
-		"xmpp:",
-	}
-
-	for _, prefix := range whitelist {
-		if strings.HasPrefix(src, prefix) {
-			return true
-		}
-	}
-
-	return false
+	scheme := strings.SplitN(src, ":", 2)[0]
+	return allowedURISchemes.has(scheme)
 }
 
 func isBlockedResource(src string) bool {

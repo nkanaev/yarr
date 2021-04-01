@@ -114,7 +114,7 @@ func TestProtocolRelativeURL(t *testing.T) {
 }
 
 func TestInvalidTag(t *testing.T) {
-	input := `<p>My invalid <b>tag</b>.</p>`
+	input := `<p>My invalid <wtf>tag</wtf>.</p>`
 	expected := `<p>My invalid tag.</p>`
 	output := Sanitize("http://example.org/", input)
 
@@ -154,7 +154,7 @@ func TestUnknownTag(t *testing.T) {
 }
 
 func TestInvalidNestedTag(t *testing.T) {
-	input := `<p>My invalid <b>tag with some <em>valid</em> tag</b>.</p>`
+	input := `<p>My invalid <wtf>tag with some <em>valid</em> tag</wtf>.</p>`
 	expected := `<p>My invalid tag with some <em>valid</em> tag.</p>`
 	output := Sanitize("http://example.org/", input)
 
@@ -193,92 +193,6 @@ func TestInvalidURLScheme(t *testing.T) {
 	}
 }
 
-func TestAPTURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="apt:some-package?channel=test">valid</a></p>`
-	expected := `<p>This link is <a href="apt:some-package?channel=test" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestBitcoinURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="bitcoin:175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W">valid</a></p>`
-	expected := `<p>This link is <a href="bitcoin:175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestCallToURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="callto:12345679">valid</a></p>`
-	expected := `<p>This link is <a href="callto:12345679" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestFeedURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="feed://example.com/rss.xml">valid</a></p>`
-	expected := `<p>This link is <a href="feed://example.com/rss.xml" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-
-	input = `<p>This link is <a href="feed:https://example.com/rss.xml">valid</a></p>`
-	expected = `<p>This link is <a href="feed:https://example.com/rss.xml" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output = Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestGeoURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="geo:13.4125,103.8667">valid</a></p>`
-	expected := `<p>This link is <a href="geo:13.4125,103.8667" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestItunesURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="itms://itunes.com/apps/my-app-name">valid</a></p>`
-	expected := `<p>This link is <a href="itms://itunes.com/apps/my-app-name" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-
-	input = `<p>This link is <a href="itms-apps://itunes.com/apps/my-app-name">valid</a></p>`
-	expected = `<p>This link is <a href="itms-apps://itunes.com/apps/my-app-name" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output = Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestMagnetURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="magnet:?xt.1=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C&amp;xt.2=urn:sha1:TXGCZQTH26NL6OUQAJJPFALHG2LTGBC7">valid</a></p>`
-	expected := `<p>This link is <a href="magnet:?xt.1=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C&amp;xt.2=urn:sha1:TXGCZQTH26NL6OUQAJJPFALHG2LTGBC7" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
 func TestMailtoURIScheme(t *testing.T) {
 	input := `<p>This link is <a href="mailto:jsmith@example.com?subject=A%20Test&amp;body=My%20idea%20is%3A%20%0A">valid</a></p>`
 	expected := `<p>This link is <a href="mailto:jsmith@example.com?subject=A%20Test&amp;body=My%20idea%20is%3A%20%0A" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
@@ -289,121 +203,9 @@ func TestMailtoURIScheme(t *testing.T) {
 	}
 }
 
-func TestNewsURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="news://news.server.example/*">valid</a></p>`
-	expected := `<p>This link is <a href="news://news.server.example/*" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-
-	input = `<p>This link is <a href="news:example.group.this">valid</a></p>`
-	expected = `<p>This link is <a href="news:example.group.this" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output = Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-
-	input = `<p>This link is <a href="nntp://news.server.example/example.group.this">valid</a></p>`
-	expected = `<p>This link is <a href="nntp://news.server.example/example.group.this" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output = Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestRTMPURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="rtmp://mycompany.com/vod/mp4:mycoolvideo.mov">valid</a></p>`
-	expected := `<p>This link is <a href="rtmp://mycompany.com/vod/mp4:mycoolvideo.mov" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestSIPURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="sip:+1-212-555-1212:1234@gateway.com;user=phone">valid</a></p>`
-	expected := `<p>This link is <a href="sip:+1-212-555-1212:1234@gateway.com;user=phone" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-
-	input = `<p>This link is <a href="sips:alice@atlanta.com?subject=project%20x&amp;priority=urgent">valid</a></p>`
-	expected = `<p>This link is <a href="sips:alice@atlanta.com?subject=project%20x&amp;priority=urgent" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output = Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestSkypeURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="skype:echo123?call">valid</a></p>`
-	expected := `<p>This link is <a href="skype:echo123?call" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestSpotifyURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="spotify:track:2jCnn1QPQ3E8ExtLe6INsx">valid</a></p>`
-	expected := `<p>This link is <a href="spotify:track:2jCnn1QPQ3E8ExtLe6INsx" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestSteamURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="steam://settings/account">valid</a></p>`
-	expected := `<p>This link is <a href="steam://settings/account" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestSubversionURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="svn://example.org">valid</a></p>`
-	expected := `<p>This link is <a href="svn://example.org" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-
-	input = `<p>This link is <a href="svn+ssh://example.org">valid</a></p>`
-	expected = `<p>This link is <a href="svn+ssh://example.org" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output = Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
 func TestTelURIScheme(t *testing.T) {
 	input := `<p>This link is <a href="tel:+1-201-555-0123">valid</a></p>`
 	expected := `<p>This link is <a href="tel:+1-201-555-0123" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
-	output := Sanitize("http://example.org/", input)
-
-	if expected != output {
-		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
-	}
-}
-
-func TestWebcalURIScheme(t *testing.T) {
-	input := `<p>This link is <a href="webcal://example.com/calendar.ics">valid</a></p>`
-	expected := `<p>This link is <a href="webcal://example.com/calendar.ics" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">valid</a></p>`
 	output := Sanitize("http://example.org/", input)
 
 	if expected != output {
