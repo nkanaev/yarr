@@ -8,7 +8,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/nkanaev/yarr/src/reader"
+	"github.com/nkanaev/yarr/src/content/readability"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 		}
 	}
 
-	content, err := reader.ExtractContent(r)
+	content, err := readability.ExtractContent(r)
 	if err != nil {
 		log.Fatalf("failed to extract content: %s", err)
 	}
