@@ -14,6 +14,7 @@ import (
 	"github.com/nkanaev/yarr/src/content/sanitizer"
 	"github.com/nkanaev/yarr/src/content/silo"
 	"github.com/nkanaev/yarr/src/server/auth"
+	"github.com/nkanaev/yarr/src/server/gzip"
 	"github.com/nkanaev/yarr/src/server/opml"
 	"github.com/nkanaev/yarr/src/server/router"
 	"github.com/nkanaev/yarr/src/storage"
@@ -22,6 +23,8 @@ import (
 
 func (s *Server) handler() http.Handler {
 	r := router.NewRouter(s.BasePath)
+
+	r.Use(gzip.Middleware)
 
 	if s.Username != "" && s.Password != "" {
 		a := &auth.Middleware{
@@ -62,7 +65,6 @@ func (s *Server) handleIndex(c *router.Context) {
 }
 
 func (s *Server) handleStatic(c *router.Context) {
-	// TODO: gzip?
 	// don't serve templates
 	dir, name := filepath.Split(c.Vars["path"])
 	if dir == "" && strings.HasSuffix(name, ".html") {
