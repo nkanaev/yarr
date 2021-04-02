@@ -6,6 +6,8 @@ import (
 	"html"
 	"io"
 	"strings"
+
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 )
 
 type atomFeed struct {
@@ -42,6 +44,13 @@ type atomLink struct {
 
 type atomLinks []atomLink
 
+func (a *atomText) Text() string {
+	if a.Type == "html" {
+		return htmlutil.ExtractText(a.Data)
+	}
+	return a.Data
+}
+
 func (a *atomText) String() string {
 	data := a.Data
 	if a.Type == "xhtml" {
@@ -76,7 +85,7 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 			GUID:     firstNonEmpty(srcitem.ID),
 			Date:     dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
 			URL:      firstNonEmpty(srcitem.OrigLink, srcitem.Links.First("alternate"), srcitem.Links.First("")),
-			Title:    srcitem.Title.String(),
+			Title:    srcitem.Title.Text(),
 			Content:  firstNonEmpty(srcitem.Content.String(), srcitem.Summary.String(), srcitem.firstMediaDescription()),
 			ImageURL: srcitem.firstMediaThumbnail(),
 			AudioURL: "",

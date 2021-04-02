@@ -1,6 +1,7 @@
 package htmlutil
 
 import (
+	"bytes"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -38,4 +39,19 @@ func Text(node *html.Node) string {
 		text = append(text, strings.TrimSpace(n.Data))
 	}
 	return strings.Join(text, " ")
+}
+
+func ExtractText(content string) string {
+	tokenizer := html.NewTokenizer(strings.NewReader(content))
+	buffer := bytes.Buffer{}
+	for {
+		token := tokenizer.Next()
+		if token == html.ErrorToken {
+			break
+		}
+		if token == html.TextToken {
+			buffer.WriteString(html.UnescapeString(string(tokenizer.Text())))
+		}
+	}
+	return buffer.String()
 }

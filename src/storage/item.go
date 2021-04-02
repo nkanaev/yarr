@@ -7,6 +7,8 @@ import (
 	"log"
 	"strings"
 	"time"
+
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 )
 
 type ItemStatus int
@@ -322,7 +324,7 @@ func (s *Storage) SyncSearch() {
 	for _, item := range items {
 		result, err := s.db.Exec(`
 			insert into search (title, description, content) values (?, ?, ?)`,
-			item.Title, HTMLText(item.Description), HTMLText(item.Content),
+			item.Title, htmlutil.ExtractText(item.Description), htmlutil.ExtractText(item.Content),
 		)
 		if err != nil {
 			log.Print(err)
