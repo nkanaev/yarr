@@ -19,11 +19,11 @@ import (
 )
 
 func (s *Server) handler() http.Handler {
-	r := router.NewRouter(BasePath)
+	r := router.NewRouter(s.BasePath)
 
 	if s.Username != "" && s.Password != "" {
 		a := &auth.Middleware{
-			BasePath: BasePath,
+			BasePath: s.BasePath,
 			Username: s.Username,
 			Password: s.Password,
 			Public:   "/static",
@@ -61,7 +61,7 @@ func (s *Server) handleIndex(c *router.Context) {
 
 func (s *Server) handleStatic(c *router.Context) {
 	// TODO: gzip?
-	http.StripPrefix(BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(c.Out, c.Req)
+	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(c.Out, c.Req)
 }
 
 func (s *Server) handleStatus(c *router.Context) {
@@ -433,6 +433,6 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 }
 
 func (s *Server) handleLogout(c *router.Context) {
-	auth.Logout(c.Out, BasePath)
+	auth.Logout(c.Out, s.BasePath)
 	c.Out.WriteHeader(http.StatusNoContent)
 }

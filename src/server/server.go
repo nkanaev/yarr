@@ -8,12 +8,13 @@ import (
 	"github.com/nkanaev/yarr/src/worker"
 )
 
-var BasePath string = ""
-
 type Server struct {
 	Addr   string
 	db     *storage.Storage
 	worker *worker.Worker
+
+	BasePath string
+
 	// auth
 	Username string
 	Password string
@@ -35,7 +36,7 @@ func (h *Server) GetAddr() string {
 	if h.CertFile != "" && h.KeyFile != "" {
 		proto = "https"
 	}
-	return proto + "://" + h.Addr + BasePath
+	return proto + "://" + h.Addr + h.BasePath
 }
 
 func (s *Server) Start() {
