@@ -2,10 +2,13 @@ package htmlutil
 
 import (
 	"bytes"
+	"regexp"
 	"strings"
 
 	"golang.org/x/net/html"
 )
+
+var whitespaceRegex = regexp.MustCompile(`[\s]+`)
 
 func HTML(node *html.Node) string {
 	writer := strings.Builder{}
@@ -53,5 +56,8 @@ func ExtractText(content string) string {
 			buffer.WriteString(html.UnescapeString(string(tokenizer.Text())))
 		}
 	}
-	return buffer.String()
+	text := buffer.String()
+	text = strings.TrimSpace(text)
+	text = whitespaceRegex.ReplaceAllLiteralString(text, " ")
+	return text
 }
