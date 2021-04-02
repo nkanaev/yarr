@@ -12,8 +12,9 @@ import (
 
 func firstNonEmpty(vals ...string) string {
 	for _, val := range vals {
-		if len(val) > 0 {
-			return val
+		valTrimmed := strings.TrimSpace(val)
+		if len(valTrimmed) > 0 {
+			return valTrimmed
 		}
 	}
 	return ""

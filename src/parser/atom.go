@@ -24,6 +24,8 @@ type atomEntry struct {
 	Updated   string    `xml:"updated"`
 	Links     atomLinks `xml:"link"`
 	Content   atomText  `xml:"http://www.w3.org/2005/Atom content"`
+	OrigLink  string    `xml:"http://rssnamespace.org/feedburner/ext/1.0 origLink"`
+
 	media
 }
 
@@ -73,9 +75,9 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 		dstfeed.Items = append(dstfeed.Items, Item{
 			GUID:     firstNonEmpty(srcitem.ID),
 			Date:     dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
-			URL:      firstNonEmpty(srcitem.Links.First("alternate"), srcfeed.Links.First("")),
+			URL:      firstNonEmpty(srcitem.OrigLink, srcitem.Links.First("alternate"), srcitem.Links.First("")),
 			Title:    srcitem.Title.String(),
-			Content:  firstNonEmpty(srcitem.Content.String(), srcitem.firstMediaDescription()),
+			Content:  firstNonEmpty(srcitem.Content.String(), srcitem.Summary.String(), srcitem.firstMediaDescription()),
 			ImageURL: srcitem.firstMediaThumbnail(),
 			AudioURL: "",
 		})

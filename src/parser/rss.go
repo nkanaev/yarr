@@ -7,6 +7,8 @@ package parser
 import (
 	"encoding/xml"
 	"io"
+	"path"
+	"strings"
 )
 
 type rssFeed struct {
@@ -28,8 +30,8 @@ type rssItem struct {
 	DublinCoreDate string `xml:"http://purl.org/dc/elements/1.1/ date"`
 	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
 
-	FeedBurnerLink          string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origLink"`
-	FeedBurnerEnclosureLink string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origEnclosureLink"`
+	OrigLink          string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origLink"`
+	OrigEnclosureLink string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origEnclosureLink"`
 
 	ItunesSubtitle    string `xml:"http://www.itunes.com/dtds/podcast-1.0.dtd subtitle"`
 	ItunesSummary     string `xml:"http://www.itunes.com/dtds/podcast-1.0.dtd summary"`
@@ -74,6 +76,12 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 		for _, e := range srcitem.Enclosures {
 			if e.Type == "audio/mpeg" || e.Type == "audio/x-m4a" {
 				podcastURL = e.URL
+
+				origBase := path.Base(srcitem.OrigEnclosureLink)
+				if origBase != "" && strings.Contains(podcastURL, origBase) {
+					podcastURL = srcitem.OrigEnclosureLink
+				}
+
 				break
 			}
 		}
@@ -81,7 +89,7 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 		dstfeed.Items = append(dstfeed.Items, Item{
 			GUID:     firstNonEmpty(srcitem.GUID, srcitem.Link),
 			Date:     dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
-			URL:      srcitem.Link,
+			URL:      firstNonEmpty(srcitem.OrigLink, srcitem.Link),
 			Title:    srcitem.Title,
 			Content:  firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
 			AudioURL: podcastURL,
