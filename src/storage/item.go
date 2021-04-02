@@ -302,7 +302,6 @@ func (s *Storage) FeedStats() []FeedStat {
 }
 
 func (s *Storage) SyncSearch() {
-	// TODO: cleaning up once feeds/items are deleted?
 	rows, err := s.db.Query(`
 		select id, title, content, description
 		from items
