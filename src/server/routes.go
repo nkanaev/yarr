@@ -5,15 +5,17 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"path/filepath"
 	"reflect"
+	"strings"
 
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/content/readability"
 	"github.com/nkanaev/yarr/src/content/sanitizer"
 	"github.com/nkanaev/yarr/src/content/silo"
-	"github.com/nkanaev/yarr/src/server/router"
 	"github.com/nkanaev/yarr/src/server/auth"
 	"github.com/nkanaev/yarr/src/server/opml"
+	"github.com/nkanaev/yarr/src/server/router"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/worker"
 )
@@ -61,6 +63,12 @@ func (s *Server) handleIndex(c *router.Context) {
 
 func (s *Server) handleStatic(c *router.Context) {
 	// TODO: gzip?
+	// don't serve templates
+	dir, name := filepath.Split(c.Vars["path"])
+	if dir == "" && strings.HasSuffix(name, ".html") {
+		c.Out.WriteHeader(http.StatusNotFound)
+		return
+	}
 	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(c.Out, c.Req)
 }
 

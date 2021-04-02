@@ -31,3 +31,15 @@ func TestStaticWithBase(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestStaticBanTemplates(t *testing.T) {
+	handler := NewServer(nil, "127.0.0.1:8000").handler()
+	url := "/static/login.html"
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", url, nil)
+	handler.ServeHTTP(recorder, request)
+	if recorder.Result().StatusCode != 404 {
+		t.FailNow()
+	}
+}
