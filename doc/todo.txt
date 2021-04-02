@@ -1,5 +1,4 @@
 - etc: test new parser extensively
-- etc: check feedburner
 - fix: resolve all TODOs
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
 
