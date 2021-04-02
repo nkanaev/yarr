@@ -186,14 +186,8 @@ func (s *Server) handleFeedList(c *router.Context) {
 				form.FolderID,
 			)
 			s.db.CreateItems(worker.ConvertItems(result.Feed.Items, *feed))
+			s.worker.FindFeedFavicon(*feed)
 
-			icon, err := worker.FindFavicon(feed.Link, feed.FeedLink)
-			if icon != nil {
-				s.db.UpdateFeedIcon(feed.Id, icon)
-			}
-			if err != nil {
-				log.Printf("Failed to find favicon for %s (%d): %s", feed.FeedLink, feed.Id, err)
-			}
 			c.JSON(http.StatusOK, map[string]string{"status": "success"})
 		default:
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
@@ -364,7 +358,9 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 			}
 		}
 
+		s.worker.FindFavicons()
 		s.worker.RefreshFeeds()
+
 		c.Out.WriteHeader(http.StatusOK)
 	} else {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)

@@ -37,6 +37,26 @@ func (w *Worker) StartFeedCleaner() {
 	}()
 }
 
+func (w *Worker) FindFavicons() {
+	go func() {
+		for _, feed := range w.db.ListFeeds() {
+			if !feed.HasIcon {
+				w.FindFeedFavicon(feed)
+			}
+		}
+	}()
+}
+
+func (w *Worker) FindFeedFavicon(feed storage.Feed) {
+	icon, err := findFavicon(feed.Link, feed.FeedLink)
+	if err != nil {
+		log.Printf("Failed to find favicon for %s (%s): %s", feed.FeedLink, feed.Link, err)
+	}
+	if icon != nil {
+		w.db.UpdateFeedIcon(feed.Id, icon)
+	}
+}
+
 func (w *Worker) SetRefreshRate(minute int64) {
 	if w.stopper != nil {
 		w.refresh.Stop()
@@ -116,16 +136,5 @@ func (w *Worker) worker(srcqueue <-chan storage.Feed, dstqueue chan<- []storage.
 			w.db.SetFeedError(feed.Id, err)
 		}
 		dstqueue <- items
-
-		// TODO: move somewhere else
-		if !feed.HasIcon {
-			icon, err := FindFavicon(feed.Link, feed.FeedLink)
-			if icon != nil {
-				w.db.UpdateFeedIcon(feed.Id, icon)
-			}
-			if err != nil {
-				log.Printf("Failed to find favicon for %s (%s): %s", feed.FeedLink, feed.Link, err)
-			}
-		}
 	}
 }

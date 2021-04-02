@@ -74,7 +74,7 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	return result, nil
 }
 
-func FindFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
+func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 	candidateUrls := make([]string, 0)
 
 	favicon := func(link string) string {
