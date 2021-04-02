@@ -1,3 +1,6 @@
+- fix: unset image/podcast if it's provided in content
+  example: https://www.reddit.com/r/funny.rss
+- fix: use only 1 item content field
 - etc: test new parser extensively
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
 
