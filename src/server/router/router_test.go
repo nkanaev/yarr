@@ -118,7 +118,6 @@ func TestRouterBase(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	request := httptest.NewRequest("GET", "/foo/bar", nil)
-
 	router.ServeHTTP(recorder, request)
 
 	if recorder.Result().StatusCode != 200 {
@@ -127,6 +126,20 @@ func TestRouterBase(t *testing.T) {
 	body, _ := io.ReadAll(recorder.Result().Body)
 	if string(body) != "!!!" {
 		t.Errorf("invalid body, got %#v", string(body))
+	}
+}
+
+func TestRouterBase404(t *testing.T) {
+	router := NewRouter("/foo")
+	router.For("/bar", func(c *Context) {
+		c.Out.Write([]byte("!!!"))
+	})
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", "/bar", nil)
+	router.ServeHTTP(recorder, request)
+	if recorder.Result().StatusCode != 404 {
+		t.Fatal("expected 404")
 	}
 }
 

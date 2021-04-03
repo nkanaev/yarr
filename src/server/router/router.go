@@ -50,9 +50,15 @@ func (r *Router) resolve(path string) *Route {
 
 func (r *Router) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// autoclose open base url
-	if r.base != "" && r.base == req.URL.Path {
-		http.Redirect(rw, req, r.base+"/", http.StatusFound)
-		return
+	if r.base != "" {
+		if r.base == req.URL.Path {
+			http.Redirect(rw, req, r.base+"/", http.StatusFound)
+			return
+		}
+		if !strings.HasPrefix(req.URL.Path, r.base) {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
 	}
 
 	path := strings.TrimPrefix(req.URL.Path, r.base)
