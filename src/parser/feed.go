@@ -80,7 +80,7 @@ func (feed *Feed) cleanup() {
 
 func (feed *Feed) SetMissingDatesTo(newdate time.Time) {
 	for i, item := range feed.Items {
-		if item.Date.Equal(defaultTime) {
+		if item.Date.IsZero() {
 			feed.Items[i].Date = newdate
 		}
 	}
