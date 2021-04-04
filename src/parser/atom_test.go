@@ -93,3 +93,41 @@ func TestAtomHTMLTitle(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestAtomImageLink(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+			<entry>
+				<media:thumbnail url="https://example.com/image.png?width=100&height=100" />
+			</entry>
+		</feed>
+	`))
+	have := feed.Items[0].ImageURL
+	want := `https://example.com/image.png?width=100&height=100`
+	if want != have {
+		t.Fatalf("item.image_url doesn't match\nwant: %#v\nhave: %#v\n", want, have)
+	}
+}
+
+// found in: https://www.reddit.com/r/funny.rss
+// items come with thumbnail urls which are also present in the content
+func TestAtomImageLinkDuplicated(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+			<entry>
+				<content type="html">&lt;img src="https://example.com/image.png?width=100&amp;height=100"&gt;</content>
+				<media:thumbnail url="https://example.com/image.png?width=100&height=100" />
+			</entry>
+		</feed>
+	`))
+	have := feed.Items[0].Content
+	want := `<img src="https://example.com/image.png?width=100&height=100">`
+	if want != have {
+		t.Fatalf("want: %#v\nhave: %#v\n", want, have)
+	}
+	if feed.Items[0].ImageURL != "" {
+		t.Fatal("item.image_url must be unset if present in the content")
+	}
+}

@@ -115,3 +115,48 @@ func TestRSSWithLotsOfSpaces(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestRSSPodcast(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0">
+			<channel>
+				<item>
+					<enclosure length="100500" type="audio/x-m4a" url="http://example.com/audio.ext"/>
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := feed.Items[0].AudioURL
+	want := "http://example.com/audio.ext"
+	if want != have {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
+// found in: https://podcast.cscript.site/podcast.xml
+func TestRSSPodcastDuplicated(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<channel>
+				<item>
+				<content:encoded>
+					<![CDATA[ <audio src="http://example.com/audio.ext"></audio> ]]>
+				</content:encoded>
+					<enclosure length="100500" type="audio/x-m4a" url="http://example.com/audio.ext"/>
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := feed.Items[0].Content
+	want := `<audio src="http://example.com/audio.ext"></audio>`
+	if want != have {
+		t.Fatalf("content doesn't match\nwant: %#v\nhave: %#v\n", want, have)
+	}
+	if feed.Items[0].AudioURL != "" {
+		t.Fatal("item.audio_url must be unset if present in the content")
+	}
+}
