@@ -4,15 +4,22 @@ import (
 	"io"
 	"log"
 	"os"
+	"testing"
 )
 
 func testDB() *Storage {
 	log.SetOutput(io.Discard)
-	db, err := New(":memory:")
-	if err != nil {
-		os.Stderr.WriteString(err.Error())
-		os.Exit(1)
-	}
+	db, _ := New(":memory:")
 	log.SetOutput(os.Stderr)
 	return db
+}
+
+func TestStorage(t *testing.T) {
+	db, err := New(":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if db == nil {
+		t.Fatal("no db")
+	}
 }
