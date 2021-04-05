@@ -573,11 +573,13 @@ var vm = new Vue({
         document.location.reload()
       })
     },
-    getReadable: function(item) {
+    toggleReadability: function() {
       if (this.itemSelectedReadability) {
         this.itemSelectedReadability = null
         return
       }
+      var item = this.itemSelectedDetails
+      if (!item) return
       if (item.link) {
         this.loading.readability = true
         api.crawl(item.link).then(function(data) {

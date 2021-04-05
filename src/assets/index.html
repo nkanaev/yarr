@@ -237,7 +237,7 @@
                 </dropdown>
                 <button class="toolbar-item"
                         :class="{active: itemSelectedReadability}"
-                        @click="getReadable(itemSelectedDetails)"
+                        @click="toggleReadability()"
                         title="Read Here">
                     <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
                 </button>
@@ -420,6 +420,10 @@
                     <tr>
                         <td><kbd>o</kbd></td>
                         <td>open an article's link</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>i</kbd></td>
+                        <td>read here</td>
                     </tr>
                     <tr>
                         <td>

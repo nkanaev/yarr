@@ -95,6 +95,9 @@ var shortcutFunctions = {
       window.open(vm.itemSelectedDetails.link, '_blank')
     }
   },
+  toggleReadability: function() {
+    vm.toggleReadability()
+  },
   toggleItemRead: function() {
     if (vm.itemSelected != null) {
       vm.toggleItemRead(vm.itemSelectedDetails)
@@ -146,6 +149,7 @@ var shortcutFunctions = {
 // If you edit, make sure you update the help modal
 var keybindings = {
   "o": shortcutFunctions.openItemLink,
+  "i": shortcutFunctions.toggleReadability,
   "r": shortcutFunctions.toggleItemRead,
   "R": shortcutFunctions.markAllRead,
   "s": shortcutFunctions.toggleItemStarred,
