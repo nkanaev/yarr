@@ -34,3 +34,6 @@ build_windows:
 
 serve:
 	go run -tags "sqlite_foreign_keys" src/main.go -db local.db
+
+test:
+	cd src && go test -tags release ./...
