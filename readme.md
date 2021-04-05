@@ -55,7 +55,7 @@ For self-hosting, see `yarr -h` for auth, tls & server configuration flags.
 
 Install `Go >= 1.16` and `gcc`. Get the source code:
 
-    git clone --recurse-submodules https://github.com/nkanaev/yarr.git
+    git clone https://github.com/nkanaev/yarr.git
 
 Then run one of the corresponding commands:
 
