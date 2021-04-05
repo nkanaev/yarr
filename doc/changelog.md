@@ -1,7 +1,12 @@
 # upcoming
 
+- (new) feed parser fully rewritten
+- (new) show youtube/vimeo iframes in "read here"
 - (new) keyboard shortcuts to scroll article content
+- (new) keyboard shortcut to "read here"
+- (new) more options for auto-refresh intervals
 - (fix) `-base` not serving static files (thanks to @vfaronov)
+- (etc) 3rd-party dependencies reduced to the bare minimum
 
 # v1.4 (2021-03-11)
 
