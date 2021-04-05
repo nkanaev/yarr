@@ -61,12 +61,13 @@
 
   - image_url
 
+    rss>item>media:thumbnail:url (rss 2.0 media)
     feed>entry>enclosure[rel='image/*'] (atom 1.0) ???
 
-  - podcast_url
+  - audio_url
 
-    rss>item>enclosure attr(url)        (rss 2.0)
-    feed>entry>enclosure[rel='audio/*'] (atom 1.0) ???
+    rss>item>enclosure:url (audio/*)  (rss 2.0)
+    feed>entry>enclosure   (audio/*') (atom 1.0) ???
 
 # specs
 

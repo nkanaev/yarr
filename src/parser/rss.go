@@ -33,9 +33,6 @@ type rssItem struct {
 	OrigLink          string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origLink"`
 	OrigEnclosureLink string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origEnclosureLink"`
 
-	ItunesSubtitle    string `xml:"http://www.itunes.com/dtds/podcast-1.0.dtd subtitle"`
-	ItunesSummary     string `xml:"http://www.itunes.com/dtds/podcast-1.0.dtd summary"`
-	GoogleDescription string `xml:"http://www.google.com/schemas/play-podcasts/1.0 description"`
 	media
 }
 
