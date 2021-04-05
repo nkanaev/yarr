@@ -70,6 +70,7 @@ func Parse(r io.Reader) (*Feed, error) {
 func (feed *Feed) cleanup() {
 	feed.Title = strings.TrimSpace(feed.Title)
 	feed.SiteURL = strings.TrimSpace(feed.SiteURL)
+
 	for i, item := range feed.Items {
 		feed.Items[i].GUID = strings.TrimSpace(item.GUID)
 		feed.Items[i].URL = strings.TrimSpace(item.URL)

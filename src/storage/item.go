@@ -3,7 +3,6 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"log"
 	"strings"
 	"time"
@@ -81,14 +80,6 @@ func (s *Storage) CreateItems(items []Item) bool {
 	now := time.Now()
 
 	for _, item := range items {
-		// WILD: some feeds provide only `item.date_updated` (without `item.date_created`)
-		if item.Date == nil {
-			item.Date = item.DateUpdated
-		}
-		// WILD: `item.guid` is not always present
-		if item.GUID == "" {
-			item.GUID = item.Link
-		}
 		_, err = tx.Exec(`
 			insert into items (
 				guid, feed_id, title, link, description,
@@ -99,7 +90,7 @@ func (s *Storage) CreateItems(items []Item) bool {
 			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			on conflict (feed_id, guid) do update set
 			date_updated = ?, date_arrived = ?`,
-			item.GUID, item.FeedId, html.UnescapeString(item.Title), item.Link, item.Description,
+			item.GUID, item.FeedId, item.Title, item.Link, item.Description,
 			item.Content, item.Author,
 			item.Date, item.DateUpdated, now,
 			UNREAD, item.Image, item.PodcastURL,

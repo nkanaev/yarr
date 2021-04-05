@@ -46,7 +46,7 @@ func ParseJSON(data io.Reader) (*Feed, error) {
 	}
 	for _, srcitem := range srcfeed.Items {
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:    srcitem.ID,
+			GUID:    firstNonEmpty(srcitem.ID, srcitem.URL),
 			Date:    dateParse(firstNonEmpty(srcitem.DatePublished, srcitem.DateModified)),
 			URL:     srcitem.URL,
 			Title:   srcitem.Title,

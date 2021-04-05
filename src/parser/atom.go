@@ -81,10 +81,11 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 		SiteURL: firstNonEmpty(srcfeed.Links.First("alternate"), srcfeed.Links.First("")),
 	}
 	for _, srcitem := range srcfeed.Entries {
+		link := firstNonEmpty(srcitem.OrigLink, srcitem.Links.First("alternate"), srcitem.Links.First(""))
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:     firstNonEmpty(srcitem.ID),
+			GUID:     firstNonEmpty(srcitem.ID, link),
 			Date:     dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
-			URL:      firstNonEmpty(srcitem.OrigLink, srcitem.Links.First("alternate"), srcitem.Links.First("")),
+			URL:      link,
 			Title:    srcitem.Title.Text(),
 			Content:  firstNonEmpty(srcitem.Content.String(), srcitem.Summary.String(), srcitem.firstMediaDescription()),
 			ImageURL: srcitem.firstMediaThumbnail(),
