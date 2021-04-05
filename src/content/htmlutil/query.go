@@ -32,6 +32,16 @@ func Query(node *html.Node, sel string) []*html.Node {
 	return FindNodes(node, matcher.Match)
 }
 
+func Closest(node *html.Node, sel string) *html.Node {
+	matcher := NewMatcher(sel)
+	for cur := node; cur != nil; cur = cur.Parent {
+		if matcher.Match(cur) {
+			return cur
+		}
+	}
+	return nil
+}
+
 func NewMatcher(sel string) Matcher {
 	multi := MultiMatch{}
 	parts := strings.Split(sel, ",")

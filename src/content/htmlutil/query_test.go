@@ -62,3 +62,28 @@ func TestQueryMulti(t *testing.T) {
 		t.Fatal("incorrect match")
 	}
 }
+
+func TestClosest(t *testing.T) {
+	html, _ := html.Parse(strings.NewReader(`
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<title></title>
+		</head>
+		<body>
+			<div class="foo">
+				<p><a class="bar" href=""></a></p>
+			</div>
+		</body>
+		</html>
+	`))
+	link := Query(html, "a")
+	if link == nil || Attr(link[0], "class") != "bar" {
+		t.FailNow()
+	}
+	wrap := Closest(link[0], "div")
+	if wrap == nil || Attr(wrap, "class") != "foo" {
+		t.FailNow()
+	}
+}

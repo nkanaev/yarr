@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	//"log"
 	"math"
 	"regexp"
 	"strings"
@@ -56,7 +55,10 @@ func ExtractContent(page io.Reader) (string, error) {
 
 	best := getTopCandidate(scores)
 	if best == nil {
-		best = root
+		for _, body := range htmlutil.Query(root, "body") {
+			best = body
+			break
+		}
 	}
 	//log.Printf("[Readability] TopCandidate: %v", topCandidate)
 
@@ -122,6 +124,10 @@ func removeUnlikelyCandidates(root *html.Node) {
 	}
 	for _, node := range htmlutil.Query(body[0], "*") {
 		str := htmlutil.Attr(node, "class") + htmlutil.Attr(node, "id")
+
+		if htmlutil.Closest(node, "table,code") != nil {
+			continue
+		}
 
 		blacklisted := (
 			blacklistCandidatesRegexp.MatchString(str) ||
