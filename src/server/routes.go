@@ -248,7 +248,6 @@ func (s *Server) handleItem(c *router.Context) {
 			return
 		}
 		item.Content = sanitizer.Sanitize(item.Link, item.Content)
-		item.Description = sanitizer.Sanitize(item.Link, item.Description)
 
 		c.JSON(http.StatusOK, item)
 	} else if c.Req.Method == "PUT" {

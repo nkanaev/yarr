@@ -44,19 +44,16 @@ func (s *ItemStatus) UnmarshalJSON(b []byte) error {
 }
 
 type Item struct {
-	Id          int64      `json:"id"`
-	GUID        string     `json:"guid"`
-	FeedId      int64      `json:"feed_id"`
-	Title       string     `json:"title"`
-	Link        string     `json:"link"`
-	Description string     `json:"description,omitempty"`
-	Content     string     `json:"content,omitempty"`
-	Author      string     `json:"author"`
-	Date        *time.Time `json:"date"`
-	DateUpdated *time.Time `json:"date_updated"`
-	Status      ItemStatus `json:"status"`
-	Image       string     `json:"image"`
-	PodcastURL  *string    `json:"podcast_url"`
+	Id       int64      `json:"id"`
+	GUID     string     `json:"guid"`
+	FeedId   int64      `json:"feed_id"`
+	Title    string     `json:"title"`
+	Link     string     `json:"link"`
+	Content  string     `json:"content,omitempty"`
+	Date     time.Time  `json:"date"`
+	Status   ItemStatus `json:"status"`
+	ImageURL *string    `json:"image"`
+	AudioURL *string    `json:"podcast_url"`
 }
 
 type ItemFilter struct {
@@ -77,25 +74,21 @@ func (s *Storage) CreateItems(items []Item) bool {
 		log.Print(err)
 		return false
 	}
+
 	now := time.Now()
 
 	for _, item := range items {
 		_, err = tx.Exec(`
 			insert into items (
-				guid, feed_id, title, link, description,
-				content, author,
-				date, date_updated, date_arrived,
-				status, image, podcast_url
+				guid, feed_id, title, link, date,
+				content, image, podcast_url,
+				date_arrived, status
 			)
-			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			on conflict (feed_id, guid) do update set
-			date_updated = ?, date_arrived = ?`,
-			item.GUID, item.FeedId, item.Title, item.Link, item.Description,
-			item.Content, item.Author,
-			item.Date, item.DateUpdated, now,
-			UNREAD, item.Image, item.PodcastURL,
-			// upsert values
-			item.DateUpdated, now,
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			on conflict (feed_id, guid) do nothing`,
+			item.GUID, item.FeedId, item.Title, item.Link, item.Date,
+			item.Content, item.ImageURL, item.AudioURL,
+			now, UNREAD,
 		)
 		if err != nil {
 			log.Print(err)
@@ -158,8 +151,9 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 
 	query := fmt.Sprintf(`
 		select
-			i.id, i.guid, i.feed_id, i.title, i.link,
-			i.author, i.date, i.date_updated, i.status, i.image, i.podcast_url
+			i.id, i.guid, i.feed_id,
+			i.title, i.link, i.date,
+			i.status, i.image, i.podcast_url
 		from items i
 		join feeds f on f.id = i.feed_id
 		where %s
@@ -174,17 +168,9 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 	for rows.Next() {
 		var x Item
 		err = rows.Scan(
-			&x.Id,
-			&x.GUID,
-			&x.FeedId,
-			&x.Title,
-			&x.Link,
-			&x.Author,
-			&x.Date,
-			&x.DateUpdated,
-			&x.Status,
-			&x.Image,
-			&x.PodcastURL,
+			&x.Id, &x.GUID, &x.FeedId,
+			&x.Title, &x.Link, &x.Date,
+			&x.Status, &x.ImageURL, &x.AudioURL,
 		)
 		if err != nil {
 			log.Print(err)
@@ -199,13 +185,13 @@ func (s *Storage) GetItem(id int64) *Item {
 	i := &Item{}
 	err := s.db.QueryRow(`
 		select
-			i.id, i.guid, i.feed_id, i.title, i.link, i.content, i.description,
-			i.author, i.date, i.date_updated, i.status, i.image, i.podcast_url
+			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
+			i.date, i.status, i.image, i.podcast_url
 		from items i
 		where i.id = ?
 	`, id).Scan(
-		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content, &i.Description,
-		&i.Author, &i.Date, &i.DateUpdated, &i.Status, &i.Image, &i.PodcastURL,
+		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
+		&i.Date, &i.Status, &i.ImageURL, &i.AudioURL,
 	)
 	if err != nil {
 		log.Print(err)
@@ -296,7 +282,7 @@ func (s *Storage) FeedStats() []FeedStat {
 
 func (s *Storage) SyncSearch() {
 	rows, err := s.db.Query(`
-		select id, title, content, description
+		select id, title, content
 		from items
 		where search_rowid is null;
 	`)
@@ -308,14 +294,14 @@ func (s *Storage) SyncSearch() {
 	items := make([]Item, 0)
 	for rows.Next() {
 		var item Item
-		rows.Scan(&item.Id, &item.Title, &item.Content, &item.Description)
+		rows.Scan(&item.Id, &item.Title, &item.Content)
 		items = append(items, item)
 	}
 
 	for _, item := range items {
 		result, err := s.db.Exec(`
-			insert into search (title, description, content) values (?, ?, ?)`,
-			item.Title, htmlutil.ExtractText(item.Description), htmlutil.ExtractText(item.Content),
+			insert into search (title, description, content) values (?, "", ?)`,
+			item.Title, htmlutil.ExtractText(item.Content),
 		)
 		if err != nil {
 			log.Print(err)
