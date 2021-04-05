@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"database/sql"
 	"html"
 	"log"
 	"net/url"
@@ -59,11 +60,19 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 }
 
 func (s *Storage) DeleteFeed(feedId int64) bool {
-	_, err := s.db.Exec(`delete from feeds where id = ?`, feedId)
+	result, err := s.db.Exec(`delete from feeds where id = ?`, feedId)
 	if err != nil {
 		log.Print(err)
+		return false
 	}
-	return err == nil
+	nrows, err := result.RowsAffected()
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Print(err)
+		}
+		return false
+	}
+	return nrows == 1
 }
 
 func (s *Storage) RenameFeed(feedId int64, newTitle string) bool {
@@ -114,26 +123,23 @@ func (s *Storage) ListFeeds() []Feed {
 }
 
 func (s *Storage) GetFeed(id int64) *Feed {
-	row := s.db.QueryRow(`
-		select id, folder_id, title, description, link, feed_link, icon,
-		       ifnull(icon, '') != '' as has_icon
+	var f Feed
+	err := s.db.QueryRow(`
+		select
+			id, folder_id, title, link, feed_link,
+			icon, ifnull(icon, '') != '' as has_icon
 		from feeds where id = ?
-	`, id)
-	if row != nil {
-		var f Feed
-		row.Scan(
-			&f.Id,
-			&f.FolderId,
-			&f.Title,
-			&f.Description,
-			&f.Link,
-			&f.FeedLink,
-			&f.Icon,
-			&f.HasIcon,
-		)
-		return &f
+	`, id).Scan(
+		&f.Id, &f.FolderId, &f.Title, &f.Link, &f.FeedLink,
+		&f.Icon, &f.HasIcon,
+	)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Print(err)
+		}
+		return nil
 	}
-	return nil
+	return &f
 }
 
 func (s *Storage) ResetFeedErrors() {
