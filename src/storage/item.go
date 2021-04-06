@@ -84,7 +84,7 @@ func (s *Storage) CreateItems(items []Item) bool {
 				content, image, podcast_url,
 				date_arrived, status
 			)
-			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			on conflict (feed_id, guid) do nothing`,
 			item.GUID, item.FeedId, item.Title, item.Link, item.Date,
 			item.Content, item.ImageURL, item.AudioURL,

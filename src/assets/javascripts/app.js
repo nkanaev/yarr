@@ -252,13 +252,7 @@ var vm = new Vue({
       if (this.itemSelectedReadability)
         return this.itemSelectedReadability
 
-      var content = ''
-      if (this.itemSelectedDetails.content)
-        content = this.itemSelectedDetails.content
-      else if (this.itemSelectedDetails.description)
-        content = this.itemSelectedDetails.description
-
-      return content
+      return this.itemSelectedDetails.content || ''
     },
   },
   watch: {

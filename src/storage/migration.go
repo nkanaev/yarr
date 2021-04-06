@@ -11,6 +11,7 @@ var migrations = []func(*sql.Tx) error{
 	m02_feed_states_and_errors,
 	m03_on_delete_actions,
 	m04_item_podcasturl,
+	m05_move_description_to_content,
 }
 
 var maxVersion = int64(len(migrations))
@@ -242,3 +243,11 @@ func m04_item_podcasturl(tx *sql.Tx) error {
 }
 
 // TODO: description -> content
+func m05_move_description_to_content(tx *sql.Tx) error {
+	sql := `
+		update items set content=description
+		where length(content) = 0 or content is null
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
