@@ -198,7 +198,6 @@ select.form-control:not([multiple]):not([size]) {
   cursor: pointer;
 }
 
-.list-row:hover,
 .toolbar-item:hover,
 .toolbar-search:hover,
 .selectgroup-label:hover,
@@ -268,16 +267,6 @@ select.form-control:not([multiple]):not([size]) {
 
 .btn-outline:hover {
   background-color: #f8f9fa;
-}
-
-.list-row {
-  padding-left: .5rem;
-  padding-right: .5rem;
-  margin-left: -.5rem;
-  margin-right: -.5rem;
-  border-radius: 3px;
-  user-select: none;
-  cursor: default;
 }
 
 .toolbar {
@@ -471,7 +460,6 @@ a,
 .theme-sepia .toolbar-item:hover,
 .theme-sepia .toolbar-search:hover,
 .theme-sepia .dropdown-item:hover,
-.theme-sepia .list-row:hover,
 .theme-sepia .toolbar-search:focus {
   background-color: #e0d6ba;
 }
@@ -495,7 +483,6 @@ a,
 .theme-night .dropdown-divider {
   border-color: #1a1a1a !important;
 }
-.theme-night .list-row:hover,
 .theme-night .selectgroup-label:hover,
 .theme-night .dropdown-item:hover,
 .theme-night .toolbar-item:hover,

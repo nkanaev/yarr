@@ -181,6 +181,10 @@ var vm = new Vue({
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
       .then(this.refreshItems.bind(this))
+
+    api.feeds.list_errors().then(function(errors) {
+      vm.feed_errors = errors
+    })
   },
   data: function() {
     var s = app.settings
@@ -244,7 +248,24 @@ var vm = new Vue({
       return folders
     },
     feedsById: function() {
-      return this.feeds.reduce(function(acc, feed) { acc[feed.id] = feed; return acc }, {})
+      return this.feeds.reduce(function(acc, f) { acc[f.id] = f; return acc }, {})
+    },
+    foldersById: function() {
+      return this.folders.reduce(function(acc, f) { acc[f.id] = f; return acc }, {})
+    },
+    current: function() {
+      var parts = (this.feedSelected || '').split(':', 2)
+      var type = parts[0]
+      var guid = parts[1]
+
+      var folder = {}, feed = {}
+
+      if (type == 'feed')
+        feed = this.feedsById[guid] || {}
+      if (type == 'folder')
+        folder = this.foldersById[guid] || {}
+
+      return {type: type, feed: feed, folder: folder}
     },
     itemSelectedContent: function() {
       if (!this.itemSelected) return ''
@@ -346,6 +367,10 @@ var vm = new Vue({
           acc[stat.feed_id] = stat
           return acc
         }, {})
+
+        api.feeds.list_errors().then(function(errors) {
+          vm.feed_errors = errors
+        })
       })
     },
     getItemsQuery: function() {
@@ -464,7 +489,10 @@ var vm = new Vue({
       if (newTitle) {
         api.folders.update(folder.id, {title: newTitle}).then(function() {
           folder.title = newTitle
-        })
+          this.folders.sort(function(a, b) {
+            return a.title.localeCompare(b.title)
+          })
+        }.bind(this))
       }
     },
     deleteFolder: function(folder) {
@@ -586,11 +614,6 @@ var vm = new Vue({
       if (settings === 'create') {
         vm.feedNewChoice = []
         vm.feedNewChoiceSelected = ''
-      }
-      if (settings === 'manage') {
-        api.feeds.list_errors().then(function(errors) {
-          vm.feed_errors = errors
-        })
       }
     },
     resizeFeedList: function(width) {

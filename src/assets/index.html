@@ -49,10 +49,6 @@
                         <span class="icon mr-1">{% inline "plus.svg" %}</span>
                         New Feed
                     </button>
-                    <button class="dropdown-item" @click="showSettings('manage')">
-                        <span class="icon mr-1">{% inline "list.svg" %}</span>
-                        Manage Feeds
-                    </button>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" @click="fetchAllFeeds()">
                         <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
@@ -146,6 +142,11 @@
                                 <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
+                                <span class="icon flex-shrink-0 mx-2 info"
+                                      :data-info="feed_errors[feed.id]"
+                                      v-if="!filterSelected && feed_errors[feed.id]">
+                                    {% inline "alert-circle.svg" %}
+                                </span>
                             </div>
                         </label>
                     </div>
@@ -176,6 +177,51 @@
                         title="Mark All Read">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
+                <dropdown class="settings-dropdown"
+                          toggle-class="btn btn-link toolbar-item px-2 ml-2"
+                          drop="right"
+                          v-if="!filterSelected && current.type == 'feed'">
+                    <template v-slot:button>
+                        <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    </template>
+                    <header class="dropdown-header">{{ current.feed.title }}</header>
+                    <a class="dropdown-item" :href="current.feed.link" target="_blank" v-if="current.feed.link">Visit Website</a>
+                    <div class="dropdown-divider" v-if="current.feed.link"></div>
+                    <button class="dropdown-item" @click="renameFeed(current.feed)">Rename</button>
+                    <div class="dropdown-divider" v-if="folders.length"></div>
+                    <header class="dropdown-header" v-if="folders.length">Move to...</header>
+                    <button class="dropdown-item"
+                        v-if="folder.id != current.feed.folder_id"
+                        v-for="folder in folders"
+                        @click="moveFeed(current.feed, folder)">
+                        <span class="icon mr-1">{% inline "folder.svg" %}</span>
+                        {{ folder.title }}
+                    </button>
+                    <button class="dropdown-item" @click="moveFeed(current.feed, null)" v-if="current.feed.folder_id">
+                        ---
+                    </button>
+                    <button class="dropdown-item" @click="moveFeedToNewFolder(current.feed)">
+                        <span class="text-muted icon mr-1">{% inline "plus.svg" %}</span>
+                        <span class="text-muted">New Folder</span>
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item text-danger"
+                       @click.prevent="deleteFeed(current.feed)">
+                        Delete
+                    </button>
+                </dropdown>
+                <dropdown class="settings-dropdown"
+                          toggle-class="btn btn-link toolbar-item px-2 ml-2"
+                          drop="right"
+                          v-if="!filterSelected && current.type == 'folder'">
+                    <template v-slot:button>
+                        <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    </template>
+                    <header class="dropdown-header">{{ current.folder.title }}</header>
+                    <button class="dropdown-item" @click="renameFolder(current.folder)">Rename</button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">Delete</button>
+                </dropdown>
             </div>
             <div id="item-list-scroll" class="p-2 overflow-auto border-top flex-grow-1" v-scroll="loadMoreItems" ref="itemlist">
                 <label v-for="item in items" :key="item.id"
@@ -299,75 +345,6 @@
                     </div>
                     <button class="btn btn-block btn-default mt-3" :class="{loading: loading.newfeed}" type="submit">Add</button>
                 </form>
-            </div>
-            <div v-else-if="settings=='manage'">
-                <p class="cursor-default"><b>Manage Feeds</b></p>
-                <div v-for="folder in foldersWithFeeds" :key="folder.id">
-                    <div class="list-row d-flex align-items-center">
-                        <div class="w-100 text-truncate" v-if="folder.id">
-                            <span class="icon mr-2">{% inline "folder.svg" %}</span>
-                            {{ folder.title }}
-                        </div>
-                        <div class="flex-shrink-0" v-if="folder.id">
-                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none" drop="right">
-                                <template v-slot:button>
-                                    <span class="icon">{% inline "more-vertical.svg" %}</span>
-                                </template>
-                                <header class="dropdown-header">{{ folder.title }}</header>
-                                <button class="dropdown-item" @click="renameFolder(folder)">Rename</button>
-                                <div class="dropdown-divider"></div>
-                                <button class="dropdown-item text-danger" @click="deleteFolder(folder)">Delete</button>
-                            </dropdown>
-                        </div>
-                    </div>
-                    <div v-for="feed in folder.feeds"
-                         class="list-row d-flex align-items-center"
-                         :class="{'ml-2': folder.id}"
-                         :key="feed.id">
-                        <div class="w-100 text-truncate">
-                            <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
-                            <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
-                            {{ feed.title }}
-                        </div>
-                        <span class="icon flex-shrink-0 mx-2 info"
-                              :data-info="feed_errors[feed.id]"
-                              v-if="feed_errors[feed.id]">
-                            {% inline "alert-circle.svg" %}
-                        </span>
-                        <div class="flex-shrink-0">
-                            <dropdown class="settings-dropdown" toggle-class="btn btn-link text-decoration-none" drop="right">
-                                <template v-slot:button>
-                                    <span class="icon">{% inline "more-vertical.svg" %}</span>
-                                </template>
-                                <header class="dropdown-header">{{ feed.title }}</header>
-                                <a class="dropdown-item" :href="feed.link" target="_blank" v-if="feed.link">Visit Website</a>
-                                <div class="dropdown-divider" v-if="feed.link"></div>
-                                <button class="dropdown-item" @click="renameFeed(feed)">Rename</button>
-                                <div class="dropdown-divider" v-if="folders.length"></div>
-                                <header class="dropdown-header" v-if="folders.length">Move to...</header>
-                                <button class="dropdown-item" @click="moveFeed(feed, null)" v-if="feed.folder_id">
-                                    ---
-                                </button>
-                                <button class="dropdown-item"
-                                    v-if="folder.id != feed.folder_id"
-                                    v-for="folder in folders"
-                                    @click="moveFeed(feed, folder)">
-                                    <span class="icon mr-1">{% inline "folder.svg" %}</span>
-                                    {{ folder.title }}
-                                </button>
-                                <button class="dropdown-item" @click="moveFeedToNewFolder(feed)">
-                                    <span class="text-muted icon mr-1">{% inline "plus.svg" %}</span>
-                                    <span class="text-muted">New Folder</span>
-                                </button>
-                                <div class="dropdown-divider"></div>
-                                <button class="dropdown-item text-danger"
-                                   @click.prevent="deleteFeed(feed)">
-                                    Delete
-                                </button>
-                            </dropdown>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div v-else-if="settings=='shortcuts'">
                 <p class="cursor-default"><b>Keyboard Shortcuts</b></p>
