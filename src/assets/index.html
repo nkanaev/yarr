@@ -180,6 +180,7 @@
                 <dropdown class="settings-dropdown"
                           toggle-class="btn btn-link toolbar-item px-2 ml-2"
                           drop="right"
+                          title="Feed Settings"
                           v-if="!filterSelected && current.type == 'feed'">
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
@@ -213,6 +214,7 @@
                 </dropdown>
                 <dropdown class="settings-dropdown"
                           toggle-class="btn btn-link toolbar-item px-2 ml-2"
+                          title="Folder Settings"
                           drop="right"
                           v-if="!filterSelected && current.type == 'folder'">
                     <template v-slot:button>
