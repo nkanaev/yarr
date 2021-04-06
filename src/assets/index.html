@@ -142,8 +142,8 @@
                                 <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
-                                <span class="icon flex-shrink-0 mx-2 info"
-                                      :data-info="feed_errors[feed.id]"
+                                <span class="icon flex-shrink-0 mx-2"
+                                      :title="feed_errors[feed.id]"
                                       v-if="!filterSelected && feed_errors[feed.id]">
                                     {% inline "alert-circle.svg" %}
                                 </span>
@@ -245,6 +245,9 @@
                     </div>
                 </label>
                 <button class="btn btn-link btn-block loading my-3" v-if="itemsPage.cur < itemsPage.num"></button>
+            </div>
+            <div class="px-3 py-2 border-top text-danger text-break" v-if="feed_errors[current.feed.id]">
+                {{ feed_errors[current.feed.id] }}
             </div>
         </div>
         <!-- item show -->

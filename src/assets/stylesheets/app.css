@@ -127,29 +127,6 @@ select.form-control:not([multiple]):not([size]) {
   height: .6rem;
 }
 
-.info {
-  position: relative;
-}
-
-.info::after {
-  visibility: hidden;
-  position: absolute;
-  right: -0.5rem;
-  left: auto;
-  bottom: 1.5rem;
-  content: attr(data-info);
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 0.5rem;
-  border-radius: 3px;
-  min-width: 16rem;
-  z-index: 1000;
-}
-
-.info:hover::after {
-  visibility: visible;
-}
-
 .feed-icon {
   width: 16px;
   height: 16px;
