@@ -169,12 +169,15 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 
 	res, err := client.getConditional(f.FeedLink, lmod, etag)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get: %s", err)
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	switch {
 	case res.StatusCode < 200 || res.StatusCode > 399:
+		if res.StatusCode == 404 {
+			return nil, fmt.Errorf("feed not found")
+		}
 		return nil, fmt.Errorf("status code %d", res.StatusCode)
 	case res.StatusCode == http.StatusNotModified:
 		return nil, nil
@@ -182,12 +185,12 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 
 	body, err := charset.NewReader(res.Body, res.Header.Get("Content-Type"))
 	if err != nil {
-		return nil, fmt.Errorf("failed to init response body: %s", err)
+		return nil, err
 	}
 
 	feed, err := parser.Parse(body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse: %s", err)
+		return nil, err
 	}
 
 	lmod = res.Header.Get("Last-Modified")
