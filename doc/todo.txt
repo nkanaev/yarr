@@ -1,4 +1,3 @@
-- fix: mysterious "cannot read title of undefined" js error
 - fix: use only 1 item content field
 - etc: test new parser extensively
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing

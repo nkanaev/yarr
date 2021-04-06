@@ -177,12 +177,10 @@ Vue.component('relative-time', {
 })
 
 var vm = new Vue({
-  mounted: function() {
-    this.refreshItems()
-  },
   created: function() {
-    this.refreshFeeds()
     this.refreshStats()
+      .then(this.refreshFeeds.bind(this))
+      .then(this.refreshItems.bind(this))
   },
   data: function() {
     var s = app.settings
@@ -343,7 +341,7 @@ var vm = new Vue({
   },
   methods: {
     refreshStats: function(loopMode) {
-      api.status().then(function(data) {
+      return api.status().then(function(data) {
         if (loopMode && !vm.itemSelected) vm.refreshItems()
 
         vm.loading.feeds = data.running
