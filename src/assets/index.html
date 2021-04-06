@@ -186,7 +186,8 @@
                     </template>
                     <header class="dropdown-header">{{ current.feed.title }}</header>
                     <a class="dropdown-item" :href="current.feed.link" target="_blank" v-if="current.feed.link">Visit Website</a>
-                    <div class="dropdown-divider" v-if="current.feed.link"></div>
+                    <a class="dropdown-item" :href="current.feed.feed_link" target="_blank" v-if="current.feed.feed_link">Open Feed</a>
+                    <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
                     <button class="dropdown-item" @click="renameFeed(current.feed)">Rename</button>
                     <div class="dropdown-divider" v-if="folders.length"></div>
                     <header class="dropdown-header" v-if="folders.length">Move to...</header>

@@ -52,6 +52,8 @@ select.form-control:not([multiple]):not([size]) {
   padding: 0;
   box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
   overflow: hidden;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
 }
 
 .settings-dropdown .dropdown-item,
