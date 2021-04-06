@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
-	"io"
 	"strings"
 
 	"github.com/nkanaev/yarr/src/content/readability"

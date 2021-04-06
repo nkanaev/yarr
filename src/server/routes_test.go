@@ -20,7 +20,7 @@ func TestStatic(t *testing.T) {
 func TestStaticWithBase(t *testing.T) {
 	server := NewServer(nil, "127.0.0.1:8000")
 	server.BasePath = "/sub"
-	
+
 	handler := server.handler()
 	url := "/sub/static/javascripts/app.js"
 

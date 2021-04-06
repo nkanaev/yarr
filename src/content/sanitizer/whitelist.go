@@ -138,19 +138,19 @@ var allowedTags = sset([]string{
 	"wbr",
 })
 
-var allowedAttrs = map[string]set {
-	"img": sset([]string{"alt", "title", "src", "srcset", "sizes"}),
-	"audio": sset([]string{"src"}),
-	"video": sset([]string{"poster", "height", "width", "src"}),
-	"source": sset([]string{"src", "type", "srcset", "sizes", "media"}),
-	"td": sset([]string{"rowspan", "colspan"}),
-	"th": sset([]string{"rowspan", "colspan"}),
-	"q": sset([]string{"cite"}),
-	"a": sset([]string{"href", "title"}),
-	"time": sset([]string{"datetime"}),
-	"abbr": sset([]string{"title"}),
+var allowedAttrs = map[string]set{
+	"img":     sset([]string{"alt", "title", "src", "srcset", "sizes"}),
+	"audio":   sset([]string{"src"}),
+	"video":   sset([]string{"poster", "height", "width", "src"}),
+	"source":  sset([]string{"src", "type", "srcset", "sizes", "media"}),
+	"td":      sset([]string{"rowspan", "colspan"}),
+	"th":      sset([]string{"rowspan", "colspan"}),
+	"q":       sset([]string{"cite"}),
+	"a":       sset([]string{"href", "title"}),
+	"time":    sset([]string{"datetime"}),
+	"abbr":    sset([]string{"title"}),
 	"acronym": sset([]string{"title"}),
-	"iframe": sset([]string{"width", "height", "frameborder", "src", "allowfullscreen"}),
+	"iframe":  sset([]string{"width", "height", "frameborder", "src", "allowfullscreen"}),
 }
 
 var allowedURISchemes = sset([]string{

@@ -23,10 +23,9 @@ func TestQuery(t *testing.T) {
 		</html>
 	`))
 	nodes := Query(node, "p")
-	match := (
-		len(nodes) == 1 &&
+	match := (len(nodes) == 1 &&
 		nodes[0].Type == html.ElementNode &&
-		nodes[0].Data == "p")		
+		nodes[0].Data == "p")
 	if !match {
 		t.Fatalf("incorrect match: %#v", nodes)
 	}
@@ -50,11 +49,10 @@ func TestQueryMulti(t *testing.T) {
 		</html>
 	`))
 	nodes := Query(node, "p , span")
-	match := (
-		len(nodes) == 3 &&
+	match := (len(nodes) == 3 &&
 		nodes[0].Type == html.ElementNode && nodes[0].Data == "p" &&
 		nodes[1].Type == html.ElementNode && nodes[1].Data == "p" &&
-		nodes[2].Type == html.ElementNode && nodes[2].Data == "span")	
+		nodes[2].Type == html.ElementNode && nodes[2].Data == "span")
 	if !match {
 		for i, n := range nodes {
 			t.Logf("%d: %s", i, HTML(n))

@@ -129,10 +129,9 @@ func removeUnlikelyCandidates(root *html.Node) {
 			continue
 		}
 
-		blacklisted := (
-			blacklistCandidatesRegexp.MatchString(str) ||
+		blacklisted := (blacklistCandidatesRegexp.MatchString(str) ||
 			(unlikelyCandidatesRegexp.MatchString(str) &&
-			 !okMaybeItsACandidateRegexp.MatchString(str)))
+				!okMaybeItsACandidateRegexp.MatchString(str)))
 		if blacklisted && node.Parent != nil {
 			node.Parent.RemoveChild(node)
 		}
@@ -198,7 +197,7 @@ func getCandidates(root *html.Node) nodeScores {
 	// Scale the final candidates score based on link density. Good content
 	// should have a relatively small link density (5% or less) and be mostly
 	// unaffected by this operation
-	for node, _ := range scores {
+	for node := range scores {
 		scores[node] *= (1 - getLinkDensity(node))
 	}
 

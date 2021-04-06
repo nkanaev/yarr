@@ -106,7 +106,7 @@ func (w *Worker) refresher() {
 
 	srcqueue := make(chan storage.Feed, len(feeds))
 	dstqueue := make(chan []storage.Item)
-	
+
 	// hardcoded to 4 workers ;)
 	go w.worker(srcqueue, dstqueue)
 	go w.worker(srcqueue, dstqueue)

@@ -3,7 +3,7 @@ package htmlutil
 import "testing"
 
 func TestExtractText(t *testing.T) {
-	testcases := [][2]string {
+	testcases := [][2]string{
 		{"hello", "<div>hello</div>"},
 		{"hello world", "<div>hello</div> world"},
 		{"helloworld", "<div>hello</div>world"},
