@@ -1,5 +1,6 @@
 # upcoming
 
+- (new) ui reworked
 - (new) feed parser fully rewritten
 - (new) show youtube/vimeo iframes in "read here"
 - (new) keyboard shortcuts to scroll article content
