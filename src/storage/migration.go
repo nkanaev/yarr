@@ -12,6 +12,7 @@ var migrations = []func(*sql.Tx) error{
 	m03_on_delete_actions,
 	m04_item_podcasturl,
 	m05_move_description_to_content,
+	m06_fill_missing_dates,
 }
 
 var maxVersion = int64(len(migrations))
@@ -246,6 +247,14 @@ func m05_move_description_to_content(tx *sql.Tx) error {
 	sql := `
 		update items set content=description
 		where length(content) = 0 or content is null
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m06_fill_missing_dates(tx *sql.Tx) error {
+	sql := `
+		update items set date = 0 where date is null;
 	`
 	_, err := tx.Exec(sql)
 	return err
