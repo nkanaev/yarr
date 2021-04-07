@@ -242,7 +242,6 @@ func m04_item_podcasturl(tx *sql.Tx) error {
 	return err
 }
 
-// TODO: description -> content
 func m05_move_description_to_content(tx *sql.Tx) error {
 	sql := `
 		update items set content=description
