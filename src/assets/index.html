@@ -190,8 +190,8 @@
                     <a class="dropdown-item" :href="current.feed.feed_link" target="_blank" v-if="current.feed.feed_link">Open Feed</a>
                     <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
                     <button class="dropdown-item" @click="renameFeed(current.feed)">Rename</button>
-                    <div class="dropdown-divider" v-if="folders.length"></div>
-                    <header class="dropdown-header" v-if="folders.length">Move to...</header>
+                    <div class="dropdown-divider"></div>
+                    <header class="dropdown-header">Move to...</header>
                     <button class="dropdown-item"
                         v-if="folder.id != current.feed.folder_id"
                         v-for="folder in folders"
