@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
