@@ -186,10 +186,19 @@
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
                     <header class="dropdown-header">{{ current.feed.title }}</header>
-                    <a class="dropdown-item" :href="current.feed.link" target="_blank" v-if="current.feed.link">Visit Website</a>
-                    <a class="dropdown-item" :href="current.feed.feed_link" target="_blank" v-if="current.feed.feed_link">Open Feed</a>
+                    <a class="dropdown-item" :href="current.feed.link" target="_blank" v-if="current.feed.link">
+                        <span class="icon mr-1">{% inline "globe.svg" %}</span>
+                        Website
+                    </a>
+                    <a class="dropdown-item" :href="current.feed.feed_link" target="_blank" v-if="current.feed.feed_link">
+                        <span class="icon mr-1">{% inline "rss.svg" %}</span>
+                        Feed Link
+                    </a>
                     <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
-                    <button class="dropdown-item" @click="renameFeed(current.feed)">Rename</button>
+                    <button class="dropdown-item" @click="renameFeed(current.feed)">
+                        <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                        Rename
+                    </button>
                     <div class="dropdown-divider"></div>
                     <header class="dropdown-header">Move to...</header>
                     <button class="dropdown-item"
@@ -199,16 +208,17 @@
                         <span class="icon mr-1">{% inline "folder.svg" %}</span>
                         {{ folder.title }}
                     </button>
-                    <button class="dropdown-item" @click="moveFeed(current.feed, null)" v-if="current.feed.folder_id">
-                        ---
+                    <button class="dropdown-item text-muted" @click="moveFeed(current.feed, null)" v-if="current.feed.folder_id">
+                        <span class="icon mr-1">{% inline "folder-minus.svg" %}</span>
+                        ──
                     </button>
-                    <button class="dropdown-item" @click="moveFeedToNewFolder(current.feed)">
-                        <span class="text-muted icon mr-1">{% inline "plus.svg" %}</span>
-                        <span class="text-muted">New Folder</span>
+                    <button class="dropdown-item text-muted" @click="moveFeedToNewFolder(current.feed)">
+                        <span class="icon mr-1">{% inline "folder-plus.svg" %}</span>
+                        new folder
                     </button>
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item text-danger"
-                       @click.prevent="deleteFeed(current.feed)">
+                    <button class="dropdown-item text-danger" @click.prevent="deleteFeed(current.feed)">
+                        <span class="icon mr-1">{% inline "trash.svg" %}</span>
                         Delete
                     </button>
                 </dropdown>
@@ -221,9 +231,15 @@
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
                     <header class="dropdown-header">{{ current.folder.title }}</header>
-                    <button class="dropdown-item" @click="renameFolder(current.folder)">Rename</button>
+                    <button class="dropdown-item" @click="renameFolder(current.folder)">
+                        <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                        Rename
+                    </button>
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">Delete</button>
+                    <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">
+                        <span class="icon mr-1">{% inline "trash.svg" %}</span>
+                        Delete
+                    </button>
                 </dropdown>
             </div>
             <div id="item-list-scroll" class="p-2 overflow-auto border-top flex-grow-1" v-scroll="loadMoreItems" ref="itemlist">
