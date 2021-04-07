@@ -7,7 +7,7 @@ import (
 	"github.com/nkanaev/yarr/src/systray"
 )
 
-func Start(s *server.Handler) {
+func Start(s *server.Server) {
 	systrayOnReady := func() {
 		systray.SetIcon(Icon)
 
