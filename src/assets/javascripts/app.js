@@ -631,7 +631,13 @@ var vm = new Vue({
       this.theme.size = +(this.theme.size + (0.1 * x)).toFixed(1)
     },
     fetchAllFeeds: function() {
-      api.feeds.refresh().then(this.refreshStats.bind(this))
+      if (this.loading.feeds) return
+      api.feeds.refresh().then(function() {
+        // NOTE: this is hacky
+        setTimeout(function() {
+          vm.refreshStats()
+        }, 1000)
+      })
     },
     computeStats: function() {
       var filter = this.filterSelected
