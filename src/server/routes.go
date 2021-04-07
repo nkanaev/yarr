@@ -188,7 +188,10 @@ func (s *Server) handleFeedList(c *router.Context) {
 			s.db.CreateItems(worker.ConvertItems(result.Feed.Items, *feed))
 			s.worker.FindFeedFavicon(*feed)
 
-			c.JSON(http.StatusOK, map[string]string{"status": "success"})
+			c.JSON(http.StatusOK, map[string]interface{}{
+				"status": "success",
+				"feed": feed,
+			})
 		default:
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
 		}

@@ -1,4 +1,3 @@
-- fix: focus on the newly added feed
 - etc: test new parser extensively
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
 

@@ -544,6 +544,7 @@ var vm = new Vue({
           vm.refreshFeeds()
           vm.refreshStats()
           vm.settings = ''
+          vm.feedSelected = 'feed:' + result.feed.id
         } else if (result.status === 'multiple') {
           vm.feedNewChoice = result.choice
           vm.feedNewChoiceSelected = result.choice[0].url
