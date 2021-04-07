@@ -152,6 +152,7 @@ The parser should be reasonably handle content provided by them.
 Delete any from the list in case they drop support of web feeds.
 
 - blogger
+- cnblogs
 - flickr
 - hatenablog
 - livejournal

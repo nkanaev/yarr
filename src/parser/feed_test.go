@@ -92,3 +92,18 @@ func TestParseShortFeed(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestParseFeedWithBOM(t *testing.T) {
+	have, err := Parse(strings.NewReader(
+		"\xEF\xBB\xBF" + `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"></feed>`,
+	))
+	want := &Feed{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}

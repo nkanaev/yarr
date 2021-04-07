@@ -17,6 +17,7 @@ type processor func(r io.Reader) (*Feed, error)
 
 func sniff(lookup string) (string, processor) {
 	lookup = strings.TrimSpace(lookup)
+	lookup = strings.TrimLeft(lookup, "\x00\xEF\xBB\xBF\xFE\xFF")
 	switch lookup[0] {
 	case '<':
 		decoder := xmlDecoder(strings.NewReader(lookup))
