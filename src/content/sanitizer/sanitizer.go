@@ -51,7 +51,7 @@ func Sanitize(baseURL, input string) string {
 
 			buffer.WriteString(html.EscapeString(token.Data))
 		case html.StartTagToken:
-			tagName := token.DataAtom.String()
+			tagName := token.Data
 			parentTag = tagName
 
 			if isValidTag(tagName) {
@@ -70,14 +70,14 @@ func Sanitize(baseURL, input string) string {
 				blacklistedTagDepth++
 			}
 		case html.EndTagToken:
-			tagName := token.DataAtom.String()
+			tagName := token.Data
 			if isValidTag(tagName) && inList(tagName, tagStack) {
 				buffer.WriteString(fmt.Sprintf("</%s>", tagName))
 			} else if isBlockedTag(tagName) {
 				blacklistedTagDepth--
 			}
 		case html.SelfClosingTagToken:
-			tagName := token.DataAtom.String()
+			tagName := token.Data
 			if isValidTag(tagName) {
 				attrNames, htmlAttributes := sanitizeAttributes(baseURL, tagName, token.Attr)
 
@@ -157,12 +157,17 @@ func getExtraAttributes(tagName string) ([]string, []string) {
 }
 
 func isValidTag(tagName string) bool {
-	return allowedTags.has(tagName)
+	x := allowedTags.has(tagName) || allowedSvgTags.has(tagName) || allowedSvgFilters.has(tagName)
+	//fmt.Println(tagName, x)
+	return x
 }
 
 func isValidAttribute(tagName, attributeName string) bool {
 	if attrs, ok := allowedAttrs[tagName]; ok {
 		return attrs.has(attributeName)
+	}
+	if allowedSvgTags.has(tagName) {
+		return allowedSvgAttrs.has(attributeName)
 	}
 	return false
 }
