@@ -89,6 +89,7 @@ func (w *Worker) SetRefreshRate(minute int64) {
 
 func (w *Worker) RefreshFeeds() {
 	log.Print("Refreshing feeds")
+	// TODO: set the counter here?
 	go w.refresher()
 }
 

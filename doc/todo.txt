@@ -1,3 +1,8 @@
+- fix: sanitizer/readability clearing out svg?
+       https://preshing.com/20210315/how-cpp-resolves-a-function-call/
+- fix: text is garbled in
+       https://www.tedinski.com/2019/11/17/book-status-update.html
+- fix: focus on the newly added feed
 - etc: test new parser extensively
 - fix: loading items (by scrolling down) is glitching while feeds are refreshing
 
