@@ -9,6 +9,8 @@
 - (fix) `-base` not serving static files (thanks to @vfaronov)
 - (etc) 3rd-party dependencies reduced to the bare minimum
 
+special thanks to @tillcash for feedback & suggestions.
+
 # v1.4 (2021-03-11)
 
 - (new) keyboard shortcuts (thanks to @Duarte-Dias)
