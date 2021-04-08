@@ -110,7 +110,7 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 	cond := make([]string, 0)
 	args := make([]interface{}, 0)
 	if filter.FolderID != nil {
-		cond = append(cond, "f.folder_id = ?")
+		cond = append(cond, "i.feed_id in (select id from feeds where folder_id = ?)")
 		args = append(args, *filter.FolderID)
 	}
 	if filter.FeedID != nil {
@@ -155,7 +155,6 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 			i.title, i.link, i.date,
 			i.status, i.image, i.podcast_url
 		from items i
-		join feeds f on f.id = i.feed_id
 		where %s
 		order by %s
 		limit %d offset %d
@@ -205,7 +204,6 @@ func (s *Storage) CountItems(filter ItemFilter) int64 {
 	query := fmt.Sprintf(`
 		select count(i.id)
 		from items i
-		join feeds f on f.id = i.feed_id
 		where %s`, predicate)
 	row := s.db.QueryRow(query, args...)
 	if row != nil {
@@ -222,28 +220,10 @@ func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
 }
 
 func (s *Storage) MarkItemsRead(filter MarkFilter) bool {
-	cond := make([]string, 0)
-	args := make([]interface{}, 0)
-
-	if filter.FolderID != nil {
-		cond = append(cond, "f.folder_id = ?")
-		args = append(args, *filter.FolderID)
-	}
-	if filter.FeedID != nil {
-		cond = append(cond, "i.feed_id = ?")
-		args = append(args, *filter.FeedID)
-	}
-	predicate := "1"
-	if len(cond) > 0 {
-		predicate = strings.Join(cond, " and ")
-	}
+	predicate, args := listQueryPredicate(ItemFilter{FolderID: filter.FolderID, FeedID: filter.FeedID})
 	query := fmt.Sprintf(`
-		update items set status = %d
-		where id in (
-			select i.id from items i
-			join feeds f on f.id = i.feed_id
-			where %s and i.status != %d
-		)
+		update items as i set status = %d
+		where %s and i.status != %d
 		`, READ, predicate, STARRED)
 	_, err := s.db.Exec(query, args...)
 	if err != nil {
