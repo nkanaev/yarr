@@ -42,7 +42,7 @@ func ParseRDF(r io.Reader) (*Feed, error) {
 			URL:     srcitem.Link,
 			Date:    dateParse(srcitem.DublinCoreDate),
 			Title:   srcitem.Title,
-			Content: srcitem.ContentEncoded,
+			Content: firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
 		})
 	}
 	return dstfeed, nil
