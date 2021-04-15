@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestRDFFeed(t *testing.T) {
@@ -50,5 +51,31 @@ func TestRDFFeed(t *testing.T) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)
 		t.Fatal("invalid rdf")
+	}
+}
+
+func TestRDFExtensions(t *testing.T) {
+	have, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<rdf:RDF xmlns="http://purl.org/rss/1.0/"
+				xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+				xmlns:dc="http://purl.org/dc/elements/1.1/"
+				xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<item>
+				<dc:date>2006-01-02T15:04:05-07:00</dc:date>
+				<content:encoded><![CDATA[test]]></content:encoded>
+			</item>
+		</rdf:RDF>
+	`))
+	date, _ := time.Parse(time.RFC1123Z, time.RFC1123Z)
+	want := &Feed{
+		Items: []Item{
+			{Content: "test", Date: date},
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
 	}
 }

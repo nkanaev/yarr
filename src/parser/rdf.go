@@ -20,8 +20,8 @@ type rdfItem struct {
 	Link        string `xml:"link"`
 	Description string `xml:"description"`
 
-	DublinCoreDate    string `xml:"http://purl.org/dc/elements/1.1/ date"`
-	DublinCoreContent string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
+	DublinCoreDate string `xml:"http://purl.org/dc/elements/1.1/ date"`
+	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
 }
 
 func ParseRDF(r io.Reader) (*Feed, error) {
@@ -38,9 +38,11 @@ func ParseRDF(r io.Reader) (*Feed, error) {
 	}
 	for _, srcitem := range srcfeed.Items {
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:  srcitem.Link,
-			URL:   srcitem.Link,
-			Title: srcitem.Title,
+			GUID:    srcitem.Link,
+			URL:     srcitem.Link,
+			Date:    dateParse(srcitem.DublinCoreDate),
+			Title:   srcitem.Title,
+			Content: srcitem.ContentEncoded,
 		})
 	}
 	return dstfeed, nil
