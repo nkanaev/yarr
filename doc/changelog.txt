@@ -1,4 +1,4 @@
-# upcoming
+# v2.0 (2021-04-18)
 
 - (new) user interface tweaks
 - (new) feed parser fully rewritten
