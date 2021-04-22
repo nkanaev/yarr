@@ -56,3 +56,34 @@ func TestParse(t *testing.T) {
 		t.Fatal("invalid opml")
 	}
 }
+
+func TestParseFallback(t *testing.T) {
+	// as reported in https://github.com/nkanaev/yarr/pull/56
+	// the feed below comes without `outline[text]` & `outline[type=rss]` attributes
+	have, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<opml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+		  <head>
+			<title>Newsflow</title>
+		  </head>
+		  <body>
+			<outline title="foldertitle">
+				<outline htmlUrl="https://example.com" text="feedtext" title="feedtitle" xmlUrl="https://example.com/feed.xml" />
+			</outline>
+		  </body>
+		</opml>
+	`))
+	want := Folder{
+		Folders: []Folder{{
+			Title: "foldertitle",
+			Feeds: []Feed{
+				{Title: "feedtext", FeedUrl: "https://example.com/feed.xml", SiteUrl: "https://example.com"},
+			},
+		}},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid opml")
+	}
+}

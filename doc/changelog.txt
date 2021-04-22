@@ -1,3 +1,7 @@
+# upcoming
+
+- (fix) handle opml files not following the spec (thanks to @huangnauh for the report)
+
 # v2.0 (2021-04-18)
 
 - (new) user interface tweaks
