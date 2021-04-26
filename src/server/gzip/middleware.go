@@ -28,15 +28,16 @@ func (rw *gzipResponseWriter) WriteHeader(statusCode int) {
 }
 
 func Middleware(c *router.Context) {
-	if strings.Contains(c.Req.Header.Get("Accept-Encoding"), "gzip") {
-		gz := &gzipResponseWriter{out: gzip.NewWriter(c.Out), src: c.Out}
-		defer gz.out.Close()
-
-		c.Out.Header().Set("Content-Encoding", "gzip")
-		c.Out = gz
+	if !strings.Contains(c.Req.Header.Get("Accept-Encoding"), "gzip") {
 		c.Next()
-
 		return
 	}
+
+	gz := &gzipResponseWriter{out: gzip.NewWriter(c.Out), src: c.Out}
+	defer gz.out.Close()
+
+	c.Out.Header().Set("Content-Encoding", "gzip")
+	c.Out = gz
+
 	c.Next()
 }
