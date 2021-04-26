@@ -29,15 +29,15 @@ func (c *Context) JSON(status int, data interface{}) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	c.Out.WriteHeader(status)
 	c.Out.Header().Set("Content-Type", "application/json; charset=utf-8")
+	c.Out.WriteHeader(status)
 	c.Out.Write(body)
 	c.Out.Write([]byte("\n"))
 }
 
 func (c *Context) HTML(status int, tmpl *template.Template, data interface{}) {
-	c.Out.WriteHeader(status)
 	c.Out.Header().Set("Content-Type", "text/html")
+	c.Out.WriteHeader(status)
 	tmpl.Execute(c.Out, data)
 }
 
