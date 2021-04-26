@@ -48,6 +48,7 @@ func (w *Worker) FindFavicons() {
 }
 
 func (w *Worker) FindFeedFavicon(feed storage.Feed) {
+	// TODO: give up search attempts if the host is reachable but has no icon
 	icon, err := findFavicon(feed.Link, feed.FeedLink)
 	if err != nil {
 		log.Printf("Failed to find favicon for %s (%s): %s", feed.FeedLink, feed.Link, err)

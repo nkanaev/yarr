@@ -144,6 +144,7 @@ func (s *Server) handleFeedErrors(c *router.Context) {
 }
 
 func (s *Server) handleFeedIcon(c *router.Context) {
+	// TODO: caching
 	id, err := c.VarInt64("id")
 	if err != nil {
 		c.Out.WriteHeader(http.StatusBadRequest)
