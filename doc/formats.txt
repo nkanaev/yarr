@@ -159,6 +159,7 @@ Delete any from the list in case they drop support of web feeds.
 - medium
 - posthaven
 - reddit
+- substack
 - tumblr
 - vimeo
 - wordpress
