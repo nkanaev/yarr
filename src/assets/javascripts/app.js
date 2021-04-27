@@ -633,7 +633,7 @@ var vm = new Vue({
     fetchAllFeeds: function() {
       if (this.loading.feeds) return
       api.feeds.refresh().then(function() {
-        // NOTE: this is hacky
+        // TODO: this is hacky. come up with something decent
         setTimeout(function() {
           vm.refreshStats()
         }, 1000)
