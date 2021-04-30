@@ -45,19 +45,19 @@ func parse(prefix string, f reflect.Value, sf reflect.StructField) error {
 	case reflect.String:
 		f.SetString(ev)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		iv, err := strconv.ParseInt(ev, 10, 64)
+		iv, err := strconv.ParseInt(ev, 10, f.Type().Bits())
 		if err != nil {
 			return fmt.Errorf("%s:%s", prefix, err)
 		}
 		f.SetInt(iv)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		uiv, err := strconv.ParseUint(ev, 10, 64)
+		uiv, err := strconv.ParseUint(ev, 10, f.Type().Bits())
 		if err != nil {
 			return fmt.Errorf("%s:%s", prefix, err)
 		}
 		f.SetUint(uiv)
 	case reflect.Float32, reflect.Float64:
-		floatValue, err := strconv.ParseFloat(ev, 64)
+		floatValue, err := strconv.ParseFloat(ev, f.Type().Bits())
 		if err != nil {
 			return fmt.Errorf("%s:%s", prefix, err)
 		}
