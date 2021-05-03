@@ -1,5 +1,6 @@
 # upcoming
 
+- (new) configuration via env variables
 - (fix) missing `content-type` headers (thanks to @verahawk for the report)
 - (fix) handle opml files not following the spec (thanks to @huangnauh for the report)
 
