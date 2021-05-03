@@ -17,18 +17,26 @@ import (
 var Version string = "0.0"
 var GitHash string = "unknown"
 
+func opt(envVar, defaultValue string) string {
+	value := os.Getenv(envVar)
+	if value != "" {
+		return value
+	}
+	return defaultValue
+}
+
 func main() {
 	log.SetOutput(os.Stdout)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	var addr, db, authfile, certfile, keyfile, basepath string
 	var ver, open bool
-	flag.StringVar(&addr, "addr", "127.0.0.1:7070", "address to run server on")
-	flag.StringVar(&authfile, "auth-file", "", "path to a file containing username:password")
-	flag.StringVar(&basepath, "base", "", "base path of the service url")
-	flag.StringVar(&certfile, "cert-file", "", "path to cert file for https")
-	flag.StringVar(&keyfile, "key-file", "", "path to key file for https")
-	flag.StringVar(&db, "db", "", "storage file path")
+	flag.StringVar(&addr, "addr", opt("YARR_ADDR", "127.0.0.1:7070"), "address to run server on")
+	flag.StringVar(&authfile, "auth-file", opt("YARR_AUTH_FILE", ""), "path to a file containing username:password")
+	flag.StringVar(&basepath, "base", opt("YARR_BASE", ""), "base path of the service url")
+	flag.StringVar(&certfile, "cert-file", opt("YARR_CERT_FILE", ""), "path to cert file for https")
+	flag.StringVar(&keyfile, "key-file", opt("YARR_KEY_FILE", ""), "path to key file for https")
+	flag.StringVar(&db, "db", opt("YARR_DB", ""), "storage file path")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.BoolVar(&open, "open", false, "open the server in browser")
 	flag.Parse()
