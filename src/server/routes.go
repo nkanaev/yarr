@@ -417,7 +417,7 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 
 	if content := silo.VideoIFrame(url); content != "" {
 		c.JSON(http.StatusOK, map[string]string{
-			"content": content,
+			"content": sanitizer.Sanitize(url, content),
 		})
 		return
 	}

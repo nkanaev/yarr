@@ -360,6 +360,27 @@ select.form-control:not([multiple]):not([size]) {
   margin-bottom: 0.5rem;
 }
 
+.content .video-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
+.content .video-wrapper::before {
+  display: block;
+  padding-top: 56.25%; /* 16x9 aspect ratio */
+  content: "";
+}
+
+.content .video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .content pre {
   overflow-x: auto;
   color: inherit;

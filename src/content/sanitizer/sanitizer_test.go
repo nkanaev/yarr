@@ -175,7 +175,7 @@ func TestInvalidIFrame(t *testing.T) {
 
 func TestIFrameWithChildElements(t *testing.T) {
 	input := `<iframe src="https://www.youtube.com/"><p>test</p></iframe>`
-	expected := `<iframe src="https://www.youtube.com/" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>`
+	expected := `<div class="video-wrapper"><iframe src="https://www.youtube.com/" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div>`
 	output := Sanitize("http://example.com/", input)
 
 	if expected != output {
@@ -255,7 +255,7 @@ func TestEspaceAttributes(t *testing.T) {
 
 func TestReplaceIframeURL(t *testing.T) {
 	input := `<iframe src="https://player.vimeo.com/video/123456?title=0&amp;byline=0"></iframe>`
-	expected := `<iframe src="https://player.vimeo.com/video/123456?title=0&amp;byline=0" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>`
+	expected := `<div class="video-wrapper"><iframe src="https://player.vimeo.com/video/123456?title=0&amp;byline=0" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div>`
 	output := Sanitize("http://example.org/", input)
 
 	if expected != output {
@@ -290,5 +290,15 @@ func TestReplaceStyle(t *testing.T) {
 
 	if expected != output {
 		t.Errorf(`Wrong output: "%s" != "%s"`, expected, output)
+	}
+}
+
+func TestWrapYoutubeIFrames(t *testing.T) {
+	input := `<iframe src="https://www.youtube.com/embed/foobar"></iframe>`
+	expected := `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/foobar" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div>`
+	output := Sanitize("http://example.org/", input)
+
+	if expected != output {
+		t.Errorf("Wrong output:\nwant: %v\nhave: %v", expected, output)
 	}
 }

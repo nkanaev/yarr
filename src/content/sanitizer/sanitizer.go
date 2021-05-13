@@ -58,19 +58,31 @@ func Sanitize(baseURL, input string) string {
 				attrNames, htmlAttributes := sanitizeAttributes(baseURL, tagName, token.Attr)
 
 				if hasRequiredAttributes(tagName, attrNames) {
+					wrap := isVideoIframe(token)
+					if wrap {
+						buffer.WriteString(`<div class="video-wrapper">`)
+					}
+
 					if len(attrNames) > 0 {
 						buffer.WriteString("<" + tagName + " " + htmlAttributes + ">")
 					} else {
 						buffer.WriteString("<" + tagName + ">")
 					}
 
-					tagStack = append(tagStack, tagName)
+					if wrap {
+						buffer.WriteString("</iframe></div>")
+					} else {
+						tagStack = append(tagStack, tagName)
+					}
 				}
 			} else if isBlockedTag(tagName) {
 				blacklistedTagDepth++
 			}
 		case html.EndTagToken:
 			tagName := token.Data
+			if tagName == "iframe" {
+				continue
+			}
 			if isValidTag(tagName) && inList(tagName, tagStack) {
 				buffer.WriteString(fmt.Sprintf("</%s>", tagName))
 			} else if isBlockedTag(tagName) {
@@ -413,6 +425,25 @@ func isValidDataAttribute(value string) bool {
 	for _, prefix := range dataAttributeAllowList {
 		if strings.HasPrefix(value, prefix) {
 			return true
+		}
+	}
+	return false
+}
+
+func isVideoIframe(token html.Token) bool {
+	videoWhitelist := map[string]bool{
+		"player.bilibili.com":      true,
+		"player.vimeo.com":         true,
+		"www.dailymotion.com":      true,
+		"www.youtube-nocookie.com": true,
+		"www.youtube.com":          true,
+	}
+	if token.Data == "iframe" {
+		for _, attr := range token.Attr {
+			if attr.Key == "src" {
+				domain := htmlutil.URLDomain(attr.Val)
+				return videoWhitelist[domain]
+			}
 		}
 	}
 	return false
