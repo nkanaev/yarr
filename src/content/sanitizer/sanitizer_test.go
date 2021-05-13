@@ -163,6 +163,16 @@ func TestInvalidNestedTag(t *testing.T) {
 	}
 }
 
+func TestValidIFrame(t *testing.T) {
+	input := `<iframe src="http://example.org/"></iframe>`
+	expected := `<iframe src="http://example.org/" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>`
+	output := Sanitize("http://example.org/", input)
+
+	if expected != output {
+		t.Errorf("Wrong output:\nwant: %s\nhave: %s", expected, output)
+	}
+}
+
 func TestInvalidIFrame(t *testing.T) {
 	input := `<iframe src="http://example.org/"></iframe>`
 	expected := ``

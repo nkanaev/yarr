@@ -69,8 +69,12 @@ func Sanitize(baseURL, input string) string {
 						buffer.WriteString("<" + tagName + ">")
 					}
 
-					if wrap {
-						buffer.WriteString("</iframe></div>")
+					if tagName == "iframe" {
+						// autoclose iframes
+						buffer.WriteString("</iframe>")
+						if wrap {
+							buffer.WriteString("</div>")
+						}
 					} else {
 						tagStack = append(tagStack, tagName)
 					}
@@ -80,6 +84,7 @@ func Sanitize(baseURL, input string) string {
 			}
 		case html.EndTagToken:
 			tagName := token.Data
+			// iframes are autoclosed. see above
 			if tagName == "iframe" {
 				continue
 			}
