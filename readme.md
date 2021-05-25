@@ -18,9 +18,12 @@ Download `yarr-*-macos64.zip`, unzip it, place `yarr.app` in `/Applications` fol
 
 The binaries are not signed, because the author doesn't want to buy a certificate.
 Apple hates cheapskate developers, therefore the OS will refuse to run the application.
-To bypass these measures, you can run the command:
+To bypass these measures, you can either follow the instructions provided [here][macos-open]
+or run the command below:
 
     xattr -d com.apple.quarantine /Applications/yarr.app
+    
+[macos-open]: https://support.apple.com/en-gb/guide/mac-help/mh40616/mac
 
 ### windows
 
