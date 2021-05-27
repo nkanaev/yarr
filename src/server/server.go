@@ -12,6 +12,7 @@ type Server struct {
 	Addr   string
 	db     *storage.Storage
 	worker *worker.Worker
+	cache  map[string]interface{}
 
 	BasePath string
 
@@ -28,6 +29,7 @@ func NewServer(db *storage.Storage, addr string) *Server {
 		db:     db,
 		Addr:   addr,
 		worker: worker.NewWorker(db),
+		cache:  make(map[string]interface{}),
 	}
 }
 

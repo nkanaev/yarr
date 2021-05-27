@@ -1,12 +1,15 @@
 package server
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"log"
 	"math"
 	"net/http"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/nkanaev/yarr/src/assets"
@@ -143,20 +146,51 @@ func (s *Server) handleFeedErrors(c *router.Context) {
 	c.JSON(http.StatusOK, errors)
 }
 
+type feedicon struct {
+	ctype string
+	bytes []byte
+	etag  string
+}
+
 func (s *Server) handleFeedIcon(c *router.Context) {
-	// TODO: caching
 	id, err := c.VarInt64("id")
 	if err != nil {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	feed := s.db.GetFeed(id)
-	if feed != nil && feed.Icon != nil {
-		c.Out.Header().Set("Content-Type", http.DetectContentType(*feed.Icon))
-		c.Out.Write(*feed.Icon)
-	} else {
-		c.Out.WriteHeader(http.StatusNotFound)
+
+	cachekey := "icon:" + strconv.FormatInt(id, 10)
+	cachedat := s.cache[cachekey]
+	if cachedat == nil {
+		feed := s.db.GetFeed(id)
+		if feed == nil || feed.Icon == nil {
+			c.Out.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		hash := md5.New()
+		hash.Write(*feed.Icon)
+
+		etag := fmt.Sprintf("%x", hash.Sum(nil))[:16]
+
+		cachedat = feedicon{
+			ctype: http.DetectContentType(*feed.Icon),
+			bytes: *(*feed).Icon,
+			etag:  etag,
+		}
+		s.cache[cachekey] = cachedat
 	}
+
+	icon := cachedat.(feedicon)
+
+	if c.Req.Header.Get("If-None-Match") == icon.etag {
+		c.Out.WriteHeader(http.StatusNotModified)
+		return
+	}
+
+	c.Out.Header().Set("Content-Type", icon.ctype)
+	c.Out.Header().Set("Etag", icon.etag)
+	c.Out.Write(icon.bytes)
 }
 
 func (s *Server) handleFeedList(c *router.Context) {
@@ -191,7 +225,7 @@ func (s *Server) handleFeedList(c *router.Context) {
 
 			c.JSON(http.StatusOK, map[string]interface{}{
 				"status": "success",
-				"feed": feed,
+				"feed":   feed,
 			})
 		default:
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
