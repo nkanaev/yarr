@@ -76,8 +76,16 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	return result, nil
 }
 
-func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
-	candidateUrls := make([]string, 0)
+var emptyIcon = make([]byte, 0)
+var imageTypes = map[string]bool{
+	"image/x-icon": true,
+	"image/png":    true,
+	"image/jpeg":   true,
+	"image/gif":    true,
+}
+
+func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
+	urls := make([]string, 0)
 
 	favicon := func(link string) string {
 		u, err := url.Parse(link)
@@ -87,49 +95,43 @@ func findFavicon(websiteUrl, feedUrl string) (*[]byte, error) {
 		return fmt.Sprintf("%s://%s/favicon.ico", u.Scheme, u.Host)
 	}
 
-	if len(websiteUrl) != 0 {
-		res, err := client.get(websiteUrl)
-		if err != nil {
-			return nil, err
-		}
-		body, err := ioutil.ReadAll(res.Body)
-		defer res.Body.Close()
-		if err != nil {
-			return nil, err
-		}
-		candidateUrls = append(candidateUrls, scraper.FindIcons(string(body), websiteUrl)...)
-		if c := favicon(websiteUrl); len(c) != 0 {
-			candidateUrls = append(candidateUrls, c)
-		}
-	}
-	if c := favicon(feedUrl); len(c) != 0 {
-		candidateUrls = append(candidateUrls, c)
-	}
-
-	imageTypes := [4]string{
-		"image/x-icon",
-		"image/png",
-		"image/jpeg",
-		"image/gif",
-	}
-	for _, url := range candidateUrls {
-		res, err := client.get(url)
-		if err != nil {
-			continue
-		}
-		defer res.Body.Close()
-		if res.StatusCode == 200 {
-			if content, err := ioutil.ReadAll(res.Body); err == nil {
-				ctype := http.DetectContentType(content)
-				for _, itype := range imageTypes {
-					if ctype == itype {
-						return &content, nil
-					}
+	if siteUrl != "" {
+		if res, err := client.get(siteUrl); err == nil {
+			defer res.Body.Close()
+			if body, err := ioutil.ReadAll(res.Body); err == nil {
+				urls = append(urls, scraper.FindIcons(string(body), siteUrl)...)
+				if c := favicon(siteUrl); c != "" {
+					urls = append(urls, c)
 				}
 			}
 		}
 	}
-	return nil, nil
+
+	if c := favicon(feedUrl); c != "" {
+		urls = append(urls, c)
+	}
+
+	for _, u := range urls {
+		res, err := client.get(u)
+		if err != nil {
+			continue
+		}
+		defer res.Body.Close()
+		if res.StatusCode != 200 {
+			continue
+		}
+
+		content, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			continue
+		}
+
+		ctype := http.DetectContentType(content)
+		if imageTypes[ctype] {
+			return &content, nil
+		}
+	}
+	return &emptyIcon, nil
 }
 
 func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {

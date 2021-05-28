@@ -41,10 +41,8 @@ func (w *Worker) StartFeedCleaner() {
 
 func (w *Worker) FindFavicons() {
 	go func() {
-		for _, feed := range w.db.ListFeeds() {
-			if !feed.HasIcon {
-				w.FindFeedFavicon(feed)
-			}
+		for _, feed := range w.db.ListFeedsMissingIcons() {
+			w.FindFeedFavicon(feed)
 		}
 	}()
 }
