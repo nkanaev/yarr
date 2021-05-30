@@ -47,13 +47,13 @@ Vue.component('drag', {
 })
 
 Vue.component('dropdown', {
-  props: ['class', 'toggle-class', 'ref', 'drop'],
+  props: ['class', 'toggle-class', 'ref', 'drop', 'title'],
   data: function() {
     return {open: false}
   },
   template: `
     <div class="dropdown" :class="$attrs.class">
-      <button ref="btn" @click="toggle" :class="btnToggleClass"><slot name="button"></slot></button>
+      <button ref="btn" @click="toggle" :class="btnToggleClass" :title="$props.title"><slot name="button"></slot></button>
       <div ref="menu" class="dropdown-menu" :class="{show: open}"><slot v-if="open"></slot></div>
     </div>
   `,
