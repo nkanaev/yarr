@@ -17,7 +17,10 @@ import (
 var Version string = "0.0"
 var GitHash string = "unknown"
 
+var OptList = make([]string, 0)
+
 func opt(envVar, defaultValue string) string {
+	OptList = append(OptList, envVar)
 	value := os.Getenv(envVar)
 	if value != "" {
 		return value
@@ -28,13 +31,24 @@ func opt(envVar, defaultValue string) string {
 func main() {
 	var addr, db, authfile, certfile, keyfile, basepath, logfile string
 	var ver, open bool
+
+	flag.CommandLine.SetOutput(os.Stdout)
+
+	flag.Usage = func() {
+		out := flag.CommandLine.Output()
+		fmt.Fprintf(out, "Usage of %s:\n", os.Args[0])
+		flag.PrintDefaults()
+		fmt.Fprintln(out, "\nThe environmental variables can used to provide the default values:")
+		fmt.Fprintln(out, " ", strings.Join(OptList, ", "))
+	}
+
 	flag.StringVar(&addr, "addr", opt("YARR_ADDR", "127.0.0.1:7070"), "address to run server on")
-	flag.StringVar(&authfile, "auth-file", opt("YARR_AUTHFILE", ""), "path to a file containing username:password")
-	flag.StringVar(&basepath, "base", opt("YARR_BASE", ""), "base path of the service url")
-	flag.StringVar(&certfile, "cert-file", opt("YARR_CERTFILE", ""), "path to cert file for https")
-	flag.StringVar(&keyfile, "key-file", opt("YARR_KEYFILE", ""), "path to key file for https")
-	flag.StringVar(&db, "db", opt("YARR_DB", ""), "storage file path")
-	flag.StringVar(&logfile, "log-file", opt("YARR_LOGFILE", ""), "path to log file to use instead of stdout")
+	flag.StringVar(&basepath, "base", opt("YARR_BASE", ""), "base path of the service url (YARR_BASE env )")
+	flag.StringVar(&authfile, "auth-file", opt("YARR_AUTHFILE", ""), "`path` to a file containing username:password")
+	flag.StringVar(&certfile, "cert-file", opt("YARR_CERTFILE", ""), "`path` to cert file for https")
+	flag.StringVar(&keyfile, "key-file", opt("YARR_KEYFILE", ""), "`path` to key file for https")
+	flag.StringVar(&db, "db", opt("YARR_DB", ""), "storage file `path`")
+	flag.StringVar(&logfile, "log-file", opt("YARR_LOGFILE", ""), "`path` to log file to use instead of stdout")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.BoolVar(&open, "open", false, "open the server in browser")
 	flag.Parse()
