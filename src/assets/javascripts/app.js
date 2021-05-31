@@ -180,7 +180,7 @@ var vm = new Vue({
   created: function() {
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
-      .then(this.refreshItems.bind(this))
+      .then(this.refreshItems.bind(this, false))
 
     api.feeds.list_errors().then(function(errors) {
       vm.feed_errors = errors
@@ -197,10 +197,7 @@ var vm = new Vue({
       'feedNewChoice': [],
       'feedNewChoiceSelected': '',
       'items': [],
-      'itemsPage': {
-        'cur': 1,
-        'num': 1,
-      },
+      'itemsHasMore': true,
       'itemSelected': null,
       'itemSelectedDetails': null,
       'itemSelectedReadability': '',
@@ -304,13 +301,13 @@ var vm = new Vue({
     },
     'filterSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({filter: newVal}).then(this.refreshItems.bind(this))
+      api.settings.update({filter: newVal}).then(this.refreshItems.bind(this, false))
       this.itemSelected = null
       this.computeStats()
     },
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({feed: newVal}).then(this.refreshItems.bind(this))
+      api.settings.update({feed: newVal}).then(this.refreshItems.bind(this, false))
       this.itemSelected = null
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0
     },
@@ -339,7 +336,7 @@ var vm = new Vue({
     }, 500),
     'itemSortNewestFirst': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({sort_newest_first: newVal}).then(this.refreshItems.bind(this))
+      api.settings.update({sort_newest_first: newVal}).then(vm.refreshItems.bind(this, false))
     },
     'feedListWidth': debounce(function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
@@ -404,34 +401,34 @@ var vm = new Vue({
           vm.feeds = values[1]
         })
     },
-    refreshItems: function() {
+    refreshItems: function(loadMore) {
       if (this.feedSelected === null) {
         vm.items = []
-        vm.itemsPage = {'cur': 1, 'num': 1}
         return
       }
+
       var query = this.getItemsQuery()
+      if (loadMore) {
+        query.after = vm.items[vm.items.length-1].id
+      }
+
       this.loading.items = true
       return api.items.list(query).then(function(data) {
-        vm.items = data.list
-        vm.itemsPage = data.page
+        if (loadMore) {
+          vm.items = vm.items.concat(data.list)
+        } else {
+          vm.items = data.list
+        }
+        vm.itemsHasMore = data.has_more
         vm.loading.items = false
       })
     },
     loadMoreItems: function(event, el) {
-      if (this.itemsPage.cur >= this.itemsPage.num) return
+      if (!this.itemsHasMore) return
+
       if (this.loading.items) return
       var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < 50
-      if (closeToBottom) {
-        this.loading.moreitems = true
-        var query = this.getItemsQuery()
-        query.page = this.itemsPage.cur + 1
-        api.items.list(query).then(function(data) {
-          vm.items = vm.items.concat(data.list)
-          vm.itemsPage = data.page
-          vm.loading.items = false
-        })
-      }
+      if (closeToBottom) this.refreshItems(true)
     },
     markItemsRead: function() {
       var query = this.getItemsQuery()

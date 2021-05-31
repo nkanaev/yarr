@@ -260,7 +260,7 @@
                         <div>{{ item.title || 'untitled' }}</div>
                     </div>
                 </label>
-                <button class="btn btn-link btn-block loading my-3" v-if="itemsPage.cur < itemsPage.num"></button>
+                <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
             </div>
             <div class="px-3 py-2 border-top text-danger text-break" v-if="feed_errors[current.feed.id]">
                 {{ feed_errors[current.feed.id] }}

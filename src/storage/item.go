@@ -61,6 +61,7 @@ type ItemFilter struct {
 	FeedID   *int64
 	Status   *ItemStatus
 	Search   *string
+	After  *int64
 }
 
 type MarkFilter struct {
@@ -106,7 +107,7 @@ func (s *Storage) CreateItems(items []Item) bool {
 	return true
 }
 
-func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
+func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []interface{}) {
 	cond := make([]string, 0)
 	args := make([]interface{}, 0)
 	if filter.FolderID != nil {
@@ -131,6 +132,14 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 		cond = append(cond, "i.search_rowid in (select rowid from search where search match ?)")
 		args = append(args, strings.Join(terms, " "))
 	}
+	if filter.After != nil {
+		compare := ">"
+		if newestFirst {
+			compare = "<"
+		}
+		cond = append(cond, fmt.Sprintf("(i.date, i.id) %s (select date, id from items where id = ?)", compare))
+		args = append(args, *filter.After)
+	}
 
 	predicate := "1"
 	if len(cond) > 0 {
@@ -140,13 +149,13 @@ func listQueryPredicate(filter ItemFilter) (string, []interface{}) {
 	return predicate, args
 }
 
-func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bool) []Item {
-	predicate, args := listQueryPredicate(filter)
+func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool) []Item {
+	predicate, args := listQueryPredicate(filter, newestFirst)
 	result := make([]Item, 0, 0)
 
-	order := "date desc"
+	order := "date desc, id desc"
 	if !newestFirst {
-		order = "date asc"
+		order = "date asc, id asc"
 	}
 
 	query := fmt.Sprintf(`
@@ -157,8 +166,8 @@ func (s *Storage) ListItems(filter ItemFilter, offset, limit int, newestFirst bo
 		from items i
 		where %s
 		order by %s
-		limit %d offset %d
-		`, predicate, order, limit, offset)
+		limit %d
+		`, predicate, order, limit)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		log.Print(err)
@@ -199,28 +208,13 @@ func (s *Storage) GetItem(id int64) *Item {
 	return i
 }
 
-func (s *Storage) CountItems(filter ItemFilter) int64 {
-	predicate, args := listQueryPredicate(filter)
-	query := fmt.Sprintf(`
-		select count(i.id)
-		from items i
-		where %s`, predicate)
-	row := s.db.QueryRow(query, args...)
-	if row != nil {
-		var result int64
-		row.Scan(&result)
-		return result
-	}
-	return 0
-}
-
 func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
 	_, err := s.db.Exec(`update items set status = ? where id = ?`, status, item_id)
 	return err == nil
 }
 
 func (s *Storage) MarkItemsRead(filter MarkFilter) bool {
-	predicate, args := listQueryPredicate(ItemFilter{FolderID: filter.FolderID, FeedID: filter.FeedID})
+	predicate, args := listQueryPredicate(ItemFilter{FolderID: filter.FolderID, FeedID: filter.FeedID}, false)
 	query := fmt.Sprintf(`
 		update items as i set status = %d
 		where %s and i.status != %d

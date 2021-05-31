@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math"
 	"net/http"
 	"path/filepath"
 	"reflect"
@@ -307,17 +306,17 @@ func (s *Server) handleItem(c *router.Context) {
 func (s *Server) handleItemList(c *router.Context) {
 	if c.Req.Method == "GET" {
 		perPage := 20
-		curPage := 1
 		query := c.Req.URL.Query()
-		if page, err := c.QueryInt64("page"); err == nil {
-			curPage = int(page)
-		}
+
 		filter := storage.ItemFilter{}
 		if folderID, err := c.QueryInt64("folder_id"); err == nil {
 			filter.FolderID = &folderID
 		}
 		if feedID, err := c.QueryInt64("feed_id"); err == nil {
 			filter.FeedID = &feedID
+		}
+		if after, err := c.QueryInt64("after"); err == nil {
+			filter.After = &after
 		}
 		if status := query.Get("status"); len(status) != 0 {
 			statusValue := storage.StatusValues[status]
@@ -327,14 +326,16 @@ func (s *Server) handleItemList(c *router.Context) {
 			filter.Search = &search
 		}
 		newestFirst := query.Get("oldest_first") != "true"
-		items := s.db.ListItems(filter, (curPage-1)*perPage, perPage, newestFirst)
-		count := s.db.CountItems(filter)
+
+		items := s.db.ListItems(filter, perPage+1, newestFirst)
+		hasMore := false
+		if len(items) == perPage+1 {
+			hasMore = true
+			items = items[:perPage]
+		}
 		c.JSON(http.StatusOK, map[string]interface{}{
-			"page": map[string]int{
-				"cur": curPage,
-				"num": int(math.Ceil(float64(count) / float64(perPage))),
-			},
 			"list": items,
+			"has_more": hasMore,
 		})
 	} else if c.Req.Method == "PUT" {
 		filter := storage.MarkFilter{}
