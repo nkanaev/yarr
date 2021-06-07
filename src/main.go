@@ -38,12 +38,12 @@ func main() {
 		out := flag.CommandLine.Output()
 		fmt.Fprintf(out, "Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
-		fmt.Fprintln(out, "\nThe environmental variables can used to provide the default values:")
+		fmt.Fprintln(out, "\nThe environmental variables, if present, will be used to provide\nthe default values for the params above:")
 		fmt.Fprintln(out, " ", strings.Join(OptList, ", "))
 	}
 
 	flag.StringVar(&addr, "addr", opt("YARR_ADDR", "127.0.0.1:7070"), "address to run server on")
-	flag.StringVar(&basepath, "base", opt("YARR_BASE", ""), "base path of the service url (YARR_BASE env )")
+	flag.StringVar(&basepath, "base", opt("YARR_BASE", ""), "base path of the service url")
 	flag.StringVar(&authfile, "auth-file", opt("YARR_AUTHFILE", ""), "`path` to a file containing username:password")
 	flag.StringVar(&certfile, "cert-file", opt("YARR_CERTFILE", ""), "`path` to cert file for https")
 	flag.StringVar(&keyfile, "key-file", opt("YARR_KEYFILE", ""), "`path` to key file for https")
