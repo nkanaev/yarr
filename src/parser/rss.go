@@ -71,7 +71,7 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 	for _, srcitem := range srcfeed.Items {
 		podcastURL := ""
 		for _, e := range srcitem.Enclosures {
-			if e.Type == "audio/mpeg" || e.Type == "audio/x-m4a" {
+			if strings.HasPrefix(e.Type, "audio/") {
 				podcastURL = e.URL
 
 				if srcitem.OrigEnclosureLink != "" && strings.Contains(podcastURL, path.Base(srcitem.OrigEnclosureLink)) {
