@@ -136,6 +136,26 @@ func TestRSSPodcast(t *testing.T) {
 	}
 }
 
+func TestRSSOpusPodcast(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0">
+			<channel>
+				<item>
+					<enclosure length="100500" type="audio/opus" url="http://example.com/audio.ext"/>
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := feed.Items[0].AudioURL
+	want := "http://example.com/audio.ext"
+	if want != have {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
 // found in: https://podcast.cscript.site/podcast.xml
 func TestRSSPodcastDuplicated(t *testing.T) {
 	feed, _ := Parse(strings.NewReader(`
