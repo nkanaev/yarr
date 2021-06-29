@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/nkanaev/yarr/src/content/scraper"
@@ -38,7 +40,7 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 		return nil, fmt.Errorf("status code %d", res.StatusCode)
 	}
 
-	body, err := charset.NewReader(res.Body, res.Header.Get("Content-Type"))
+	body, err := httpBody(res)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +187,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 		return nil, nil
 	}
 
-	body, err := charset.NewReader(res.Body, res.Header.Get("Content-Type"))
+	body, err := httpBody(res)
 	if err != nil {
 		return nil, err
 	}
@@ -203,4 +205,12 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	feed.TranslateURLs(f.FeedLink)
 	feed.SetMissingDatesTo(time.Now())
 	return ConvertItems(feed.Items, f), nil
+}
+
+func httpBody(res *http.Response) (io.Reader, error) {
+	ctype := res.Header.Get("Content-Type")
+	if strings.Contains(ctype, "charset") {
+		return charset.NewReader(res.Body, ctype)
+	}
+	return res.Body, nil
 }
