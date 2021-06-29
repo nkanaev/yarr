@@ -4,6 +4,7 @@
 - (fix) missing `content-type` headers (thanks to @verahawk for the report)
 - (fix) handle opml files not following the spec (thanks to @huangnauh for the report)
 - (fix) pagination in unread/starred feeds (thanks to @Farow for the report)
+- (fix) handling feeds with non-utf8 encodings (thanks to @fserb for the report)
 - (fix) ui tweaks (thanks to @Farow)
 
 # v2.0 (2021-04-18)
