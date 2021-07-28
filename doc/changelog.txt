@@ -6,6 +6,7 @@
 - (fix) pagination in unread/starred feeds (thanks to @Farow for the report)
 - (fix) handling feeds with non-utf8 encodings (thanks to @fserb for the report)
 - (fix) errors caused by empty feeds (thanks to @decke)
+- (fix) recognize all audio mime types as podcasts (thanks to @krkk)
 - (fix) ui tweaks (thanks to @Farow)
 
 # v2.0 (2021-04-18)
