@@ -1,4 +1,4 @@
-# upcoming
+# v2.1 (2021-08-16)
 
 - (new) configuration via env variables
 - (fix) missing `content-type` headers (thanks to @verahawk for the report)
