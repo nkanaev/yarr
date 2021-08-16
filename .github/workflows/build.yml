@@ -131,7 +131,7 @@ jobs:
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./yarr-windows.zip
-          asset_name: yarr-${{ github.ref }}-windows32.zip
+          asset_name: yarr-${{ github.ref }}-windows64.zip
           asset_content_type: application/zip
     - name: Upload Linux
       uses: actions/upload-release-asset@v1
@@ -140,5 +140,5 @@ jobs:
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./yarr-linux.zip
-          asset_name: yarr-${{ github.ref }}-linux32.zip
+          asset_name: yarr-${{ github.ref }}-linux64.zip
           asset_content_type: application/zip
