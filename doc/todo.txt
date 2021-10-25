@@ -1,0 +1,3 @@
+- strip out html tags from titles
+  https://www.aldaily.com/feed/
+- feedlist keyboard navigation is flaky in "unread" section
