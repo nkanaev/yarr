@@ -12,6 +12,8 @@ import (
 	"github.com/nkanaev/yarr/src/platform"
 	"github.com/nkanaev/yarr/src/server"
 	"github.com/nkanaev/yarr/src/storage"
+
+	"github.com/ffred/guitocons"
 )
 
 var Version string = "0.0"
@@ -31,6 +33,8 @@ func opt(envVar, defaultValue string) string {
 func main() {
 	var addr, db, authfile, certfile, keyfile, basepath, logfile string
 	var ver, open bool
+
+	guitocons.Guitocons()
 
 	flag.CommandLine.SetOutput(os.Stdout)
 
