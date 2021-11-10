@@ -180,3 +180,26 @@ func TestRSSPodcastDuplicated(t *testing.T) {
 		t.Fatal("item.audio_url must be unset if present in the content")
 	}
 }
+
+func TestRSSTitleHTMLTags(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<channel>
+				<item>
+					<title>&lt;p&gt;title in p&lt;/p&gt;</title>
+				</item>
+				<item>
+					<title>very &lt;strong&gt;strong&lt;/strong&gt; title</title>
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := []string{feed.Items[0].Title, feed.Items[1].Title}
+	want := []string{"title in p", "very strong title"}
+	for i := 0; i < len(want); i++ {
+		if want[i] != have[i] {
+			t.Errorf("title doesn't match\nwant: %#v\nhave: %#v\n", want[i], have[i])
+		}
+	}
+}

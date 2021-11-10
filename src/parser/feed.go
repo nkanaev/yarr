@@ -9,6 +9,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 )
 
 var UnknownFormat = errors.New("unknown feed format")
@@ -80,7 +82,7 @@ func (feed *Feed) cleanup() {
 	for i, item := range feed.Items {
 		feed.Items[i].GUID = strings.TrimSpace(item.GUID)
 		feed.Items[i].URL = strings.TrimSpace(item.URL)
-		feed.Items[i].Title = strings.TrimSpace(item.Title)
+		feed.Items[i].Title = strings.TrimSpace(htmlutil.ExtractText(item.Title))
 		feed.Items[i].Content = strings.TrimSpace(item.Content)
 
 		if item.ImageURL != "" && strings.Contains(item.Content, item.ImageURL) {
