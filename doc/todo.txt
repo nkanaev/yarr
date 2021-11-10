@@ -1,3 +1,2 @@
 - feedlist keyboard navigation is flaky in "unread" section
-- make feed settings available in all filter modes
 - show `mark as read` in `all feeds` filter (along with numbers)

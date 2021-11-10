@@ -177,11 +177,16 @@
                         title="Mark All Read">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
+
+
+                <button class="btn btn-link toolbar-item px-2 ml-2" v-if="!current.type" disabled>
+                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                </button>
                 <dropdown class="settings-dropdown"
                           toggle-class="btn btn-link toolbar-item px-2 ml-2"
                           drop="right"
                           title="Feed Settings"
-                          v-if="!filterSelected && current.type == 'feed'">
+                          v-if="current.type == 'feed'">
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
@@ -226,7 +231,7 @@
                           toggle-class="btn btn-link toolbar-item px-2 ml-2"
                           title="Folder Settings"
                           drop="right"
-                          v-if="!filterSelected && current.type == 'folder'">
+                          v-if="current.type == 'folder'">
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
