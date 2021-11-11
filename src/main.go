@@ -29,6 +29,8 @@ func opt(envVar, defaultValue string) string {
 }
 
 func main() {
+	platform.FixConsoleIfNeeded()
+
 	var addr, db, authfile, certfile, keyfile, basepath, logfile string
 	var ver, open bool
 
