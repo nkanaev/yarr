@@ -1,3 +1,10 @@
+# upcoming
+
+- (fix) windows console support (thanks to @dufferzafar for the report)
+- (fix) remove html tags from article titles (thanks to Alex Went for the report)
+- (etc) autoselect current folder when adding a new feed (thanks to @krkk)
+- (etc) folder/feed settings menu available across all filters
+
 # v2.1 (2021-08-16)
 
 - (new) configuration via env variables
