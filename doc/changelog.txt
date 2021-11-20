@@ -1,4 +1,4 @@
-# upcoming
+# v2.2 (2021-11-20)
 
 - (fix) windows console support (thanks to @dufferzafar for the report)
 - (fix) remove html tags from article titles (thanks to Alex Went for the report)
