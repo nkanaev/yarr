@@ -1,1 +1,0 @@
-- feedlist keyboard navigation is flaky in "unread" section
