@@ -21,6 +21,12 @@ Vue.directive('scroll', {
   },
 })
 
+Vue.directive('focus', {
+  inserted: function(el) {
+    el.focus()
+  }
+})
+
 Vue.component('drag', {
   props: ['width'],
   template: '<div class="drag"></div>',
