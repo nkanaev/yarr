@@ -350,6 +350,8 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .content img, .content video {
+  display: block;
+  margin: 1rem auto;
   max-width: 100%;
   height: auto;
 }
@@ -587,5 +589,14 @@ a,
   .toolbar-item,
   .toolbar-search {
     padding: .5rem;
+  }
+  #col-item-toolbar {
+    position: fixed;
+    inset: auto 0 0 0;
+    border-top: 1px solid #dee2e6 !important;
+    background: #fff;
+  }
+  #col-item-toolbar .toolbar-item {
+    padding: 1rem;
   }
 }

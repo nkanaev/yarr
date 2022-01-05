@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="./static/stylesheets/app.css">
     <link rel="icon shortcut" href="./static/graphicarts/icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="white">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
     <script>
         window.app = window.app || {}
         window.app.settings = {% .settings %}
@@ -288,19 +292,7 @@
         <!-- item show -->
         <div id="col-item" class="vh-100 d-flex flex-column w-100" style="min-width: 0;">
             <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
-                <button class="toolbar-item"
-                        @click="toggleItemStarred(itemSelectedDetails)"
-                        title="Mark Starred">
-                    <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
-                    <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
-                </button>
-                <button class="toolbar-item"
-                        title="Mark Unread"
-                        @click="toggleItemRead(itemSelectedDetails)">
-                    <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
-                    <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
-                </button>
-                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" title="Appearance">
+                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" title="Appearance">
                     <template v-slot:button>
                         <span class="icon">{% inline "sliders.svg" %}</span>
                     </template>
@@ -314,15 +306,43 @@
                         <button class="dropdown-item" style="font-size: 1.2rem" @click.stop="incrFont(1)">A</button>
                     </div>
                 </dropdown>
-                <button class="toolbar-item"
-                        :class="{active: itemSelectedReadability}"
-                        @click="toggleReadability()"
-                        title="Read Here">
-                    <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
-                </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" title="Open Link">
-                    <span class="icon">{% inline "external-link.svg" %}</span>
-                </a>
+                <div id="col-item-toolbar" class="flex-grow-1 d-flex">
+                    <button class="toolbar-item mr-2 d-block d-lg-none"
+                            @click="helperFunctions.navigateToItem(-1);"
+                            :disabled="itemSelected == items.at(0).id"
+                            title="Previous article">
+                        <span class="icon">{% inline "chevron-left.svg" %}</span>
+                    </button>
+                    <div class="flex-grow-1 d-lg-none"></div>
+                    <button class="toolbar-item"
+                            @click="toggleItemStarred(itemSelectedDetails)"
+                            title="Mark Starred">
+                        <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
+                        <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
+                    </button>
+                    <button class="toolbar-item"
+                            title="Mark Unread"
+                            @click="toggleItemRead(itemSelectedDetails)">
+                        <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
+                        <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
+                    </button>
+                    <button class="toolbar-item"
+                            :class="{active: itemSelectedReadability}"
+                            @click="toggleReadability()"
+                            title="Read Here">
+                        <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
+                    </button>
+                    <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" title="Open Link">
+                        <span class="icon">{% inline "external-link.svg" %}</span>
+                    </a>
+                    <div class="flex-grow-1 d-lg-none"></div>
+                    <button class="toolbar-item mr-2 d-block d-lg-none"
+                            @click="helperFunctions.navigateToItem(+1);"
+                            :disabled="itemSelected == items.at(-1).id && (!this.itemsHasMore || refreshItems(true))"
+                            title="Next article">
+                        <span class="icon">{% inline "chevron-right.svg" %}</span>
+                    </button>
+                </div>
                 <div class="flex-grow-1"></div>
                 <button class="toolbar-item" @click="itemSelected=null" title="Close Article">
                     <span class="icon">{% inline "x.svg" %}</span>
