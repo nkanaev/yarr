@@ -1,0 +1,37 @@
+{
+    "short_name": "yarr!",
+    "name": "yarr!",
+    "description": "yarr (yet another rss reader) is a web-based feed aggregator which can be used both as a desktop application and a personal self-hosted server.",
+    "icons": [
+        {
+          "src": "/static/graphicarts/icon-48.png",
+          "type": "image/png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/static/graphicarts/icon-64.png",
+          "type": "image/png",
+          "sizes": "64x64"
+        },
+        {
+          "src": "/static/graphicarts/icon-128.png",
+          "type": "image/png",
+          "sizes": "128x128"
+        },
+        {
+          "src": "/static/graphicarts/icon-256.png",
+          "type": "image/png",
+          "sizes": "256x256"
+        },
+        {
+          "src": "/static/graphicarts/icon-512.png",
+          "type": "image/png",
+          "sizes": "512x512"
+        }
+    ],
+    "display": "standalone",
+    "start_url": "/",
+    "scope": "/",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff"
+  }

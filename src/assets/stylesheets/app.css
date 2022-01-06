@@ -593,10 +593,18 @@ a,
   #col-item-toolbar {
     position: fixed;
     inset: auto 0 0 0;
-    border-top: 1px solid #dee2e6 !important;
+    border-top: 1px solid #dee2e6;
     background: #fff;
   }
   #col-item-toolbar .toolbar-item {
     padding: 1rem;
+  }
+  .theme-sepia #col-item-toolbar {
+    border-color: #e0d6ba;
+    background: #f4f0e5;
+  }
+  .theme-night #col-item-toolbar {
+    border-color: #1a1a1a;
+    background: #0e0e0e;
   }
 }

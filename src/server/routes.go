@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"io"
 
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/content/readability"
@@ -39,6 +40,7 @@ func (s *Server) handler() http.Handler {
 	}
 
 	r.For("/", s.handleIndex)
+	r.For("/sw.js", s.handleServiceWorker)
 	r.For("/static/*path", s.handleStatic)
 	r.For("/api/status", s.handleStatus)
 	r.For("/api/folders", s.handleFolderList)
@@ -64,6 +66,13 @@ func (s *Server) handleIndex(c *router.Context) {
 		"settings":      s.db.GetSettings(),
 		"authenticated": s.Username != "" && s.Password != "",
 	})
+}
+
+func (s *Server) handleServiceWorker(c *router.Context) {
+	c.Out.Header().Set("Content-Type", "application/javascript")
+	c.Out.WriteHeader(http.StatusOK)
+	file, _ := assets.FS.Open("javascripts/sw.js")
+	io.Copy(c.Out, file)
 }
 
 func (s *Server) handleStatic(c *router.Context) {

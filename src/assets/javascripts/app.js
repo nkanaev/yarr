@@ -1,6 +1,14 @@
 'use strict';
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
 var TITLE = document.title
+
+var refreshThemeColor = function() {
+  document.querySelector('meta[name=theme-color]').content = window.getComputedStyle(document.body).backgroundColor;
+}
 
 var debounce = function(callback, wait) {
   var timeout
@@ -184,6 +192,8 @@ Vue.component('relative-time', {
 
 var vm = new Vue({
   created: function() {
+    refreshThemeColor();
+
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
       .then(this.refreshItems.bind(this, false))
@@ -284,6 +294,7 @@ var vm = new Vue({
       deep: true,
       handler: function(theme) {
         document.body.classList.value = 'theme-' + theme.name
+        refreshThemeColor();
         api.settings.update({
           theme_name: theme.name,
           theme_font: theme.font,
