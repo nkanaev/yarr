@@ -347,6 +347,7 @@ select.form-control:not([multiple]):not([size]) {
 .content {
   overflow-wrap: break-word;
   line-height: 1.5;
+  padding-bottom: 5rem;
 }
 
 .content img, .content video {
@@ -583,12 +584,12 @@ a,
     cursor: default;
   }
   .toolbar {
-    min-height: 3rem !important;
-    max-height: 3rem !important;
+    min-height: 4rem !important;
+    max-height: 4rem !important;
   }
   .toolbar-item,
   .toolbar-search {
-    padding: .5rem;
+    padding: 1rem !important;
   }
   #col-item-toolbar {
     position: fixed;
@@ -597,7 +598,7 @@ a,
     background: #fff;
   }
   #col-item-toolbar .toolbar-item {
-    padding: 1rem;
+    padding: 1.5rem !important;
   }
   .theme-sepia #col-item-toolbar {
     border-color: #e0d6ba;

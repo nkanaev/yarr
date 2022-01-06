@@ -307,7 +307,7 @@
                     </div>
                 </dropdown>
                 <div id="col-item-toolbar" class="flex-grow-1 d-flex">
-                    <button class="toolbar-item mr-2 d-block d-lg-none"
+                    <button class="toolbar-item ml-2 d-block d-lg-none"
                             @click="helperFunctions.navigateToItem(-1);"
                             :disabled="itemSelected == items.at(0).id"
                             title="Previous article">
@@ -350,7 +350,7 @@
             </div>
             <div v-if="itemSelectedDetails"
                  ref="content"
-                 class="content px-4 pt-3 pb-5 border-top overflow-auto"
+                 class="content px-4 pt-3 border-top overflow-auto"
                  :class="{'font-serif': theme.font == 'serif', 'font-monospace': theme.font == 'monospace'}"
                  :style="{'font-size': theme.size + 'rem'}">
                 <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
