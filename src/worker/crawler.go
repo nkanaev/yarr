@@ -40,7 +40,7 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 		return nil, fmt.Errorf("status code %d", res.StatusCode)
 	}
 
-	body, err := httpBody(res)
+	body, err := ConvertToUTF8(res)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 		return nil, nil
 	}
 
-	body, err := httpBody(res)
+	body, err := ConvertToUTF8(res)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	return ConvertItems(feed.Items, f), nil
 }
 
-func httpBody(res *http.Response) (io.Reader, error) {
+func ConvertToUTF8(res *http.Response) (io.Reader, error) {
 	ctype := res.Header.Get("Content-Type")
 	if strings.Contains(ctype, "charset") {
 		return charset.NewReader(res.Body, ctype)

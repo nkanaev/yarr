@@ -334,7 +334,7 @@ func (s *Server) handleItemList(c *router.Context) {
 			items = items[:perPage]
 		}
 		c.JSON(http.StatusOK, map[string]interface{}{
-			"list": items,
+			"list":     items,
 			"has_more": hasMore,
 		})
 	} else if c.Req.Method == "PUT" {
@@ -463,8 +463,14 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	body, err := worker.ConvertToUTF8(res)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
 	defer res.Body.Close()
-	content, err := readability.ExtractContent(res.Body)
+	content, err := readability.ExtractContent(body)
 	if err != nil {
 		log.Print(err)
 		c.Out.WriteHeader(http.StatusNoContent)

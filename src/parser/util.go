@@ -5,8 +5,6 @@ import (
 	"io"
 	"regexp"
 	"strings"
-
-	"golang.org/x/net/html/charset"
 )
 
 func firstNonEmpty(vals ...string) string {
@@ -30,6 +28,6 @@ func plain2html(text string) string {
 func xmlDecoder(r io.Reader) *xml.Decoder {
 	decoder := xml.NewDecoder(r)
 	decoder.Strict = false
-	decoder.CharsetReader = charset.NewReaderLabel
+	decoder.CharsetReader = func(charset string, reader io.Reader) (io.Reader, error) { return reader, nil }
 	return decoder
 }
