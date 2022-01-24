@@ -1,6 +1,6 @@
 # upcoming
 
-- (fix) encoding handling fully rewritten (thanks to @f100024 for the report)
+- (fix) encoding handling fully rewritten (thanks to @f100024 & @fserb)
 - (etc) autofocus when adding a new feed (thanks to @lakuapik)
 
 # v2.2 (2021-11-20)
