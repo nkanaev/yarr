@@ -11,19 +11,22 @@ import (
 	"time"
 
 	"github.com/nkanaev/yarr/src/content/htmlutil"
+	"golang.org/x/net/html/charset"
 )
 
 var UnknownFormat = errors.New("unknown feed format")
 
 type processor func(r io.Reader) (*Feed, error)
 
-func sniff(lookup string) (string, processor) {
+func sniff(lookup string) (string, bool, processor) {
 	lookup = strings.TrimSpace(lookup)
 	lookup = strings.TrimLeft(lookup, "\x00\xEF\xBB\xBF\xFE\xFF")
 
-	if len(lookup) < 0 {
-		return "", nil
+	if len(lookup) == 0 {
+		return "", false, nil
 	}
+
+	var decode bool
 
 	switch lookup[0] {
 	case '<':
@@ -33,24 +36,32 @@ func sniff(lookup string) (string, processor) {
 			if token == nil {
 				break
 			}
+			// check for absence of xml encoding <?xml encoding="ENCODING" ?>
+			if el, ok := token.(xml.ProcInst); ok && el.Target == "xml" {
+				decode = strings.Index(string(el.Inst), "encoding=") == -1
+			}
 			if el, ok := token.(xml.StartElement); ok {
 				switch el.Name.Local {
 				case "rss":
-					return "rss", ParseRSS
+					return "rss", decode, ParseRSS
 				case "RDF":
-					return "rdf", ParseRDF
+					return "rdf", decode, ParseRDF
 				case "feed":
-					return "atom", ParseAtom
+					return "atom", decode, ParseAtom
 				}
 			}
 		}
 	case '{':
-		return "json", ParseJSON
+		return "json", true, ParseJSON
 	}
-	return "", nil
+	return "", false, nil
 }
 
 func Parse(r io.Reader) (*Feed, error) {
+	return ParseWithEncoding(r, "")
+}
+
+func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
 	lookup := make([]byte, 2048)
 	n, err := io.ReadFull(r, lookup)
 	switch {
@@ -63,9 +74,16 @@ func Parse(r io.Reader) (*Feed, error) {
 		r = io.MultiReader(bytes.NewReader(lookup), r)
 	}
 
-	_, callback := sniff(string(lookup))
+	_, decode, callback := sniff(string(lookup))
 	if callback == nil {
 		return nil, UnknownFormat
+	}
+
+	if decode && fallbackEncoding != "" {
+		r, err = charset.NewReaderLabel(fallbackEncoding, r)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	feed, err := callback(r)
@@ -75,8 +93,8 @@ func Parse(r io.Reader) (*Feed, error) {
 	return feed, err
 }
 
-func ParseAndFix(r io.Reader, baseURL string) (*Feed, error) {
-	feed, err := Parse(r)
+func ParseAndFix(r io.Reader, baseURL, fallbackEncoding string) (*Feed, error) {
+	feed, err := ParseWithEncoding(r, fallbackEncoding)
 	if err != nil {
 		return nil, err
 	}

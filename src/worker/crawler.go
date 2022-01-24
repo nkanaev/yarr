@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"net/url"
 	"strings"
@@ -38,18 +39,15 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	if res.StatusCode != 200 {
 		return nil, fmt.Errorf("status code %d", res.StatusCode)
 	}
+	cs := getCharset(res)
 
-	body, err := httpBody(res)
-	if err != nil {
-		return nil, err
-	}
-	content, err := ioutil.ReadAll(body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	// Try to feed into parser
-	feed, err := parser.ParseAndFix(bytes.NewReader(content), candidateUrl)
+	feed, err := parser.ParseAndFix(bytes.NewReader(body), candidateUrl, cs)
 	if err == nil {
 		result.Feed = feed
 		result.FeedLink = candidateUrl
@@ -57,8 +55,16 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	}
 
 	// Possibly an html link. Search for feed links
+	content := string(body)
+	if cs != "" {
+		if r, err := charset.NewReaderLabel(cs, bytes.NewReader(body)); err == nil {
+			if body, err := io.ReadAll(r); err == nil {
+				content = string(body)
+			}
+		}
+	}
 	sources := make([]FeedSource, 0)
-	for url, title := range scraper.FindFeeds(string(content), candidateUrl) {
+	for url, title := range scraper.FindFeeds(content, candidateUrl) {
 		sources = append(sources, FeedSource{Title: title, Url: url})
 	}
 	switch {
@@ -184,12 +190,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 		return nil, nil
 	}
 
-	body, err := httpBody(res)
-	if err != nil {
-		return nil, err
-	}
-
-	feed, err := parser.ParseAndFix(body, f.FeedLink)
+	feed, err := parser.ParseAndFix(res.Body, f.FeedLink, getCharset(res))
 	if err != nil {
 		return nil, err
 	}
@@ -202,14 +203,39 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	return ConvertItems(feed.Items, f), nil
 }
 
-func httpBody(res *http.Response) (io.ReadCloser, error) {
+func getCharset(res *http.Response) string {
+	contentType := res.Header.Get("Content-Type")
+	if _, params, err := mime.ParseMediaType(contentType); err == nil {
+		if cs, ok := params["charset"]; ok {
+			if e, _ := charset.Lookup(cs); e != nil {
+				return cs
+			}
+		}
+	}
+	return ""
+}
+
+func GetBody(url string) (string, error) {
+	res, err := client.get(url)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	var r io.Reader
+
 	ctype := res.Header.Get("Content-Type")
 	if strings.Contains(ctype, "charset") {
-		reader, err := charset.NewReader(res.Body, ctype)
+		r, err = charset.NewReader(res.Body, ctype)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
-		return io.NopCloser(reader), nil
+	} else {
+		r = res.Body
 	}
-	return res.Body, nil
+	body, err := io.ReadAll(r)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }

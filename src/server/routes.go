@@ -457,14 +457,13 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		return
 	}
 
-	res, err := worker.GetHTTP(url)
+	body, err := worker.GetBody(url)
 	if err != nil {
 		log.Print(err)
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	defer res.Body.Close()
-	content, err := readability.ExtractContent(res.Body)
+	content, err := readability.ExtractContent(strings.NewReader(body))
 	if err != nil {
 		log.Print(err)
 		c.Out.WriteHeader(http.StatusNoContent)

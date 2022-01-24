@@ -50,16 +50,3 @@ func init() {
 		userAgent:  "Yarr/1.0",
 	}
 }
-
-func GetHTTP(url string) (*http.Response, error) {
-	res, err := client.get(url)
-	if err != nil {
-		return nil, err
-	}
-	body, err := httpBody(res)
-	if err != nil {
-		return nil, err
-	}
-	res.Body = body
-	return res, nil
-}
