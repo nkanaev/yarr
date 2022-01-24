@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/nkanaev/yarr/src/content/scraper"
 	"github.com/nkanaev/yarr/src/parser"
@@ -50,10 +49,8 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	}
 
 	// Try to feed into parser
-	feed, err := parser.Parse(bytes.NewReader(content))
+	feed, err := parser.ParseAndFix(bytes.NewReader(content), candidateUrl)
 	if err == nil {
-		feed.TranslateURLs(candidateUrl)
-		feed.SetMissingDatesTo(time.Now())
 		result.Feed = feed
 		result.FeedLink = candidateUrl
 		return result, nil
@@ -192,7 +189,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 		return nil, err
 	}
 
-	feed, err := parser.Parse(body)
+	feed, err := parser.ParseAndFix(body, f.FeedLink)
 	if err != nil {
 		return nil, err
 	}
@@ -202,8 +199,6 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	if lmod != "" || etag != "" {
 		db.SetHTTPState(f.Id, lmod, etag)
 	}
-	feed.TranslateURLs(f.FeedLink)
-	feed.SetMissingDatesTo(time.Now())
 	return ConvertItems(feed.Items, f), nil
 }
 

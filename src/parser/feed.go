@@ -75,6 +75,16 @@ func Parse(r io.Reader) (*Feed, error) {
 	return feed, err
 }
 
+func ParseAndFix(r io.Reader, baseURL string) (*Feed, error) {
+	feed, err := Parse(r)
+	if err != nil {
+		return nil, err
+	}
+	feed.TranslateURLs(baseURL)
+	feed.SetMissingDatesTo(time.Now())
+	return feed, nil
+}
+
 func (feed *Feed) cleanup() {
 	feed.Title = strings.TrimSpace(feed.Title)
 	feed.SiteURL = strings.TrimSpace(feed.SiteURL)
