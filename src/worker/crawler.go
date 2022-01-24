@@ -202,10 +202,14 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	return ConvertItems(feed.Items, f), nil
 }
 
-func httpBody(res *http.Response) (io.Reader, error) {
+func httpBody(res *http.Response) (io.ReadCloser, error) {
 	ctype := res.Header.Get("Content-Type")
 	if strings.Contains(ctype, "charset") {
-		return charset.NewReader(res.Body, ctype)
+		reader, err := charset.NewReader(res.Body, ctype)
+		if err != nil {
+			return nil, err
+		}
+		return io.NopCloser(reader), nil
 	}
 	return res.Body, nil
 }

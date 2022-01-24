@@ -457,7 +457,7 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		return
 	}
 
-	res, err := http.Get(url)
+	res, err := worker.GetHTTP(url)
 	if err != nil {
 		log.Print(err)
 		c.Out.WriteHeader(http.StatusBadRequest)
