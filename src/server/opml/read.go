@@ -3,6 +3,8 @@ package opml
 import (
 	"encoding/xml"
 	"io"
+
+	"golang.org/x/net/html/charset"
 )
 
 type opml struct {
@@ -45,6 +47,7 @@ func Parse(r io.Reader) (Folder, error) {
 	decoder := xml.NewDecoder(r)
 	decoder.Entity = xml.HTMLEntity
 	decoder.Strict = false
+	decoder.CharsetReader = charset.NewReaderLabel
 
 	err := decoder.Decode(&val)
 	if err != nil {

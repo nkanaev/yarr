@@ -1,6 +1,7 @@
 package opml
 
 import (
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -80,6 +81,44 @@ func TestParseFallback(t *testing.T) {
 				{Title: "feedtext", FeedUrl: "https://example.com/feed.xml", SiteUrl: "https://example.com"},
 			},
 		}},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid opml")
+	}
+}
+
+func TestParseWithEncoding(t *testing.T) {
+	file, err := os.Open("sample_win1251.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	have, err := Parse(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := Folder{
+		Title: "",
+		Feeds: []Feed{
+			{
+				Title:   "пример1",
+				FeedUrl: "https://baz.com/feed.xml",
+				SiteUrl: "https://baz.com/",
+			},
+		},
+		Folders: []Folder{
+			{
+				Title: "папка",
+				Feeds: []Feed{
+					{
+						Title:   "пример2",
+						FeedUrl: "https://foo.com/feed.xml",
+						SiteUrl: "https://foo.com/",
+					},
+				},
+			},
+		},
 	}
 	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %#v", want)

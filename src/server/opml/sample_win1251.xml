@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<opml version="1.1">
+<head><title>Заголовок</title></head>
+<body>
+    <outline text="папка">
+        <outline type="rss" text="пример2" description="пример2" xmlUrl="https://foo.com/feed.xml" htmlUrl="https://foo.com/"/>
+    </outline>
+    <outline type="rss" text="пример1" description="пример1" xmlUrl="https://baz.com/feed.xml" htmlUrl="https://baz.com/"/>
+</body>
+</opml>
