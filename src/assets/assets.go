@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/fs"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -29,9 +30,18 @@ func Template(path string) *template.Template {
 	if !found {
 		tmpl = template.Must(template.New(path).Delims("{%", "%}").Funcs(template.FuncMap{
 			"inline": func(svg string) template.HTML {
-				svgfile, _ := FS.Open("graphicarts/" + svg)
-				content, _ := ioutil.ReadAll(svgfile)
-				svgfile.Close()
+				svgfile, err := FS.Open("graphicarts/" + svg)
+				// should never happen
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer svgfile.Close()
+
+				content, err := ioutil.ReadAll(svgfile)
+				// should never happen
+				if err != nil {
+					log.Fatal(err)
+				}
 				return template.HTML(content)
 			},
 		}).ParseFS(FS, path))
