@@ -3,6 +3,7 @@ package storage
 import (
 	"log"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -45,14 +46,14 @@ func testItemsSetup(db *Storage) testItemScope {
 	db.CreateItems([]Item{
 		// feed11
 		{GUID: "item111", FeedId: feed11.Id, Title: "title111", Date: now.Add(time.Hour * 24 * 1)},
-		{GUID: "item112", FeedId: feed11.Id, Title: "title112", Date: now.Add(time.Hour * 24 * 2)},  // read
-		{GUID: "item113", FeedId: feed11.Id, Title: "title113", Date: now.Add(time.Hour * 24 * 3)},  // starred
+		{GUID: "item112", FeedId: feed11.Id, Title: "title112", Date: now.Add(time.Hour * 24 * 2)}, // read
+		{GUID: "item113", FeedId: feed11.Id, Title: "title113", Date: now.Add(time.Hour * 24 * 3)}, // starred
 		// feed12
 		{GUID: "item121", FeedId: feed12.Id, Title: "title121", Date: now.Add(time.Hour * 24 * 4)},
-		{GUID: "item122", FeedId: feed12.Id, Title: "title122", Date: now.Add(time.Hour * 24 * 5)},  // read
+		{GUID: "item122", FeedId: feed12.Id, Title: "title122", Date: now.Add(time.Hour * 24 * 5)}, // read
 		// feed21
-		{GUID: "item211", FeedId: feed21.Id, Title: "title211", Date: now.Add(time.Hour * 24 * 6)},  // read
-		{GUID: "item212", FeedId: feed21.Id, Title: "title212", Date: now.Add(time.Hour * 24 * 7)},  // starred
+		{GUID: "item211", FeedId: feed21.Id, Title: "title211", Date: now.Add(time.Hour * 24 * 6)}, // read
+		{GUID: "item212", FeedId: feed21.Id, Title: "title212", Date: now.Add(time.Hour * 24 * 7)}, // starred
 		// feed01
 		{GUID: "item011", FeedId: feed01.Id, Title: "title011", Date: now.Add(time.Hour * 24 * 8)},
 		{GUID: "item012", FeedId: feed01.Id, Title: "title012", Date: now.Add(time.Hour * 24 * 9)},  // read
@@ -269,5 +270,59 @@ func TestMarkItemsRead(t *testing.T) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)
 		t.Fail()
+	}
+}
+
+func TestDeleteOldItems(t *testing.T) {
+	extraItems := 10
+
+	now := time.Now()
+	db := testDB()
+	feed := db.CreateFeed("feed", "", "", "http://test.com/feed11.xml", nil)
+
+	items := make([]Item, 0)
+	for i := 0; i < itemsKeepSize+extraItems; i++ {
+		istr := strconv.Itoa(i)
+		items = append(items, Item{
+			GUID:   istr,
+			FeedId: feed.Id,
+			Title:  istr,
+			Date:   now.Add(time.Hour * time.Duration(i)),
+		})
+	}
+	db.CreateItems(items)
+	
+	db.SetFeedSize(feed.Id, len(items))
+	var feedSize int
+	err := db.db.QueryRow(
+		`select size from feed_sizes where feed_id = ?`, feed.Id,
+	).Scan(&feedSize)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if feedSize != itemsKeepSize+extraItems {
+		t.Fatalf(
+			"expected feed size to get updated\nwant: %d\nhave: %d", 
+			itemsKeepSize+extraItems,
+			feedSize,
+		)
+	}
+
+	_, err = db.db.Exec(
+		`update items set date_arrived = ?`,
+		now.Add(-time.Hour*time.Duration(itemsKeepDays*24)),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	db.DeleteOldItems()
+	feedItems := db.ListItems(ItemFilter{FeedID: &feed.Id}, 1000, false)
+	if len(feedItems) != itemsKeepSize {
+		t.Fatalf(
+			"invalid number of old items kept\nwant: %d\nhave: %d",
+			itemsKeepSize,
+			len(feedItems),
+		)
 	}
 }

@@ -292,6 +292,13 @@ func (s *Storage) SyncSearch() {
 	}
 }
 
+
+// TODO: better naming
+var (
+	itemsKeepSize = 100
+	itemsKeepDays = 90
+)
+
 func (s *Storage) DeleteOldItems() {
 	rows, err := s.db.Query(fmt.Sprintf(`
 		select feed_id, count(*) as num_items
@@ -318,7 +325,7 @@ func (s *Storage) DeleteOldItems() {
 			delete from items where feed_id = ? and status != ? and date_arrived < ?`,
 			feedId,
 			STARRED,
-			time.Now().Add(-time.Hour*24*90), // 90 days
+			time.Now().Add(-time.Hour*time.Duration(24*itemsKeepDays)),
 		)
 		if err != nil {
 			log.Print(err)

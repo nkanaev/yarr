@@ -13,6 +13,7 @@ var migrations = []func(*sql.Tx) error{
 	m04_item_podcasturl,
 	m05_move_description_to_content,
 	m06_fill_missing_dates,
+	m07_add_feed_size,
 }
 
 var maxVersion = int64(len(migrations))
@@ -255,6 +256,17 @@ func m05_move_description_to_content(tx *sql.Tx) error {
 func m06_fill_missing_dates(tx *sql.Tx) error {
 	sql := `
 		update items set date = 0 where date is null;
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m07_add_feed_size(tx *sql.Tx) error {
+	sql := `
+		create table if not exists feed_sizes (
+		 feed_id        references feeds(id) unique,
+		 size           integer not null default 0
+		);
 	`
 	_, err := tx.Exec(sql)
 	return err
