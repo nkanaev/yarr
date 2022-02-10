@@ -61,7 +61,7 @@ type ItemFilter struct {
 	FeedID   *int64
 	Status   *ItemStatus
 	Search   *string
-	After  *int64
+	After    *int64
 }
 
 type MarkFilter struct {
@@ -292,52 +292,70 @@ func (s *Storage) SyncSearch() {
 	}
 }
 
-
-// TODO: better naming
 var (
 	itemsKeepSize = 100
 	itemsKeepDays = 90
 )
 
+// Delete old articles from the database to cleanup space.
+//
+// The rules:
+// * Never delete starred entries
+// * Take each feed capacity (number of entries provided by the feed)
+//   into account (see `SetFeedSize`, default: 100).
+//   This prevents old items from reappearing after the cleanup.
+// * Keep entries for a certain period (default: 90 days).
 func (s *Storage) DeleteOldItems() {
-	rows, err := s.db.Query(fmt.Sprintf(`
-		select feed_id, count(*) as num_items
-		from items
-		where status != %d
-		group by feed_id
-		having num_items > 50
-	`, STARRED))
+	rows, err := s.db.Query(`
+		select
+			i.feed_id,
+			max(coalesce(s.size, 0), ?) as max_items,
+			count(*) as num_items
+		from items i
+		left outer join feed_sizes s on s.feed_id = i.feed_id
+		where status != ?
+		group by i.feed_id
+	`, itemsKeepSize, STARRED)
 
 	if err != nil {
 		log.Print(err)
 		return
 	}
 
-	feedIds := make([]int64, 0)
+	feedLimits := make(map[int64]int64, 0)
 	for rows.Next() {
-		var id int64
-		rows.Scan(&id, nil)
-		feedIds = append(feedIds, id)
+		var feedId, limit int64
+		rows.Scan(&feedId, &limit, nil)
+		feedLimits[feedId] = limit
 	}
 
-	for _, feedId := range feedIds {
+	for feedId, limit := range feedLimits {
 		result, err := s.db.Exec(`
-			delete from items where feed_id = ? and status != ? and date_arrived < ?`,
+			delete from items
+			where id in (
+				select i.id
+				from items i
+				where i.feed_id = ? and status != ?
+				order by date desc
+				limit -1 offset ?
+			) and date_arrived < ?
+			`,
 			feedId,
 			STARRED,
+			limit,
 			time.Now().Add(-time.Hour*time.Duration(24*itemsKeepDays)),
 		)
 		if err != nil {
 			log.Print(err)
 			return
 		}
-		num, err := result.RowsAffected()
+		numDeleted, err := result.RowsAffected()
 		if err != nil {
 			log.Print(err)
 			return
 		}
-		if num > 0 {
-			log.Printf("Deleted %d old items (%d)", num, feedId)
+		if numDeleted > 0 {
+			log.Printf("Deleted %d old items (feed: %d)", numDeleted, feedId)
 		}
 	}
 }
