@@ -264,7 +264,7 @@ func m06_fill_missing_dates(tx *sql.Tx) error {
 func m07_add_feed_size(tx *sql.Tx) error {
 	sql := `
 		create table if not exists feed_sizes (
-		 feed_id        references feeds(id) unique,
+		 feed_id        references feeds(id) on delete cascade unique,
 		 size           integer not null default 0
 		);
 	`
