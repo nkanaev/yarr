@@ -219,7 +219,11 @@ func (s *Server) handleFeedList(c *router.Context) {
 				result.FeedLink,
 				form.FolderID,
 			)
-			s.db.CreateItems(worker.ConvertItems(result.Feed.Items, *feed))
+			items := worker.ConvertItems(result.Feed.Items, *feed)
+			if len(items) > 0 {
+				s.db.CreateItems(items)
+				s.db.SetFeedSize(feed.Id, len(items))
+			}
 			s.worker.FindFeedFavicon(*feed)
 
 			c.JSON(http.StatusOK, map[string]interface{}{

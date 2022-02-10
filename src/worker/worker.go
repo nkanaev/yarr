@@ -121,7 +121,11 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 		srcqueue <- feed
 	}
 	for i := 0; i < len(feeds); i++ {
-		w.db.CreateItems(<-dstqueue)
+		items := <-dstqueue
+		if len(items) > 0 {
+			w.db.CreateItems(items)
+			w.db.SetFeedSize(items[0].FeedId, len(items))
+		}
 		atomic.AddInt32(w.pending, -1)
 		w.db.SyncSearch()
 	}
