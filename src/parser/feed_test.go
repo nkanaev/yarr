@@ -34,7 +34,7 @@ func TestSniff(t *testing.T) {
 		},
 	}
 	for _, testcase := range testcases {
-		have, _ := sniff(testcase[0])
+		have, _, _ := sniff(testcase[0])
 		want := testcase[1]
 		if want != have {
 			t.Log(testcase[0])
