@@ -54,6 +54,7 @@ type Item struct {
 	Status   ItemStatus `json:"status"`
 	ImageURL *string    `json:"image"`
 	AudioURL *string    `json:"podcast_url"`
+	Author   string     `json:"author"`
 }
 
 type ItemFilter struct {
@@ -83,13 +84,14 @@ func (s *Storage) CreateItems(items []Item) bool {
 			insert into items (
 				guid, feed_id, title, link, date,
 				content, image, podcast_url,
-				date_arrived, status
+				date_arrived, status,
+				author
 			)
-			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			on conflict (feed_id, guid) do nothing`,
 			item.GUID, item.FeedId, item.Title, item.Link, item.Date,
 			item.Content, item.ImageURL, item.AudioURL,
-			now, UNREAD,
+			now, UNREAD, item.Author,
 		)
 		if err != nil {
 			log.Print(err)
@@ -194,12 +196,14 @@ func (s *Storage) GetItem(id int64) *Item {
 	err := s.db.QueryRow(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
-			i.date, i.status, i.image, i.podcast_url
+			i.date, i.status, i.image, i.podcast_url,
+			i.author
 		from items i
 		where i.id = ?
 	`, id).Scan(
 		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
 		&i.Date, &i.Status, &i.ImageURL, &i.AudioURL,
+		&i.Author,
 	)
 	if err != nil {
 		log.Print(err)

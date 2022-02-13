@@ -34,6 +34,9 @@ type rssItem struct {
 	OrigEnclosureLink string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origEnclosureLink"`
 
 	media
+
+	DublinCoreCreator string `xml:"http://purl.org/dc/elements/1.1/ creator"`
+	Author            string `xml:"author"`
 }
 
 type rssLink struct {
@@ -81,6 +84,11 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			}
 		}
 
+		author := srcitem.DublinCoreCreator
+		if len(author) == 0 {
+			author = srcitem.Author
+		}
+
 		dstfeed.Items = append(dstfeed.Items, Item{
 			GUID:     firstNonEmpty(srcitem.GUID, srcitem.Link),
 			Date:     dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
@@ -89,6 +97,7 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			Content:  firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
 			AudioURL: podcastURL,
 			ImageURL: srcitem.firstMediaThumbnail(),
+			Author:   author,
 		})
 	}
 	return dstfeed, nil

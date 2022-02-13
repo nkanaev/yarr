@@ -343,6 +343,7 @@
                 <div class="text-muted">
                     <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
                     <time>{{ formatDate(itemSelectedDetails.date) }}</time>
+                    <div v-html="itemSelectedDetails.author"></div>
                 </div>
                 <hr>
                 <div v-if="!itemSelectedReadability">

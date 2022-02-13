@@ -161,6 +161,7 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 			Status:   storage.UNREAD,
 			ImageURL: imageURL,
 			AudioURL: audioURL,
+			Author:   item.Author,
 		}
 	}
 	return result

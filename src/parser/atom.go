@@ -29,6 +29,8 @@ type atomEntry struct {
 	OrigLink  string    `xml:"http://rssnamespace.org/feedburner/ext/1.0 origLink"`
 
 	media
+
+	Author string `xml:"author>name"`
 }
 
 type atomText struct {
@@ -90,6 +92,7 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 			Content:  firstNonEmpty(srcitem.Content.String(), srcitem.Summary.String(), srcitem.firstMediaDescription()),
 			ImageURL: srcitem.firstMediaThumbnail(),
 			AudioURL: "",
+			Author:   srcitem.Author,
 		})
 	}
 	return dstfeed, nil

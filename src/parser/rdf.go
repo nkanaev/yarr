@@ -22,6 +22,9 @@ type rdfItem struct {
 
 	DublinCoreDate string `xml:"http://purl.org/dc/elements/1.1/ date"`
 	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
+
+	DublinCoreCreator string `xml:"http://purl.org/dc/elements/1.1/ creator"`
+	Author            string `xml:"author"`
 }
 
 func ParseRDF(r io.Reader) (*Feed, error) {
@@ -37,12 +40,17 @@ func ParseRDF(r io.Reader) (*Feed, error) {
 		SiteURL: srcfeed.Link,
 	}
 	for _, srcitem := range srcfeed.Items {
+		author := srcitem.DublinCoreCreator
+		if len(author) == 0 {
+			author = srcitem.Author
+		}
 		dstfeed.Items = append(dstfeed.Items, Item{
 			GUID:    srcitem.Link,
 			URL:     srcitem.Link,
 			Date:    dateParse(srcitem.DublinCoreDate),
 			Title:   srcitem.Title,
 			Content: firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
+			Author:  author,
 		})
 	}
 	return dstfeed, nil
