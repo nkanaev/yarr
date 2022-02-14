@@ -9,3 +9,4 @@ hash:
 changes:
 
 -removed `getlantern/golog` dependency
+-prevent from compiling in linux
