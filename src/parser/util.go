@@ -2,11 +2,11 @@ package parser
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/xml"
 	"io"
 	"regexp"
 	"strings"
-	"unicode/utf8"
 
 	"golang.org/x/net/html/charset"
 )
@@ -37,50 +37,34 @@ func xmlDecoder(r io.Reader) *xml.Decoder {
 }
 
 type safexmlreader struct {
-	reader  *bufio.Reader
-	buffer  []byte
-	isEOF   bool
-	runebuf []byte
+	reader *bufio.Reader
+	buffer *bytes.Buffer
 }
 
 func NewSafeXMLReader(r io.Reader) io.Reader {
 	return &safexmlreader{
-		reader:  bufio.NewReader(r),
-		runebuf: make([]byte, 6),
+		reader: bufio.NewReader(r),
+		buffer: bytes.NewBuffer(make([]byte, 0, 4096)),
 	}
 }
 
 func (xr *safexmlreader) Read(p []byte) (int, error) {
-	if len(p) == 0 {
-		return 0, nil
-	}
-
-	for len(xr.buffer) < cap(p) {
+	for xr.buffer.Len() < cap(p) {
 		r, _, err := xr.reader.ReadRune()
 		if err == io.EOF {
-			xr.isEOF = true
+			if xr.buffer.Len() == 0 {
+				return 0, io.EOF
+			}
 			break
 		}
 		if err != nil {
 			return 0, err
 		}
 		if isInCharacterRange(r) {
-			size := utf8.EncodeRune(xr.runebuf, r)
-			xr.buffer = append(xr.buffer, xr.runebuf[:size]...)
+			xr.buffer.WriteRune(r)
 		}
 	}
-
-	if xr.isEOF && len(xr.buffer) == 0 {
-		return 0, io.EOF
-	}
-
-	n := cap(p)
-	if len(xr.buffer) < n {
-		n = len(xr.buffer)
-	}
-	copy(p, xr.buffer[:n])
-	xr.buffer = xr.buffer[n:]
-	return n, nil
+	return xr.buffer.Read(p)
 }
 
 // NOTE: copied from "encoding/xml" package
