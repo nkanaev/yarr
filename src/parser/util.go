@@ -30,9 +30,15 @@ func plain2html(text string) string {
 }
 
 func xmlDecoder(r io.Reader) *xml.Decoder {
-	decoder := xml.NewDecoder(NewSafeXMLReader(r))
+	decoder := xml.NewDecoder(r)
 	decoder.Strict = false
-	decoder.CharsetReader = charset.NewReaderLabel
+	decoder.CharsetReader = func(cs string, input io.Reader) (io.Reader, error) {
+		r, err := charset.NewReaderLabel(cs, input)
+		if err == nil {
+			r = NewSafeXMLReader(r)
+		}
+		return r, err
+	}
 	return decoder
 }
 
@@ -78,4 +84,29 @@ func isInCharacterRange(r rune) (inrange bool) {
 		r >= 0x20 && r <= 0xD7FF ||
 		r >= 0xE000 && r <= 0xFFFD ||
 		r >= 0x10000 && r <= 0x10FFFF
+}
+
+// NOTE: copied from "encoding/xml" package
+// procInst parses the `param="..."` or `param='...'`
+// value out of the provided string, returning "" if not found.
+func procInst(param, s string) string {
+	// TODO: this parsing is somewhat lame and not exact.
+	// It works for all actual cases, though.
+	param = param + "="
+	idx := strings.Index(s, param)
+	if idx == -1 {
+		return ""
+	}
+	v := s[idx+len(param):]
+	if v == "" {
+		return ""
+	}
+	if v[0] != '\'' && v[0] != '"' {
+		return ""
+	}
+	idx = strings.IndexRune(v[1:], rune(v[0]))
+	if idx == -1 {
+		return ""
+	}
+	return v[1 : idx+1]
 }
