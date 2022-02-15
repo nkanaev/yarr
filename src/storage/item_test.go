@@ -308,8 +308,10 @@ func TestDeleteOldItems(t *testing.T) {
 		)
 	}
 
+	// expire only the first 3 articles
 	_, err = db.db.Exec(
-		`update items set date_arrived = ?`,
+		`update items set date_arrived = ?
+		where id in (select id from items limit 3)`,
 		now.Add(-time.Hour*time.Duration(itemsKeepDays*24)),
 	)
 	if err != nil {
@@ -318,10 +320,10 @@ func TestDeleteOldItems(t *testing.T) {
 
 	db.DeleteOldItems()
 	feedItems := db.ListItems(ItemFilter{FeedID: &feed.Id}, 1000, false)
-	if len(feedItems) != itemsKeepSize {
+	if len(feedItems) != len(items)-3 {
 		t.Fatalf(
 			"invalid number of old items kept\nwant: %d\nhave: %d",
-			itemsKeepSize,
+			len(items)-3,
 			len(feedItems),
 		)
 	}
