@@ -2,6 +2,7 @@
 
 - (fix) handling encodings (thanks to @f100024 & @fserb)
 - (fix) parsing xml feeds with illegal characters (thanks to @stepelu for the report)
+- (fix) old articles reappearing as unread (thanks to @adaszko for the report)
 - (etc) autofocus when adding a new feed (thanks to @lakuapik)
 
 # v2.2 (2021-11-20)
