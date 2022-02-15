@@ -293,17 +293,17 @@ func (s *Storage) SyncSearch() {
 }
 
 var (
-	itemsKeepSize = 100
+	itemsKeepSize = 50
 	itemsKeepDays = 90
 )
 
 // Delete old articles from the database to cleanup space.
 //
 // The rules:
-// * Never delete starred entries
-// * Take each feed capacity (number of entries provided by the feed)
-//   into account (see `SetFeedSize`, default: 100).
-//   This prevents old items from reappearing after the cleanup.
+// * Never delete starred entries.
+// * Keep at least the same amount of articles the feed provides (default: 50).
+//   This prevents from deleting items for rarely updated and/or ever-growing
+//   feeds which might eventually reappear as unread.
 // * Keep entries for a certain period (default: 90 days).
 func (s *Storage) DeleteOldItems() {
 	rows, err := s.db.Query(`
