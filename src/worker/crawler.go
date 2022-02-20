@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"github.com/nkanaev/yarr/src/content/scraper"
 	"github.com/nkanaev/yarr/src/parser"
 	"github.com/nkanaev/yarr/src/storage"
@@ -161,7 +162,7 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 			Status:   storage.UNREAD,
 			ImageURL: imageURL,
 			AudioURL: audioURL,
-			Author:   item.Author,
+			Author:   htmlutil.ExtractText(item.Author),
 		}
 	}
 	return result
