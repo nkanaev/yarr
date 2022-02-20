@@ -20,6 +20,7 @@ func TestRSSFeed(t *testing.T) {
 				<title>Title 1</title>
 				<link>http://www.scripting.com/one/</link>
 				<description>Description 1</description>
+				<author>Doe John, Stelvio Runner</author>
 			</item>
 			<item>
 				<title>Title 2</title>
@@ -38,6 +39,7 @@ func TestRSSFeed(t *testing.T) {
 				URL:     "http://www.scripting.com/one/",
 				Title:   "Title 1",
 				Content: "Description 1",
+				Author:  "Doe John, Stelvio Runner",
 			},
 			{
 				GUID:    "http://www.scripting.com/two/",

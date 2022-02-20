@@ -47,6 +47,7 @@ func TestAtom(t *testing.T) {
 				Content:  `<div xmlns="http://www.w3.org/1999/xhtml"><p>This is the entry content.</p></div>`,
 				ImageURL: "",
 				AudioURL: "",
+				Author:   "John Doe",
 			},
 		},
 	}
