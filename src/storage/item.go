@@ -260,7 +260,7 @@ func (s *Storage) FeedStats() []FeedStat {
 
 func (s *Storage) SyncSearch() {
 	rows, err := s.db.Query(`
-		select id, title, content
+		select id, title, content, author
 		from items
 		where search_rowid is null;
 	`)
@@ -272,14 +272,14 @@ func (s *Storage) SyncSearch() {
 	items := make([]Item, 0)
 	for rows.Next() {
 		var item Item
-		rows.Scan(&item.Id, &item.Title, &item.Content)
+		rows.Scan(&item.Id, &item.Title, &item.Content, &item.Author)
 		items = append(items, item)
 	}
 
 	for _, item := range items {
 		result, err := s.db.Exec(`
-			insert into search (title, description, content) values (?, "", ?)`,
-			item.Title, htmlutil.ExtractText(item.Content),
+			insert into search (title, description, content, author) values (?, "", ?, ?)`,
+			item.Title, htmlutil.ExtractText(item.Content), item.Author,
 		)
 		if err != nil {
 			log.Print(err)

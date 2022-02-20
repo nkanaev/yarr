@@ -131,7 +131,7 @@ func m01_initial(tx *sql.Tx) error {
 		 val            blob
 		);
 
-		create virtual table if not exists search using fts4(title, description, content);
+		create virtual table if not exists search using fts4(title, description, content, author);
 
 		create trigger if not exists del_item_search after delete on items begin
 		  delete from search where rowid = old.search_rowid;
