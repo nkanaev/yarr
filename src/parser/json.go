@@ -63,7 +63,7 @@ func ParseJSON(data io.Reader) (*Feed, error) {
 			URL:     srcitem.URL,
 			Title:   srcitem.Title,
 			Content: firstNonEmpty(srcitem.HTML, srcitem.Text, srcitem.Summary),
-			Author:  strings.Join(authors, ","),
+			Author:  strings.Join(authors, ", "),
 		})
 	}
 	return dstfeed, nil
