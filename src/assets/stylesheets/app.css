@@ -85,6 +85,10 @@ select.form-control:not([multiple]):not([size]) {
   outline: none;
 }
 
+.table-compact {
+  color: unset !important;
+}
+
 .table-compact tr td:first-child {
   padding-left: 0;
 }
