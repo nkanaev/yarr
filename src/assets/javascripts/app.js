@@ -419,7 +419,7 @@ var vm = new Vue({
       }
 
       this.loading.items = true
-      return api.items.list(query).then(function(data) {
+      api.items.list(query).then(function(data) {
         if (loadMore) {
           vm.items = vm.items.concat(data.list)
         } else {
@@ -427,14 +427,24 @@ var vm = new Vue({
         }
         vm.itemsHasMore = data.has_more
         vm.loading.items = false
+
+        // load more if there's some space left at the bottom of the item list.
+        vm.$nextTick(function() {
+          if (vm.itemsHasMore && !vm.loading.items && vm.itemListCloseToBottom()) {
+            vm.refreshItems(true)
+          }
+        })
       })
+    },
+    itemListCloseToBottom: function() {
+      var el = this.$refs.itemlist
+      var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < 50
+      return closeToBottom
     },
     loadMoreItems: function(event, el) {
       if (!this.itemsHasMore) return
-
       if (this.loading.items) return
-      var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < 50
-      if (closeToBottom) this.refreshItems(true)
+      if (this.itemListCloseToBottom()) this.refreshItems(true)
     },
     markItemsRead: function() {
       var query = this.getItemsQuery()
