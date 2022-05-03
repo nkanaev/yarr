@@ -3,7 +3,7 @@
 - (fix) handling encodings (thanks to @f100024 & @fserb)
 - (fix) parsing xml feeds with illegal characters (thanks to @stepelu for the report)
 - (fix) old articles reappearing as unread (thanks to @adaszko for the report)
-- (fix) item list not scrolling on large screens (thanks to @bielej for the report)
+- (fix) item list scrolling issue on large screens (thanks to @bielej for the report)
 - (fix) keyboard shortcuts color in dark mode (thanks to @John09f9 for the report)
 - (etc) autofocus when adding a new feed (thanks to @lakuapik)
 
