@@ -1,3 +1,7 @@
+# upcoming
+
+- (new) ARM building support (thanks to @tillcash & @fenuks)
+
 # v2.3 (2022-05-03)
 
 - (fix) handling encodings (thanks to @f100024 & @fserb)
