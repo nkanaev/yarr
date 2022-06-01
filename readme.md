@@ -45,7 +45,7 @@ and pasting the content:
     Categories=Internet;
 
 For self-hosting, see `yarr -h` for auth, tls & server configuration flags.
-For building from source code, see [doc/build.md](doc/build.md)
+For building from source code, see [build.md](build.md)
 
 ## credits
 
