@@ -32,10 +32,13 @@ func (r *Router) Use(h Handler) {
 }
 
 func (r *Router) For(path string, handler Handler) {
+    chain := make([]Handler, 0)
+    chain = append(chain, r.middle...)
+    chain = append(chain, handler)
+
 	x := Route{}
 	x.regex = routeRegexp(path)
-	x.chain = append(r.middle, handler)
-
+	x.chain = chain
 	r.routes = append(r.routes, x)
 }
 
