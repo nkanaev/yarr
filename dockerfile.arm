@@ -5,7 +5,9 @@ RUN apt update
 RUN apt install -y \
         wget build-essential \
         gcc-aarch64-linux-gnu \
-        binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg
+        binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg \
+        gcc-arm-linux-gnueabihf \
+        binutils-arm-linux-gnueabihf binutils-arm-linux-gnueabihf-dbg
 RUN env DEBIAN_FRONTEND=noninteractive \
     apt install -y qemu-user qemu-user-static
 
@@ -29,5 +31,14 @@ RUN env \
         -tags "sqlite_foreign_keys release linux" \
         -ldflags="-s -w" \
         -o /root/out/yarr.arm64 src/main.go
+
+RUN env \
+        CC=arm-linux-gnueabihf-gcc \
+        CGO_ENABLED=1 \
+        GOOS=linux GOARCH=arm GOARM=7 \
+    go build \
+        -tags "sqlite_foreign_keys release linux" \
+        -ldflags="-s -w" \
+        -o /root/out/yarr.arm7 src/main.go
 
 CMD ["/bin/bash"]
