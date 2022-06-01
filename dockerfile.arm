@@ -1,0 +1,33 @@
+FROM ubuntu:20.04
+
+# Install GCC
+RUN apt update
+RUN apt install -y \
+        wget build-essential \
+        gcc-aarch64-linux-gnu \
+        binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg
+RUN env DEBIAN_FRONTEND=noninteractive \
+    apt install -y qemu-user qemu-user-static
+
+# Install Golang
+RUN wget --quiet https://go.dev/dl/go1.18.2.linux-amd64.tar.gz && \
+    rm -rf /usr/local/go && \
+    tar -C /usr/local -xzf go1.18.2.linux-amd64.tar.gz
+ENV PATH=$PATH:/usr/local/go/bin
+
+# Copy source code
+WORKDIR /root/src
+RUN mkdir /root/out
+COPY . .
+
+# Build ARM64
+RUN env \
+        CC=aarch64-linux-gnu-gcc \
+        CGO_ENABLED=1 \
+        GOOS=linux GOARCH=arm64 \
+    go build \
+        -tags "sqlite_foreign_keys release linux" \
+        -ldflags="-s -w" \
+        -o /root/out/yarr.arm64 src/main.go
+
+CMD ["/bin/bash"]
