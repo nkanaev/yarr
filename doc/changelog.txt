@@ -1,6 +1,7 @@
 # upcoming
 
 - (new) ARM building support (thanks to @tillcash & @fenuks)
+- (fix) favicon visibility in dark mode (thanks to @caycaycarly for the report)
 
 # v2.3 (2022-05-03)
 
