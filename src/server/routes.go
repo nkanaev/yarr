@@ -177,7 +177,9 @@ func (s *Server) handleFeedIcon(c *router.Context) {
 			bytes: *(*feed).Icon,
 			etag:  etag,
 		}
+		s.cache_mutex.Lock()
 		s.cache[cachekey] = cachedat
+		s.cache_mutex.Unlock()
 	}
 
 	icon := cachedat.(feedicon)
