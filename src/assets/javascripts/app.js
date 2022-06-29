@@ -437,8 +437,12 @@ var vm = new Vue({
       })
     },
     itemListCloseToBottom: function() {
+      // approx. vertical space at the bottom of the list (loading el & paddings) when 1rem = 16px
+      var bottomSpace = 70
+      var scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16
+
       var el = this.$refs.itemlist
-      var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < 50
+      var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < bottomSpace * scale
       return closeToBottom
     },
     loadMoreItems: function(event, el) {
