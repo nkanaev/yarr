@@ -291,7 +291,7 @@ func TestDeleteOldItems(t *testing.T) {
 		})
 	}
 	db.CreateItems(items)
-	
+
 	db.SetFeedSize(feed.Id, itemsKeepSize)
 	var feedSize int
 	err := db.db.QueryRow(
@@ -302,7 +302,7 @@ func TestDeleteOldItems(t *testing.T) {
 	}
 	if feedSize != itemsKeepSize {
 		t.Fatalf(
-			"expected feed size to get updated\nwant: %d\nhave: %d", 
+			"expected feed size to get updated\nwant: %d\nhave: %d",
 			itemsKeepSize+extraItems,
 			feedSize,
 		)

@@ -7,9 +7,9 @@ import (
 )
 
 func TestSniff(t *testing.T) {
-	testcases := []struct{
+	testcases := []struct {
 		input string
-		want feedProbe
+		want  feedProbe
 	}{
 		{
 			`<?xml version="1.0"?><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"></rdf:RDF>`,
