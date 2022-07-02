@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -94,16 +93,9 @@ func main() {
 			log.Fatal("Failed to open auth file: ", err)
 		}
 		defer f.Close()
-		scanner := bufio.NewScanner(f)
-		for scanner.Scan() {
-			line := scanner.Text()
-			parts := strings.Split(line, ":")
-			if len(parts) != 2 {
-				log.Fatalf("Invalid auth: %v (expected `username:password`)", line)
-			}
-			username = parts[0]
-			password = parts[1]
-			break
+		username, password, err = parseAuthfile(f)
+		if err != nil {
+			log.Fatal("Failed to parse auth file: ", err)
 		}
 	}
 
