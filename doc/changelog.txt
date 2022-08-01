@@ -1,7 +1,10 @@
 # upcoming
 
-- (new) ARM building support (thanks to @tillcash & @fenuks)
+- (new) ARM build support (thanks to @tillcash & @fenuks)
+- (new) auth configuration via param or env variable (thanks to @pierreprinetti)
+- (fix) concurrency issue crashing the app (thanks to @quoing)
 - (fix) favicon visibility in dark mode (thanks to @caycaycarly for the report)
+- (fix) autoloading more articles not working in certain edge cases (thanks to @fenuks for the report)
 
 # v2.3 (2022-05-03)
 
