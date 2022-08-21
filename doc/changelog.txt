@@ -5,6 +5,7 @@
 - (fix) concurrency issue crashing the app (thanks to @quoing)
 - (fix) favicon visibility in dark mode (thanks to @caycaycarly for the report)
 - (fix) autoloading more articles not working in certain edge cases (thanks to @fenuks for the report)
+- (fix) handle Google URL redirects in "Read Here" (thanks to @cubbei for discovery)
 
 # v2.3 (2022-05-03)
 
