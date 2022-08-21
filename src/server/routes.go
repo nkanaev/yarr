@@ -456,6 +456,9 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 func (s *Server) handlePageCrawl(c *router.Context) {
 	url := c.Req.URL.Query().Get("url")
 
+    if newUrl := silo.RedirectURL(url); newUrl != "" {
+        url = newUrl
+    }
 	if content := silo.VideoIFrame(url); content != "" {
 		c.JSON(http.StatusOK, map[string]string{
 			"content": sanitizer.Sanitize(url, content),

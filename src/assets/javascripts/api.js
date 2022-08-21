@@ -105,7 +105,7 @@
       return api('post', './logout')
     },
     crawl: function(url) {
-      return api('get', './page?url=' + url).then(json)
+      return api('get', './page?url=' + encodeURIComponent(url)).then(json)
     }
   }
 })()
