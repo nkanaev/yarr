@@ -28,7 +28,7 @@ Download `yarr-*-windows64.zip`, unzip it, open `yarr.exe`
 ### linux
 
 Download `yarr-*-windows`, unzip it, place `yarr` in `$HOME/.local/bin`
-and run [the script][etc/install-linux.sh].
+and run [the script](etc/install-linux.sh).
 
 For self-hosting, see `yarr -h` for auth, tls & server configuration flags.
 For building from source code, see [build.md](build.md)
