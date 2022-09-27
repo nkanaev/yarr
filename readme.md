@@ -14,8 +14,7 @@ The latest prebuilt binaries for Linux/MacOS/Windows are available
 
 ### macos
 
-Download `yarr-*-macos64.zip`, unzip it, place `yarr.app` in `/Applications` folder.
-To open the app follow the instructions provided [here][macos-open] or run the command below:
+Download `yarr-*-macos64.zip`, unzip it, place `yarr.app` in `/Applications` folder, [open the app][macos-open].
 
 [macos-open]: https://support.apple.com/en-gb/guide/mac-help/mh40616/mac
 
