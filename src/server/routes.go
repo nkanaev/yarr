@@ -474,8 +474,9 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 	}
 	content, err := readability.ExtractContent(strings.NewReader(body))
 	if err != nil {
-		log.Print(err)
-		c.Out.WriteHeader(http.StatusNoContent)
+        c.JSON(http.StatusOK, map[string]string{
+            "content": "error: " + err.Error(),
+        })
 		return
 	}
 	content = sanitizer.Sanitize(url, content)
