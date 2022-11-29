@@ -31,10 +31,10 @@ func (s *Server) handler() http.Handler {
 
 	if s.Username != "" && s.Password != "" {
 		a := &auth.Middleware{
-			BasePath: s.BasePath,
-			Username: s.Username,
-			Password: s.Password,
-			Public:   "/static",
+			BasePath:      s.BasePath,
+			Username:      s.Username,
+			Password:      s.Password,
+			SkipAuthPaths: []string{"/static", "/fever"},
 		}
 		r.Use(a.Handler)
 	}
@@ -57,6 +57,7 @@ func (s *Server) handler() http.Handler {
 	r.For("/opml/export", s.handleOPMLExport)
 	r.For("/page", s.handlePageCrawl)
 	r.For("/logout", s.handleLogout)
+	r.For("/fever/", s.handleFever)
 
 	return r
 }
