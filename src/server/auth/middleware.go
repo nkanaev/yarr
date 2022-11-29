@@ -9,10 +9,10 @@ import (
 )
 
 type Middleware struct {
-	Username string
-	Password string
-	BasePath string
-	Public   string
+	Username      string
+	Password      string
+	BasePath      string
+	SkipAuthPaths []string
 }
 
 func unsafeMethod(method string) bool {
@@ -20,9 +20,11 @@ func unsafeMethod(method string) bool {
 }
 
 func (m *Middleware) Handler(c *router.Context) {
-	if strings.HasPrefix(c.Req.URL.Path, m.BasePath+m.Public) {
-		c.Next()
-		return
+	for _, path := range m.SkipAuthPaths {
+		if strings.HasPrefix(c.Req.URL.Path, m.BasePath+path) {
+			c.Next()
+			return
+		}
 	}
 	if IsAuthenticated(c.Req, m.Username, m.Password) {
 		c.Next()
