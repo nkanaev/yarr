@@ -197,7 +197,7 @@ function isTextBox(element) {
 document.addEventListener('keydown',function(event) {
   // Ignore while focused on text or
   // when using modifier keys (to not clash with browser behaviour)
-  if (isTextBox(event.target) || event.metaKey || event.ctrlKey) {
+  if (isTextBox(event.target) || event.metaKey || event.ctrlKey || event.altKey) {
     return
   }
   var keybindFunction = keybindings[event.key] || codebindings[event.code]
