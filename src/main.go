@@ -47,8 +47,8 @@ func parseAuthfile(authfile io.Reader) (username, password string, err error) {
 func main() {
 	platform.FixConsoleIfNeeded()
 
-	var addr, db, authfile, auth, certfile, keyfile, basepath, logfile string
-	var ver, open bool
+	var addr, db, db_fast, authfile, auth, certfile, keyfile, basepath, logfile string
+	var ver, open, is_db_fast bool
 
 	flag.CommandLine.SetOutput(os.Stdout)
 
@@ -67,6 +67,7 @@ func main() {
 	flag.StringVar(&certfile, "cert-file", opt("YARR_CERTFILE", ""), "`path` to cert file for https")
 	flag.StringVar(&keyfile, "key-file", opt("YARR_KEYFILE", ""), "`path` to key file for https")
 	flag.StringVar(&db, "db", opt("YARR_DB", ""), "storage file `path`")
+	flag.StringVar(&db_fast, "db-fast", opt("YARR_DB_FAST", "") , "db in memory, load on init, store on exit")
 	flag.StringVar(&logfile, "log-file", opt("YARR_LOGFILE", ""), "`path` to log file to use instead of stdout")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.BoolVar(&open, "open", false, "open the server in browser")
@@ -102,7 +103,14 @@ func main() {
 		db = filepath.Join(storagePath, "storage.db")
 	}
 
-	log.Printf("using db file %s", db)
+	if db_fast == "TRUE" {
+		log.Printf("using in-memory db, with backup file %s", db)
+		is_db_fast = true
+	}	else{
+		log.Printf("using db file %s", db)
+		is_db_fast = false
+	}
+
 
 	var username, password string
 	if authfile != "" {
@@ -126,10 +134,11 @@ func main() {
 		log.Fatalf("Both cert & key files are required")
 	}
 
-	store, err := storage.New(db)
+	store, err := storage.New(db, is_db_fast)
 	if err != nil {
 		log.Fatal("Failed to initialise database: ", err)
 	}
+	defer storage.Close(store, db, is_db_fast)
 
 	srv := server.NewServer(store, addr)
 
@@ -152,4 +161,5 @@ func main() {
 		platform.Open(srv.GetAddr())
 	}
 	platform.Start(srv)
+
 }

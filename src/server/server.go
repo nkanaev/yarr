@@ -4,6 +4,10 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"os"
+	"os/signal"
+	"context"
+	"syscall"
 
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/worker"
@@ -55,13 +59,27 @@ func (s *Server) Start() {
 
 	httpserver := &http.Server{Addr: s.Addr, Handler: s.handler()}
 
+	serveNoMore := make(chan struct{})
+	go func() {
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+		<-sigs
+		if err := httpserver.Shutdown(context.Background()); err != nil {
+			log.Printf("HTTP Server Shutdown Error: %v", err)
+		}
+		close(serveNoMore)
+	}()
+
 	var err error
 	if s.CertFile != "" && s.KeyFile != "" {
 		err = httpserver.ListenAndServeTLS(s.CertFile, s.KeyFile)
 	} else {
 		err = httpserver.ListenAndServe()
 	}
+
 	if err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
+
+	<-serveNoMore
 }
