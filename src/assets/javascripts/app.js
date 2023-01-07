@@ -184,6 +184,10 @@ Vue.component('relative-time', {
 
 var vm = new Vue({
   created: function() {
+    window.addEventListener('popstate', (event) => {
+      vm.itemSelected = event.state
+    })
+
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
       .then(this.refreshItems.bind(this, false))
@@ -319,6 +323,7 @@ var vm = new Vue({
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedReadability = ''
+      window.history.pushState(newVal, "")
       if (newVal === null) {
         this.itemSelectedDetails = null
         return
