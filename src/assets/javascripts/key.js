@@ -165,6 +165,24 @@ var keybindings = {
   "3": shortcutFunctions.showAll,
 }
 
+var codebindings = {
+  "KeyO": shortcutFunctions.openItemLink,
+  "KeyI": shortcutFunctions.toggleReadability,
+  //"r": shortcutFunctions.toggleItemRead,
+  //"KeyR": shortcutFunctions.markAllRead,
+  "KeyS": shortcutFunctions.toggleItemStarred,
+  "Slash": shortcutFunctions.focusSearch,
+  "KeyJ": shortcutFunctions.nextItem,
+  "KeyK": shortcutFunctions.previousItem,
+  "KeyL": shortcutFunctions.nextFeed,
+  "KeyH": shortcutFunctions.previousFeed,
+  "KeyF": shortcutFunctions.scrollForward,
+  "KeyB": shortcutFunctions.scrollBackward,
+  "Digit1": shortcutFunctions.showUnread,
+  "Digit2": shortcutFunctions.showStarred,
+  "Digit3": shortcutFunctions.showAll,
+}
+
 function isTextBox(element) {
   var tagName = element.tagName.toLowerCase()
   // Input elements that aren't text
@@ -182,7 +200,7 @@ document.addEventListener('keydown',function(event) {
   if (isTextBox(event.target) || event.metaKey || event.ctrlKey) {
     return
   }
-  var keybindFunction = keybindings[event.key]
+  var keybindFunction = keybindings[event.key] || codebindings[event.code]
   if (keybindFunction) {
     event.preventDefault()
     keybindFunction()
