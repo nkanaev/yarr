@@ -334,17 +334,19 @@
                  class="content px-4 pt-3 pb-5 border-top overflow-auto"
                  :class="{'font-serif': theme.font == 'serif', 'font-monospace': theme.font == 'monospace'}"
                  :style="{'font-size': theme.size + 'rem'}">
-                <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
-                <div class="text-muted">
-                    <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
-                    <time>{{ formatDate(itemSelectedDetails.date) }}</time>
+                <div class="content-wrapper">
+                    <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
+                    <div class="text-muted">
+                        <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
+                        <time>{{ formatDate(itemSelectedDetails.date) }}</time>
+                    </div>
+                    <hr>
+                    <div v-if="!itemSelectedReadability">
+                        <img :src="itemSelectedDetails.image" v-if="itemSelectedDetails.image" class="mb-3">
+                        <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
+                    </div>
+                    <div v-html="itemSelectedContent"></div>
                 </div>
-                <hr>
-                <div v-if="!itemSelectedReadability">
-                    <img :src="itemSelectedDetails.image" v-if="itemSelectedDetails.image" class="mb-3">
-                    <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
-                </div>
-                <div v-html="itemSelectedContent"></div>
             </div>
         </div>
         <modal :open="!!settings" @hide="settings = ''">
