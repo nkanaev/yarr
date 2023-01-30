@@ -39,6 +39,7 @@ func (s *Server) handler() http.Handler {
 	}
 
 	r.For("/", s.handleIndex)
+	r.For("/manifest.json", s.handleManifest)
 	r.For("/static/*path", s.handleStatic)
 	r.For("/api/status", s.handleStatus)
 	r.For("/api/folders", s.handleFolderList)
@@ -74,6 +75,24 @@ func (s *Server) handleStatic(c *router.Context) {
 		return
 	}
 	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(c.Out, c.Req)
+}
+
+func (s *Server) handleManifest(c *router.Context) {
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"$schema":     "https://json.schemastore.org/web-manifest-combined.json",
+		"name":        "yarr!",
+		"short_name":  "yarr",
+		"description": "yet another rss reader",
+		"display":     "standalone",
+		"start_url":   s.BasePath,
+		"icons": []map[string]interface{}{
+			{
+				"src":   s.BasePath + "/static/graphicarts/favicon.png",
+				"sizes": "64x64",
+				"type":  "image/png",
+			},
+		},
+	})
 }
 
 func (s *Server) handleStatus(c *router.Context) {
