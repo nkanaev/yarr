@@ -432,11 +432,11 @@ button.theme-light {
 }
 
 a,
-.btn-link:hover,
-.toolbar-item.active {
+.btn-link:hover {
   color: #0080d4;
 }
 
+.toolbar-item.active,
 .dropdown-item.active,
 .dropdown-item:active,
 .selectgroup input:checked + .selectgroup-label {
