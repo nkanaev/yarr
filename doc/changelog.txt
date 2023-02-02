@@ -9,6 +9,7 @@
 - (fix) handle Google URL redirects in "Read Here" (thanks to @cubbei for discovery)
 - (fix) handle failures to extract content in "Read Here" (thanks to @grigio for the report)
 - (fix) article view width for high resolution screens (thanks to @whaler-ragweed for the report)
+- (fix) make newly added feed searchable (thanks to @BMorearty for the report)
 
 # v2.3 (2022-05-03)
 
