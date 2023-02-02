@@ -244,6 +244,7 @@ func (s *Server) handleFeedList(c *router.Context) {
 			if len(items) > 0 {
 				s.db.CreateItems(items)
 				s.db.SetFeedSize(feed.Id, len(items))
+                s.db.SyncSearch()
 			}
 			s.worker.FindFeedFavicon(*feed)
 
