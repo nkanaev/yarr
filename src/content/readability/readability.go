@@ -60,9 +60,9 @@ func ExtractContent(page io.Reader) (string, error) {
 			best = body
 			break
 		}
-        if best == nil {
-            return "", errors.New("failed to extract content")
-        }
+		if best == nil {
+			return "", errors.New("failed to extract content")
+		}
 	}
 	//log.Printf("[Readability] TopCandidate: %v", topCandidate)
 

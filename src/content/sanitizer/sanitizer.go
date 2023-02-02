@@ -364,7 +364,6 @@ func isBlockedTag(tagName string) bool {
 }
 
 /*
-
 One or more strings separated by commas, indicating possible image sources for the user agent to use.
 
 Each string is composed of:
@@ -372,7 +371,6 @@ Each string is composed of:
 - Optionally, whitespace followed by one of:
 - A width descriptor (a positive integer directly followed by w). The width descriptor is divided by the source size given in the sizes attribute to calculate the effective pixel density.
 - A pixel density descriptor (a positive floating point number directly followed by x).
-
 */
 func sanitizeSrcsetAttr(baseURL, value string) string {
 	var sanitizedSources []string

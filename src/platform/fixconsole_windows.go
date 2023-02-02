@@ -58,17 +58,20 @@ var oldStdin, oldStdout, oldStderr *os.File
 //
 // Net result is as follows.
 // Before:
-//    SHELL            NON-REDIRECTED     REDIRECTED
-//    explorer.exe     no console         n/a
-//    cmd.exe          broken             works
-//    powershell       broken             broken
-//    WSL bash         broken             works
+//
+//	SHELL            NON-REDIRECTED     REDIRECTED
+//	explorer.exe     no console         n/a
+//	cmd.exe          broken             works
+//	powershell       broken             broken
+//	WSL bash         broken             works
+//
 // After
-//    SHELL            NON-REDIRECTED     REDIRECTED
-//    explorer.exe     no console         n/a
-//    cmd.exe          works              works
-//    powershell       works              broken
-//    WSL bash         works              works
+//
+//	SHELL            NON-REDIRECTED     REDIRECTED
+//	explorer.exe     no console         n/a
+//	cmd.exe          works              works
+//	powershell       works              broken
+//	WSL bash         works              works
 //
 // We don't seem to make anything worse, at least.
 func FixConsoleIfNeeded() error {

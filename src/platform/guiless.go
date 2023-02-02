@@ -1,3 +1,4 @@
+//go:build !windows && !macos
 // +build !windows,!macos
 
 package platform

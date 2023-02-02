@@ -1,3 +1,4 @@
+//go:build macos || windows
 // +build macos windows
 
 package platform

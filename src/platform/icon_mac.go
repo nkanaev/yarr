@@ -1,3 +1,4 @@
+//go:build macos
 // +build macos
 
 package platform
