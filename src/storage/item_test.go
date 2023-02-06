@@ -104,7 +104,7 @@ func TestListItems(t *testing.T) {
 
 	// filter by folder_id
 
-	have := getItemGuids(db.ListItems(ItemFilter{FolderID: &scope.folder1.Id}, 10, false))
+	have := getItemGuids(db.ListItems(ItemFilter{FolderID: &scope.folder1.Id}, 10, false, false))
 	want := []string{"item111", "item112", "item113", "item121", "item122"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -112,7 +112,7 @@ func TestListItems(t *testing.T) {
 		t.Fail()
 	}
 
-	have = getItemGuids(db.ListItems(ItemFilter{FolderID: &scope.folder2.Id}, 10, false))
+	have = getItemGuids(db.ListItems(ItemFilter{FolderID: &scope.folder2.Id}, 10, false, false))
 	want = []string{"item211", "item212"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -122,7 +122,7 @@ func TestListItems(t *testing.T) {
 
 	// filter by feed_id
 
-	have = getItemGuids(db.ListItems(ItemFilter{FeedID: &scope.feed11.Id}, 10, false))
+	have = getItemGuids(db.ListItems(ItemFilter{FeedID: &scope.feed11.Id}, 10, false, false))
 	want = []string{"item111", "item112", "item113"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -130,7 +130,7 @@ func TestListItems(t *testing.T) {
 		t.Fail()
 	}
 
-	have = getItemGuids(db.ListItems(ItemFilter{FeedID: &scope.feed01.Id}, 10, false))
+	have = getItemGuids(db.ListItems(ItemFilter{FeedID: &scope.feed01.Id}, 10, false, false))
 	want = []string{"item011", "item012", "item013"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -141,7 +141,7 @@ func TestListItems(t *testing.T) {
 	// filter by status
 
 	var starred ItemStatus = STARRED
-	have = getItemGuids(db.ListItems(ItemFilter{Status: &starred}, 10, false))
+	have = getItemGuids(db.ListItems(ItemFilter{Status: &starred}, 10, false, false))
 	want = []string{"item113", "item212", "item013"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -150,7 +150,7 @@ func TestListItems(t *testing.T) {
 	}
 
 	var unread ItemStatus = UNREAD
-	have = getItemGuids(db.ListItems(ItemFilter{Status: &unread}, 10, false))
+	have = getItemGuids(db.ListItems(ItemFilter{Status: &unread}, 10, false, false))
 	want = []string{"item111", "item121", "item011"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -160,7 +160,7 @@ func TestListItems(t *testing.T) {
 
 	// limit
 
-	have = getItemGuids(db.ListItems(ItemFilter{}, 2, false))
+	have = getItemGuids(db.ListItems(ItemFilter{}, 2, false, false))
 	want = []string{"item111", "item112"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -171,7 +171,7 @@ func TestListItems(t *testing.T) {
 	// filter by search
 	db.SyncSearch()
 	search1 := "title111"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &search1}, 4, true))
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &search1}, 4, true, false))
 	want = []string{"item111"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -180,7 +180,7 @@ func TestListItems(t *testing.T) {
 	}
 
 	// sort by date
-	have = getItemGuids(db.ListItems(ItemFilter{}, 4, true))
+	have = getItemGuids(db.ListItems(ItemFilter{}, 4, true, false))
 	want = []string{"item013", "item012", "item011", "item212"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -197,7 +197,7 @@ func TestListItemsPaginated(t *testing.T) {
 	item121 := getItem(db, "item121")
 
 	// all, newest first
-	have := getItemGuids(db.ListItems(ItemFilter{After: &item012.Id}, 3, true))
+	have := getItemGuids(db.ListItems(ItemFilter{After: &item012.Id}, 3, true, false))
 	want := []string{"item011", "item212", "item211"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -207,7 +207,7 @@ func TestListItemsPaginated(t *testing.T) {
 
 	// unread, newest first
 	unread := UNREAD
-	have = getItemGuids(db.ListItems(ItemFilter{After: &item012.Id, Status: &unread}, 3, true))
+	have = getItemGuids(db.ListItems(ItemFilter{After: &item012.Id, Status: &unread}, 3, true, false))
 	want = []string{"item011", "item121", "item111"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -217,7 +217,7 @@ func TestListItemsPaginated(t *testing.T) {
 
 	// starred, oldest first
 	starred := STARRED
-	have = getItemGuids(db.ListItems(ItemFilter{After: &item121.Id, Status: &starred}, 3, false))
+	have = getItemGuids(db.ListItems(ItemFilter{After: &item121.Id, Status: &starred}, 3, false, false))
 	want = []string{"item212", "item013"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -233,7 +233,7 @@ func TestMarkItemsRead(t *testing.T) {
 	db1 := testDB()
 	testItemsSetup(db1)
 	db1.MarkItemsRead(MarkFilter{})
-	have := getItemGuids(db1.ListItems(ItemFilter{Status: &read}, 10, false))
+	have := getItemGuids(db1.ListItems(ItemFilter{Status: &read}, 10, false, false))
 	want := []string{
 		"item111", "item112", "item121", "item122",
 		"item211", "item011", "item012",
@@ -247,7 +247,7 @@ func TestMarkItemsRead(t *testing.T) {
 	db2 := testDB()
 	scope2 := testItemsSetup(db2)
 	db2.MarkItemsRead(MarkFilter{FolderID: &scope2.folder1.Id})
-	have = getItemGuids(db2.ListItems(ItemFilter{Status: &read}, 10, false))
+	have = getItemGuids(db2.ListItems(ItemFilter{Status: &read}, 10, false, false))
 	want = []string{
 		"item111", "item112", "item121", "item122",
 		"item211", "item012",
@@ -261,7 +261,7 @@ func TestMarkItemsRead(t *testing.T) {
 	db3 := testDB()
 	scope3 := testItemsSetup(db3)
 	db3.MarkItemsRead(MarkFilter{FeedID: &scope3.feed11.Id})
-	have = getItemGuids(db3.ListItems(ItemFilter{Status: &read}, 10, false))
+	have = getItemGuids(db3.ListItems(ItemFilter{Status: &read}, 10, false, false))
 	want = []string{
 		"item111", "item112", "item122",
 		"item211", "item012",
@@ -319,7 +319,7 @@ func TestDeleteOldItems(t *testing.T) {
 	}
 
 	db.DeleteOldItems()
-	feedItems := db.ListItems(ItemFilter{FeedID: &feed.Id}, 1000, false)
+	feedItems := db.ListItems(ItemFilter{FeedID: &feed.Id}, 1000, false, false)
 	if len(feedItems) != len(items)-3 {
 		t.Fatalf(
 			"invalid number of old items kept\nwant: %d\nhave: %d",

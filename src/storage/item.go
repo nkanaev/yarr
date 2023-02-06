@@ -65,6 +65,7 @@ type ItemFilter struct {
 	IDs      *[]int64
 	SinceID  *int64
 	MaxID    *int64
+	Before   *time.Time
 }
 
 type MarkFilter struct {
@@ -172,7 +173,7 @@ func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []interfac
 	return predicate, args
 }
 
-func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool) []Item {
+func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, withContent bool) []Item {
 	predicate, args := listQueryPredicate(filter, newestFirst)
 	result := make([]Item, 0, 0)
 
@@ -184,16 +185,19 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool) []It
 		order = "i.id asc"
 	}
 
+	selectCols := "i.id, i.guid, i.feed_id, i.title, i.link, i.date, i.status, i.image, i.podcast_url"
+	if withContent {
+		selectCols += ", i.content"
+	} else {
+		selectCols += ", '' as content"
+	}
 	query := fmt.Sprintf(`
-		select
-			i.id, i.guid, i.feed_id,
-			i.title, i.link, i.content, i.date,
-			i.status, i.image, i.podcast_url
+		select %s
 		from items i
 		where %s
 		order by %s
 		limit %d
-		`, predicate, order, limit)
+		`, selectCols, predicate, order, limit)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		log.Print(err)
@@ -203,8 +207,8 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool) []It
 		var x Item
 		err = rows.Scan(
 			&x.Id, &x.GUID, &x.FeedId,
-			&x.Title, &x.Link, &x.Content, &x.Date,
-			&x.Status, &x.ImageURL, &x.AudioURL,
+			&x.Title, &x.Link, &x.Date,
+			&x.Status, &x.ImageURL, &x.AudioURL, &x.Content,
 		)
 		if err != nil {
 			log.Print(err)

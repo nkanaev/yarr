@@ -30,10 +30,10 @@ func (s *Server) handler() http.Handler {
 
 	if s.Username != "" && s.Password != "" {
 		a := &auth.Middleware{
-			BasePath:      s.BasePath,
-			Username:      s.Username,
-			Password:      s.Password,
-			SkipAuthPaths: []string{"/static", "/fever"},
+			BasePath: s.BasePath,
+			Username: s.Username,
+			Password: s.Password,
+			Public:   []string{"/static", "/fever"},
 		}
 		r.Use(a.Handler)
 	}
@@ -354,7 +354,7 @@ func (s *Server) handleItemList(c *router.Context) {
 		}
 		newestFirst := query.Get("oldest_first") != "true"
 
-		items := s.db.ListItems(filter, perPage+1, newestFirst)
+		items := s.db.ListItems(filter, perPage+1, newestFirst, false)
 		hasMore := false
 		if len(items) == perPage+1 {
 			hasMore = true
