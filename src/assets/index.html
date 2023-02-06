@@ -134,7 +134,7 @@
                                               && !(current.folder.id == folder.id || current.feed.folder_id == folder.id)
                                               && !filteredFolderStats[folder.id]
                                               && (!itemSelectedDetails || feedsById[itemSelectedDetails.feed_id].folder_id != folder.id)}">
-                        <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected">
+                        <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
                         <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
                             <span class="icon mr-2"
                                   :class="{expanded: folder.is_expanded}"
