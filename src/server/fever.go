@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nkanaev/yarr/src/server/auth"
 	"github.com/nkanaev/yarr/src/server/router"
 	"github.com/nkanaev/yarr/src/storage"
 )
@@ -63,7 +64,8 @@ func (s *Server) feverAuth(c *router.Context) bool {
 	if s.Username != "" && s.Password != "" {
 		apiKey := c.Req.FormValue("api_key")
 		md5HashValue := md5.Sum([]byte(fmt.Sprintf("%s:%s", s.Username, s.Password)))
-		if apiKey != fmt.Sprintf("%x", md5HashValue[:]) {
+		hexMD5HashValue := fmt.Sprintf("%x", md5HashValue[:])
+		if auth.StringsEqual(apiKey, hexMD5HashValue) {
 			return false
 		}
 	}
@@ -130,7 +132,6 @@ func feedGroups(db *storage.Storage) []*FeverFeedsGroup {
 
 	groupFeeds := make(map[int64][]int64)
 	for _, feed := range feeds {
-		// TODO: what about top-level feeds?
 		if feed.FolderId == nil {
 			continue
 		}
@@ -184,38 +185,6 @@ func (s *Server) feverFeedsHandler(c *router.Context) {
 	})
 }
 
-func (s *Server) feverUnreadItemIDsHandler(c *router.Context) {
-	status := storage.UNREAD
-	itemIds := make([]int64, 0, 1000)
-	batch := 10000
-
-	items := s.db.ListItems(storage.ItemFilter{
-		Status: &status,
-	}, batch, true)
-	for _, item := range items {
-		itemIds = append(itemIds, item.Id)
-	}
-	writeFeverJSON(c, map[string]interface{}{
-		"unread_item_ids": joinInts(itemIds),
-	})
-}
-
-func (s *Server) feverSavedItemIDsHandler(c *router.Context) {
-	status := storage.STARRED
-	itemIds := make([]int64, 0, 1000)
-	batch := 10000
-
-	items := s.db.ListItems(storage.ItemFilter{
-		Status: &status,
-	}, batch, true)
-	for _, item := range items {
-		itemIds = append(itemIds, item.Id)
-	}
-	writeFeverJSON(c, map[string]interface{}{
-		"saved_item_ids": joinInts(itemIds),
-	})
-}
-
 func (s *Server) feverFaviconsHandler(c *router.Context) {
 	feeds := s.db.ListFeeds()
 	favicons := make([]*FeverFavicon, len(feeds))
@@ -236,6 +205,10 @@ func (s *Server) feverFaviconsHandler(c *router.Context) {
 		"favicons": favicons,
 	})
 }
+
+// for memory pressure reasons, we only return a limited number of items
+// documented at https://github.com/DigitalDJ/tinytinyrss-fever-plugin/blob/master/fever-api.md#items
+const listLimit = 50
 
 func (s *Server) feverItemsHandler(c *router.Context) {
 	filter := storage.ItemFilter{}
@@ -262,7 +235,7 @@ func (s *Server) feverItemsHandler(c *router.Context) {
 		}
 	}
 
-	items := s.db.ListItems(filter, 50, true)
+	items := s.db.ListItems(filter, listLimit, true, true)
 
 	feverItems := make([]FeverItem, len(items))
 	for i, item := range items {
@@ -301,6 +274,50 @@ func (s *Server) feverLinksHandler(c *router.Context) {
 	})
 }
 
+func (s *Server) feverUnreadItemIDsHandler(c *router.Context) {
+	status := storage.UNREAD
+	itemIds := make([]int64, 0)
+
+	itemFilter := storage.ItemFilter{
+		Status: &status,
+	}
+	for {
+		items := s.db.ListItems(itemFilter, listLimit, true, false)
+		if len(items) == 0 {
+			break
+		}
+		for _, item := range items {
+			itemIds = append(itemIds, item.Id)
+		}
+		itemFilter.After = &items[len(items)-1].Id
+	}
+	writeFeverJSON(c, map[string]interface{}{
+		"unread_item_ids": joinInts(itemIds),
+	})
+}
+
+func (s *Server) feverSavedItemIDsHandler(c *router.Context) {
+	status := storage.STARRED
+	itemIds := make([]int64, 0)
+
+	itemFilter := storage.ItemFilter{
+		Status: &status,
+	}
+	for {
+		items := s.db.ListItems(itemFilter, listLimit, true, false)
+		if len(items) == 0 {
+			break
+		}
+		for _, item := range items {
+			itemIds = append(itemIds, item.Id)
+		}
+		itemFilter.After = &items[len(items)-1].Id
+	}
+	writeFeverJSON(c, map[string]interface{}{
+		"saved_item_ids": joinInts(itemIds),
+	})
+}
+
 func (s *Server) feverMarkHandler(c *router.Context) {
 	id, err := strconv.ParseInt(c.Req.Form.Get("id"), 10, 64)
 	if err != nil {
@@ -326,13 +343,22 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 		}
 		s.db.UpdateItemStatus(id, status)
 	case "feed":
+		markFilter := storage.MarkFilter{FeedID: &id}
 		x, _ := strconv.ParseInt(c.Req.Form.Get("before"), 10, 64)
-		before := time.Unix(x, 0)
-		s.db.MarkItemsRead(storage.MarkFilter{FeedID: &id, Before: &before})
+		if x > 0 {
+			before := time.Unix(x, 0)
+			markFilter.Before = &before
+		}
+		s.db.MarkItemsRead(markFilter)
+		// s.db.MarkItemsRead(markFilter)
 	case "group":
+		markFilter := storage.MarkFilter{FolderID: &id}
 		x, _ := strconv.ParseInt(c.Req.Form.Get("before"), 10, 64)
-		before := time.Unix(x, 0)
-		s.db.MarkItemsRead(storage.MarkFilter{FolderID: &id, Before: &before})
+		if x > 0 {
+			before := time.Unix(x, 0)
+			markFilter.Before = &before
+		}
+		s.db.MarkItemsRead(markFilter)
 	default:
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
