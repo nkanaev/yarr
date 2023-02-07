@@ -125,7 +125,7 @@ func (s *Server) handleFever(c *router.Context) {
 		c.JSON(http.StatusOK, map[string]interface{}{
 			"api_version":            1,
 			"auth":                   1,
-			"last_refreshed_on_time": 0,
+			"last_refreshed_on_time": getLastRefreshedOnTime(s.db.ListHTTPStates()),
 		})
 	}
 }
