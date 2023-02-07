@@ -164,6 +164,10 @@ func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []interfac
 		cond = append(cond, "i.id < ?")
 		args = append(args, filter.MaxID)
 	}
+	if filter.Before != nil {
+		cond = append(cond, "i.date < ?")
+		args = append(args, filter.Before)
+	}
 
 	predicate := "1"
 	if len(cond) > 0 {
@@ -244,7 +248,11 @@ func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
 }
 
 func (s *Storage) MarkItemsRead(filter MarkFilter) bool {
-	predicate, args := listQueryPredicate(ItemFilter{FolderID: filter.FolderID, FeedID: filter.FeedID}, false)
+	predicate, args := listQueryPredicate(ItemFilter{
+		FolderID: filter.FolderID,
+		FeedID:   filter.FeedID,
+		Before:   filter.Before,
+	}, false)
 	query := fmt.Sprintf(`
 		update items as i set status = %d
 		where %s and i.status != %d

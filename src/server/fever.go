@@ -53,11 +53,25 @@ type FeverFavicon struct {
 	Data string `json:"data"`
 }
 
-func writeFeverJSON(c *router.Context, data map[string]interface{}) {
+func writeFeverJSON(c *router.Context, data map[string]interface{}, lastRefreshed int64) {
 	data["api_version"] = 1
 	data["auth"] = 1
-	data["last_refreshed_on_time"] = time.Now().Unix()
+	data["last_refreshed_on_time"] = lastRefreshed
 	c.JSON(http.StatusOK, data)
+}
+
+func getLastRefreshedOnTime(httpStates map[int64]storage.HTTPState) int64 {
+	if len(httpStates) == 0 {
+		return 0
+	}
+
+	var lastRefreshed int64
+	for _, state := range httpStates {
+		if state.LastRefreshed.Unix() > lastRefreshed {
+			lastRefreshed = state.LastRefreshed.Unix()
+		}
+	}
+	return lastRefreshed
 }
 
 func (s *Server) feverAuth(c *router.Context) bool {
@@ -156,7 +170,7 @@ func (s *Server) feverGroupsHandler(c *router.Context) {
 	writeFeverJSON(c, map[string]interface{}{
 		"groups":       groups,
 		"feeds_groups": feedGroups(s.db),
-	})
+	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
 func (s *Server) feverFeedsHandler(c *router.Context) {
@@ -182,7 +196,7 @@ func (s *Server) feverFeedsHandler(c *router.Context) {
 	writeFeverJSON(c, map[string]interface{}{
 		"feeds":        feverFeeds,
 		"feeds_groups": feedGroups(s.db),
-	})
+	}, getLastRefreshedOnTime(httpStates))
 }
 
 func (s *Server) feverFaviconsHandler(c *router.Context) {
@@ -203,7 +217,7 @@ func (s *Server) feverFaviconsHandler(c *router.Context) {
 
 	writeFeverJSON(c, map[string]interface{}{
 		"favicons": favicons,
-	})
+	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
 // for memory pressure reasons, we only return a limited number of items
@@ -265,13 +279,13 @@ func (s *Server) feverItemsHandler(c *router.Context) {
 
 	writeFeverJSON(c, map[string]interface{}{
 		"items": feverItems,
-	})
+	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
 func (s *Server) feverLinksHandler(c *router.Context) {
 	writeFeverJSON(c, map[string]interface{}{
 		"links": make([]interface{}, 0),
-	})
+	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
 func (s *Server) feverUnreadItemIDsHandler(c *router.Context) {
@@ -293,7 +307,7 @@ func (s *Server) feverUnreadItemIDsHandler(c *router.Context) {
 	}
 	writeFeverJSON(c, map[string]interface{}{
 		"unread_item_ids": joinInts(itemIds),
-	})
+	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
 func (s *Server) feverSavedItemIDsHandler(c *router.Context) {
@@ -315,7 +329,7 @@ func (s *Server) feverSavedItemIDsHandler(c *router.Context) {
 	}
 	writeFeverJSON(c, map[string]interface{}{
 		"saved_item_ids": joinInts(itemIds),
-	})
+	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
 func (s *Server) feverMarkHandler(c *router.Context) {
@@ -343,6 +357,9 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 		}
 		s.db.UpdateItemStatus(id, status)
 	case "feed":
+		if c.Req.Form.Get("as") != "read" {
+			c.Out.WriteHeader(http.StatusBadRequest)
+		}
 		markFilter := storage.MarkFilter{FeedID: &id}
 		x, _ := strconv.ParseInt(c.Req.Form.Get("before"), 10, 64)
 		if x > 0 {
@@ -350,8 +367,10 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 			markFilter.Before = &before
 		}
 		s.db.MarkItemsRead(markFilter)
-		// s.db.MarkItemsRead(markFilter)
 	case "group":
+		if c.Req.Form.Get("as") != "read" {
+			c.Out.WriteHeader(http.StatusBadRequest)
+		}
 		markFilter := storage.MarkFilter{FolderID: &id}
 		x, _ := strconv.ParseInt(c.Req.Form.Get("before"), 10, 64)
 		if x > 0 {
