@@ -1,3 +1,0 @@
-- arrow scroll (up/down) issues
-  - loading more items not triggered in item list
-  - selecting hidden feeds in filtered (unread/starred) feed list
