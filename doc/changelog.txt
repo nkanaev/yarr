@@ -11,6 +11,8 @@
 - (fix) article view width for high resolution screens (thanks to @whaler-ragweed for the report)
 - (fix) make newly added feed searchable (thanks to @BMorearty for the report)
 - (fix) feed/article selection accessibility via arrow keys (thanks to @grigio and @tillcash)
+- (fix) keyboard shortcuts in Firefox (thanks to @kaloyan13)
+- (fix) keyboard shortcuts in non-English layouts (thanks to @kaloyan13)
 
 # v2.3 (2022-05-03)
 
