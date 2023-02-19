@@ -92,15 +92,20 @@ Vue.component('dropdown', {
       }
 
       document.addEventListener('click', this.clickHandler)
+      document.addEventListener('keyup', this.handleEscape);
     },
     hide: function() {
       this.open = false
+      document.removeEventListener('keyup', this.handleEscape);
       document.removeEventListener('click', this.clickHandler)
     },
     clickHandler: function(e) {
       var dropdown = e.target.closest('.dropdown')
       if (dropdown == null || dropdown != this.$el) return this.hide()
       if (e.target.closest('.dropdown-item') != null) return this.hide()
+    },
+    handleEscape: function(e) {
+      if (e.key === 'Escape') return this.hide()
     }
   },
 })
@@ -125,9 +130,11 @@ Vue.component('modal', {
     'open': function(newVal) {
       if (newVal) {
         this.opening = true
+        document.addEventListener('keyup', this.handleEscape);
         document.addEventListener('click', this.handleClick)
       } else {
         document.removeEventListener('click', this.handleClick)
+        document.removeEventListener('keyup', this.handleEscape);
       }
     },
   },
@@ -139,6 +146,9 @@ Vue.component('modal', {
       }
       if (e.target.closest('.modal-content') == null) this.$emit('hide')
     },
+    handleEscape: function(e) {
+      if (e.key === 'Escape') this.$emit("hide");
+    }
   },
 })
 
