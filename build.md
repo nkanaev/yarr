@@ -11,6 +11,9 @@ Then run one of the corresponding commands:
     make build_linux    # -> _output/linux/yarr
     make build_windows  # -> _output/windows/yarr.exe
 
+    # create an executable for Raspberry Pi
+    make build_linux_arm7  # -> _output/linux/yarr
+
     # host-specific cli version (no gui)
     make build_default  # -> _output/yarr
 
