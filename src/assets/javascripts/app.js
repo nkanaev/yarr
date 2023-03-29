@@ -191,6 +191,15 @@ var vm = new Vue({
     api.feeds.list_errors().then(function(errors) {
       vm.feed_errors = errors
     })
+
+    this.setTheme()
+  },
+  mounted: function() {
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", () => {
+        this.setTheme()
+      })
   },
   data: function() {
     var s = app.settings
@@ -283,7 +292,8 @@ var vm = new Vue({
     'theme': {
       deep: true,
       handler: function(theme) {
-        document.body.classList.value = 'theme-' + theme.name
+        this.setTheme()
+
         api.settings.update({
           theme_name: theme.name,
           theme_font: theme.font,
@@ -681,6 +691,17 @@ var vm = new Vue({
       this.filteredFeedStats = statsFeeds
       this.filteredFolderStats = statsFolders
       this.filteredTotalStats = statsTotal
+    },
+    setTheme: function() {
+      if (this.theme.name === "auto") {
+        document.body.classList.value = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches
+          ? "theme-night"
+          : "theme-sepia";
+      } else {
+        document.body.classList.value = "theme-" + this.theme.name;
+      }
     },
   }
 })

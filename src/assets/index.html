@@ -61,10 +61,10 @@
 
                     <header class="dropdown-header">Theme</header>
                     <div class="row text-center m-0">
-                        <button class="btn btn-link col-4 px-0 rounded-0"
+                        <button class="btn btn-link col-3 px-0 rounded-0"
                                 :class="'theme-'+t"
                                 @click.stop="theme.name = t"
-                                v-for="t in ['light', 'sepia', 'night']">
+                                v-for="t in ['light', 'sepia', 'night', 'auto']">
                             <span class="icon" v-if="theme.name == t">{% inline "check.svg" %}</span>
                         </button>
                     </div>
