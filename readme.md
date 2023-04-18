@@ -14,13 +14,13 @@ The latest prebuilt binaries for Linux/MacOS/Windows are available
 
 ### macos
 
-Download `yarr-*-macos64.zip`, unzip it, place `yarr.app` in `/Applications` folder, [open the app][macos-open].
+Download `yarr-*-macos64.zip`, unzip it, place `yarr.app` in `/Applications` folder, [open the app][macos-open], click the anchor menu bar icon, select "Open".
 
 [macos-open]: https://support.apple.com/en-gb/guide/mac-help/mh40616/mac
 
 ### windows
 
-Download `yarr-*-windows64.zip`, unzip it, open `yarr.exe`
+Download `yarr-*-windows64.zip`, unzip it, open `yarr.exe`, click the anchor system tray icon, select "Open".
 
 ### linux
 
