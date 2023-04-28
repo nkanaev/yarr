@@ -276,7 +276,7 @@ func TestMarkItemsRead(t *testing.T) {
 func TestDeleteOldItems(t *testing.T) {
 	extraItems := 10
 
-	now := time.Now()
+	now := time.Now().UTC()
 	db := testDB()
 	feed := db.CreateFeed("feed", "", "", "http://test.com/feed11.xml", nil)
 
