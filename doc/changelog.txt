@@ -13,6 +13,7 @@
 - (fix) feed/article selection accessibility via arrow keys (thanks to @grigio and @tillcash)
 - (fix) keyboard shortcuts in Firefox (thanks to @kaloyan13)
 - (fix) keyboard shortcuts in non-English layouts (thanks to @kaloyan13)
+- (fix) sorting articles with timezone information (thanks to @x2cf)
 
 # v2.3 (2022-05-03)
 
