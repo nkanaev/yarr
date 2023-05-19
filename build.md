@@ -1,6 +1,6 @@
 ## Compilation
 
-Install `Go >= 1.16` and `GCC`. Get the source code:
+Install `Go >= 1.17` and `GCC`. Get the source code:
 
     git clone https://github.com/nkanaev/yarr.git
 
@@ -26,7 +26,7 @@ The instructions below are to cross-compile *yarr* to `Linux/ARM*`.
 
 Build:
 
-    docker build -t yarr.arm -f dockerfile.arm .
+    docker build -t yarr.arm -f Dockerfile.arm .
 
 Test:
 

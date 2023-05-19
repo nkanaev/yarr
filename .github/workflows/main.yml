@@ -1,0 +1,75 @@
+name: Test & Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, main, develop, dev ]
+  pull_request:
+    branches: [ master, main, develop, dev ]
+
+jobs:
+  build_macos:
+    name: Test & Build for MacOS
+    runs-on: macos-11
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.17'
+    - name: "Test"
+      run: make test
+    - name: "Build"
+      run: make build_macos
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos
+        path: _output/macos/yarr.app
+
+  build_windows:
+    name: Test & Build for Windows
+    runs-on: windows-2019
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.17'
+    - name: "Test"
+      run: make test
+    - name: "Build"
+      run: make build_windows
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows
+        path: _output/windows/yarr.exe
+
+  build_linux:
+    name: Test & Build for Linux
+    runs-on: ubuntu-20.04
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.17'
+    - name: "Test"
+      run: make test
+    - name: "Build"
+      run: make build_linux
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux
+        path: _output/linux/yarr

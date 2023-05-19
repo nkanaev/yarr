@@ -1,0 +1,114 @@
+name: Test, Build, & Release
+
+on:
+  push:
+    tags: ['v*.*', 'v*.*.*']
+
+jobs:
+  build_macos:
+    name: Test & Build for MacOS
+    runs-on: macos-11
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.17'
+    - name: "Test"
+      run: make test
+    - name: "Build"
+      run: make build_macos
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos
+        path: _output/macos/yarr.app
+
+  build_windows:
+    name: Test & Build for Windows
+    runs-on: windows-2019
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.17'
+    - name: "Test"
+      run: make test
+    - name: "Build"
+      run: make build_windows
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows
+        path: _output/windows/yarr.exe
+
+  build_linux:
+    name: Test & Build for Linux
+    runs-on: ubuntu-20.04
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.17'
+    - name: "Test"
+      run: make test
+    - name: "Build"
+      run: make build_linux
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux
+        path: _output/linux/yarr
+
+  create_release:
+    # Create release with GitHub CLI
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build_macos, build_windows, build_linux]
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Create Release
+      run: gh release create ${{ github.ref_name }} --title "Workflow - ${{ github.ref }}" --draft --prerelease
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: .
+    - name: Preparation
+      run: |
+        ls -R
+        chmod u+x macos/Contents/MacOS/yarr
+        chmod u+x linux/yarr
+
+        mv macos yarr.app     && zip -r yarr-macos.zip yarr.app
+        mv windows/yarr.exe . && zip yarr-windows.zip yarr.exe
+        mv linux/yarr .       && zip yarr-linux.zip yarr
+    - name: Upload MacOS
+      run: gh release upload ${{ github.ref_name }} --clobber ./yarr-macos.zip#yarr-${{ github.ref_name }}-macos-amd64.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Windows
+      run: gh release upload ${{ github.ref_name }} --clobber ./yarr-windows.zip#yarr-${{ github.ref_name }}-windows-amd64.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Linux
+      run: gh release upload ${{ github.ref_name }} --clobber ./yarr-linux.zip#yarr-${{ github.ref_name }}-linux-amd64.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
