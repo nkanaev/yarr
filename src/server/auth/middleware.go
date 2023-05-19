@@ -13,6 +13,7 @@ type Middleware struct {
 	Password string
 	BasePath string
 	Public   string
+	Title    string
 }
 
 func unsafeMethod(method string) bool {
@@ -47,9 +48,12 @@ func (m *Middleware) Handler(c *router.Context) {
 			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]string{
 				"username": username,
 				"error":    "Invalid username/password",
+				"title":    m.Title + " - Login",
 			})
 			return
 		}
 	}
-	c.HTML(http.StatusOK, assets.Template("login.html"), nil)
+	c.HTML(http.StatusOK, assets.Template("login.html"), map[string]string{
+		"title": m.Title + " - Login",
+	})
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"os"
@@ -47,7 +48,7 @@ func parseAuthfile(authfile io.Reader) (username, password string, err error) {
 func main() {
 	platform.FixConsoleIfNeeded()
 
-	var addr, db, authfile, auth, certfile, keyfile, basepath, logfile string
+	var addr, db, authfile, auth, certfile, keyfile, basepath, logfile, title string
 	var ver, open bool
 
 	flag.CommandLine.SetOutput(os.Stdout)
@@ -68,9 +69,13 @@ func main() {
 	flag.StringVar(&keyfile, "key-file", opt("YARR_KEYFILE", ""), "`path` to key file for https")
 	flag.StringVar(&db, "db", opt("YARR_DB", ""), "storage file `path`")
 	flag.StringVar(&logfile, "log-file", opt("YARR_LOGFILE", ""), "`path` to log file to use instead of stdout")
+	flag.StringVar(&title, "title", opt("YARR_TITLE", "Yarr!"), "title of the served page")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.BoolVar(&open, "open", false, "open the server in browser")
 	flag.Parse()
+
+	// Sanitize title as its used in the template.
+	title = template.HTMLEscapeString(title)
 
 	if ver {
 		fmt.Printf("v%s (%s)\n", Version, GitHash)
@@ -131,7 +136,7 @@ func main() {
 		log.Fatal("Failed to initialise database: ", err)
 	}
 
-	srv := server.NewServer(store, addr)
+	srv := server.NewServer(store, addr, title)
 
 	if basepath != "" {
 		srv.BasePath = "/" + strings.Trim(basepath, "/")

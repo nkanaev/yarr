@@ -21,18 +21,23 @@ type Server struct {
 	// auth
 	Username string
 	Password string
+
 	// https
 	CertFile string
 	KeyFile  string
+
+	// assets
+	Title string
 }
 
-func NewServer(db *storage.Storage, addr string) *Server {
+func NewServer(db *storage.Storage, addr string, name string) *Server {
 	return &Server{
 		db:          db,
 		Addr:        addr,
 		worker:      worker.NewWorker(db),
 		cache:       make(map[string]interface{}),
 		cache_mutex: &sync.Mutex{},
+		Title:       name,
 	}
 }
 

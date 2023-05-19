@@ -34,6 +34,7 @@ func (s *Server) handler() http.Handler {
 			Username: s.Username,
 			Password: s.Password,
 			Public:   "/static",
+			Title:    s.Title,
 		}
 		r.Use(a.Handler)
 	}
@@ -64,6 +65,7 @@ func (s *Server) handleIndex(c *router.Context) {
 	c.HTML(http.StatusOK, assets.Template("index.html"), map[string]interface{}{
 		"settings":      s.db.GetSettings(),
 		"authenticated": s.Username != "" && s.Password != "",
+		"title":         s.Title,
 	})
 }
 
