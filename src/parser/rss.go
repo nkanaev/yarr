@@ -20,7 +20,7 @@ type rssFeed struct {
 }
 
 type rssItem struct {
-	GUID        string         `xml:"guid"`
+	GUID        rssGuid         `xml:"guid"`
 	Title       string         `xml:"title"`
 	Link        string         `xml:"rss link"`
 	Description string         `xml:"rss description"`
@@ -34,6 +34,11 @@ type rssItem struct {
 	OrigEnclosureLink string `xml:"http://rssnamespace.org/feedburner/ext/1.0 origEnclosureLink"`
 
 	media
+}
+
+type rssGuid struct {
+	GUID        string `xml:",chardata"`
+	IsPermaLink string `xml:"isPermaLink,attr"`
 }
 
 type rssLink struct {
@@ -81,10 +86,15 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			}
 		}
 
+        permalink := ""
+        if srcitem.GUID.IsPermaLink == "true" {
+            permalink = srcitem.GUID.GUID
+        }
+
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:     firstNonEmpty(srcitem.GUID, srcitem.Link),
+			GUID:     firstNonEmpty(srcitem.GUID.GUID, srcitem.Link),
 			Date:     dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
-			URL:      firstNonEmpty(srcitem.OrigLink, srcitem.Link),
+			URL:      firstNonEmpty(srcitem.OrigLink, srcitem.Link, permalink),
 			Title:    srcitem.Title,
 			Content:  firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
 			AudioURL: podcastURL,
