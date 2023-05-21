@@ -178,7 +178,9 @@ func (s *Server) handleFeedIcon(c *router.Context) {
 	}
 
 	cachekey := "icon:" + strconv.FormatInt(id, 10)
+	s.cache_mutex.Lock()
 	cachedat := s.cache[cachekey]
+	s.cache_mutex.Unlock()
 	if cachedat == nil {
 		feed := s.db.GetFeed(id)
 		if feed == nil || feed.Icon == nil {
