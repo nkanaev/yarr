@@ -15,6 +15,7 @@
 - (fix) keyboard shortcuts in non-English layouts (thanks to @kaloyan13)
 - (fix) sorting articles with timezone information (thanks to @x2cf)
 - (fix) handling links set in guid only for certain feeds (thanks to @adaszko for the report)
+- (fix) crashes caused by feed icon endpoint (thanks to @adaszko)
 
 # v2.3 (2022-05-03)
 
