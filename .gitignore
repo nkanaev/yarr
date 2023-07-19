@@ -3,3 +3,6 @@
 *.db
 *.syso
 versioninfo.rc
+
+.vscode
+.DS_Store

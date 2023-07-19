@@ -89,12 +89,12 @@ func main() {
 		log.SetOutput(os.Stdout)
 	}
 
-	configPath, err := os.UserConfigDir()
-	if err != nil {
-		log.Fatal("Failed to get config dir: ", err)
-	}
-
 	if db == "" {
+		configPath, err := os.UserConfigDir()
+		if err != nil {
+			log.Fatal("Failed to get config dir: ", err)
+		}
+
 		storagePath := filepath.Join(configPath, "yarr")
 		if err := os.MkdirAll(storagePath, 0755); err != nil {
 			log.Fatal("Failed to create app config dir: ", err)
@@ -116,6 +116,7 @@ func main() {
 			log.Fatal("Failed to parse auth file: ", err)
 		}
 	} else if auth != "" {
+		var err error
 		username, password, err = parseAuthfile(strings.NewReader(auth))
 		if err != nil {
 			log.Fatal("Failed to parse auth literal: ", err)
@@ -128,7 +129,7 @@ func main() {
 
 	store, err := storage.New(db)
 	if err != nil {
-		log.Fatal("Failed to initialise database: ", err)
+		log.Fatal("Failed to initialize database: ", err)
 	}
 
 	srv := server.NewServer(store, addr)
