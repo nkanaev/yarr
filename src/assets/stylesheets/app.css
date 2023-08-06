@@ -427,6 +427,11 @@ select.form-control:not([multiple]):not([size]) {
   font-size: 1rem;
 }
 
+.content p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
 /* theme: light */
 
 button.theme-light {
