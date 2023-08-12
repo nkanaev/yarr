@@ -1,6 +1,6 @@
 ## Compilation
 
-Install `Go >= 1.16` and `GCC`. Get the source code:
+Install `Go >= 1.17` and `GCC`. Get the source code:
 
     git clone https://github.com/nkanaev/yarr.git
 
