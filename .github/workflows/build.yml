@@ -7,7 +7,7 @@ on:
 jobs:
   build_macos:
     name: Build for MacOS
-    runs-on: macos-10.15
+    runs-on: macos-13
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
@@ -34,7 +34,7 @@ jobs:
 
   build_windows:
     name: Build for Windows
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
@@ -61,7 +61,7 @@ jobs:
 
   build_linux:
     name: Build for Linux
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
