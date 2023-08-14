@@ -133,7 +133,7 @@
                            :class="{'d-none': filterSelected
                                               && !(current.folder.id == folder.id || current.feed.folder_id == folder.id)
                                               && !filteredFolderStats[folder.id]
-                                              && (!itemSelectedDetails || feedsById[itemSelectedDetails.feed_id].folder_id != folder.id)}">
+                                              && (!itemSelectedDetails || (feedsById[itemSelectedDetails.feed_id] || {}).folder_id != folder.id)}">
                         <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
                         <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
                             <span class="icon mr-2"
@@ -274,7 +274,7 @@
                                 <span class="icon icon-small mr-1" v-if="item.status=='starred'">{% inline "star-full.svg" %}</span>
                             </transition>
                             <small class="flex-fill text-truncate mr-1">
-                                {{ feedsById[item.feed_id].title }}
+                                {{ (feedsById[item.feed_id] || {}).title }}
                             </small>
                             <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                         </div>
@@ -338,7 +338,7 @@
                 <div class="content-wrapper">
                     <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
                     <div class="text-muted">
-                        <div>{{ feedsById[itemSelectedDetails.feed_id].title }}</div>
+                        <div>{{ (feedsById[itemSelectedDetails.feed_id] || {}).title }}</div>
                         <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                     </div>
                     <hr>

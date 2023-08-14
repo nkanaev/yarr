@@ -410,6 +410,7 @@ var vm = new Vue({
     refreshItems: function(loadMore) {
       if (this.feedSelected === null) {
         vm.items = []
+        vm.itemsHasMore = false
         return
       }
 
@@ -516,10 +517,7 @@ var vm = new Vue({
     deleteFolder: function(folder) {
       if (confirm('Are you sure you want to delete ' + folder.title + '?')) {
         api.folders.delete(folder.id).then(function() {
-          if (vm.feedSelected === 'folder:'+folder.id) {
-            vm.items = []
-            vm.feedSelected = ''
-          }
+          vm.feedSelected = null
           vm.refreshStats()
           vm.refreshFeeds()
         })
@@ -536,12 +534,7 @@ var vm = new Vue({
     deleteFeed: function(feed) {
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         api.feeds.delete(feed.id).then(function() {
-          // unselect feed to prevent reading properties of null in template
-          var isSelected = !vm.feedSelected
-            || (vm.feedSelected === 'feed:'+feed.id
-            || (feed.folder_id && vm.feedSelected === 'folder:'+feed.folder_id));
-          if (isSelected) vm.feedSelected = null
-
+          vm.feedSelected = null
           vm.refreshStats()
           vm.refreshFeeds()
         })
