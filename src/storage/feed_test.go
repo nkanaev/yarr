@@ -17,6 +17,23 @@ func TestCreateFeed(t *testing.T) {
 	}
 }
 
+func TestCreateFeedSameLink(t *testing.T) {
+	db := testDB()
+	feed1 := db.CreateFeed("title", "", "", "http://example1.com/feed.xml", nil)
+	if feed1 == nil || feed1.Id == 0 {
+		t.Fatal("expected feed")
+	}
+
+    for i := 0; i < 10; i++ {
+	    db.CreateFeed("title", "", "", "http://example2.com/feed.xml", nil)
+    }
+
+	feed2 := db.CreateFeed("title", "", "http://example.com", "http://example1.com/feed.xml", nil)
+	if feed1.Id != feed2.Id {
+        t.Fatalf("expected the same feed.\nwant: %#v\nhave: %#v", feed1, feed2)
+	}
+}
+
 func TestReadFeed(t *testing.T) {
 	db := testDB()
 	if db.GetFeed(100500) != nil {

@@ -20,20 +20,21 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 	if title == "" {
 		title = feedLink
 	}
-	result, err := s.db.Exec(`
+	row := s.db.QueryRow(`
 		insert into feeds (title, description, link, feed_link, folder_id) 
 		values (?, ?, ?, ?, ?)
-		on conflict (feed_link) do update set folder_id=?`,
+		on conflict (feed_link) do update set folder_id = ?
+        returning id`,
 		title, description, link, feedLink, folderId,
 		folderId,
 	)
-	if err != nil {
-		return nil
-	}
-	id, idErr := result.LastInsertId()
-	if idErr != nil {
-		return nil
-	}
+
+    var id int64
+    err := row.Scan(&id)
+    if err != nil {
+        log.Print(err)
+        return nil
+    }
 	return &Feed{
 		Id:          id,
 		Title:       title,
