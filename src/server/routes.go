@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/nkanaev/yarr/src/assets"
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"github.com/nkanaev/yarr/src/content/readability"
 	"github.com/nkanaev/yarr/src/content/sanitizer"
 	"github.com/nkanaev/yarr/src/content/silo"
@@ -312,6 +313,14 @@ func (s *Server) handleItem(c *router.Context) {
 			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+        // runtime fix for relative links
+        if !strings.HasPrefix(item.Link, "http") {
+            if feed := s.db.GetFeed(item.FeedId); feed != nil {
+                item.Link = htmlutil.AbsoluteUrl(item.Link, feed.Link)
+            }
+        }
+
 		item.Content = sanitizer.Sanitize(item.Link, item.Content)
 
 		c.JSON(http.StatusOK, item)
