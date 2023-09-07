@@ -2,6 +2,7 @@ package htmlutil
 
 import (
 	"net/url"
+	"strings"
 )
 
 func Any(els []string, el string, match func(string, string) bool) bool {
@@ -30,4 +31,8 @@ func URLDomain(val string) string {
 		return u.Host
 	}
 	return val
+}
+
+func IsAPossibleLink(val string) bool {
+	return strings.HasPrefix(val, "http://") || strings.HasPrefix(val, "https://")
 }

@@ -217,11 +217,11 @@ func TestRSSIsPermalink(t *testing.T) {
 	`))
 	have := feed.Items
 	want := []Item{
-        {
-            GUID:    "http://example.com/posts/1",
-            URL:     "http://example.com/posts/1",
-        },
-    }
+		{
+			GUID: "http://example.com/posts/1",
+			URL:  "http://example.com/posts/1",
+		},
+	}
 	for i := 0; i < len(want); i++ {
 		if want[i] != have[i] {
 			t.Errorf("Failed to handle isPermalink\nwant: %#v\nhave: %#v\n", want[i], have[i])

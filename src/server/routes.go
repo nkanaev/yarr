@@ -314,12 +314,12 @@ func (s *Server) handleItem(c *router.Context) {
 			return
 		}
 
-        // runtime fix for relative links
-        if !strings.HasPrefix(item.Link, "http") {
-            if feed := s.db.GetFeed(item.FeedId); feed != nil {
-                item.Link = htmlutil.AbsoluteUrl(item.Link, feed.Link)
-            }
-        }
+		// runtime fix for relative links
+		if !htmlutil.IsAPossibleLink(item.Link) {
+			if feed := s.db.GetFeed(item.FeedId); feed != nil {
+				item.Link = htmlutil.AbsoluteUrl(item.Link, feed.Link)
+			}
+		}
 
 		item.Content = sanitizer.Sanitize(item.Link, item.Content)
 

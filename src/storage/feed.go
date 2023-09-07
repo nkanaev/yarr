@@ -29,12 +29,12 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 		folderId,
 	)
 
-    var id int64
-    err := row.Scan(&id)
-    if err != nil {
-        log.Print(err)
-        return nil
-    }
+	var id int64
+	err := row.Scan(&id)
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
 	return &Feed{
 		Id:          id,
 		Title:       title,

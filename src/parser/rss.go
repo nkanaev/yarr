@@ -20,7 +20,7 @@ type rssFeed struct {
 }
 
 type rssItem struct {
-	GUID        rssGuid         `xml:"guid"`
+	GUID        rssGuid        `xml:"guid"`
 	Title       string         `xml:"title"`
 	Link        string         `xml:"rss link"`
 	Description string         `xml:"rss description"`
@@ -86,10 +86,10 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			}
 		}
 
-        permalink := ""
-        if srcitem.GUID.IsPermaLink == "true" {
-            permalink = srcitem.GUID.GUID
-        }
+		permalink := ""
+		if srcitem.GUID.IsPermaLink == "true" {
+			permalink = srcitem.GUID.GUID
+		}
 
 		dstfeed.Items = append(dstfeed.Items, Item{
 			GUID:     firstNonEmpty(srcitem.GUID.GUID, srcitem.Link),

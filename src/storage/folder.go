@@ -17,11 +17,11 @@ func (s *Storage) CreateFolder(title string) *Folder {
 		on conflict (title) do update set title = ?
         returning id`,
 		title, expanded,
-        // provide title again so that we can extract row id
-        title,
+		// provide title again so that we can extract row id
+		title,
 	)
-    var id int64
-    err := row.Scan(&id)
+	var id int64
+	err := row.Scan(&id)
 
 	if err != nil {
 		log.Print(err)
