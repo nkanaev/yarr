@@ -1,9 +1,9 @@
 VERSION=2.4
 GITHASH=$(shell git rev-parse --short=8 HEAD)
 
-CGO_ENABLED=1
+CGO_ENABLED=0
 
-GO_LDFLAGS  = -s -w
+GO_LDFLAGS  = -linkmode 'external' -extldflags '-static' -s -w
 GO_LDFLAGS := $(GO_LDFLAGS) -X 'main.Version=$(VERSION)' -X 'main.GitHash=$(GITHASH)'
 
 build_default:
