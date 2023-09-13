@@ -177,6 +177,23 @@ func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []interfac
 	return predicate, args
 }
 
+func (s *Storage) CountItems(filter ItemFilter) int {
+	predicate, args := listQueryPredicate(filter, false)
+
+	var count int
+	query := fmt.Sprintf(`
+		select count(*)
+		from items
+		where %s
+		`, predicate)
+	err := s.db.QueryRow(query, args...).Scan(&count)
+	if err != nil {
+		log.Print(err)
+		return 0
+	}
+	return count
+}
+
 func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, withContent bool) []Item {
 	predicate, args := listQueryPredicate(filter, newestFirst)
 	result := make([]Item, 0, 0)
@@ -185,8 +202,11 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 	if !newestFirst {
 		order = "date asc, id asc"
 	}
-	if filter.IDs != nil || filter.SinceID != nil || filter.MaxID != nil {
+	if filter.IDs != nil || filter.SinceID != nil {
 		order = "i.id asc"
+	}
+	if filter.MaxID != nil {
+		order = "i.id desc"
 	}
 
 	selectCols := "i.id, i.guid, i.feed_id, i.title, i.link, i.date, i.status, i.image, i.podcast_url"
