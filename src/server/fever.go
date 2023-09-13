@@ -54,7 +54,7 @@ type FeverFavicon struct {
 }
 
 func writeFeverJSON(c *router.Context, data map[string]interface{}, lastRefreshed int64) {
-	data["api_version"] = 1
+	data["api_version"] = 3
 	data["auth"] = 1
 	data["last_refreshed_on_time"] = lastRefreshed
 	c.JSON(http.StatusOK, data)
@@ -77,9 +77,10 @@ func getLastRefreshedOnTime(httpStates map[int64]storage.HTTPState) int64 {
 func (s *Server) feverAuth(c *router.Context) bool {
 	if s.Username != "" && s.Password != "" {
 		apiKey := c.Req.FormValue("api_key")
+		apiKey = strings.ToLower(apiKey)
 		md5HashValue := md5.Sum([]byte(fmt.Sprintf("%s:%s", s.Username, s.Password)))
 		hexMD5HashValue := fmt.Sprintf("%x", md5HashValue[:])
-		if auth.StringsEqual(apiKey, hexMD5HashValue) {
+		if !auth.StringsEqual(apiKey, hexMD5HashValue) {
 			return false
 		}
 	}
@@ -97,7 +98,7 @@ func (s *Server) handleFever(c *router.Context) {
 	c.Req.ParseForm()
 	if !s.feverAuth(c) {
 		c.JSON(http.StatusOK, map[string]interface{}{
-			"api_version":            1,
+			"api_version":            3,
 			"auth":                   0,
 			"last_refreshed_on_time": 0,
 		})
@@ -123,7 +124,7 @@ func (s *Server) handleFever(c *router.Context) {
 		s.feverMarkHandler(c)
 	default:
 		c.JSON(http.StatusOK, map[string]interface{}{
-			"api_version":            1,
+			"api_version":            3,
 			"auth":                   1,
 			"last_refreshed_on_time": getLastRefreshedOnTime(s.db.ListHTTPStates()),
 		})
@@ -277,8 +278,11 @@ func (s *Server) feverItemsHandler(c *router.Context) {
 		}
 	}
 
+	totalItems := s.db.CountItems(storage.ItemFilter{})
+
 	writeFeverJSON(c, map[string]interface{}{
-		"items": feverItems,
+		"items":       feverItems,
+		"total_items": totalItems,
 	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
@@ -382,4 +386,8 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"api_version": 3,
+		"auth":        1,
+	})
 }
