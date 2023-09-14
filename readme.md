@@ -30,9 +30,7 @@ and run [the script](etc/install-linux.sh).
 For self-hosting, see `yarr -h` for auth, tls & server configuration flags.
 For building from source code, see [build.md](build.md)
 
-## Fever API
-
-Now, the Fever API is supported, see [Fever API support](fever.md).
+For Fever API support, see [fever.md](fever.md).
 
 ## credits
 
