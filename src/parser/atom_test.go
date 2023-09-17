@@ -94,6 +94,44 @@ func TestAtomHTMLTitle(t *testing.T) {
 	}
 }
 
+func TestAtomXHTMLTitle(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom">
+			<entry><title type="xhtml">say &lt;code&gt;what&lt;/code&gt;?</entry>
+		</feed>
+	`))
+	have := feed.Items[0].Title
+	want := "say what?"
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
+func TestAtomXHTMLNestedTitle(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom">
+			<entry>
+				<title type="xhtml">
+					<div xmlns="http://www.w3.org/1999/xhtml">
+						<a href="https://example.com">Link to Example</a>
+					</div>
+				</title>
+			</entry>
+		</feed>
+	`))
+	have := feed.Items[0].Title
+	want := "Link to Example"
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
 func TestAtomImageLink(t *testing.T) {
 	feed, _ := Parse(strings.NewReader(`
 		<?xml version="1.0" encoding="UTF-8"?>
