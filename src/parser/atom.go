@@ -47,6 +47,8 @@ type atomLinks []atomLink
 func (a *atomText) Text() string {
 	if a.Type == "html" {
 		return htmlutil.ExtractText(a.Data)
+	} else if a.Type == "xhtml" {
+		return htmlutil.ExtractText(a.XML)
 	}
 	return a.Data
 }
