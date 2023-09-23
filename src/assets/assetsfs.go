@@ -1,6 +1,3 @@
-//go:build release
-// +build release
-
 package assets
 
 import "embed"
