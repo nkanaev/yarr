@@ -15,6 +15,8 @@
         window.app.authenticated = {% .authenticated %}
 
         if ("serviceWorker" in navigator) {
+            // we use `./sw.js` instead of `./static/javascripts/sw.js` since the latter would not work with
+            // `./manifest.json`, and it leads to uninstallable PWA
             navigator.serviceWorker.register("./sw.js")
         }
     </script>
