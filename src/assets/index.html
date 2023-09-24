@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/stylesheets/app.css" crossorigin="use-credentials">
     <link rel="icon" href="/static/graphicarts/favicon.svg" type="image/svg+xml" crossorigin="use-credentials">
     <link rel="alternate icon" href="/static/graphicarts/favicon.png" type="image/png" crossorigin="use-credentials">
-    <link rel="manifest" href="/static/manifest.json" crossorigin="use-credentials"/>
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script>
         window.app = window.app || {}
@@ -15,7 +15,7 @@
         window.app.authenticated = {% .authenticated %}
 
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/static/javascripts/sw.js");
+            navigator.serviceWorker.register("/static/javascripts/sw.js")
         }
     </script>
 </head>
