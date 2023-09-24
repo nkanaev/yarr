@@ -9,7 +9,6 @@ import "embed"
 //go:embed graphicarts
 //go:embed javascripts
 //go:embed stylesheets
-//go:embed manifest.json
 var embedded embed.FS
 
 func init() {
