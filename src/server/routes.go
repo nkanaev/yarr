@@ -86,12 +86,17 @@ func (s *Server) handleManifest(c *router.Context) {
 		"short_name":  "yarr",
 		"description": "yet another rss reader",
 		"display":     "standalone",
-		"start_url":   s.BasePath,
+		"start_url":   "/",
 		"icons": []map[string]interface{}{
 			{
 				"src":   s.BasePath + "/static/graphicarts/favicon.png",
 				"sizes": "64x64",
 				"type":  "image/png",
+			},
+			{
+				"src":   s.BasePath + "/static/graphicarts/favicon.svg",
+				"sizes": "any",
+				"type":  "image/svg",
 			},
 		},
 	})
