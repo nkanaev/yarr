@@ -41,6 +41,7 @@ func (s *Server) handler() http.Handler {
 
 	r.For("/", s.handleIndex)
 	r.For("/manifest.json", s.handleManifest)
+	r.For("/sw.js", s.handleServiceWorker)
 	r.For("/static/*path", s.handleStatic)
 	r.For("/api/status", s.handleStatus)
 	r.For("/api/folders", s.handleFolderList)
@@ -105,6 +106,10 @@ func (s *Server) handleManifest(c *router.Context) {
 			},
 		},
 	})
+}
+
+func (s *Server) handleServiceWorker(c *router.Context) {
+	http.ServeFile(c.Out, c.Req, "src/assets/javascripts/sw.js")
 }
 
 func (s *Server) handleStatus(c *router.Context) {

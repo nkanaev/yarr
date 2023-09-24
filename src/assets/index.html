@@ -15,7 +15,7 @@
         window.app.authenticated = {% .authenticated %}
 
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/static/javascripts/sw.js")
+            navigator.serviceWorker.register("./sw.js")
         }
     </script>
 </head>
