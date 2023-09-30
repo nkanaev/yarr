@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 	"time"
 
@@ -75,6 +76,25 @@ type MarkFilter struct {
 	Before *time.Time
 }
 
+type ItemList []Item
+
+func (list ItemList) Len() int {
+    return len(list)
+}
+
+func (list ItemList) SortKey(i int) string {
+    return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
+}
+
+func (list ItemList) Less(i, j int) bool {
+    return list.SortKey(i) < list.SortKey(j)
+}
+
+func (list ItemList) Swap(i, j int) {
+    list[i], list[j] = list[j], list[i]
+}
+
+
 func (s *Storage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
@@ -84,7 +104,10 @@ func (s *Storage) CreateItems(items []Item) bool {
 
 	now := time.Now().UTC()
 
-	for _, item := range items {
+    itemsSorted := ItemList(items)
+    sort.Sort(itemsSorted)
+
+	for _, item := range itemsSorted {
 		_, err = tx.Exec(`
 			insert into items (
 				guid, feed_id, title, link, date,

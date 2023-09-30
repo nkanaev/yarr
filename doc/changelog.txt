@@ -5,6 +5,7 @@
 - (fix) relative article links (thanks to @adazsko for the report)
 - (fix) atom article links stored in id element (thanks to @adazsko for the report)
 - (fix) parsing atom feed titles (thanks to @wnh)
+- (fix) sorting same-day batch articles (thanks to @lamescholar for the report)
 
 # v2.4 (2023-08-15)
 
