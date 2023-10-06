@@ -278,7 +278,7 @@
                             </small>
                             <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                         </div>
-                        <div>{{ item.title || 'untitled' }}</div>
+                        <div>{{ item.title || '&nbsp;' }}</div>
                     </div>
                 </label>
                 <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
@@ -336,7 +336,7 @@
                  :class="{'font-serif': theme.font == 'serif', 'font-monospace': theme.font == 'monospace'}"
                  :style="{'font-size': theme.size + 'rem'}">
                 <div class="content-wrapper">
-                    <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
+                    <h1><b>{{ itemSelectedDetails.title || '&nbsp;' }}</b></h1>
                     <div class="text-muted">
                         <div>{{ (feedsById[itemSelectedDetails.feed_id] || {}).title }}</div>
                         <time>{{ formatDate(itemSelectedDetails.date) }}</time>
