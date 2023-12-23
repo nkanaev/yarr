@@ -214,3 +214,19 @@ func TestAtomLinkInID(t *testing.T) {
 		t.Fatalf("\nwant: %#v\nhave: %#v\n", want, have)
 	}
 }
+
+func TestAtomContentEscaped(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+			<entry>
+				<content type="html">&lt;code&gt;&amp;gt;&lt;/code&gt;</content>
+			</entry>
+		</feed>
+	`))
+	have := feed.Items[0].Content
+	want := `<code>&gt;</code>`
+	if want != have {
+		t.Fatalf("want: %#v\nhave: %#v\n", want, have)
+	}
+}
