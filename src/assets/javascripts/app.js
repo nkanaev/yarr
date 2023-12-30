@@ -199,8 +199,6 @@ var vm = new Vue({
     api.feeds.list_errors().then(function(errors) {
       vm.feed_errors = errors
     })
-
-    alert(new URLSearchParams(window.location.search).get('test'))
   },
   data: function() {
     var s = app.settings
