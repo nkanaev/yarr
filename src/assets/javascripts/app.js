@@ -183,6 +183,14 @@ Vue.component('relative-time', {
 })
 
 var vm = new Vue({
+  mounted:function(){
+    const subscribe_to = new URLSearchParams(window.location.search).get('subscribe_to');
+    if(subscribe_to){
+      vm.settings = 'create'
+      //document.getElementById("feed-url").value = subscribe_to;
+      this.autoFeedUrl = subscribe_to;
+    }
+  },
   created: function() {
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
@@ -191,6 +199,8 @@ var vm = new Vue({
     api.feeds.list_errors().then(function(errors) {
       vm.feed_errors = errors
     })
+
+    alert(new URLSearchParams(window.location.search).get('test'))
   },
   data: function() {
     var s = app.settings
@@ -676,6 +686,7 @@ var vm = new Vue({
       this.filteredTotalStats = statsTotal
     },
   }
+  
 })
 
 vm.$mount('#app')
