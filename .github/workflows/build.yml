@@ -150,7 +150,7 @@ jobs:
       - name: Read latest release tag
         id: read-tag
         run: |
-          echo ::set-output name=tag::$(curl -sL https://raw.githubusercontent.com/rebron1900/yarr/main/yarr-version.txt)
+          echo ::set-output name=tag::$(curl -sL https://raw.githubusercontent.com/rebron1900/yarr/master/yarr-version.txt)
       - name: Checkout
         uses: actions/checkout@v2
         with:
