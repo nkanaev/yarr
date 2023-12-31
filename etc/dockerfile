@@ -1,4 +1,4 @@
-FROM golang:alpine AS build
+FROM golang:alpine3.18 AS build
 RUN apk add build-base git
 WORKDIR /src
 COPY . .
