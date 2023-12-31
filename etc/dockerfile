@@ -1,12 +1,13 @@
 FROM golang:1.21.5-alpine AS build
-RUN apk add --no-cache build-base git
-
+RUN apk add build-base git
 WORKDIR /src
-RUN git clone https://github.com/nkanaev/yarr.git .
+COPY . .
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
-RUN make build_default
+RUN make build_linux
 
-FROM alpine:3.19
-COPY --from=build /src/_output/yarr /usr/local/bin/yarr
-RUN mkdir /data
+FROM alpine:latest
+RUN apk add --no-cache ca-certificates && \
+    update-ca-certificates
+COPY --from=build /src/_output/linux/yarr /usr/local/bin/yarr
+EXPOSE 7070
 CMD ["/usr/local/bin/yarr", "-addr", "0.0.0.0:7070", "-db", "/data/yarr.db"]
