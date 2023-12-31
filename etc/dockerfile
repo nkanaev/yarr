@@ -2,6 +2,7 @@ FROM golang:alpine AS build
 RUN apk add build-base git
 WORKDIR /src
 COPY . .
+ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
 RUN make build_linux
 
 FROM alpine:latest
