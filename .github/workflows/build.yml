@@ -100,8 +100,6 @@ jobs:
       with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          draft: true
-          prerelease: true
     - name: Download Artifacts
       uses: actions/download-artifact@v2
       with:
@@ -172,7 +170,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./etc/dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
