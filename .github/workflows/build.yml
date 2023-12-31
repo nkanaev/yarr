@@ -100,8 +100,6 @@ jobs:
       with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          draft: true
-          prerelease: true
     - name: Download Artifacts
       uses: actions/download-artifact@v2
       with:
@@ -142,3 +140,38 @@ jobs:
           asset_path: ./yarr-linux.zip
           asset_name: yarr-${{ github.ref }}-linux64.zip
           asset_content_type: application/zip
+
+  build_docker:
+    runs-on: ubuntu-latest
+    needs: [create_release]
+    steps:
+      - name: Read latest release tag
+        id: read-tag
+        run: |
+          echo ::set-output name=tag::$(curl -sL https://raw.githubusercontent.com/rebron1900/yarr/master/yarr-version.txt)
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: 'rebron1900/yarr'
+          ref: ${{ steps.read-tag.outputs.tag }}
+      - name: Remove GOARCH
+        run: |
+          sed -i -e 's/GOARCH=amd64//g' makefile
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to registry
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push to Docker
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/yarr:latest
+            ${{ secrets.DOCKER_USERNAME }}/yarr:${{ steps.read-tag.outputs.tag }}

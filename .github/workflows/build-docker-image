@@ -1,38 +1,47 @@
-name: Publish Docker Image
+name: Build Yarr Docker image
 on:
+  workflow_dispatch:
   push:
-    tags: [ 'v*.*.*', 'v*.*', 'v*', 'latest' ]
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: nkanaev/yarr
+    paths:
+      - 'yarr-version.txt'
 jobs:
-  build-and-push-image:
+  main:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      -
+        name: Read latest release tag
+        id: read-tag
+        run: |
+          echo ::set-output name=tag::$(curl -sL https://raw.githubusercontent.com/rebron1900/yarr/main/yarr-version.txt)
+      -
+        name: Checkout
+        uses: actions/checkout@v2
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+          repository: 'rebron1900/yarr'
+          ref: ${{ steps.read-tag.outputs.tag }}
+      - 
+        name: Remove GOARCH
+        run: |
+          sed -i -e 's/GOARCH=amd64//g' makefile
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - 
+        name: Login to registry
+        uses: docker/login-action@v1 
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - 
+        name: Push to Docker
+        uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./etc/dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/yarr:latest
+            ${{ secrets.DOCKER_USERNAME }}/yarr:${{ steps.read-tag.outputs.tag }}
