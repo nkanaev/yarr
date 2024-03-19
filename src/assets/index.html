@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>yarr!</title>
-    <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css">
-    <link rel="stylesheet" href="./static/stylesheets/app.css">
-    <link rel="icon" href="./static/graphicarts/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png">
-    <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css" crossorigin="use-credentials">
+    <link rel="stylesheet" href="./static/stylesheets/app.css" crossorigin="use-credentials">
+    <link rel="icon" href="./static/graphicarts/favicon.svg" type="image/svg+xml" crossorigin="use-credentials">
+    <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png" crossorigin="use-credentials">
+    <link rel="manifest" href="./manifest.json" crossorigin="use-credentials"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script>
         window.app = window.app || {}
         window.app.settings = {% .settings %}
         window.app.authenticated = {% .authenticated %}
+
+        if ("serviceWorker" in navigator) {
+            // we use `./sw.js` instead of `./static/javascripts/sw.js` since the latter would not work with
+            // `./manifest.json`, and it leads to uninstallable PWA
+            navigator.serviceWorker.register("./sw.js")
+        }
     </script>
 </head>
 <body class="theme-{% .settings.theme_name %}">
