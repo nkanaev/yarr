@@ -20,6 +20,10 @@ build_linux:
 	mkdir -p _output/linux
 	GOOS=linux GOARCH=amd64 go build -tags "sqlite_foreign_keys linux" -ldflags="$(GO_LDFLAGS)" -o _output/linux/yarr ./cmd/yarr
 
+build_linux_x86:
+	mkdir -p _output/linux
+	GOOS=linux GOARCH=386 go build -tags "sqlite_foreign_keys linux" -ldflags="$(GO_LDFLAGS)" -o _output/linux/yarr ./cmd/yarr
+
 build_windows:
 	mkdir -p _output/windows
 	go run ./cmd/generate_versioninfo -version "$(VERSION)" -outfile src/platform/versioninfo.rc
