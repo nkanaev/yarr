@@ -339,6 +339,7 @@
                     <h1><b>{{ itemSelectedDetails.title || '&nbsp;' }}</b></h1>
                     <div class="text-muted">
                         <div>{{ (feedsById[itemSelectedDetails.feed_id] || {}).title }}</div>
+                        <div>{{ itemSelectedDetails.author }}</div>
                         <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                     </div>
                     <hr>

@@ -49,6 +49,7 @@ type Item struct {
 	GUID     string     `json:"guid"`
 	FeedId   int64      `json:"feed_id"`
 	Title    string     `json:"title"`
+	Author   string     `json:"author"`
 	Link     string     `json:"link"`
 	Content  string     `json:"content,omitempty"`
 	Date     time.Time  `json:"date"`

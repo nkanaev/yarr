@@ -155,6 +155,7 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 			GUID:     item.GUID,
 			FeedId:   feed.Id,
 			Title:    item.Title,
+			Author:   item.Author,
 			Link:     item.URL,
 			Content:  item.Content,
 			Date:     item.Date,

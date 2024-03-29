@@ -13,6 +13,7 @@ type Item struct {
 	Date  time.Time
 	URL   string
 	Title string
+	Author string
 
 	Content  string
 	ImageURL string
