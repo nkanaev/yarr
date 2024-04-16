@@ -111,13 +111,17 @@ func (s *Storage) CreateItems(items []Item) bool {
 	for _, item := range itemsSorted {
 		_, err = tx.Exec(`
 			insert into items (
-				guid, feed_id, title, link, date,
+				guid, feed_id, title, author, link, date,
 				content, image, podcast_url,
 				date_arrived, status
 			)
-			values (?, ?, ?, ?, strftime('%Y-%m-%d %H:%M:%f', ?), ?, ?, ?, ?, ?)
+			values (
+				?, ?, ?, ?, ?, strftime('%Y-%m-%d %H:%M:%f', ?),
+				?, ?, ?,
+				?, ?
+			)
 			on conflict (feed_id, guid) do nothing`,
-			item.GUID, item.FeedId, item.Title, item.Link, item.Date,
+			item.GUID, item.FeedId, item.Title, item.Author, item.Link, item.Date,
 			item.Content, item.ImageURL, item.AudioURL,
 			now, UNREAD,
 		)
@@ -233,7 +237,10 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 		order = "i.id desc"
 	}
 
-	selectCols := "i.id, i.guid, i.feed_id, i.title, i.link, i.date, i.status, i.image, i.podcast_url"
+	selectCols := `
+		i.id, i.guid, i.feed_id,
+		i.title, i.link, i.date, ifnull(i.author,''),
+		i.status, i.image, i.podcast_url`
 	if withContent {
 		selectCols += ", i.content"
 	} else {
@@ -255,7 +262,7 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 		var x Item
 		err = rows.Scan(
 			&x.Id, &x.GUID, &x.FeedId,
-			&x.Title, &x.Link, &x.Date,
+			&x.Title, &x.Link, &x.Date, &x.Author,
 			&x.Status, &x.ImageURL, &x.AudioURL, &x.Content,
 		)
 		if err != nil {
@@ -271,12 +278,12 @@ func (s *Storage) GetItem(id int64) *Item {
 	i := &Item{}
 	err := s.db.QueryRow(`
 		select
-			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
+			i.id, i.guid, i.feed_id, i.title, i.link, i.content, ifnull(i.author, ''),
 			i.date, i.status, i.image, i.podcast_url
 		from items i
 		where i.id = ?
 	`, id).Scan(
-		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
+		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content, &i.Author,
 		&i.Date, &i.Status, &i.ImageURL, &i.AudioURL,
 	)
 	if err != nil {
