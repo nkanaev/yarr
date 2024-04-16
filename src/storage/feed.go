@@ -71,6 +71,11 @@ func (s *Storage) UpdateFeedFolder(feedId int64, newFolderId *int64) bool {
 	return err == nil
 }
 
+func (s *Storage) UpdateFeedLink(feedId int64, newLink string) bool {
+	_, err := s.db.Exec(`update feeds set feed_link = ? where id = ?`, newLink, feedId)
+	return err == nil
+}
+
 func (s *Storage) UpdateFeedIcon(feedId int64, icon *[]byte) bool {
 	_, err := s.db.Exec(`update feeds set icon = ? where id = ?`, icon, feedId)
 	return err == nil

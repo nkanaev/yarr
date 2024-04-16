@@ -211,10 +211,10 @@
                         <span class="icon mr-1">{% inline "globe.svg" %}</span>
                         Website
                     </a>
-                    <a class="dropdown-item" :href="current.feed.feed_link" target="_blank" v-if="current.feed.feed_link">
-                        <span class="icon mr-1">{% inline "rss.svg" %}</span>
+                    <button class="dropdown-item" @click="updateFeedLink(current.feed)">
+                        <span class="icon mr-1">{% inline "edit.svg" %}</span>
                         Feed Link
-                    </a>
+                    </button>
                     <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
                     <button class="dropdown-item" @click="renameFeed(current.feed)">
                         <span class="icon mr-1">{% inline "edit.svg" %}</span>
