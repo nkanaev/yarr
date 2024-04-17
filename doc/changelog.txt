@@ -1,6 +1,7 @@
 # upcoming 
 
 - (new) Fever API support (thanks to @icefed)
+- (new) editable feed link (thanks to @adaszko)
 - (fix) duplicate articles caused by the same feed addition (thanks to @adaszko)
 - (fix) relative article links (thanks to @adazsko for the report)
 - (fix) atom article links stored in id element (thanks to @adazsko for the report)
