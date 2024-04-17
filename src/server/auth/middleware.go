@@ -6,6 +6,7 @@ import (
 
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/server/router"
+	"github.com/nkanaev/yarr/src/storage"
 )
 
 type Middleware struct {
@@ -13,6 +14,7 @@ type Middleware struct {
 	Password string
 	BasePath string
 	Public   []string
+	DB       *storage.Storage
 }
 
 func unsafeMethod(method string) bool {
@@ -46,12 +48,15 @@ func (m *Middleware) Handler(c *router.Context) {
 			c.Redirect(rootUrl)
 			return
 		} else {
-			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]string{
+			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]interface{}{
 				"username": username,
 				"error":    "Invalid username/password",
+		        "settings": m.DB.GetSettings(),
 			})
 			return
 		}
 	}
-	c.HTML(http.StatusOK, assets.Template("login.html"), nil)
+	c.HTML(http.StatusOK, assets.Template("login.html"), map[string]interface{}{
+        "settings": m.DB.GetSettings(),
+    })
 }
