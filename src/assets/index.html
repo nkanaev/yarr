@@ -342,7 +342,11 @@
                 <div class="content-wrapper">
                     <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
                     <div class="text-muted">
-                        <div>{{ (feedsById[itemSelectedDetails.feed_id] || {}).title }}</div>
+                        <div>
+                            <span class="cursor-pointer" @click="feedSelected = 'feed:'+(feedsById[itemSelectedDetails.feed_id] || {}).id">
+                                {{ (feedsById[itemSelectedDetails.feed_id] || {}).title }}
+                            </span>
+                        </div>
                         <time>{{ formatDate(itemSelectedDetails.date) }}</time>
                     </div>
                     <hr>
