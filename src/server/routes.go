@@ -294,7 +294,7 @@ func (s *Server) handleFeed(c *router.Context) {
 				s.db.UpdateFeedFolder(id, &folderId)
 			}
 		}
-		if link, ok := body["link"]; ok {
+		if link, ok := body["feed_link"]; ok {
 			if reflect.TypeOf(link).Kind() == reflect.String {
 				s.db.UpdateFeedLink(id, link.(string))
 			}

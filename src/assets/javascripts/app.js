@@ -524,10 +524,10 @@ var vm = new Vue({
       }
     },
     updateFeedLink: function(feed) {
-      var newLink = prompt('Feed Link', feed.link)
+      var newLink = prompt('Enter feed link', feed.feed_link)
       if (newLink) {
-        api.feeds.update(feed.id, {link: newLink}).then(function() {
-          feed.link = newLink
+        api.feeds.update(feed.id, {feed_link: newLink}).then(function() {
+          feed.feed_link = newLink
         })
       }
     },
