@@ -13,9 +13,10 @@ type Folder struct {
 }
 
 type Feed struct {
-	Title   string
-	FeedUrl string
-	SiteUrl string
+	Title       string
+	FeedUrl     string
+	SiteUrl     string
+	CustomOrder string
 }
 
 func (f Folder) AllFeeds() []Feed {
@@ -52,8 +53,8 @@ func (f Folder) outline(level int) string {
 
 func (f Feed) outline(level int) string {
 	return strings.Repeat(indent, level) + fmt.Sprintf(
-		`<outline type="rss" text="%s" xmlUrl="%s" htmlUrl="%s"/>`+nl,
-		e(f.Title), e(f.FeedUrl), e(f.SiteUrl),
+		`<outline type="rss" text="%s" xmlUrl="%s" htmlUrl="%s" customOrder="%s"/>`+nl,
+		e(f.Title), e(f.FeedUrl), e(f.SiteUrl), e(f.CustomOrder),
 	)
 }
 

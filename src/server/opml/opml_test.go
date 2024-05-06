@@ -10,9 +10,10 @@ func TestOPML(t *testing.T) {
 		Title: "",
 		Feeds: []Feed{
 			{
-				Title:   "title1",
-				FeedUrl: "https://baz.com/feed.xml",
-				SiteUrl: "https://baz.com/",
+				Title:       "title1",
+				FeedUrl:     "https://baz.com/feed.xml",
+				SiteUrl:     "https://baz.com/",
+				CustomOrder: "",
 			},
 		},
 		Folders: []Folder{
@@ -20,14 +21,16 @@ func TestOPML(t *testing.T) {
 				Title: "sub",
 				Feeds: []Feed{
 					{
-						Title:   "subtitle1",
-						FeedUrl: "https://foo.com/feed.xml",
-						SiteUrl: "https://foo.com/",
+						Title:       "subtitle1",
+						FeedUrl:     "https://foo.com/feed.xml",
+						SiteUrl:     "https://foo.com/",
+						CustomOrder: "123",
 					},
 					{
-						Title:   "&>",
-						FeedUrl: "https://bar.com/feed.xml",
-						SiteUrl: "https://bar.com/",
+						Title:       "&>",
+						FeedUrl:     "https://bar.com/feed.xml",
+						SiteUrl:     "https://bar.com/",
+						CustomOrder: "456",
 					},
 				},
 				Folders: []Folder{},
@@ -39,10 +42,10 @@ func TestOPML(t *testing.T) {
 <head><title>subscriptions</title></head>
 <body>
   <outline text="sub">
-    <outline type="rss" text="subtitle1" xmlUrl="https://foo.com/feed.xml" htmlUrl="https://foo.com/"/>
-    <outline type="rss" text="&amp;&gt;" xmlUrl="https://bar.com/feed.xml" htmlUrl="https://bar.com/"/>
+    <outline type="rss" text="subtitle1" xmlUrl="https://foo.com/feed.xml" htmlUrl="https://foo.com/" customOrder="123"/>
+    <outline type="rss" text="&amp;&gt;" xmlUrl="https://bar.com/feed.xml" htmlUrl="https://bar.com/" customOrder="456"/>
   </outline>
-  <outline type="rss" text="title1" xmlUrl="https://baz.com/feed.xml" htmlUrl="https://baz.com/"/>
+  <outline type="rss" text="title1" xmlUrl="https://baz.com/feed.xml" htmlUrl="https://baz.com/" customOrder=""/>
 </body>
 </opml>
 `

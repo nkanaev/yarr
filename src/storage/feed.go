@@ -14,18 +14,37 @@ type Feed struct {
 	FeedLink    string  `json:"feed_link"`
 	Icon        *[]byte `json:"icon,omitempty"`
 	HasIcon     bool    `json:"has_icon"`
+	CustomOrder string  `json:"custom_order"`
 }
 
-func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId *int64) *Feed {
+func (s *Storage) CreateFeed(title, description, link, feedLink, customOrder string, folderId *int64) *Feed {
 	if title == "" {
 		title = feedLink
 	}
+	if customOrder == "" {
+		// it's a text column (not int), to provide a bit more flexibility
+
+		// it's a not null column that defaults to an empty string (both in go
+		// and sql), to make the order-by result not having to mix null and not
+		// null
+
+		// OPML imports should include customOrder="a" or customOrder="1" or
+		// such, but when adding feeds via other means, we should just default
+		// to something. if we default to "", we couldn't sort via ASC
+
+		// defaulting to a "low" sort here seems more important, so that feeds
+		// imported with any order through the OPML, is more likely to be
+		// respected. "xxxxxxxxx" should be "low enough" to not conflict with
+		// feeds without a custom order
+
+		customOrder = "xxxxxxxxx"
+	}
 	row := s.db.QueryRow(`
-		insert into feeds (title, description, link, feed_link, folder_id) 
-		values (?, ?, ?, ?, ?)
+		insert into feeds (title, description, link, feed_link, folder_id, custom_order)
+		values (?, ?, ?, ?, ?, ?)
 		on conflict (feed_link) do update set folder_id = ?
         returning id`,
-		title, description, link, feedLink, folderId,
+		title, description, link, feedLink, folderId, customOrder,
 		folderId,
 	)
 
@@ -42,6 +61,7 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 		Link:        link,
 		FeedLink:    feedLink,
 		FolderId:    folderId,
+		CustomOrder: customOrder,
 	}
 }
 

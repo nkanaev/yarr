@@ -86,6 +86,9 @@ func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
 		r = io.MultiReader(bytes.NewReader(lookup), r)
 	}
 
+	// out.callback() will return the parsed feed. there's no custom order here,
+	// that's only applicable in the storage part, and in the opml-import part.
+	// this is a third "feed" representation.
 	out := sniff(string(lookup))
 	if out.feedType == "" {
 		return nil, UnknownFormat

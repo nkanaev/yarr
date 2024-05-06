@@ -79,21 +79,20 @@ type MarkFilter struct {
 type ItemList []Item
 
 func (list ItemList) Len() int {
-    return len(list)
+	return len(list)
 }
 
 func (list ItemList) SortKey(i int) string {
-    return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
+	return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
 }
 
 func (list ItemList) Less(i, j int) bool {
-    return list.SortKey(i) < list.SortKey(j)
+	return list.SortKey(i) < list.SortKey(j)
 }
 
 func (list ItemList) Swap(i, j int) {
-    list[i], list[j] = list[j], list[i]
+	list[i], list[j] = list[j], list[i]
 }
-
 
 func (s *Storage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
@@ -104,8 +103,8 @@ func (s *Storage) CreateItems(items []Item) bool {
 
 	now := time.Now().UTC()
 
-    itemsSorted := ItemList(items)
-    sort.Sort(itemsSorted)
+	itemsSorted := ItemList(items)
+	sort.Sort(itemsSorted)
 
 	for _, item := range itemsSorted {
 		_, err = tx.Exec(`
@@ -221,9 +220,9 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 	predicate, args := listQueryPredicate(filter, newestFirst)
 	result := make([]Item, 0, 0)
 
-	order := "date desc, id desc"
+	order := "i.date desc, i.id desc"
 	if !newestFirst {
-		order = "date asc, id asc"
+		order = "i.date asc, i.id asc"
 	}
 	if filter.IDs != nil || filter.SinceID != nil {
 		order = "i.id asc"
@@ -238,13 +237,25 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 	} else {
 		selectCols += ", '' as content"
 	}
+
+	customOrder := ""
+	if filter.Status != nil && *filter.Status == UNREAD {
+		// let's start with only adjusting for unread
+		customOrder = "f.custom_order asc, "
+	}
+
+	// actually, injecting "customOrder" through all of these layers feels sub-optimal. large patch (conflict friendly :/)
+
+	// maybe a smarter & smaller thing would be: create a separate table with feed-url, custom-order columns, join them in this query only
 	query := fmt.Sprintf(`
 		select %s
 		from items i
+		inner join feeds f
+		on f.id = i.feed_id
 		where %s
-		order by %s
+		order by %s%s
 		limit %d
-		`, selectCols, predicate, order, limit)
+		`, selectCols, predicate, customOrder, order, limit)
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		log.Print(err)

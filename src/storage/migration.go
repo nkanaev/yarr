@@ -16,6 +16,7 @@ var migrations = []func(*sql.Tx) error{
 	m06_fill_missing_dates,
 	m07_add_feed_size,
 	m08_normalize_datetime,
+	m09_custom_order,
 }
 
 var maxVersion = int64(len(migrations))
@@ -292,5 +293,13 @@ func m08_normalize_datetime(tx *sql.Tx) error {
 		}
 	}
 	_, err = tx.Exec(`update items set date = strftime('%Y-%m-%d %H:%M:%f', date);`)
+	return err
+}
+
+func m09_custom_order(tx *sql.Tx) error {
+	sql := `
+		alter table feeds add column custom_order text not null default "xxxxxxxxx"
+	`
+	_, err := tx.Exec(sql)
 	return err
 }

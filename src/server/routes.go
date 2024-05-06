@@ -35,7 +35,7 @@ func (s *Server) handler() http.Handler {
 			Username: s.Username,
 			Password: s.Password,
 			Public:   []string{"/static", "/fever"},
-            DB:       s.db,
+			DB:       s.db,
 		}
 		r.Use(a.Handler)
 	}
@@ -243,6 +243,7 @@ func (s *Server) handleFeedList(c *router.Context) {
 				"",
 				result.Feed.SiteURL,
 				result.FeedLink,
+				"",
 				form.FolderID,
 			)
 			items := worker.ConvertItems(result.Feed.Items, *feed)
@@ -431,12 +432,12 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 			return
 		}
 		for _, f := range doc.Feeds {
-			s.db.CreateFeed(f.Title, "", f.SiteUrl, f.FeedUrl, nil)
+			s.db.CreateFeed(f.Title, "", f.SiteUrl, f.FeedUrl, f.CustomOrder, nil)
 		}
 		for _, f := range doc.Folders {
 			folder := s.db.CreateFolder(f.Title)
 			for _, ff := range f.AllFeeds() {
-				s.db.CreateFeed(ff.Title, "", ff.SiteUrl, ff.FeedUrl, &folder.Id)
+				s.db.CreateFeed(ff.Title, "", ff.SiteUrl, ff.FeedUrl, ff.CustomOrder, &folder.Id)
 			}
 		}
 
@@ -461,9 +462,10 @@ func (s *Server) handleOPMLExport(c *router.Context) {
 			feed := feed
 			if feed.FolderId == nil {
 				doc.Feeds = append(doc.Feeds, opml.Feed{
-					Title:   feed.Title,
-					FeedUrl: feed.FeedLink,
-					SiteUrl: feed.Link,
+					Title:       feed.Title,
+					FeedUrl:     feed.FeedLink,
+					SiteUrl:     feed.Link,
+					CustomOrder: feed.CustomOrder,
 				})
 			} else {
 				id := *feed.FolderId
