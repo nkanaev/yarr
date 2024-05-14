@@ -1,12 +1,10 @@
 VERSION=2.4
 GITHASH=$(shell git rev-parse --short=8 HEAD)
 
-CGO_ENABLED=1
+GO_LDFLAGS = -s -w -X 'main.Version=$(VERSION)' -X 'main.GitHash=$(GITHASH)'
 
-GO_LDFLAGS  = -s -w
-GO_LDFLAGS := $(GO_LDFLAGS) -X 'main.Version=$(VERSION)' -X 'main.GitHash=$(GITHASH)'
-
-export GOARCH ?= amd64
+export GOARCH      ?= amd64
+export CGO_ENABLED  = 1
 
 build_default:
 	mkdir -p _output
