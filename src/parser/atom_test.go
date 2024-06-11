@@ -214,3 +214,19 @@ func TestAtomLinkInID(t *testing.T) {
 		t.Fatalf("\nwant: %#v\nhave: %#v\n", want, have)
 	}
 }
+
+func TestAtomDoesntEscapeHTMLTags(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom">
+			<entry><summary type="html">&amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</summary></entry>
+		</feed>
+	`))
+	have := feed.Items[0].Content
+	want := "&lt;script&gt;alert(1);&lt;/script&gt;"
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
