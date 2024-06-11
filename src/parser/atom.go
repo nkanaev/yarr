@@ -3,7 +3,6 @@ package parser
 
 import (
 	"encoding/xml"
-	"html"
 	"io"
 	"strings"
 
@@ -58,7 +57,7 @@ func (a *atomText) String() string {
 	if a.Type == "xhtml" {
 		data = a.XML
 	}
-	return html.UnescapeString(strings.TrimSpace(data))
+	return strings.TrimSpace(data)
 }
 
 func (links atomLinks) First(rel string) string {
