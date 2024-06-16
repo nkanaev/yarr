@@ -2,12 +2,14 @@
 
 - (new) Fever API support (thanks to @icefed)
 - (new) editable feed link (thanks to @adaszko)
+- (new) switch to feed by clicking the title in the article page (thanks to @tarasglek for suggestion)
 - (fix) duplicate articles caused by the same feed addition (thanks to @adaszko)
 - (fix) relative article links (thanks to @adazsko for the report)
 - (fix) atom article links stored in id element (thanks to @adazsko for the report)
 - (fix) parsing atom feed titles (thanks to @wnh)
 - (fix) sorting same-day batch articles (thanks to @lamescholar for the report)
 - (fix) showing login page in the selected theme (thanks to @feddiriko for the report)
+- (fix) parsing atom feeds with html elements (thanks to @tillcash & @toBeOfUse for the report, @krkk for the fix)
 
 # v2.4 (2023-08-15)
 
