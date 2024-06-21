@@ -16,13 +16,16 @@ var migrations = []func(*sql.Tx) error{
 	m06_fill_missing_dates,
 	m07_add_feed_size,
 	m08_normalize_datetime,
+    m09_change_item_index,
 }
 
 var maxVersion = int64(len(migrations))
 
 func migrate(db *sql.DB) error {
 	var version int64
-	db.QueryRow("pragma user_version").Scan(&version)
+    if err := db.QueryRow("pragma user_version").Scan(&version); err != nil {
+        return err
+    }
 
 	if version >= maxVersion {
 		return nil
@@ -292,5 +295,14 @@ func m08_normalize_datetime(tx *sql.Tx) error {
 		}
 	}
 	_, err = tx.Exec(`update items set date = strftime('%Y-%m-%d %H:%M:%f', date);`)
+	return err
+}
+
+func m09_change_item_index(tx *sql.Tx) error {
+	sql := `
+        drop index if exists idx_item_status;
+		create index if not exists idx_item__date_id_status on items(date,id,status);
+	`
+	_, err := tx.Exec(sql)
 	return err
 }
