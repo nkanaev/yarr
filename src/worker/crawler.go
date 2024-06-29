@@ -152,15 +152,16 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 			imageURL = &item.ImageURL
 		}
 		result[i] = storage.Item{
-			GUID:     item.GUID,
-			FeedId:   feed.Id,
-			Title:    item.Title,
-			Link:     item.URL,
-			Content:  item.Content,
-			Date:     item.Date,
-			Status:   storage.UNREAD,
-			ImageURL: imageURL,
-			AudioURL: audioURL,
+			GUID:        item.GUID,
+			FeedId:      feed.Id,
+			Title:       item.Title,
+			Link:        item.URL,
+			Content:     item.Content,
+			Date:        item.Date,
+			Status:      storage.UNREAD,
+			ImageURL:    imageURL,
+			AudioURL:    audioURL,
+			CommentsURL: item.CommentsURL,
 		}
 	}
 	return result

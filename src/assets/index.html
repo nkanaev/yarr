@@ -329,6 +329,10 @@
                 <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" title="Open Link">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
+                <a class="toolbar-item" :href="itemSelectedDetails.comments_url" target="_blank" title="Open Comments Link"
+                    v-if="itemSelectedDetails.comments_url">
+                    <span class="icon">{% inline "message-square.svg" %}</span>
+                </a>
                 <div class="flex-grow-1"></div>
                 <button class="toolbar-item" @click="itemSelected=null" title="Close Article">
                     <span class="icon">{% inline "x.svg" %}</span>
