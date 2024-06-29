@@ -16,16 +16,17 @@ var migrations = []func(*sql.Tx) error{
 	m06_fill_missing_dates,
 	m07_add_feed_size,
 	m08_normalize_datetime,
-    m09_change_item_index,
+	m09_change_item_index,
+	m10_add_comments_url,
 }
 
 var maxVersion = int64(len(migrations))
 
 func migrate(db *sql.DB) error {
 	var version int64
-    if err := db.QueryRow("pragma user_version").Scan(&version); err != nil {
-        return err
-    }
+	if err := db.QueryRow("pragma user_version").Scan(&version); err != nil {
+		return err
+	}
 
 	if version >= maxVersion {
 		return nil
@@ -302,6 +303,14 @@ func m09_change_item_index(tx *sql.Tx) error {
 	sql := `
         drop index if exists idx_item_status;
 		create index if not exists idx_item__date_id_status on items(date,id,status);
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m10_add_comments_url(tx *sql.Tx) error {
+	sql := `
+		alter table items add column comments_url text
 	`
 	_, err := tx.Exec(sql)
 	return err

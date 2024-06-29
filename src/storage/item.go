@@ -45,16 +45,17 @@ func (s *ItemStatus) UnmarshalJSON(b []byte) error {
 }
 
 type Item struct {
-	Id       int64      `json:"id"`
-	GUID     string     `json:"guid"`
-	FeedId   int64      `json:"feed_id"`
-	Title    string     `json:"title"`
-	Link     string     `json:"link"`
-	Content  string     `json:"content,omitempty"`
-	Date     time.Time  `json:"date"`
-	Status   ItemStatus `json:"status"`
-	ImageURL *string    `json:"image"`
-	AudioURL *string    `json:"podcast_url"`
+	Id          int64      `json:"id"`
+	GUID        string     `json:"guid"`
+	FeedId      int64      `json:"feed_id"`
+	Title       string     `json:"title"`
+	Link        string     `json:"link"`
+	Content     string     `json:"content,omitempty"`
+	Date        time.Time  `json:"date"`
+	Status      ItemStatus `json:"status"`
+	ImageURL    *string    `json:"image"`
+	AudioURL    *string    `json:"podcast_url"`
+	CommentsURL string     `json:"comments_url"`
 }
 
 type ItemFilter struct {
@@ -79,21 +80,20 @@ type MarkFilter struct {
 type ItemList []Item
 
 func (list ItemList) Len() int {
-    return len(list)
+	return len(list)
 }
 
 func (list ItemList) SortKey(i int) string {
-    return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
+	return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
 }
 
 func (list ItemList) Less(i, j int) bool {
-    return list.SortKey(i) < list.SortKey(j)
+	return list.SortKey(i) < list.SortKey(j)
 }
 
 func (list ItemList) Swap(i, j int) {
-    list[i], list[j] = list[j], list[i]
+	list[i], list[j] = list[j], list[i]
 }
-
 
 func (s *Storage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
@@ -104,20 +104,20 @@ func (s *Storage) CreateItems(items []Item) bool {
 
 	now := time.Now().UTC()
 
-    itemsSorted := ItemList(items)
-    sort.Sort(itemsSorted)
+	itemsSorted := ItemList(items)
+	sort.Sort(itemsSorted)
 
 	for _, item := range itemsSorted {
 		_, err = tx.Exec(`
 			insert into items (
 				guid, feed_id, title, link, date,
-				content, image, podcast_url,
+				content, image, podcast_url, comments_url,
 				date_arrived, status
 			)
-			values (?, ?, ?, ?, strftime('%Y-%m-%d %H:%M:%f', ?), ?, ?, ?, ?, ?)
+			values (?, ?, ?, ?, strftime('%Y-%m-%d %H:%M:%f', ?), ?, ?, ?, ?, ?, ?)
 			on conflict (feed_id, guid) do nothing`,
 			item.GUID, item.FeedId, item.Title, item.Link, item.Date,
-			item.Content, item.ImageURL, item.AudioURL,
+			item.Content, item.ImageURL, item.AudioURL, item.CommentsURL,
 			now, UNREAD,
 		)
 		if err != nil {
@@ -232,7 +232,7 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 		order = "i.id desc"
 	}
 
-	selectCols := "i.id, i.guid, i.feed_id, i.title, i.link, i.date, i.status, i.image, i.podcast_url"
+	selectCols := "i.id, i.guid, i.feed_id, i.title, i.link, i.date, i.status, i.image, i.podcast_url, i.comments_url"
 	if withContent {
 		selectCols += ", i.content"
 	} else {
@@ -255,7 +255,7 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 		err = rows.Scan(
 			&x.Id, &x.GUID, &x.FeedId,
 			&x.Title, &x.Link, &x.Date,
-			&x.Status, &x.ImageURL, &x.AudioURL, &x.Content,
+			&x.Status, &x.ImageURL, &x.AudioURL, &x.CommentsURL, &x.Content,
 		)
 		if err != nil {
 			log.Print(err)
@@ -271,12 +271,12 @@ func (s *Storage) GetItem(id int64) *Item {
 	err := s.db.QueryRow(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
-			i.date, i.status, i.image, i.podcast_url
+			i.date, i.status, i.image, i.podcast_url, i.comments_url
 		from items i
 		where i.id = ?
 	`, id).Scan(
 		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
-		&i.Date, &i.Status, &i.ImageURL, &i.AudioURL,
+		&i.Date, &i.Status, &i.ImageURL, &i.AudioURL, &i.CommentsURL,
 	)
 	if err != nil {
 		log.Print(err)

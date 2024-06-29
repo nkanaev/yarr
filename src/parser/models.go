@@ -14,7 +14,8 @@ type Item struct {
 	URL   string
 	Title string
 
-	Content  string
-	ImageURL string
-	AudioURL string
+	Content     string
+	ImageURL    string
+	AudioURL    string
+	CommentsURL string
 }

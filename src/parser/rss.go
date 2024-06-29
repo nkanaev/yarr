@@ -23,6 +23,7 @@ type rssItem struct {
 	GUID        rssGuid        `xml:"guid"`
 	Title       string         `xml:"title"`
 	Link        string         `xml:"rss link"`
+	Comments    string         `xml:"comments"`
 	Description string         `xml:"rss description"`
 	PubDate     string         `xml:"pubDate"`
 	Enclosures  []rssEnclosure `xml:"enclosure"`
@@ -92,13 +93,14 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 		}
 
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:     firstNonEmpty(srcitem.GUID.GUID, srcitem.Link),
-			Date:     dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
-			URL:      firstNonEmpty(srcitem.OrigLink, srcitem.Link, permalink),
-			Title:    srcitem.Title,
-			Content:  firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
-			AudioURL: podcastURL,
-			ImageURL: srcitem.firstMediaThumbnail(),
+			GUID:        firstNonEmpty(srcitem.GUID.GUID, srcitem.Link),
+			Date:        dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
+			URL:         firstNonEmpty(srcitem.OrigLink, srcitem.Link, permalink),
+			Title:       srcitem.Title,
+			Content:     firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
+			AudioURL:    podcastURL,
+			ImageURL:    srcitem.firstMediaThumbnail(),
+			CommentsURL: srcitem.Comments,
 		})
 	}
 	return dstfeed, nil
