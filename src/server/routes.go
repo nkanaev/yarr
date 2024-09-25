@@ -35,7 +35,7 @@ func (s *Server) handler() http.Handler {
 			Username: s.Username,
 			Password: s.Password,
 			Public:   []string{"/static", "/fever"},
-            DB:       s.db,
+			DB:       s.db,
 		}
 		r.Use(a.Handler)
 	}

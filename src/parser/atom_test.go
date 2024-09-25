@@ -192,23 +192,23 @@ func TestAtomLinkInID(t *testing.T) {
 	have := feed.Items
 	want := []Item{
 		Item{
-			GUID:     "https://example.com/posts/1::2003-12-13T09:17:51",
-			Date:     time.Date(2003, time.December, 13, 9, 17, 51, 0, time.UTC),
-			URL:      "https://example.com/posts/1",
-			Title:    "one updated",
-        },
+			GUID:  "https://example.com/posts/1::2003-12-13T09:17:51",
+			Date:  time.Date(2003, time.December, 13, 9, 17, 51, 0, time.UTC),
+			URL:   "https://example.com/posts/1",
+			Title: "one updated",
+		},
 		Item{
 			GUID: "urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6",
-            Date: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), URL: "",
-            Title: "two",
-        },
-        Item{
-            GUID: "https://example.com/posts/1::",
-            Date: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
-            URL: "https://example.com/posts/1",
-            Title: "one",
-            Content: "",
-        },
+			Date: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), URL: "",
+			Title: "two",
+		},
+		Item{
+			GUID:    "https://example.com/posts/1::",
+			Date:    time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
+			URL:     "https://example.com/posts/1",
+			Title:   "one",
+			Content: "",
+		},
 	}
 	if !reflect.DeepEqual(want, have) {
 		t.Fatalf("\nwant: %#v\nhave: %#v\n", want, have)

@@ -51,12 +51,12 @@ func (m *Middleware) Handler(c *router.Context) {
 			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]interface{}{
 				"username": username,
 				"error":    "Invalid username/password",
-		        "settings": m.DB.GetSettings(),
+				"settings": m.DB.GetSettings(),
 			})
 			return
 		}
 	}
 	c.HTML(http.StatusOK, assets.Template("login.html"), map[string]interface{}{
-        "settings": m.DB.GetSettings(),
-    })
+		"settings": m.DB.GetSettings(),
+	})
 }

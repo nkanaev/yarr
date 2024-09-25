@@ -79,21 +79,20 @@ type MarkFilter struct {
 type ItemList []Item
 
 func (list ItemList) Len() int {
-    return len(list)
+	return len(list)
 }
 
 func (list ItemList) SortKey(i int) string {
-    return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
+	return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
 }
 
 func (list ItemList) Less(i, j int) bool {
-    return list.SortKey(i) < list.SortKey(j)
+	return list.SortKey(i) < list.SortKey(j)
 }
 
 func (list ItemList) Swap(i, j int) {
-    list[i], list[j] = list[j], list[i]
+	list[i], list[j] = list[j], list[i]
 }
-
 
 func (s *Storage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
@@ -104,8 +103,8 @@ func (s *Storage) CreateItems(items []Item) bool {
 
 	now := time.Now().UTC()
 
-    itemsSorted := ItemList(items)
-    sort.Sort(itemsSorted)
+	itemsSorted := ItemList(items)
+	sort.Sort(itemsSorted)
 
 	for _, item := range itemsSorted {
 		_, err = tx.Exec(`

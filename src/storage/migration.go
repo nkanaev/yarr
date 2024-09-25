@@ -16,16 +16,16 @@ var migrations = []func(*sql.Tx) error{
 	m06_fill_missing_dates,
 	m07_add_feed_size,
 	m08_normalize_datetime,
-    m09_change_item_index,
+	m09_change_item_index,
 }
 
 var maxVersion = int64(len(migrations))
 
 func migrate(db *sql.DB) error {
 	var version int64
-    if err := db.QueryRow("pragma user_version").Scan(&version); err != nil {
-        return err
-    }
+	if err := db.QueryRow("pragma user_version").Scan(&version); err != nil {
+		return err
+	}
 
 	if version >= maxVersion {
 		return nil
