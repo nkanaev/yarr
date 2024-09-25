@@ -17,6 +17,7 @@ var migrations = []func(*sql.Tx) error{
 	m07_add_feed_size,
 	m08_normalize_datetime,
 	m09_change_item_index,
+	m10_add_item_medialinks,
 }
 
 var maxVersion = int64(len(migrations))
@@ -302,6 +303,31 @@ func m09_change_item_index(tx *sql.Tx) error {
 	sql := `
         drop index if exists idx_item_status;
 		create index if not exists idx_item__date_id_status on items(date,id,status);
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m10_add_item_medialinks(tx *sql.Tx) error {
+	sql := `
+		alter table items add column media_links blob;
+		update items set media_links =
+			iif(
+				coalesce(image, '') != '' and coalesce(podcast_url, '') != '',
+				json_array(json_object('type', 'image', 'url', image), json_object('type', 'audio', 'url', podcast_url)),
+				iif(
+					coalesce(image, '') != '',
+					json_array(json_object('type', 'image', 'url', image)),
+					iif(
+						coalesce(podcast_url, '') != '',
+						json_array(json_object('type', 'audio', 'url', podcast_url)),
+						null
+					)
+				)
+			);
+
+		alter table items drop column image;
+		alter table items drop column podcast_url;
 	`
 	_, err := tx.Exec(sql)
 	return err

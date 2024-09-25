@@ -75,9 +75,15 @@ func TestRSSMediaContentThumbnail(t *testing.T) {
 			</channel>
 		</rss>
 	`))
-	have := feed.Items[0].ImageURL
-	want := "https://i.vimeocdn.com/video/1092705247_960.jpg"
-	if have != want {
+	if len(feed.Items[0].MediaLinks) != 1 {
+		t.Fatalf("Expected 1 media link, got %#v", feed.Items[0].MediaLinks)
+	}
+	have := feed.Items[0].MediaLinks[0]
+	want := MediaLink{
+		URL:  "https://i.vimeocdn.com/video/1092705247_960.jpg",
+		Type: "image",
+	}
+	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)
 		t.FailNow()
@@ -127,9 +133,15 @@ func TestRSSPodcast(t *testing.T) {
 			</channel>
 		</rss>
 	`))
-	have := feed.Items[0].AudioURL
-	want := "http://example.com/audio.ext"
-	if want != have {
+	if len(feed.Items[0].MediaLinks) != 1 {
+		t.Fatal("Invalid media links")
+	}
+	have := feed.Items[0].MediaLinks[0]
+	want := MediaLink{
+		URL:  "http://example.com/audio.ext",
+		Type: "audio",
+	}
+	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)
 		t.FailNow()
@@ -147,9 +159,15 @@ func TestRSSOpusPodcast(t *testing.T) {
 			</channel>
 		</rss>
 	`))
-	have := feed.Items[0].AudioURL
-	want := "http://example.com/audio.ext"
-	if want != have {
+	if len(feed.Items[0].MediaLinks) != 1 {
+		t.Fatal("Invalid media links")
+	}
+	have := feed.Items[0].MediaLinks[0]
+	want := MediaLink{
+		URL:  "http://example.com/audio.ext",
+		Type: "audio",
+	}
+	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)
 		t.FailNow()
@@ -176,8 +194,9 @@ func TestRSSPodcastDuplicated(t *testing.T) {
 	if want != have {
 		t.Fatalf("content doesn't match\nwant: %#v\nhave: %#v\n", want, have)
 	}
-	if feed.Items[0].AudioURL != "" {
-		t.Fatal("item.audio_url must be unset if present in the content")
+
+	if len(feed.Items[0].MediaLinks) != 0 {
+		t.Fatal("item media must be excluded if present in the content")
 	}
 }
 
@@ -223,7 +242,7 @@ func TestRSSIsPermalink(t *testing.T) {
 		},
 	}
 	for i := 0; i < len(want); i++ {
-		if want[i] != have[i] {
+		if !reflect.DeepEqual(want, have) {
 			t.Errorf("Failed to handle isPermalink\nwant: %#v\nhave: %#v\n", want[i], have[i])
 		}
 	}
