@@ -134,11 +134,14 @@ func (feed *Feed) cleanup() {
 		feed.Items[i].Title = strings.TrimSpace(htmlutil.ExtractText(item.Title))
 		feed.Items[i].Content = strings.TrimSpace(item.Content)
 
-		if item.ImageURL != "" && strings.Contains(item.Content, item.ImageURL) {
-			feed.Items[i].ImageURL = ""
-		}
-		if item.AudioURL != "" && strings.Contains(item.Content, item.AudioURL) {
-			feed.Items[i].AudioURL = ""
+		if len(feed.Items[i].MediaLinks) > 0 {
+			mediaLinks := make([]MediaLink, 0)
+			for _, link := range item.MediaLinks {
+				if !strings.Contains(item.Content, link.URL) {
+					mediaLinks = append(mediaLinks, link)
+				}
+			}
+			feed.Items[i].MediaLinks = mediaLinks
 		}
 	}
 }

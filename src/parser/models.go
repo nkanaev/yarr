@@ -14,7 +14,12 @@ type Item struct {
 	URL   string
 	Title string
 
-	Content  string
-	ImageURL string
-	AudioURL string
+	Content    string
+	MediaLinks []MediaLink
+}
+
+type MediaLink struct {
+	URL         string
+	Type        string
+	Description string
 }
