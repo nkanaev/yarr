@@ -362,8 +362,14 @@
                     </div>
                     <hr>
                     <div v-if="!itemSelectedReadability">
-                        <img :src="itemSelectedDetails.image" v-if="itemSelectedDetails.image" class="mb-3">
-                        <audio class="w-100" controls v-if="itemSelectedDetails.podcast_url" :src="itemSelectedDetails.podcast_url"></audio>
+                        <div v-if="contentImages.length">
+                            <figure v-for="media in contentImages">
+                                <img :src="media.url" loading="lazy">
+                                <figcaption v-if="media.description" v-html="media.description"></figcaption>
+                            </figure>
+                        </div>
+                        <audio class="w-100" controls v-for="media in contentAudios" :src="media.url"></audio>
+                        <video class="w-100" controls v-for="media in contentVideos" :src="media.url"></video>
                     </div>
                     <div v-html="itemSelectedContent"></div>
                 </div>

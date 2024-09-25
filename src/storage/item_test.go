@@ -77,12 +77,12 @@ func getItem(db *Storage, guid string) *Item {
 	err := db.db.QueryRow(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
-			i.date, i.status, i.image, i.podcast_url
+			i.date, i.status, i.media_links
 		from items i
 		where i.guid = ?
 	`, guid).Scan(
 		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
-		&i.Date, &i.Status, &i.ImageURL, &i.AudioURL,
+		&i.Date, &i.Status, &i.MediaLinks,
 	)
 	if err != nil {
 		log.Fatal(err)

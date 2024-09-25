@@ -298,6 +298,18 @@ var vm = new Vue({
 
       return this.itemSelectedDetails.content || ''
     },
+    contentImages: function() {
+      if (!this.itemSelectedDetails) return []
+      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'image')
+    },
+    contentAudios: function() {
+      if (!this.itemSelectedDetails) return []
+      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'audio')
+    },
+    contentVideos: function() {
+      if (!this.itemSelectedDetails) return []
+      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'video')
+    }
   },
   watch: {
     'theme': {

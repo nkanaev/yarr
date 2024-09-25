@@ -40,13 +40,11 @@ func TestAtom(t *testing.T) {
 		SiteURL: "http://example.org/",
 		Items: []Item{
 			{
-				GUID:     "urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a",
-				Date:     time.Unix(1071340202, 0).UTC(),
-				URL:      "http://example.org/2003/12/13/atom03.html",
-				Title:    "Atom-Powered Robots Run Amok",
-				Content:  `<div xmlns="http://www.w3.org/1999/xhtml"><p>This is the entry content.</p></div>`,
-				ImageURL: "",
-				AudioURL: "",
+				GUID:    "urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a",
+				Date:    time.Unix(1071340202, 0).UTC(),
+				URL:     "http://example.org/2003/12/13/atom03.html",
+				Title:   "Atom-Powered Robots Run Amok",
+				Content: `<div xmlns="http://www.w3.org/1999/xhtml"><p>This is the entry content.</p></div>`,
 			},
 		},
 	}
@@ -141,9 +139,15 @@ func TestAtomImageLink(t *testing.T) {
 			</entry>
 		</feed>
 	`))
-	have := feed.Items[0].ImageURL
-	want := `https://example.com/image.png?width=100&height=100`
-	if want != have {
+	if len(feed.Items[0].MediaLinks) != 1 {
+		t.Fatalf("Expected 1 media link, got: %#v", feed.Items[0].MediaLinks)
+	}
+	have := feed.Items[0].MediaLinks[0]
+	want := MediaLink{
+		URL:  `https://example.com/image.png?width=100&height=100`,
+		Type: "image",
+	}
+	if !reflect.DeepEqual(want, have) {
 		t.Fatalf("item.image_url doesn't match\nwant: %#v\nhave: %#v\n", want, have)
 	}
 }
@@ -165,8 +169,8 @@ func TestAtomImageLinkDuplicated(t *testing.T) {
 	if want != have {
 		t.Fatalf("want: %#v\nhave: %#v\n", want, have)
 	}
-	if feed.Items[0].ImageURL != "" {
-		t.Fatal("item.image_url must be unset if present in the content")
+	if len(feed.Items[0].MediaLinks) != 0 {
+		t.Fatal("item media link must be excluded if present in the content")
 	}
 }
 
