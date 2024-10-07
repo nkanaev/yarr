@@ -1,0 +1,64 @@
+- site: https://vimeo.com/channels/staffpicks/videos
+  feed: https://vimeo.com/channels/staffpicks/videos/rss
+  tags: [vimeo, image]
+
+- site: https://www.youtube.com/@everyframeapainting/videos
+  feed: https://www.youtube.com/feeds/videos.xml?channel_id=UCjFqcJQXGZ6T6sxyFB-5i6A"
+  tags: [youtube, image]
+
+- site: https://iwdrm.tumblr.com/
+  feed: https://iwdrm.tumblr.com/rss
+  tags: [tumblr, image]
+
+- site: https://falseknees.tumblr.com/
+  feed: https://falseknees.tumblr.com/rss
+  tags: [tumblr, image]
+
+- site: https://accidentallyquadratic.tumblr.com/
+  feed: https://accidentallyquadratic.tumblr.com/rss
+  info: text blog with code sections
+  tags: [tumblr, text, code]
+
+- site: https://www.flickr.com/photos/maratsafin/
+  feed: https://www.flickr.com/services/feeds/photos_public.gne?id=59021497@N07&lang=en-us&format=atom
+  tags: [flickr, image]
+
+- site: https://www.reddit.com/r/comics
+  feed: https://www.reddit.com/r/comics.rss
+  tags: [reddit, image]
+
+- site: https://www.reddit.com/r/AITAH
+  feed: https://www.reddit.com/r/AITAH.rss
+  tags: [reddit, text]
+
+- site: https://idothei.wordpress.com/
+  feed: https://idothei.wordpress.com/feed/
+  tags: [wordpress, text]
+
+- site: https://www.vidarholen.net/contents/blog/
+  feed: https://www.vidarholen.net/contents/blog/?feed=rss2
+  tags: [wordpress, text]
+
+- site: https://blog.posthaven.com/
+  feed: https://blog.posthaven.com/posts.atom
+  tags: [posthaven, text]
+
+- site: https://medium.com/@dailynewsletter
+  feed: https://medium.com/feed/@dailynewsletter
+  tags: [medium, text]
+
+- site: https://thereveal.substack.com/
+  feed: https://thereveal.substack.com/feed
+  tags: [substack, text]
+
+- site: https://tema.livejournal.com/
+  feed: https://tema.livejournal.com/data/rss
+  tags: [livejournal, text]
+
+- site: https://mametter.hatenablog.com/
+  feed: https://mametter.hatenablog.com/feed
+  tags: [hatena, text]
+
+- site: https://juliepowell.blogspot.com/
+  feed: https://juliepowell.blogspot.com/feeds/posts/default
+  tags: [blogger, text]
