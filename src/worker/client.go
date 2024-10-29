@@ -32,6 +32,10 @@ func (c *Client) getConditional(url, lastModified, etag string) (*http.Response,
 
 var client *Client
 
+func SetVersion(num string) {
+	client.userAgent = "Yarr/" + num
+}
+
 func init() {
 	transport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,

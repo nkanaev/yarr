@@ -13,6 +13,7 @@ import (
 	"github.com/nkanaev/yarr/src/platform"
 	"github.com/nkanaev/yarr/src/server"
 	"github.com/nkanaev/yarr/src/storage"
+	"github.com/nkanaev/yarr/src/worker"
 )
 
 var Version string = "0.0"
@@ -131,6 +132,7 @@ func main() {
 		log.Fatal("Failed to initialise database: ", err)
 	}
 
+	worker.SetVersion(Version)
 	srv := server.NewServer(store, addr)
 
 	if basepath != "" {
