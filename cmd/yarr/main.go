@@ -90,12 +90,12 @@ func main() {
 		log.SetOutput(os.Stdout)
 	}
 
-	configPath, err := os.UserConfigDir()
-	if err != nil {
-		log.Fatal("Failed to get config dir: ", err)
-	}
-
 	if db == "" {
+		configPath, err := os.UserConfigDir()
+		if err != nil {
+			log.Fatal("Failed to get config dir: ", err)
+		}
+
 		storagePath := filepath.Join(configPath, "yarr")
 		if err := os.MkdirAll(storagePath, 0755); err != nil {
 			log.Fatal("Failed to create app config dir: ", err)
