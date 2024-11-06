@@ -106,6 +106,7 @@ func main() {
 	log.Printf("using db file %s", db)
 
 	var username, password string
+	var err error
 	if authfile != "" {
 		f, err := os.Open(authfile)
 		if err != nil {
