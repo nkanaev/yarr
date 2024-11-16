@@ -1,15 +1,112 @@
-# github.com/mattn/go-sqlite3 v1.14.7
+# github.com/btcsuite/btcd/btcec/v2 v2.3.4
+## explicit; go 1.17
+github.com/btcsuite/btcd/btcec/v2
+github.com/btcsuite/btcd/btcec/v2/schnorr
+# github.com/btcsuite/btcd/btcutil v1.1.3
+## explicit; go 1.16
+github.com/btcsuite/btcd/btcutil/bech32
+# github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0
+## explicit; go 1.17
+github.com/btcsuite/btcd/chaincfg/chainhash
+# github.com/cespare/xxhash/v2 v2.3.0
+## explicit; go 1.11
+github.com/cespare/xxhash/v2
+# github.com/decred/dcrd/crypto/blake256 v1.1.0
+## explicit; go 1.17
+github.com/decred/dcrd/crypto/blake256
+github.com/decred/dcrd/crypto/blake256/internal/compress
+# github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0
+## explicit; go 1.17
+github.com/decred/dcrd/dcrec/secp256k1/v4
+github.com/decred/dcrd/dcrec/secp256k1/v4/schnorr
+# github.com/dgraph-io/ristretto v1.0.0
+## explicit; go 1.19
+github.com/dgraph-io/ristretto
+github.com/dgraph-io/ristretto/z
+github.com/dgraph-io/ristretto/z/simd
+# github.com/dustin/go-humanize v1.0.1
+## explicit; go 1.16
+github.com/dustin/go-humanize
+# github.com/fiatjaf/eventstore v0.9.0
+## explicit; go 1.23.0
+github.com/fiatjaf/eventstore
+github.com/fiatjaf/eventstore/nullstore
+# github.com/gobwas/httphead v0.1.0
+## explicit; go 1.15
+github.com/gobwas/httphead
+# github.com/gobwas/pool v0.2.1
+## explicit
+github.com/gobwas/pool
+github.com/gobwas/pool/internal/pmath
+github.com/gobwas/pool/pbufio
+github.com/gobwas/pool/pbytes
+# github.com/gobwas/ws v1.4.0
+## explicit; go 1.16
+github.com/gobwas/ws
+github.com/gobwas/ws/wsflate
+github.com/gobwas/ws/wsutil
+# github.com/graph-gophers/dataloader/v7 v7.1.0
+## explicit; go 1.18
+github.com/graph-gophers/dataloader/v7
+# github.com/josharian/intern v1.0.0
+## explicit; go 1.5
+github.com/josharian/intern
+# github.com/mailru/easyjson v0.7.7
 ## explicit; go 1.12
+github.com/mailru/easyjson
+github.com/mailru/easyjson/buffer
+github.com/mailru/easyjson/jlexer
+github.com/mailru/easyjson/jwriter
+# github.com/mattn/go-sqlite3 v1.14.18
+## explicit; go 1.16
 github.com/mattn/go-sqlite3
+# github.com/nbd-wtf/go-nostr v0.42.2
+## explicit; go 1.23.1
+github.com/nbd-wtf/go-nostr
+github.com/nbd-wtf/go-nostr/nip05
+github.com/nbd-wtf/go-nostr/nip19
+github.com/nbd-wtf/go-nostr/sdk
+github.com/nbd-wtf/go-nostr/sdk/cache
+github.com/nbd-wtf/go-nostr/sdk/cache/memory
+github.com/nbd-wtf/go-nostr/sdk/hints
+github.com/nbd-wtf/go-nostr/sdk/hints/memory
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# github.com/puzpuzpuz/xsync/v3 v3.4.0
+## explicit; go 1.18
+github.com/puzpuzpuz/xsync/v3
+# github.com/tidwall/gjson v1.17.3
+## explicit; go 1.12
+github.com/tidwall/gjson
+# github.com/tidwall/match v1.1.1
+## explicit; go 1.15
+github.com/tidwall/match
+# github.com/tidwall/pretty v1.2.1
+## explicit; go 1.16
+github.com/tidwall/pretty
+# github.com/yuin/goldmark v1.7.8
+## explicit; go 1.19
+github.com/yuin/goldmark
+github.com/yuin/goldmark/ast
+github.com/yuin/goldmark/parser
+github.com/yuin/goldmark/renderer
+github.com/yuin/goldmark/renderer/html
+github.com/yuin/goldmark/text
+github.com/yuin/goldmark/util
+# golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
+## explicit; go 1.22.0
+golang.org/x/exp/constraints
 # golang.org/x/net v0.23.0
 ## explicit; go 1.18
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
-# golang.org/x/sys v0.18.0
+# golang.org/x/sys v0.26.0
 ## explicit; go 1.18
+golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.14.0
+# golang.org/x/text v0.19.0
 ## explicit; go 1.18
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime"
 	"net/http"
 	"net/url"
@@ -29,8 +30,15 @@ type DiscoverResult struct {
 }
 
 func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
-	result := &DiscoverResult{}
+
+	// see if its nostr
+	foundNostr, result := discoverNostr(candidateUrl)
+	if foundNostr {
+		return result, nil
+	}
+
 	// Query URL
+	result = &DiscoverResult{}
 	res, err := client.get(candidateUrl)
 	if err != nil {
 		return nil, err
@@ -78,6 +86,7 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	}
 
 	result.Sources = sources
+	log.Println("we found something very cool", *result)
 	return result, nil
 }
 
@@ -116,6 +125,10 @@ func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
 		urls = append(urls, c)
 	}
 
+	return getIcons(urls)
+}
+
+func getIcons(urls []string) (*[]byte, error) {
 	for _, u := range urls {
 		res, err := client.get(u)
 		if err != nil {
@@ -167,6 +180,10 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 }
 
 func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
+	if nostr, feedItems, err := nostrListItems(f.FeedLink); nostr {
+		return ConvertItems(feedItems, f), err
+	}
+
 	lmod := ""
 	etag := ""
 	if state := db.GetHTTPState(f.Id); state != nil {
