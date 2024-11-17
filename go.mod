@@ -3,7 +3,7 @@ module github.com/nkanaev/yarr
 go 1.23.3
 
 require (
-	github.com/github-tijlxyz/goldmark-nostr v0.0.1
+	github.com/github-tijlxyz/goldmark-nostr v0.2.0
 	github.com/mattn/go-sqlite3 v1.14.18
 	github.com/nbd-wtf/go-nostr v0.42.2
 	github.com/yuin/goldmark v1.7.8

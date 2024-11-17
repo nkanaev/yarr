@@ -86,7 +86,7 @@ func discoverNostr(candidateUrl string) (bool, *DiscoverResult) {
 			FeedLink: fmt.Sprintf("nostr:%s", nprofile),
 			Feed: &parser.Feed{
 				Title:   profile.Name,
-				SiteURL: fmt.Sprintf("nostr:%s", nprofile),
+				SiteURL: fmt.Sprintf("https://njump.me/%s", nprofile),
 				Items:   items,
 			},
 			Sources: []FeedSource{},
@@ -151,7 +151,7 @@ func nostrListItems(f string) (bool, []parser.Item, error) {
 			}
 
 			// format content from markdown to html
-			md := goldmark.New(goldmark.WithExtensions(extension.NewNostr()))
+			md := goldmark.New(goldmark.WithExtensions(extension.New(extension.WithStrict(), extension.WithNostrLink("https://njump.me/%s"))))
 			var buf bytes.Buffer
 			if err := md.Convert([]byte(event.Content), &buf); err != nil {
 				continue
@@ -160,7 +160,7 @@ func nostrListItems(f string) (bool, []parser.Item, error) {
 			feedItems = append(feedItems, parser.Item{
 				GUID:     fmt.Sprintf("nostr:%s:%s", event.PubKey, event.Tags.GetD()),
 				Date:     publishedAt,
-				URL:      fmt.Sprintf("nostr:%s", naddr),
+				URL:      fmt.Sprintf("https://njump.me/%s", naddr),
 				Content:  buf.String(),
 				Title:    title,
 				ImageURL: image,

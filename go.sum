@@ -46,8 +46,8 @@ github.com/fiatjaf/eventstore v0.9.0 h1:WsGDVAaRaVaV/J8PdrQDGfzChrL13q+lTO4C44rh
 github.com/fiatjaf/eventstore v0.9.0/go.mod h1:JrAce5h0wi79+Sw4gsEq5kz0NtUxbVkOZ7lAo7ay6R8=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
-github.com/github-tijlxyz/goldmark-nostr v0.0.1 h1:w/GnHJQCCqFUCYHGJzwcPp4usDBIDAZ9q47nW/57NMc=
-github.com/github-tijlxyz/goldmark-nostr v0.0.1/go.mod h1:ezZL9+JeyK9T5VQ4EdtBaREOr7hIuWORuzMwS9wRbA8=
+github.com/github-tijlxyz/goldmark-nostr v0.2.0 h1:vN2U0Tb+CGiXe69G3lXoz5fxEGfkGs0HRgZmJdJJXik=
+github.com/github-tijlxyz/goldmark-nostr v0.2.0/go.mod h1:ezZL9+JeyK9T5VQ4EdtBaREOr7hIuWORuzMwS9wRbA8=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=
 github.com/gobwas/httphead v0.1.0/go.mod h1:O/RXo79gxV8G+RqlR/otEwx4Q36zl9rqC5u12GKvMCM=
 github.com/gobwas/pool v0.2.1 h1:xfeeEhW7pwmX8nuLVlqbzVc7udMDrwetjEv+TZIz1og=
