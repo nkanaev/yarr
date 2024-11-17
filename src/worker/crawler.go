@@ -86,7 +86,6 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	}
 
 	result.Sources = sources
-	log.Println("we found something very cool", *result)
 	return result, nil
 }
 

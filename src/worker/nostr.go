@@ -158,9 +158,9 @@ func nostrListItems(f string) (bool, []parser.Item, error) {
 			}
 
 			feedItems = append(feedItems, parser.Item{
-				GUID:     fmt.Sprintf("nostr:", event.ID),
+				GUID:     fmt.Sprintf("nostr:%s", event.ID),
 				Date:     publishedAt,
-				URL:      fmt.Sprintf("nostr:", nevent),
+				URL:      fmt.Sprintf("nostr:%s", nevent),
 				Content:  buf.String(),
 				Title:    title,
 				ImageURL: image,
