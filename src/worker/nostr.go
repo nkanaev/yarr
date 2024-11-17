@@ -35,13 +35,13 @@ func isItNostr(ctx context.Context, url string) (bool, *sdk.ProfileMetadata) {
 	}
 
 	// check for nostr url prefixes
-	hasNostrPrefix := false
 	if strings.HasPrefix(url, "nostr://") {
 		url = url[8:]
-		hasNostrPrefix = true
 	} else if strings.HasPrefix(url, "nostr:") {
 		url = url[6:]
-		hasNostrPrefix = true
+	} else {
+		// only accept nostr: or nostr:// urls for now
+		return false, nil
 	}
 
 	// check for npub or nprofile
@@ -56,7 +56,7 @@ func isItNostr(ctx context.Context, url string) (bool, *sdk.ProfileMetadata) {
 	}
 
 	// only do nip05 check when nostr prefix
-	if hasNostrPrefix && nip05.IsValidIdentifier(url) {
+	if nip05.IsValidIdentifier(url) {
 		profile, err := nostrSdk.FetchProfileFromInput(ctx, url)
 		if err != nil {
 			return false, nil
@@ -131,7 +131,7 @@ func nostrListItems(f string) (bool, []parser.Item, error) {
 				}
 			}
 
-			nevent, err := nip19.EncodeEvent(event.ID, []string{event.Relay.String()}, event.PubKey)
+			naddr, err := nip19.EncodeEntity(event.PubKey, event.Kind, event.Tags.GetD(), relays)
 			if err != nil {
 				continue
 			}
@@ -158,9 +158,9 @@ func nostrListItems(f string) (bool, []parser.Item, error) {
 			}
 
 			feedItems = append(feedItems, parser.Item{
-				GUID:     fmt.Sprintf("nostr:%s", event.ID),
+				GUID:     fmt.Sprintf("nostr:%s:%s", event.PubKey, event.Tags.GetD()),
 				Date:     publishedAt,
-				URL:      fmt.Sprintf("nostr:%s", nevent),
+				URL:      fmt.Sprintf("nostr:%s", naddr),
 				Content:  buf.String(),
 				Title:    title,
 				ImageURL: image,
