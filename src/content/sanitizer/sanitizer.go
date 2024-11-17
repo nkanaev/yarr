@@ -127,6 +127,10 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 			continue
 		}
 
+		if (tagName == "img" || tagName == "source") && attribute.Key == "srcset" {
+			value = sanitizeSrcsetAttr(baseURL, value)
+		}
+
 		if isExternalResourceAttribute(attribute.Key) {
 			if tagName == "iframe" {
 				if isValidIframeSource(baseURL, attribute.Val) {

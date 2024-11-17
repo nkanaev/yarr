@@ -56,7 +56,6 @@ func isItNostr(ctx context.Context, url string) (bool, *sdk.ProfileMetadata) {
 		}
 	}
 
-	// only do nip05 check when nostr prefix
 	if nip05.IsValidIdentifier(url) {
 		profile, err := nostrSdk.FetchProfileFromInput(ctx, url)
 		if err != nil {
