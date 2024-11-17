@@ -31,6 +31,9 @@ github.com/dustin/go-humanize
 ## explicit; go 1.23.0
 github.com/fiatjaf/eventstore
 github.com/fiatjaf/eventstore/nullstore
+# github.com/github-tijlxyz/goldmark-nostr v0.0.1
+## explicit; go 1.23.3
+github.com/github-tijlxyz/goldmark-nostr
 # github.com/gobwas/httphead v0.1.0
 ## explicit; go 1.15
 github.com/gobwas/httphead

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/github-tijlxyz/goldmark-nostr"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip05"
 	"github.com/nbd-wtf/go-nostr/nip19"
@@ -151,7 +152,7 @@ func nostrListItems(f string) (bool, []parser.Item, error) {
 			}
 
 			// format content from markdown to html
-			md := goldmark.New()
+			md := goldmark.New(goldmark.WithExtensions(extension.NewNostr()))
 			var buf bytes.Buffer
 			if err := md.Convert([]byte(event.Content), &buf); err != nil {
 				continue
