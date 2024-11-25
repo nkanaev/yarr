@@ -167,7 +167,7 @@ func getExtraAttributes(tagName string) ([]string, []string) {
 	case "iframe":
 		return []string{"sandbox", "loading"}, []string{`sandbox="allow-scripts allow-same-origin allow-popups"`, `loading="lazy"`}
 	case "img":
-		return []string{"loading"}, []string{`loading="lazy"`}
+		return []string{"loading"}, []string{`loading="lazy"`, `referrerpolicy="no-referrer"`}
 	default:
 		return nil, nil
 	}
