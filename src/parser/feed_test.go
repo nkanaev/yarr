@@ -150,3 +150,32 @@ func TestParseCleanIllegalCharsInNonUTF8(t *testing.T) {
 		t.Fatalf("invalid feed, got: %v", feed)
 	}
 }
+
+func TestParseMissingGUID(t *testing.T) {
+	data := `
+		<?xml version="1.0" encoding="windows-1251"?>
+		<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<channel>
+				<item>
+					<title>foo</title>
+				</item>
+				<item>
+					<title>bar</title>
+				</item>
+			</channel>
+		</rss>
+	`
+	feed, err := ParseAndFix(strings.NewReader(data), "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(feed.Items) != 2 {
+		t.Fatalf("expected 2 items, got %d", len(feed.Items))
+	}
+	if feed.Items[0].GUID == "" || feed.Items[1].GUID == "" {
+		t.Fatalf("item GUIDs are missing, got %#v", feed.Items)
+	}
+	if feed.Items[0].GUID == feed.Items[1].GUID {
+		t.Fatalf("item GUIDs are not unique, got %#v", feed.Items)
+	}
+}

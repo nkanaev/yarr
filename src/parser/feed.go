@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -119,6 +120,7 @@ func ParseAndFix(r io.Reader, baseURL, fallbackEncoding string) (*Feed, error) {
 	}
 	feed.TranslateURLs(baseURL)
 	feed.SetMissingDatesTo(time.Now())
+	feed.SetMissingGUIDs()
 	return feed, nil
 }
 
@@ -167,4 +169,13 @@ func (feed *Feed) TranslateURLs(base string) error {
 		item.URL = siteUrl.ResolveReference(itemUrl).String()
 	}
 	return nil
+}
+
+func (feed *Feed) SetMissingGUIDs() {
+	for i, item := range feed.Items {
+		if item.GUID == "" {
+			id := strings.Join([]string{item.Title, item.Date.Format(time.RFC3339), item.URL}, ";;")
+			feed.Items[i].GUID = fmt.Sprintf("%x", sha256.Sum256([]byte(id)))
+		}
+	}
 }
