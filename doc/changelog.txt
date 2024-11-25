@@ -10,6 +10,10 @@
 - (fix) sorting same-day batch articles (thanks to @lamescholar for the report)
 - (fix) showing login page in the selected theme (thanks to @feddiriko for the report)
 - (fix) parsing atom feeds with html elements (thanks to @tillcash & @toBeOfUse for the report, @krkk for the fix)
+- (fix) parsing feeds with missing guids (thanks to @hoyii for the report)
+- (fix) sending actual client version to servers (thanks to @aidanholm)
+- (fix) error caused by missing config dir (thanks to @timster)
+- (etc) load external images with no-referrer policy (thanks to @tillcash for the report)
 
 # v2.4 (2023-08-15)
 
