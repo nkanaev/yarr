@@ -207,11 +207,11 @@
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
                     <header class="dropdown-header">{{ current.feed.title }}</header>
-                    <a class="dropdown-item" :href="current.feed.link" target="_blank" v-if="current.feed.link">
+                    <a class="dropdown-item" :href="current.feed.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.link">
                         <span class="icon mr-1">{% inline "globe.svg" %}</span>
                         Website
                     </a>
-                    <a class="dropdown-item" :href="current.feed.feed_link" target="_blank" v-if="current.feed.feed_link">
+                    <a class="dropdown-item" :href="current.feed.feed_link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.feed_link">
                         <span class="icon mr-1">{% inline "rss.svg" %}</span>
                         Feed Link
                     </a>
@@ -326,7 +326,7 @@
                         title="Read Here">
                     <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
                 </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" target="_blank" title="Open Link">
+                <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
                 <div class="flex-grow-1"></div>

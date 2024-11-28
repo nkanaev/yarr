@@ -92,7 +92,7 @@ var helperFunctions = {
 var shortcutFunctions = {
   openItemLink: function() {
     if (vm.itemSelectedDetails && vm.itemSelectedDetails.link) {
-      window.open(vm.itemSelectedDetails.link, '_blank')
+      window.open(vm.itemSelectedDetails.link, '_blank', 'noopener,noreferrer')
     }
   },
   toggleReadability: function() {
