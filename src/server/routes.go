@@ -371,11 +371,18 @@ func (s *Server) handleItemList(c *router.Context) {
 		}
 		newestFirst := query.Get("oldest_first") != "true"
 
-		items := s.db.ListItems(filter, perPage+1, newestFirst, false)
+		items := s.db.ListItems(filter, perPage+1, newestFirst, true)
 		hasMore := false
 		if len(items) == perPage+1 {
 			hasMore = true
 			items = items[:perPage]
+		}
+
+		for i, item := range items {
+			if item.Title == "" {
+				text := htmlutil.ExtractText(item.Content)
+				items[i].Title = htmlutil.TruncateText(text, 140)
+			}
 		}
 		c.JSON(http.StatusOK, map[string]interface{}{
 			"list":     items,

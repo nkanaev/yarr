@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"golang.org/x/net/html"
 )
@@ -60,4 +61,17 @@ func ExtractText(content string) string {
 	text = strings.TrimSpace(text)
 	text = whitespaceRegex.ReplaceAllLiteralString(text, " ")
 	return text
+}
+
+func TruncateText(input string, size int) string {
+	runes := []rune(input)
+	if len(runes) <= size {
+		return input
+	}
+	for i := size - 1; i > 0; i-- {
+		if unicode.IsSpace(runes[i]) {
+			return string(runes[:i]) + " ..."
+		}
+	}
+	return input
 }

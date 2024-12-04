@@ -24,3 +24,21 @@ func TestExtractText(t *testing.T) {
 		}
 	}
 }
+
+func TestTruncateText(t *testing.T) {
+	input := "Lorem ipsum — классический текст-«рыба»"
+
+	size := 30
+	want := "Lorem ipsum — классический ..."
+	have := TruncateText(input, size)
+	if want != have {
+		t.Errorf("\nsize: %d\nwant: %#v\nhave: %#v", size, want, have)
+	}
+
+	size = 1000
+	want = input
+	have = TruncateText(input, size)
+	if want != have {
+		t.Errorf("\nsize: %d\nwant: %#v\nhave: %#v", size, want, have)
+	}
+}
