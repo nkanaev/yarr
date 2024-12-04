@@ -2,6 +2,26 @@
 
 var TITLE = document.title
 
+function scrollto(target, scroll) {
+  var padding = 10
+  var targetRect = target.getBoundingClientRect()
+  var scrollRect = scroll.getBoundingClientRect()
+
+  // target
+  var relativeOffset = targetRect.y - scrollRect.y
+  var absoluteOffset = relativeOffset + scroll.scrollTop
+
+  if (padding <= relativeOffset && relativeOffset + targetRect.height <= scrollRect.height - padding) return
+
+  var newPos = scroll.scrollTop
+  if (relativeOffset < padding) {
+    newPos = absoluteOffset - padding
+  } else {
+    newPos = absoluteOffset - scrollRect.height + targetRect.height + padding
+  }
+  scroll.scrollTop = Math.round(newPos)
+}
+
 var debounce = function(callback, wait) {
   var timeout
   return function() {
@@ -407,7 +427,7 @@ var vm = new Vue({
           vm.feeds = values[1]
         })
     },
-    refreshItems: function(loadMore) {
+    refreshItems: function(loadMore = false) {
       if (this.feedSelected === null) {
         vm.items = []
         vm.itemsHasMore = false
@@ -420,7 +440,7 @@ var vm = new Vue({
       }
 
       this.loading.items = true
-      api.items.list(query).then(function(data) {
+      return api.items.list(query).then(function(data) {
         if (loadMore) {
           vm.items = vm.items.concat(data.list)
         } else {
@@ -443,13 +463,17 @@ var vm = new Vue({
       var scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16
 
       var el = this.$refs.itemlist
+
+      if (el.scrollHeight === 0) return false  // element is invisible (responsive design)
+
       var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < bottomSpace * scale
       return closeToBottom
     },
     loadMoreItems: function(event, el) {
       if (!this.itemsHasMore) return
       if (this.loading.items) return
-      if (this.itemListCloseToBottom()) this.refreshItems(true)
+      if (this.itemListCloseToBottom()) return this.refreshItems(true)
+      if (this.itemSelected && this.itemSelected === this.items[this.items.length - 1].id) return this.refreshItems(true)
     },
     markItemsRead: function() {
       var query = this.getItemsQuery()
@@ -682,6 +706,65 @@ var vm = new Vue({
       this.filteredFeedStats = statsFeeds
       this.filteredFolderStats = statsFolders
       this.filteredTotalStats = statsTotal
+    },
+    // navigation helper, navigate relative to selected item
+    navigateToItem: function(relativePosition) {
+      let vm = this
+      if (vm.itemSelected == null) {
+        // if no item is selected, select first
+        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
+        return
+      }
+
+      var itemPosition = vm.items.findIndex(function(x) { return x.id === vm.itemSelected })
+      if (itemPosition === -1) {
+        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
+        return
+      }
+
+      var newPosition = itemPosition + relativePosition
+      if (newPosition < 0 || newPosition >= vm.items.length) return
+
+      vm.itemSelected = vm.items[newPosition].id
+
+      vm.$nextTick(function() {
+        var scroll = document.querySelector('#item-list-scroll')
+
+        var handle = scroll.querySelector('input[type=radio]:checked')
+        var target = handle && handle.parentElement
+
+        if (target && scroll) scrollto(target, scroll)
+
+        vm.loadMoreItems()
+      })
+    },
+    // navigation helper, navigate relative to selected feed
+    navigateToFeed: function(relativePosition) {
+      let vm = this
+      var navigationList = Array.from(document.querySelectorAll('#col-feed-list input[name=feed]'))
+        .filter(function(r) { return r.offsetParent !== null && r.value !== 'folder:null' })
+        .map(function(r) { return r.value })
+
+      var currentFeedPosition = navigationList.indexOf(vm.feedSelected)
+
+      if (currentFeedPosition == -1) {
+        vm.feedSelected = ''
+        return
+      }
+
+      var newPosition = currentFeedPosition+relativePosition
+      if (newPosition < 0 || newPosition >= navigationList.length) return
+
+      vm.feedSelected = navigationList[newPosition]
+
+      vm.$nextTick(function() {
+        var scroll = document.querySelector('#feed-list-scroll')
+
+        var handle = scroll.querySelector('input[type=radio]:checked')
+        var target = handle && handle.parentElement
+
+        if (target && scroll) scrollto(target, scroll)
+      })
     },
   }
 })

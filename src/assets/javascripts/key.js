@@ -1,79 +1,4 @@
-function scrollto(target, scroll) {
-  var padding = 10
-  var targetRect = target.getBoundingClientRect()
-  var scrollRect = scroll.getBoundingClientRect()
-
-  // target
-  var relativeOffset = targetRect.y - scrollRect.y
-  var absoluteOffset = relativeOffset + scroll.scrollTop
-
-  if (padding <= relativeOffset && relativeOffset + targetRect.height <= scrollRect.height - padding) return
-
-  var newPos = scroll.scrollTop
-  if (relativeOffset < padding) {
-    newPos = absoluteOffset - padding
-  } else {
-    newPos = absoluteOffset - scrollRect.height + targetRect.height + padding
-  }
-  scroll.scrollTop = Math.round(newPos)
-}
-
 var helperFunctions = {
-  // navigation helper, navigate relative to selected item
-  navigateToItem: function(relativePosition) {
-    if (vm.itemSelected == null) {
-      // if no item is selected, select first
-      if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
-      return
-    }
-
-    var itemPosition = vm.items.findIndex(function(x) { return x.id === vm.itemSelected })
-    if (itemPosition === -1) {
-      if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
-      return
-    }
-
-    var newPosition = itemPosition + relativePosition
-    if (newPosition < 0 || newPosition >= vm.items.length) return
-
-    vm.itemSelected = vm.items[newPosition].id
-
-    vm.$nextTick(function() {
-      var scroll = document.querySelector('#item-list-scroll')
-
-      var handle = scroll.querySelector('input[type=radio]:checked')
-      var target = handle && handle.parentElement
-
-      if (target && scroll) scrollto(target, scroll)
-    })
-  },
-  // navigation helper, navigate relative to selected feed
-  navigateToFeed: function(relativePosition) {
-    var navigationList = Array.from(document.querySelectorAll('#col-feed-list input[name=feed]'))
-      .filter(function(r) { return r.offsetParent !== null && r.value !== 'folder:null' })
-      .map(function(r) { return r.value })
-
-    var currentFeedPosition = navigationList.indexOf(vm.feedSelected)
-
-    if (currentFeedPosition == -1) {
-      vm.feedSelected = ''
-      return
-    }
-
-    var newPosition = currentFeedPosition+relativePosition
-    if (newPosition < 0 || newPosition >= navigationList.length) return
-
-    vm.feedSelected = navigationList[newPosition]
-
-    vm.$nextTick(function() {
-      var scroll = document.querySelector('#feed-list-scroll')
-
-      var handle = scroll.querySelector('input[type=radio]:checked')
-      var target = handle && handle.parentElement
-
-      if (target && scroll) scrollto(target, scroll)
-    })
-  },
   scrollContent: function(direction) {
     var padding = 40
     var scroll = document.querySelector('.content')
@@ -118,16 +43,16 @@ var shortcutFunctions = {
     document.getElementById("searchbar").focus()
   },
   nextItem(){
-    helperFunctions.navigateToItem(+1)
+    vm.navigateToItem(+1)
   },
   previousItem() {
-    helperFunctions.navigateToItem(-1)
+    vm.navigateToItem(-1)
   },
   nextFeed(){
-    helperFunctions.navigateToFeed(+1)
+    vm.navigateToFeed(+1)
   },
   previousFeed() {
-    helperFunctions.navigateToFeed(-1)
+    vm.navigateToFeed(-1)
   },
   scrollForward: function() {
     helperFunctions.scrollContent(+1)
