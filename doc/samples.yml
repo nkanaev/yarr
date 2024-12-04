@@ -62,3 +62,7 @@
 - site: https://juliepowell.blogspot.com/
   feed: https://juliepowell.blogspot.com/feeds/posts/default
   tags: [blogger, text]
+
+- site: https://micro.blog/val
+  feed: https://micro.blog/posts/val
+  tags: [json, microblog]

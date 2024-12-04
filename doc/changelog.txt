@@ -15,6 +15,7 @@
 - (fix) error caused by missing config dir (thanks to @timster)
 - (etc) load external images with no-referrer policy (thanks to @tillcash for the report)
 - (etc) open external links with no-referrer policy (thanks to @donovanglover)
+- (etc) show article content in the list if title is missing (thanks to @asimpson for suggestion)
 
 # v2.4 (2023-08-15)
 
