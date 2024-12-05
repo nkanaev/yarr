@@ -168,14 +168,18 @@ function dateRepr(d) {
   var out = ''
 
   sec = Math.abs(sec)
-  if (sec < 2700)  // less than 45 minutes
+  if (sec < 3600)  // less than 60 minutes
     out = Math.round(sec / 60) + 'm'
   else if (sec < 86400)  // less than 24 hours
     out = Math.round(sec / 3600) + 'h'
   else if (sec < 604800)  // less than a week
     out = Math.round(sec / 86400) + 'd'
+  else if (sec < 2419200) // less than a month
+    out = Math.round(sec / 604800) + 'w'
+  else if (sec < 29030400) // less than a year
+    out = Math.round(sec / 2592000) + 'M'
   else
-    out = d.toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"})
+    out = Math.round(sec / 29030400) + 'y'
 
   if (neg) return '-' + out
   return out
