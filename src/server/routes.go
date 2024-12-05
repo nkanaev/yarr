@@ -349,7 +349,7 @@ func (s *Server) handleItem(c *router.Context) {
 
 func (s *Server) handleItemList(c *router.Context) {
 	if c.Req.Method == "GET" {
-		perPage := 20
+		perPage := 100
 		query := c.Req.URL.Query()
 
 		filter := storage.ItemFilter{}
