@@ -179,7 +179,7 @@ function dateRepr(d) {
   else if (sec < 29030400) // less than a year
     out = Math.round(sec / 2592000) + 'M'
   else
-    out = Math.round(sec / 29030400) + 'y'
+    out = Math.round(sec / 29030400) + 'Y'
 
   if (neg) return '-' + out
   return out
