@@ -124,14 +124,14 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .icon-small {
-  width: .6rem;
-  height: .6rem;
+  width: .45rem;
+  height: .45rem;
   display: inline-block;
 }
 
 .icon-small > svg , .icon-small > img {
-  width: .6rem;
-  height: .6rem;
+  width: .45rem;
+  height: .45rem;
 }
 
 .feed-icon {
