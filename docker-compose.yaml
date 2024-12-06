@@ -1,0 +1,11 @@
+services:
+  yarr:
+    ports:
+      - '7070:7070'
+    volumes:
+      - '/docker/yarr:/data'
+    image: alterem/yarr
+    build:
+      context: .
+      dockerfile: Dockerfile
+      no_cache: true
