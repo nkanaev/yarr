@@ -52,6 +52,9 @@
       list_errors: function() {
         return api('get', './api/feeds/errors').then(json)
       },
+      get_expire_minutes: function(id) {
+        return api('get', './api/feeds/' + id + '/expire').then(json)
+      },
     },
     folders: {
       list: function() {

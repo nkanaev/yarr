@@ -16,6 +16,7 @@ func settingsDefaults() map[string]interface{} {
 		"theme_font":        "",
 		"theme_size":        1,
 		"refresh_rate":      0,
+		"expiration_rate":   0,
 	}
 }
 

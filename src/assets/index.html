@@ -225,6 +225,15 @@
                         Change Link
                     </button>
                     <div class="dropdown-divider"></div>
+
+                    <header class="dropdown-header">Expire Unreads</header>
+                    <div class="row text-center m-0">
+                        <button class="dropdown-item col-4 px-0" :class="{active: feedExpire == 1440}" @click.stop="feedExpireUnreads(current.feed, 1440)">1d</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: feedExpire == 10080}" @click.stop="feedExpireUnreads(current.feed, 10080)">1w</button>
+                        <button class="dropdown-item col-4 px-0" :class="{active: feedExpire == 43200}" @click.stop="feedExpireUnreads(current.feed, 43200)">1m</button>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
                     <header class="dropdown-header">Move to...</header>
                     <button class="dropdown-item"
                         v-if="folder.id != current.feed.folder_id"

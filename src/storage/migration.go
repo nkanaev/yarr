@@ -17,6 +17,7 @@ var migrations = []func(*sql.Tx) error{
 	m07_add_feed_size,
 	m08_normalize_datetime,
 	m09_change_item_index,
+	m10_per_feed_expiration,
 }
 
 var maxVersion = int64(len(migrations))
@@ -103,7 +104,8 @@ func m01_initial(tx *sql.Tx) error {
 		 description    text,
 		 link           text,
 		 feed_link      text not null,
-		 icon           blob
+		 icon           blob,
+         expire_minutes integer not null default 0
 		);
 
 		create index if not exists idx_feed_folder_id on feeds(folder_id);
@@ -303,6 +305,12 @@ func m09_change_item_index(tx *sql.Tx) error {
         drop index if exists idx_item_status;
 		create index if not exists idx_item__date_id_status on items(date,id,status);
 	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m10_per_feed_expiration(tx *sql.Tx) error {
+	sql := `alter table feeds add column expire_minutes integer not null default 0;`
 	_, err := tx.Exec(sql)
 	return err
 }

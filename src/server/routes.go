@@ -51,6 +51,7 @@ func (s *Server) handler() http.Handler {
 	r.For("/api/feeds/errors", s.handleFeedErrors)
 	r.For("/api/feeds/:id/icon", s.handleFeedIcon)
 	r.For("/api/feeds/:id", s.handleFeed)
+	r.For("/api/feeds/:id/expire", s.handleFeedExpire)
 	r.For("/api/items", s.handleItemList)
 	r.For("/api/items/:id", s.handleItem)
 	r.For("/api/settings", s.handleSettings)
@@ -263,13 +264,54 @@ func (s *Server) handleFeedList(c *router.Context) {
 	}
 }
 
+func (s *Server) handleFeedExpire(c *router.Context) {
+	feedId, err := c.VarInt64("id")
+	if err != nil {
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if c.Req.Method != "GET" {
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	feed := s.db.GetFeed(feedId)
+	if feed == nil {
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	expire_minutes, err := s.db.GetFeedExpirationRate(feedId)
+	if err != nil {
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"feedExpire": expire_minutes,
+	})
+}
+
 func (s *Server) handleFeed(c *router.Context) {
 	id, err := c.VarInt64("id")
 	if err != nil {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if c.Req.Method == "PUT" {
+	if c.Req.Method == "GET" {
+		feedId, err := c.QueryInt64("feed_id")
+		if err == nil {
+			c.Out.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		feed := s.db.GetFeed(feedId)
+		if feed == nil {
+			c.Out.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		expire_minutes, err := s.db.GetFeedExpirationRate(feedId)
+		c.JSON(http.StatusOK, map[string]interface{}{
+			"expire_minutes": expire_minutes,
+		})
+	} else if c.Req.Method == "PUT" {
 		feed := s.db.GetFeed(id)
 		if feed == nil {
 			c.Out.WriteHeader(http.StatusBadRequest)
@@ -297,6 +339,15 @@ func (s *Server) handleFeed(c *router.Context) {
 		if link, ok := body["feed_link"]; ok {
 			if reflect.TypeOf(link).Kind() == reflect.String {
 				s.db.UpdateFeedLink(id, link.(string))
+			}
+		}
+		if expire_minutes, ok := body["expire_minutes"]; ok {
+			if reflect.TypeOf(expire_minutes).Kind() == reflect.Float64 {
+				minutes := int64(expire_minutes.(float64))
+				err := s.db.UpdateFeedExpirationRate(id, minutes)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 		}
 		c.Out.WriteHeader(http.StatusOK)
@@ -416,6 +467,10 @@ func (s *Server) handleSettings(c *router.Context) {
 		if s.db.UpdateSettings(settings) {
 			if _, ok := settings["refresh_rate"]; ok {
 				s.worker.SetRefreshRate(s.db.GetSettingsValueInt64("refresh_rate"))
+			}
+			if _, ok := settings["expiration_rate"]; ok {
+				expirationRate := s.db.GetSettingsValueInt64("expiration_rate")
+				s.expirer.SetExpirationRate(uint64(expirationRate))
 			}
 			c.Out.WriteHeader(http.StatusOK)
 		} else {
