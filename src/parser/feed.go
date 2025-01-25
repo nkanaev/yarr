@@ -148,7 +148,7 @@ func (feed *Feed) cleanup() {
 
 func (feed *Feed) SetMissingDatesTo(newdate time.Time) {
 	for i, item := range feed.Items {
-		if item.Date.IsZero() {
+		if item.Date.IsZero() || item.Date.After(newdate) {
 			feed.Items[i].Date = newdate
 		}
 	}
