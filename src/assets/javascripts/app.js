@@ -692,14 +692,7 @@ var vm = new Vue({
       })
     },
     computeStats: function() {
-      var filter = this.filterSelected
-      if (!filter) {
-        this.filteredFeedStats = {}
-        this.filteredFolderStats = {}
-        this.filteredTotalStats = null
-        return
-      }
-
+      var filter = this.filterSelected || 'unread'
       var statsFeeds = {}, statsFolders = {}, statsTotal = 0
 
       for (var i = 0; i < this.feeds.length; i++) {
