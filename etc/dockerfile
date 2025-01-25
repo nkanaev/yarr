@@ -2,7 +2,8 @@ FROM golang:alpine3.18 AS build
 RUN apk add build-base git
 WORKDIR /src
 COPY . .
-RUN make build_linux
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg \
+  make build_linux
 
 FROM alpine:latest
 RUN apk add --no-cache ca-certificates && \
