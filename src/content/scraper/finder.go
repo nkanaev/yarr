@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"net/url"
 	"strings"
 
 	"github.com/nkanaev/yarr/src/content/htmlutil"
@@ -35,6 +36,18 @@ func FindFeeds(body string, base string) map[string]string {
 		link := htmlutil.AbsoluteUrl(href, base)
 		if link != "" {
 			candidates[link] = name
+
+			l, err := url.Parse(link)
+			if err == nil && l.Host == "www.youtube.com" && l.Path == "/feeds/videos.xml" {
+				// https://wiki.archiveteam.org/index.php/YouTube/Technical_details#Playlists
+				channelID, found := strings.CutPrefix(l.Query().Get("channel_id"), "UC")
+				if found {
+					const url string = "https://www.youtube.com/feeds/videos.xml?playlist_id="
+					candidates[url + "UULF" + channelID] = name + " - Videos"
+					candidates[url + "UULV" + channelID] = name + " - Live Streams"
+					candidates[url + "UUSH" + channelID] = name + " - Short videos"
+				}
+			}
 		}
 	}
 
