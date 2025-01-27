@@ -111,16 +111,16 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .icon {
-  height: 1rem;
-  width: 1rem;
+  height: 1.2rem;
+  width: 1.2rem;
   display: inline-block;
   line-height: 1;
 }
 
 .icon > svg , .icon > img {
-  width: 1rem;
-  height: 1rem;
-  vertical-align: top;
+  width: 1.2rem;
+  height: 1.2rem;
+  vertical-align: middle;
 }
 
 .icon-small {
@@ -132,6 +132,7 @@ select.form-control:not([multiple]):not([size]) {
 .icon-small > svg , .icon-small > img {
   width: .6rem;
   height: .6rem;
+  vertical-align: top;
 }
 
 .icon-unread {
@@ -266,8 +267,8 @@ select.form-control:not([multiple]):not([size]) {
 }
 
 .toolbar {
-  min-height: 2rem !important;
-  max-height: 2rem !important;
+  min-height: 3rem !important;
+  max-height: 3rem !important;
 }
 
 .toolbar-item {
@@ -607,12 +608,13 @@ a,
   .drag {
     cursor: default;
   }
+
   .toolbar {
-    min-height: 3rem !important;
-    max-height: 3rem !important;
+    min-height: 4rem !important;
+    max-height: 4rem !important;
   }
   .toolbar-item,
   .toolbar-search {
-    padding: .5rem;
+    padding: .8rem;
   }
 }
