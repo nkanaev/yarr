@@ -489,7 +489,6 @@ var vm = new Vue({
       var query = this.getItemsQuery()
       api.items.mark_read(query).then(function() {
         vm.items = []
-        vm.itemsPage = {'cur': 1, 'num': 1}
         vm.itemSelected = null
         vm.itemsHasMore = false
         vm.refreshStats()
