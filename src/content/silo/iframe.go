@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	youtubeFrame = `<iframe src="https://www.youtube.com/embed/%s" width="560" height="315" frameborder="0" allowfullscreen></iframe>`
+	youtubeFrame = `<iframe src="https://www.youtube-nocookie.com/embed/%s" width="640" height="360" frameborder="0" allowfullscreen></iframe>`
 	vimeoFrame   = `<iframe src="https://player.vimeo.com/video/%s" width="640" height="360" frameborder="0" allowfullscreen></iframe>`
 	vimeoRegex   = regexp.MustCompile(`\/(\d+)$`)
 )
