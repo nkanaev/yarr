@@ -32,5 +32,5 @@ jobs:
           context: .  # Ensure this points to where your Dockerfile is located
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-mod:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-mod:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
