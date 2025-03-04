@@ -43,9 +43,9 @@ func FindFeeds(body string, base string) map[string]string {
 				channelID, found := strings.CutPrefix(l.Query().Get("channel_id"), "UC")
 				if found {
 					const url string = "https://www.youtube.com/feeds/videos.xml?playlist_id="
-					candidates[url + "UULF" + channelID] = name + " - Videos"
-					candidates[url + "UULV" + channelID] = name + " - Live Streams"
-					candidates[url + "UUSH" + channelID] = name + " - Short videos"
+					candidates[url+"UULF"+channelID] = name + " - Videos"
+					candidates[url+"UULV"+channelID] = name + " - Live Streams"
+					candidates[url+"UUSH"+channelID] = name + " - Short videos"
 				}
 			}
 		}
