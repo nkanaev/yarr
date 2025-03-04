@@ -59,7 +59,7 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header">Theme</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">Theme</header>
                     <div class="row text-center m-0">
                         <button class="btn btn-link col-4 px-0 rounded-0"
                                 :class="'theme-'+t"
@@ -72,7 +72,7 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header">Auto Refresh</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">Auto Refresh</header>
                     <div class="row text-center m-0">
                         <button class="dropdown-item col-4 px-0" :class="{active: !refreshRate}" @click.stop="refreshRate = 0">0</button>
                         <button class="dropdown-item col-4 px-0" :class="{active: refreshRate == 10}" @click.stop="refreshRate = 10">10m</button>
@@ -84,13 +84,13 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header">Show first</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">Show first</header>
                     <div class="d-flex text-center">
                         <button class="dropdown-item px-0" :class="{active: itemSortNewestFirst}" @click.stop="itemSortNewestFirst=true">New</button>
                         <button class="dropdown-item px-0" :class="{active: !itemSortNewestFirst}" @click.stop="itemSortNewestFirst=false">Old</button>
                     </div>
                     <div class="dropdown-divider"></div>
-                    <header class="dropdown-header">Subscriptions</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">Subscriptions</header>
                     <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
                         <input type="file"
                                id="opml-import"
@@ -207,7 +207,7 @@
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
-                    <header class="dropdown-header">{{ current.feed.title }}</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ current.feed.title }}</header>
                     <a class="dropdown-item" :href="current.feed.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.link">
                         <span class="icon mr-1">{% inline "globe.svg" %}</span>
                         Website
@@ -226,7 +226,7 @@
                         Change Link
                     </button>
                     <div class="dropdown-divider"></div>
-                    <header class="dropdown-header">Move to...</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">Move to...</header>
                     <button class="dropdown-item"
                         v-if="folder.id != current.feed.folder_id"
                         v-for="folder in folders"
@@ -256,7 +256,7 @@
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
-                    <header class="dropdown-header">{{ current.folder.title }}</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ current.folder.title }}</header>
                     <button class="dropdown-item" @click="renameFolder(current.folder)">
                         <span class="icon mr-1">{% inline "edit.svg" %}</span>
                         Rename
