@@ -250,6 +250,8 @@ var vm = new Vue({
         'size': s.theme_size,
       },
       'refreshRate': s.refresh_rate,
+      'expireUnreads': s.expiration_rate,
+      'feedExpire': 0,
       'authenticated': app.authenticated,
       'feed_errors': {},
     }
@@ -333,8 +335,18 @@ var vm = new Vue({
     },
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
+
       api.settings.update({feed: newVal}).then(this.refreshItems.bind(this, false))
       this.itemSelected = null
+
+      var parts = newVal.split(':', 2)
+      if (parts[0] == 'feed') {
+        var feed_id = parts[1]
+        api.feeds.get_expire_minutes(feed_id).then(function(resp) {
+          vm.feedExpire = resp.feedExpire
+        })
+      }
+
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0
     },
     'itemSelected': function(newVal, oldVal) {
@@ -495,6 +507,14 @@ var vm = new Vue({
         hour: '2-digit', minute: '2-digit',
       }
       return new Date(datestr).toLocaleDateString(undefined, options)
+    },
+    'feedExpireUnreads': function(feed, newVal) {
+      if (vm.feedExpire == newVal) {
+        newVal = 0
+      }
+      api.feeds.update(feed.id, {expire_minutes: newVal}).then(function() {
+        vm.feedExpire = newVal
+      })
     },
     moveFeed: function(feed, folder) {
       var folder_id = folder ? folder.id : null

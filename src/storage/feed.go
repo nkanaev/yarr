@@ -21,7 +21,7 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 		title = feedLink
 	}
 	row := s.db.QueryRow(`
-		insert into feeds (title, description, link, feed_link, folder_id) 
+		insert into feeds (title, description, link, feed_link, folder_id)
 		values (?, ?, ?, ?, ?)
 		on conflict (feed_link) do update set folder_id = ?
         returning id`,
@@ -74,6 +74,31 @@ func (s *Storage) UpdateFeedFolder(feedId int64, newFolderId *int64) bool {
 func (s *Storage) UpdateFeedLink(feedId int64, newLink string) bool {
 	_, err := s.db.Exec(`update feeds set feed_link = ? where id = ?`, newLink, feedId)
 	return err == nil
+}
+
+func (s *Storage) GetFeedExpirationRate(feedId int64) (*uint64, error) {
+	var result uint64
+	row := s.db.QueryRow(`select expire_minutes from feeds where id = ?`, feedId)
+	err := row.Scan(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+func (s *Storage) UpdateFeedExpirationRate(feedId int64, expireMinutes int64) error {
+	_, err := s.db.Exec(`update feeds set expire_minutes = ? where id = ?`, expireMinutes, feedId)
+	return err
+}
+
+func (s *Storage) GetMinExpirationPeriod() (*uint64, error) {
+	var result uint64
+	row := s.db.QueryRow(`select min(expire_minutes) from feeds`)
+	err := row.Scan(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 func (s *Storage) UpdateFeedIcon(feedId int64, icon *[]byte) bool {

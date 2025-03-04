@@ -372,6 +372,51 @@ func (s *Storage) SyncSearch() {
 	}
 }
 
+func (s *Storage) ExpireUnreads(globalExpireMinutes uint64) {
+	var numExpiredItems int64
+
+	// Collect expiration rates for each feed -- it's either the global default or a per-feed override
+	rows, err := s.db.Query(`select id, iif(expire_minutes = 0, ?, expire_minutes) from feeds`, globalExpireMinutes)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	periodFromFeedId := make(map[int64]int64, 0)
+	for rows.Next() {
+		var feedId, period int64
+		if period == 0 {
+			continue
+		}
+		rows.Scan(&feedId, &period, nil)
+		periodFromFeedId[feedId] = period
+	}
+
+	for feedId, period := range periodFromFeedId {
+		result, err := s.db.Exec(
+			`UPDATE items SET status = ? WHERE feed_id = ? AND status = ? AND (julianday('now') - julianday(date_arrived)) * 3600 >= ?`,
+			feedId,
+			READ,
+			UNREAD,
+			period,
+		)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		numExpiredItems += rowsAffected
+	}
+
+	if numExpiredItems > 0 {
+		log.Printf("Expired %d old unread items", numExpiredItems)
+	}
+}
+
 var (
 	itemsKeepSize = 50
 	itemsKeepDays = 90

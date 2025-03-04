@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/nkanaev/yarr/src/expirer"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/worker"
 )
@@ -13,6 +14,7 @@ type Server struct {
 	Addr        string
 	db          *storage.Storage
 	worker      *worker.Worker
+	expirer     *expirer.Expirer
 	cache       map[string]interface{}
 	cache_mutex *sync.Mutex
 
@@ -31,6 +33,7 @@ func NewServer(db *storage.Storage, addr string) *Server {
 		db:          db,
 		Addr:        addr,
 		worker:      worker.NewWorker(db),
+		expirer:     expirer.NewExpirer(db),
 		cache:       make(map[string]interface{}),
 		cache_mutex: &sync.Mutex{},
 	}
@@ -52,6 +55,9 @@ func (s *Server) Start() {
 	if refreshRate > 0 {
 		s.worker.RefreshFeeds()
 	}
+
+	globalExpirationPeriod := s.db.GetSettingsValueInt64("expiration_rate")
+	s.expirer.StartUnreadsExpirer(uint64(globalExpirationPeriod))
 
 	httpserver := &http.Server{Addr: s.Addr, Handler: s.handler()}
 
