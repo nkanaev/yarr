@@ -1,8 +1,6 @@
 name: build
 
-on:
-  push:
-    tags: ['v*', 'test*']
+on: push
 
 jobs:
   build_macos:
@@ -18,7 +16,7 @@ jobs:
       with:
         go-version: '^1.17'
     - name: Cache Go Modules
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -27,7 +25,7 @@ jobs:
     - name: "Build"
       run: make build_macos
     - name: Upload
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: macos
         path: _output/macos/yarr.app
@@ -45,7 +43,7 @@ jobs:
       with:
         go-version: '^1.17'
     - name: Cache Go Modules
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -54,7 +52,7 @@ jobs:
     - name: "Build"
       run: make build_windows
     - name: Upload
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: windows
         path: _output/windows/yarr.exe
@@ -72,36 +70,97 @@ jobs:
       with:
         go-version: '^1.17'
     - name: Cache Go Modules
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-amd64-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-go-
+          ${{ runner.os }}-go-amd64
     - name: "Build"
       run: make build_linux
     - name: Upload
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: linux
+        path: _output/linux/yarr
+
+  build_linux-arm:
+    name: Build for Linux ARM
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Install dependencies
+      run: >
+        sudo apt-get install -y
+        gcc-arm-linux-gnueabihf
+        libc6-dev-armhf-cross
+    - name: "Checkout"
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v2
+      with:
+        go-version: '^1.17'
+    - name: Cache Go Modules
+      uses: actions/cache@v4
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-armv7-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-armv7
+    - name: "Build"
+      env:
+        CC: arm-linux-gnueabihf-gcc
+        GOARCH: arm
+        GOARM: 7
+      run: make build_linux
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux_arm
+        path: _output/linux/yarr
+
+  build_linux-arm64:
+    name: Build for Linux ARM64
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Install dependencies
+      run: >
+        sudo apt-get install -y
+        gcc-aarch64-linux-gnu
+        libc6-dev-arm64-cross
+    - name: "Checkout"
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: "Setup Go"
+      uses: actions/setup-go@v2
+      with:
+        go-version: '^1.17'
+    - name: Cache Go Modules
+      uses: actions/cache@v4
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-arm64-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-arm64
+    - name: "Build"
+      env:
+        CC: aarch64-linux-gnu-gcc
+        GOARCH: arm64
+      run: make build_linux
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux_arm64
         path: _output/linux/yarr
 
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref, 'test') }}
-    needs: [build_macos, build_windows, build_linux]
+    if: ${{ startsWith(github.ref, 'refs/tags/') && !contains(github.ref, 'test') }}
+    needs: [build_macos, build_windows, build_linux, build_linux-arm, build_linux-arm64]
     steps:
-    - name: Create Release
-      uses: actions/create-release@v1
-      id: create_release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: true
-          prerelease: true
     - name: Download Artifacts
       uses: actions/download-artifact@v4.1.7
       with:
@@ -111,34 +170,24 @@ jobs:
         ls -R
         chmod u+x macos/Contents/MacOS/yarr
         chmod u+x linux/yarr
+        chmod u+x linux_arm/yarr
+        chmod u+x linux_arm64/yarr
 
-        mv macos yarr.app     && zip -r yarr-macos.zip yarr.app
-        mv windows/yarr.exe . && zip yarr-windows.zip yarr.exe
-        mv linux/yarr .       && zip yarr-linux.zip yarr
-    - name: Upload MacOS
-      uses: actions/upload-release-asset@v1
+        mv macos yarr.app && zip -r yarr-${GITHUB_REF_NAME}-macos64.zip yarr.app
+        ( cd windows        && zip ../yarr-${GITHUB_REF_NAME}-windows64.zip yarr.exe )
+        ( cd linux          && zip ../yarr-${GITHUB_REF_NAME}-linux64.zip yarr )
+        ( cd linux_arm      && zip ../yarr-${GITHUB_REF_NAME}-linux_arm.zip yarr )
+        ( cd linux_arm64    && zip ../yarr-${GITHUB_REF_NAME}-linux_arm64.zip yarr )
+    - name: Upload Release
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./yarr-macos.zip
-          asset_name: yarr-${{ github.ref }}-macos64.zip
-          asset_content_type: application/zip
-    - name: Upload Windows
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./yarr-windows.zip
-          asset_name: yarr-${{ github.ref }}-windows64.zip
-          asset_content_type: application/zip
-    - name: Upload Linux
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./yarr-linux.zip
-          asset_name: yarr-${{ github.ref }}-linux64.zip
-          asset_content_type: application/zip
+          draft: true
+          prerelease: true
+          files: |
+            yarr-${{ github.ref_name }}-macos64.zip
+            yarr-${{ github.ref_name }}-windows64.zip
+            yarr-${{ github.ref_name }}-linux64.zip
+            yarr-${{ github.ref_name }}-linux_arm.zip
+            yarr-${{ github.ref_name }}-linux_arm64.zip
