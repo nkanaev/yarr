@@ -11,6 +11,7 @@ import (
 func Start(s *server.Server) {
 	systrayOnReady := func() {
 		systray.SetIcon(Icon)
+		systray.SetTooltip("yarr")
 
 		menuOpen := systray.AddMenuItem("Open", "")
 		systray.AddSeparator()
