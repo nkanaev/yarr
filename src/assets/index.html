@@ -64,6 +64,7 @@
                         <button class="btn btn-link col-4 px-0 rounded-0"
                                 :class="'theme-'+t"
                                 @click.stop="theme.name = t"
+                                :aria-label="t"
                                 v-for="t in ['light', 'sepia', 'night']">
                             <span class="icon" v-if="theme.name == t">{% inline "check.svg" %}</span>
                         </button>
