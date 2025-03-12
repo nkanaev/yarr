@@ -16,20 +16,11 @@ jobs:
     runs-on: macos-13
     steps:
     - name: "Checkout"
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
+      uses: actions/checkout@v4
     - name: "Setup Go"
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
-        go-version: '^1.17'
-    - name: Cache Go Modules
-      uses: actions/cache@v4
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
+        go-version: '^1.18'
     - name: "Build"
       run: make build_macos
     - name: Upload
@@ -43,20 +34,11 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: "Checkout"
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
+      uses: actions/checkout@v4
     - name: "Setup Go"
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
-        go-version: '^1.17'
-    - name: Cache Go Modules
-      uses: actions/cache@v4
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
+        go-version: '^1.18'
     - name: "Build"
       run: make build_windows
     - name: Upload
@@ -70,20 +52,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: "Checkout"
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
+      uses: actions/checkout@v4
     - name: "Setup Go"
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
-        go-version: '^1.17'
-    - name: Cache Go Modules
-      uses: actions/cache@v4
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-amd64-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-amd64
+        go-version: '^1.18'
     - name: "Build"
       run: make build_linux
     - name: Upload
@@ -102,20 +75,11 @@ jobs:
         gcc-arm-linux-gnueabihf
         libc6-dev-armhf-cross
     - name: "Checkout"
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
+      uses: actions/checkout@v4
     - name: "Setup Go"
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
-        go-version: '^1.17'
-    - name: Cache Go Modules
-      uses: actions/cache@v4
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-armv7-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-armv7
+        go-version: '^1.18'
     - name: "Build"
       env:
         CC: arm-linux-gnueabihf-gcc
@@ -138,20 +102,11 @@ jobs:
         gcc-aarch64-linux-gnu
         libc6-dev-arm64-cross
     - name: "Checkout"
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
+      uses: actions/checkout@v4
     - name: "Setup Go"
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
-        go-version: '^1.17'
-    - name: Cache Go Modules
-      uses: actions/cache@v4
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-arm64-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-arm64
+        go-version: '^1.18'
     - name: "Build"
       env:
         CC: aarch64-linux-gnu-gcc
