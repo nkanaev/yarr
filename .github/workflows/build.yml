@@ -1,6 +1,10 @@
 name: Build
 
 on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
   workflow_run:
     workflows: [Test]
     types:
