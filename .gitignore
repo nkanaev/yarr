@@ -1,4 +1,5 @@
 /_output
+/out
 /yarr
 *.db
 *.db-shm

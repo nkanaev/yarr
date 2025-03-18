@@ -1,5 +1,4 @@
-//go:build !windows && !macos
-// +build !windows,!macos
+//go:build !gui
 
 package platform
 

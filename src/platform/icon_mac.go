@@ -1,5 +1,4 @@
-//go:build macos
-// +build macos
+//go:build darwin && gui
 
 package platform
 

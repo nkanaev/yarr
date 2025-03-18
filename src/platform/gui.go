@@ -1,5 +1,4 @@
-//go:build macos || windows
-// +build macos windows
+//go:build (darwin || windows) && gui
 
 package platform
 
