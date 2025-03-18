@@ -40,17 +40,27 @@ etc/icon.icns: etc/icon_macos.png
 	sips -s format png --resampleWidth   16 etc/icon_macos.png --out etc/icon.iconset/icon_16x16.png
 	iconutil -c icns etc/icon.iconset -o etc/icon.icns
 
-darwin_arm64:
-	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
-
 darwin_amd64:
-	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+	# not supported yet
+	# CC="zig cc -target x86_64-macos-none" GOOS=darwin GOARCH=arm64 go build $(subst -s ,,$(GO_FLAGS)) -o out/$@/yarr ./cmd/yarr
+
+darwin_arm64:
+	# not supported yet
+	# CC="zig cc -target aarch64-macos-none" GOOS=darwin GOARCH=arm64 go build $(subst -s ,,$(GO_FLAGS)) -o out/$@/yarr ./cmd/yarr
 
 linux_amd64:
-	GOOS=linux GOARCH=amd64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+	CC="zig cc -target x86_64-linux-musl -O2 -g0" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" GOOS=linux GOARCH=amd64 \
+	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
 linux_arm64:
-	GOOS=linux GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+	CC="zig cc -target aarch64-linux-musl -O2 -g0" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" GOOS=linux GOARCH=arm64 \
+	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+
+windows_amd64:
+	CC="zig cc -target x86_64-windows-gnu" GOOS=windows GOARCH=amd64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+
+windows_arm64:
+	CC="zig cc -target aarch64-windows-gnu" GOOS=windows GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
 darwin_arm64_gui: etc/icon.icns
 	mkdir -p out/$@
