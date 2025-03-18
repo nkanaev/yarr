@@ -40,9 +40,21 @@ etc/icon.icns: etc/icon_macos.png
 	sips -s format png --resampleWidth   16 etc/icon_macos.png --out etc/icon.iconset/icon_16x16.png
 	iconutil -c icns etc/icon.iconset -o etc/icon.icns
 
+darwin_arm64:
+	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+
+darwin_amd64:
+	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+
+linux_amd64:
+	GOOS=linux GOARCH=amd64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+
+linux_arm64:
+	GOOS=linux GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+
 darwin_arm64_gui: etc/icon.icns
 	mkdir -p out/$@
-	CGOGOOS=darwin GOARCH=arm64 go build $(GO_FLAGS_GUI) -o out/$@/yarr ./cmd/yarr
+	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS_GUI) -o out/$@/yarr ./cmd/yarr
 	./etc/macos_package.sh $(VERSION) etc/icon.icns out/$@/yarr out/$@
 
 darwin_amd64_gui: etc/icon.icns
@@ -57,5 +69,5 @@ test:
 	go test $(GO_FLAGS) ./...
 
 .PHONY: serve test \
-	mac_amd64_gui \
-	mac_arm64_gui
+	darwin_amd64 darwin_amd64_gui \
+	darwin_arm64 darwin_arm64_gui
