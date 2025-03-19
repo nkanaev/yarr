@@ -50,6 +50,10 @@ linux_arm64:
 	CC="zig cc -target aarch64-linux-musl -O2 -g0" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" GOOS=linux GOARCH=arm64 \
 	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
+linux_armv7:
+	CC="zig cc -target arm-linux-musleabihf -O2 -g0" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" GOOS=linux GOARCH=arm GOARM=7 \
+	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+
 windows_amd64:
 	CC="zig cc -target x86_64-windows-gnu" GOOS=windows GOARCH=amd64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
