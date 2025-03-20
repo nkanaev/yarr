@@ -18,25 +18,25 @@ jobs:
       with:
         go-version: '^1.18'
     - name: Build arm64 gui
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: darwin_arm64_gui
         cmd: make darwin_arm64_gui
         out: out/darwin_arm64_gui/yarr.app
     - name: Build amd64 gui
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: darwin_amd64_gui
         cmd: make darwin_amd64_gui
         out: out/darwin_amd64_gui/yarr.app
     - name: Build arm64
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: darwin_arm64
         cmd: make darwin_arm64
         out: out/darwin_arm64/yarr
     - name: Build amd64
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: darwin_amd64
         cmd: make darwin_amd64
@@ -57,25 +57,25 @@ jobs:
       with:
         version: 0.14.0
     - name: Build arm64 gui
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: windows_arm64_gui
         cmd: make windows_arm64_gui
         out: out/windows_arm64_gui/yarr.app
     - name: Build amd64 gui
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: windows_amd64_gui
         cmd: make windows_amd64_gui
         out: out/windows_amd64_gui/yarr.app
     - name: Build arm64
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: windows_arm64
         cmd: make windows_arm64
         out: out/windows_arm64/yarr
     - name: Build amd64
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: windows_amd64
         cmd: make windows_amd64
@@ -96,19 +96,19 @@ jobs:
       with:
         version: 0.14.0
     - name: Build amd64
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: windows_amd64
         cmd: make windows_amd64
         out: out/windows_amd64/yarr
     - name: Build arm64
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: windows_arm64
         cmd: make windows_arm64
         out: out/windows_arm64/yarr
     - name: Build armv7
-      uses: ./.github/actions/build.yml
+      uses: ./.github/actions/prepare
       with:
         id: windows_armv7
         cmd: make windows_armv7
