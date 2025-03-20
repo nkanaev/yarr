@@ -1,0 +1,23 @@
+name: Build & Upload
+inputs:
+  id:
+    description: artifact name
+    required: true
+  cmd:
+    description: command to run
+    required: true
+  out:
+    description: path to output file
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: compile
+      run: ${{ inputs.cmd }}
+    - name: archive
+      run: tar -cvf ${{ out }}.tar ${{ out }}
+    - name: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ id }}
+        path: ${{ out }}.tar
