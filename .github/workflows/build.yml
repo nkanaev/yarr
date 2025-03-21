@@ -98,21 +98,21 @@ jobs:
     - name: Build amd64
       uses: ./.github/actions/prepare
       with:
-        id: windows_amd64
-        cmd: make windows_amd64
-        out: out/windows_amd64/yarr
+        id: linux_amd64
+        cmd: make linux_amd64
+        out: out/linux_amd64/yarr
     - name: Build arm64
       uses: ./.github/actions/prepare
       with:
-        id: windows_arm64
-        cmd: make windows_arm64
-        out: out/windows_arm64/yarr
+        id: linux_arm64
+        cmd: make linux_arm64
+        out: out/linux_arm64/yarr
     - name: Build armv7
       uses: ./.github/actions/prepare
       with:
-        id: windows_armv7
-        cmd: make windows_armv7
-        out: out/windows_armv7/yarr
+        id: linux_armv7
+        cmd: make linux_armv7
+        out: out/linux_armv7/yarr
 
   create_release:
     name: Create Release
