@@ -68,7 +68,7 @@ darwin_amd64_gui: etc/icon.icns
 	GOOS=darwin GOARCH=amd64 go build $(GO_FLAGS_GUI) -o out/$@/yarr ./cmd/yarr
 	./etc/macos_package.sh $(VERSION) etc/icon.icns out/$@/yarr out/$@
 
-windows_amd64_gui: windows_versioninfo
+windows_amd64_gui: src/platform/versioninfo.rc
 	GOOS=windows GOARCH=amd64 go build $(GO_FLAGS_GUI_WIN) -o out/$@/yarr.exe ./cmd/yarr
 
 windows_arm64_gui: src/platform/versioninfo.rc
