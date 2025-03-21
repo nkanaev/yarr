@@ -64,6 +64,7 @@ jobs:
         cmd: make windows_arm64_gui
         out: out/windows_arm64_gui/yarr.exe
     - name: Build amd64 gui
+      if: false
       uses: ./.github/actions/prepare
       with:
         id: windows_amd64_gui
