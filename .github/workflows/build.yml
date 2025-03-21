@@ -114,7 +114,6 @@ jobs:
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
     needs: [build_macos, build_windows, build_multi_cli]
     steps:
     - name: Download Artifacts
@@ -124,6 +123,12 @@ jobs:
     - name: Preparation
       run: |
         ls -R
+        for tarfile in `ls **/*.tar`; do
+          tar -xvf $tarfile
+        done
+        for dir in `find ./out -type d -depth 1`; do
+          (cd $dir && zip -r ../yarr_`basename $dir`.zip *)
+        done
     - name: Upload Release
       if: false
       uses: softprops/action-gh-release@v2
@@ -133,4 +138,4 @@ jobs:
           draft: true
           prerelease: true
           files: |
-            *.zip
+            out/*.zip
