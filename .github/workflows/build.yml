@@ -57,6 +57,7 @@ jobs:
       with:
         version: 0.14.0
     - name: Build arm64 gui
+      if: false
       uses: ./.github/actions/prepare
       with:
         id: windows_arm64_gui
