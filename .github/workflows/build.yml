@@ -126,8 +126,8 @@ jobs:
         for tarfile in `ls **/*.tar`; do
           tar -xvf $tarfile
         done
-        for dir in `find ./out -type d -depth 1`; do
-          (cd $dir && zip -r ../yarr_`basename $dir`.zip *)
+        for dir in out/*; do
+          (test -d "$dir" && cd $dir && zip -r ../yarr_`basename $dir`.zip *)
         done
     - name: Upload Release
       if: false
