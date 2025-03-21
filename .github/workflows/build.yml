@@ -122,13 +122,16 @@ jobs:
         path: .
     - name: Preparation
       run: |
+        set -ex
         ls -R
         for tarfile in `ls **/*.tar`; do
           tar -xvf $tarfile
         done
         for dir in out/*; do
+          echo "Compressing: $dir"
           (test -d "$dir" && cd $dir && zip -r ../yarr_`basename $dir`.zip *)
         done
+        ls out
     - name: Upload Release
       if: false
       uses: softprops/action-gh-release@v2
