@@ -1,21 +1,33 @@
 ## Compilation
 
-Install `Go >= 1.17` and `GCC`. Get the source code:
+Prerequisies:
+
+* Go >= 1.18
+* C Compiler (GCC / Clang / ...)
+* Zig >= 0.14.0 (optional, for cross-compiling CLI versions)
+* binutils (optional, for building Windows GUI version)
+
+Get the source code:
 
     git clone https://github.com/nkanaev/yarr.git
 
-Then run one of the corresponding commands:
+Compile:
 
-    # create an executable for the host os
-    make build_macos    # -> _output/macos/yarr.app
-    make build_linux    # -> _output/linux/yarr
-    make build_windows  # -> _output/windows/yarr.exe
+    # create cli for the host OS/architecture
+    make host               # out/yarr
 
-    # host-specific cli version (no gui)
-    make build_default  # -> _output/yarr
+    # create GUI, works only in the target OS
+    make windows_amd64_gui  # out/windows_amd64_gui/yarr.exe
+    make windows_arm64_gui  # out/windows_arm64_gui/yarr.exe
+    make darwin_arm64_gui   # out/darwin_arm64_gui/yarr.app
+    make darwin_amd64_gui   # out/darwin_amd64_gui/yarr.app
 
-    # ... or start a dev server locally
-    make serve          # starts a server at http://localhost:7070
+    # create cli, cross-compiles within any OS/architecture
+    make linux_amd64
+    make linux_arm64
+    make linux_armv7
+    make windows_amd64
+    make windows_arm64
 
     # ... or build a docker image
     docker build -t yarr -f etc/dockerfile .

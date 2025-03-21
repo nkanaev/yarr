@@ -3,12 +3,12 @@ RUN apk add build-base git
 WORKDIR /src
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg \
-  make build_linux
+  make host
 
 FROM alpine:latest
 RUN apk add --no-cache ca-certificates && \
     update-ca-certificates
-COPY --from=build /src/_output/linux/yarr /usr/local/bin/yarr
+COPY --from=build /src/out/yarr /usr/local/bin/yarr
 EXPOSE 7070
 ENTRYPOINT ["/usr/local/bin/yarr"]
 CMD ["-addr", "0.0.0.0:7070", "-db", "/data/yarr.db"]
