@@ -29,6 +29,18 @@ jobs:
         id: darwin_amd64_gui
         cmd: make darwin_amd64_gui
         out: out/darwin_amd64_gui/yarr.app
+    - name: Build arm64 cli
+      uses: ./.github/actions/prepare
+      with:
+        id: darwin_arm64
+        cmd: make darwin_arm64
+        out: out/darwin_arm64/yarr
+    - name: Build amd64 cli
+      uses: ./.github/actions/prepare
+      with:
+        id: darwin_amd64
+        cmd: make darwin_amd64
+        out: out/darwin_amd64/yarr
 
   build_windows:
     name: Build for Windows
@@ -47,6 +59,7 @@ jobs:
         cmd: make windows_amd64_gui
         out: out/windows_amd64_gui/yarr.exe
     - name: Build arm64 gui
+      if: false
       uses: ./.github/actions/prepare
       with:
         id: windows_arm64_gui
@@ -85,18 +98,6 @@ jobs:
         id: linux_armv7
         cmd: make linux_armv7
         out: out/linux_armv7/yarr
-    - name: Build darwin/arm64
-      uses: ./.github/actions/prepare
-      with:
-        id: darwin_arm64
-        cmd: make darwin_arm64
-        out: out/darwin_arm64/yarr
-    - name: Build darwin/amd64
-      uses: ./.github/actions/prepare
-      with:
-        id: darwin_amd64
-        cmd: make darwin_amd64
-        out: out/darwin_amd64/yarr
     - name: Build windows/amd64
       uses: ./.github/actions/prepare
       with:
