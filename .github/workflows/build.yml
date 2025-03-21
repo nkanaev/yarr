@@ -62,13 +62,13 @@ jobs:
       with:
         id: windows_arm64_gui
         cmd: make windows_arm64_gui
-        out: out/windows_arm64_gui/yarr.app
+        out: out/windows_arm64_gui/yarr.exe
     - name: Build amd64 gui
       uses: ./.github/actions/prepare
       with:
         id: windows_amd64_gui
         cmd: make windows_amd64_gui
-        out: out/windows_amd64_gui/yarr.app
+        out: out/windows_amd64_gui/yarr.exe
     - name: Build arm64
       uses: ./.github/actions/prepare
       with:
