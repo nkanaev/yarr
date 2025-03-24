@@ -310,22 +310,19 @@ func m09_change_item_index(tx *sql.Tx) error {
 
 func m10_add_item_medialinks(tx *sql.Tx) error {
 	sql := `
-		alter table items add column media_links blob;
-		update items set media_links =
-			iif(
-				coalesce(image, '') != '' and coalesce(podcast_url, '') != '',
-				json_array(json_object('type', 'image', 'url', image), json_object('type', 'audio', 'url', podcast_url)),
-				iif(
-					coalesce(image, '') != '',
-					json_array(json_object('type', 'image', 'url', image)),
-					iif(
-						coalesce(podcast_url, '') != '',
-						json_array(json_object('type', 'audio', 'url', podcast_url)),
-						null
-					)
-				)
-			);
+		alter table items add column media_links json;
+		update items set media_links = case
+			when coalesce(image, '') != '' and coalesce(podcast_url, '') != ''
+			then json_array(json_object('type', 'image', 'url', image), json_object('type', 'audio', 'url', podcast_url))
 
+			when coalesce(image, '') != ''
+			then json_array(json_object('type', 'image', 'url', image))
+
+			when coalesce(podcast_url, '') != ''
+			then json_array(json_object('type', 'audio', 'url', podcast_url))
+
+			else null
+		end;
 		alter table items drop column image;
 		alter table items drop column podcast_url;
 	`
