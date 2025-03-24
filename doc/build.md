@@ -2,7 +2,7 @@
 
 Prerequisies:
 
-* Go >= 1.18
+* Go >= 1.23
 * C Compiler (GCC / Clang / ...)
 * Zig >= 0.14.0 (optional, for cross-compiling CLI versions)
 * binutils (optional, for building Windows GUI version)
