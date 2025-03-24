@@ -9,6 +9,8 @@
     <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png">
     <link rel="manifest" href="./manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <script>
         window.app = window.app || {}
         window.app.settings = {% .settings %}
@@ -435,6 +437,19 @@
     <!-- external -->
     <script src="./static/javascripts/vue.min.js"></script>
     <!-- internal -->
+    <script src="./sw.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+            navigator.serviceWorker
+                .register("./sw.js")
+                .then()
+                .catch((error) => {
+                    console.error("Service Worker registration failed:", error);
+                });
+            });
+        }
+    </script>
     <script src="./static/javascripts/api.js"></script>
     <script src="./static/javascripts/app.js"></script>
     <script src="./static/javascripts/key.js"></script>

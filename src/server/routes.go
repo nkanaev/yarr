@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"io"
 
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/content/htmlutil"
@@ -34,7 +35,7 @@ func (s *Server) handler() http.Handler {
 			BasePath: s.BasePath,
 			Username: s.Username,
 			Password: s.Password,
-			Public:   []string{"/static", "/fever"},
+			Public:   []string{"/static", "/fever", "/manifest.json"},
 			DB:       s.db,
 		}
 		r.Use(a.Handler)
@@ -42,6 +43,7 @@ func (s *Server) handler() http.Handler {
 
 	r.For("/", s.handleIndex)
 	r.For("/manifest.json", s.handleManifest)
+	r.For("/sw.js", s.handleServiceWorker)
 	r.For("/static/*path", s.handleStatic)
 	r.For("/api/status", s.handleStatus)
 	r.For("/api/folders", s.handleFolderList)
@@ -88,14 +90,22 @@ func (s *Server) handleManifest(c *router.Context) {
 		"description": "yet another rss reader",
 		"display":     "standalone",
 		"start_url":   "/" + strings.TrimPrefix(s.BasePath, "/"),
+		"background_color": "#f0f0f0",
 		"icons": []map[string]interface{}{
 			{
-				"src":   s.BasePath + "/static/graphicarts/favicon.png",
-				"sizes": "64x64",
-				"type":  "image/png",
+				"src":   s.BasePath + "/static/graphicarts/anchor.svg",
+				"sizes": "any",
+				"type":  "image/svg+xml",
 			},
 		},
 	})
+}
+
+func (s *Server) handleServiceWorker(c *router.Context) {
+	c.Out.Header().Set("Content-Type", "application/javascript")
+	c.Out.WriteHeader(http.StatusOK)
+	file, _ := assets.FS.Open("javascripts/sw.js")
+	io.Copy(c.Out, file)
 }
 
 func (s *Server) handleStatus(c *router.Context) {
