@@ -3,6 +3,7 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file.
 
+//go:build sqlite_vtable || vtable
 // +build sqlite_vtable vtable
 
 package sqlite3
@@ -19,7 +20,7 @@ package sqlite3
 #cgo CFLAGS: -Wno-deprecated-declarations
 
 #ifndef USE_LIBSQLITE3
-#include <sqlite3-binding.h>
+#include "sqlite3-binding.h"
 #else
 #include <sqlite3.h>
 #endif
@@ -472,10 +473,21 @@ func goVBestIndex(pVTab unsafe.Pointer, icp unsafe.Pointer) *C.char {
 	}
 
 	info.idxNum = C.int(res.IdxNum)
-	idxStr := C.CString(res.IdxStr)
-	defer C.free(unsafe.Pointer(idxStr))
-	info.idxStr = idxStr
-	info.needToFreeIdxStr = C.int(0)
+	info.idxStr = (*C.char)(C.sqlite3_malloc(C.int(len(res.IdxStr) + 1)))
+	if info.idxStr == nil {
+		// C.malloc and C.CString ordinarily do this for you. See https://golang.org/cmd/cgo/
+		panic("out of memory")
+	}
+	info.needToFreeIdxStr = C.int(1)
+
+	idxStr := *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(info.idxStr)),
+		Len:  len(res.IdxStr) + 1,
+		Cap:  len(res.IdxStr) + 1,
+	}))
+	copy(idxStr, res.IdxStr)
+	idxStr[len(idxStr)-1] = 0 // null-terminated string
+
 	if res.AlreadyOrdered {
 		info.orderByConsumed = C.int(1)
 	}
@@ -505,7 +517,7 @@ func goMDestroy(pClientData unsafe.Pointer) {
 func goVFilter(pCursor unsafe.Pointer, idxNum C.int, idxName *C.char, argc C.int, argv **C.sqlite3_value) *C.char {
 	vtc := lookupHandle(pCursor).(*sqliteVTabCursor)
 	args := (*[(math.MaxInt32 - 1) / unsafe.Sizeof((*C.sqlite3_value)(nil))]*C.sqlite3_value)(unsafe.Pointer(argv))[:argc:argc]
-	vals := make([]interface{}, 0, argc)
+	vals := make([]any, 0, argc)
 	for _, v := range args {
 		conv, err := callbackArgGeneric(v)
 		if err != nil {
@@ -577,7 +589,7 @@ func goVUpdate(pVTab unsafe.Pointer, argc C.int, argv **C.sqlite3_value, pRowid 
 	if v, ok := vt.vTab.(VTabUpdater); ok {
 		// convert argv
 		args := (*[(math.MaxInt32 - 1) / unsafe.Sizeof((*C.sqlite3_value)(nil))]*C.sqlite3_value)(unsafe.Pointer(argv))[:argc:argc]
-		vals := make([]interface{}, 0, argc)
+		vals := make([]any, 0, argc)
 		for _, v := range args {
 			conv, err := callbackArgGeneric(v)
 			if err != nil {
@@ -651,9 +663,9 @@ type VTab interface {
 // deleted.
 // See: https://sqlite.org/vtab.html#xupdate
 type VTabUpdater interface {
-	Delete(interface{}) error
-	Insert(interface{}, []interface{}) (int64, error)
-	Update(interface{}, []interface{}) error
+	Delete(any) error
+	Insert(any, []any) (int64, error)
+	Update(any, []any) error
 }
 
 // VTabCursor describes cursors that point into the virtual table and are used
@@ -662,7 +674,7 @@ type VTabCursor interface {
 	// http://sqlite.org/vtab.html#xclose
 	Close() error
 	// http://sqlite.org/vtab.html#xfilter
-	Filter(idxNum int, idxStr string, vals []interface{}) error
+	Filter(idxNum int, idxStr string, vals []any) error
 	// http://sqlite.org/vtab.html#xnext
 	Next() error
 	// http://sqlite.org/vtab.html#xeof
