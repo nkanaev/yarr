@@ -274,9 +274,9 @@ func TestRSSMultipleMedia(t *testing.T) {
 			GUID: "http://example.com/posts/1",
 			URL:  "http://example.com/posts/1",
 			MediaLinks: []MediaLink{
-				{URL:"https://example.com/path/to/image1.png", Type:"image", Description:"description 1"},
-				{URL:"https://example.com/path/to/image2.png", Type:"image", Description:"description 2"},
-				{URL:"https://example.com/path/to/video1.mp4", Type:"video", Description:"video description"},
+				{URL: "https://example.com/path/to/image1.png", Type: "image", Description: "description 1"},
+				{URL: "https://example.com/path/to/image2.png", Type: "image", Description: "description 2"},
+				{URL: "https://example.com/path/to/video1.mp4", Type: "video", Description: "video description"},
 			},
 		},
 	}
