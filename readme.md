@@ -9,21 +9,21 @@ The app is a single binary with an embedded database (SQLite).
 
 ## usage
 
-The latest prebuilt binaries for Linux/MacOS/Windows AMD64 are available
-[here](https://github.com/nkanaev/yarr/releases/latest). Installation instructions:
+The latest prebuilt binaries for Linux/MacOS/Windows are available
+[here](https://github.com/nkanaev/yarr/releases/latest).
+The archives follow the naming convention `yarr_{OS}_{ARCH}[_gui].zip`, where:
 
-* MacOS
+* `OS` corresponds to the target operating system (darwin/linux/windows for Linux, MacOS, Windows, respectively)
+* `ARCH` is the CPU architecture (`arm64` for AMD64/Aarch64, `amd64` for X86-64)
+* `-gui` indicates that the application ships with the GUI (tray icon), and is a command line application if omitted
 
-  Download `yarr-*-macos64.zip`, unzip it, place `yarr.app` in `/Applications` folder, [open the app][macos-open], click the anchor menu bar icon, select "Open".
+Usage instructions:
 
-* Windows
+* MacOS: place `yarr.app` in `/Applications` folder, [open the app][macos-open], click the anchor menu bar icon, select "Open".
 
-  Download `yarr-*-windows64.zip`, unzip it, open `yarr.exe`, click the anchor system tray icon, select "Open".
+* Windows: open `yarr.exe`, click the anchor system tray icon, select "Open".
 
-* Linux
-
-  Download `yarr-*-linux64.zip`, unzip it, place `yarr` in `$HOME/.local/bin`
-and run [the script](etc/install-linux.sh).
+* Linux: place `yarr` in `$HOME/.local/bin` and run [the script](etc/install-linux.sh).
 
 [macos-open]: https://support.apple.com/en-gb/guide/mac-help/mh40616/mac
 
