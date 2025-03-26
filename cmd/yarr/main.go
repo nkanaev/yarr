@@ -90,6 +90,10 @@ func main() {
 		log.SetOutput(os.Stdout)
 	}
 
+	if open && strings.HasPrefix(addr, "unix:") {
+		log.Fatal("Cannot open ", addr, " in browser")
+	}
+
 	if db == "" {
 		configPath, err := os.UserConfigDir()
 		if err != nil {

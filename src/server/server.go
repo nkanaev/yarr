@@ -2,7 +2,10 @@ package server
 
 import (
 	"log"
+	"net"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 
 	"github.com/nkanaev/yarr/src/storage"
@@ -53,14 +56,31 @@ func (s *Server) Start() {
 		s.worker.RefreshFeeds()
 	}
 
-	httpserver := &http.Server{Addr: s.Addr, Handler: s.handler()}
-
+	var ln net.Listener
 	var err error
-	if s.CertFile != "" && s.KeyFile != "" {
-		err = httpserver.ListenAndServeTLS(s.CertFile, s.KeyFile)
+
+	if path, isUnix := strings.CutPrefix(s.Addr, "unix:"); isUnix {
+		err = os.Remove(path)
+		if err != nil {
+			log.Print(err)
+		}
+		ln, err = net.Listen("unix", path)
 	} else {
-		err = httpserver.ListenAndServe()
+		ln, err = net.Listen("tcp", s.Addr)
 	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	httpserver := &http.Server{Handler: s.handler()}
+	if s.CertFile != "" && s.KeyFile != "" {
+		err = httpserver.ServeTLS(ln, s.CertFile, s.KeyFile)
+		ln.Close()
+	} else {
+		err = httpserver.Serve(ln)
+	}
+
 	if err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
