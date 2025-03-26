@@ -365,7 +365,7 @@
                         <div v-if="contentImages.length">
                             <figure v-for="media in contentImages">
                                 <img :src="media.url" loading="lazy">
-                                <figcaption v-if="media.description" v-html="media.description"></figcaption>
+                                <figcaption v-if="media.description">{{ media.description }}</figcaption>
                             </figure>
                         </div>
                         <audio class="w-100" controls v-for="media in contentAudios" :src="media.url"></audio>
