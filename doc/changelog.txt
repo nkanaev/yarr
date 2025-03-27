@@ -1,4 +1,8 @@
-# upcoming 
+# upcoming
+
+- (new) serve on unix socket (thanks to @rvighne)
+
+# v2.5 (2025-03-26)
 
 - (new) Fever API support (thanks to @icefed)
 - (new) editable feed link (thanks to @adaszko)
