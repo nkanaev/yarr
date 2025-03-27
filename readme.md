@@ -13,9 +13,9 @@ The latest prebuilt binaries for Linux/MacOS/Windows are available
 [here](https://github.com/nkanaev/yarr/releases/latest).
 The archives follow the naming convention `yarr_{OS}_{ARCH}[_gui].zip`, where:
 
-* `OS` corresponds to the target operating system (darwin/linux/windows for Linux, MacOS, Windows, respectively)
-* `ARCH` is the CPU architecture (`arm64` for AMD64/Aarch64, `amd64` for X86-64)
-* `-gui` indicates that the application ships with the GUI (tray icon), and is a command line application if omitted
+* `OS` is the target operating system
+* `ARCH` is the CPU architecture (`arm64` for AArch64, `amd64` for X86-64)
+* `-gui` indicates that the binary ships with the GUI (tray icon), and is a command line application if omitted
 
 Usage instructions:
 
