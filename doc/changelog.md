@@ -1,6 +1,7 @@
 # upcoming
 
 - (new) serve on unix socket (thanks to @rvighne)
+- (fix) smooth scrolling on iOS (thanks to gatheraled)
 
 # v2.5 (2025-03-26)
 

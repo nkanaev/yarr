@@ -100,6 +100,10 @@ select.form-control:not([multiple]):not([size]) {
   padding-right: 0;
 }
 
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
 /* custom elements */
 
 .font-serif {
