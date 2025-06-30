@@ -10,7 +10,7 @@ Name=yarr
 Exec=$HOME/.local/bin/yarr -open
 Icon=yarr
 Type=Application
-Categories=Internet;
+Categories=Internet;Network;News;Feed;
 END
 
 if [[ ! -d "$HOME/.local/share/icons" ]]; then
