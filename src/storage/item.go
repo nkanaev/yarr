@@ -54,10 +54,14 @@ type MediaLink struct {
 type MediaLinks []MediaLink
 
 func (m *MediaLinks) Scan(src any) error {
-	if data, ok := src.([]byte); ok {
+	switch data := src.(type) {
+	case []byte:
 		return json.Unmarshal(data, m)
+	case string:
+		return json.Unmarshal([]byte(data), m)
+	default:
+		return nil
 	}
-	return nil
 }
 
 func (m MediaLinks) Value() (driver.Value, error) {
@@ -419,7 +423,6 @@ func (s *Storage) DeleteOldItems() {
 		where status != ?
 		group by i.feed_id
 	`, itemsKeepSize, STARRED)
-
 	if err != nil {
 		log.Print(err)
 		return
