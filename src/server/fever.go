@@ -95,7 +95,7 @@ func formHasValue(values url.Values, value string) bool {
 }
 
 func (s *Server) handleFever(c *router.Context) {
-	c.Req.ParseForm()
+	c.Req.ParseMultipartForm(1 << 20) // Read up to 1MiB max.
 	if !s.feverAuth(c) {
 		c.JSON(http.StatusOK, map[string]interface{}{
 			"api_version":            3,
