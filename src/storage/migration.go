@@ -18,6 +18,7 @@ var migrations = []func(*sql.Tx) error{
 	m08_normalize_datetime,
 	m09_change_item_index,
 	m10_add_item_medialinks,
+	m11_add_feed_archived,
 }
 
 var maxVersion = int64(len(migrations))
@@ -325,6 +326,14 @@ func m10_add_item_medialinks(tx *sql.Tx) error {
 		end;
 		alter table items drop column image;
 		alter table items drop column podcast_url;
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m11_add_feed_archived(tx *sql.Tx) error {
+	sql := `
+		alter table feeds add column archived boolean not null default false;
 	`
 	_, err := tx.Exec(sql)
 	return err

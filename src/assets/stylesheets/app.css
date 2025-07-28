@@ -190,6 +190,10 @@ select.form-control:not([multiple]):not([size]) {
   cursor: pointer;
 }
 
+.selectgroup.archived .selectgroup-label {
+  opacity: 0.5;
+}
+
 .toolbar-item:hover,
 .toolbar-search:hover,
 .selectgroup-label:hover,

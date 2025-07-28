@@ -14,6 +14,7 @@ type Feed struct {
 	FeedLink    string  `json:"feed_link"`
 	Icon        *[]byte `json:"icon,omitempty"`
 	HasIcon     bool    `json:"has_icon"`
+	Archived    bool    `json:"archived"`
 }
 
 func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId *int64) *Feed {
@@ -85,7 +86,7 @@ func (s *Storage) ListFeeds() []Feed {
 	result := make([]Feed, 0)
 	rows, err := s.db.Query(`
 		select id, folder_id, title, description, link, feed_link,
-		       ifnull(length(icon), 0) > 0 as has_icon
+		       ifnull(length(icon), 0) > 0 as has_icon, archived
 		from feeds
 		order by title collate nocase
 	`)
@@ -103,6 +104,7 @@ func (s *Storage) ListFeeds() []Feed {
 			&f.Link,
 			&f.FeedLink,
 			&f.HasIcon,
+			&f.Archived,
 		)
 		if err != nil {
 			log.Print(err)
@@ -148,11 +150,11 @@ func (s *Storage) GetFeed(id int64) *Feed {
 	err := s.db.QueryRow(`
 		select
 			id, folder_id, title, link, feed_link,
-			icon, ifnull(icon, '') != '' as has_icon
+			icon, ifnull(icon, '') != '' as has_icon, archived
 		from feeds where id = ?
 	`, id).Scan(
 		&f.Id, &f.FolderId, &f.Title, &f.Link, &f.FeedLink,
-		&f.Icon, &f.HasIcon,
+		&f.Icon, &f.HasIcon, &f.Archived,
 	)
 	if err != nil {
 		if err != sql.ErrNoRows {
@@ -211,4 +213,14 @@ func (s *Storage) SetFeedSize(feedId int64, size int) {
 	if err != nil {
 		log.Print(err)
 	}
+}
+
+func (s *Storage) ArchiveFeed(feedId int64) bool {
+	_, err := s.db.Exec(`update feeds set archived = true where id = ?`, feedId)
+	return err == nil
+}
+
+func (s *Storage) UnarchiveFeed(feedId int64) bool {
+	_, err := s.db.Exec(`update feeds set archived = false where id = ?`, feedId)
+	return err == nil
 }

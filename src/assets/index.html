@@ -155,7 +155,8 @@
                               :class="{'d-none': filterSelected
                                                  && !(current.feed.id == feed.id)
                                                  && !filteredFeedStats[feed.id]
-                                                 && (!itemSelectedDetails || itemSelectedDetails.feed_id != feed.id)}"
+                                                 && (!itemSelectedDetails || itemSelectedDetails.feed_id != feed.id),
+                                       'archived': feed.archived}"
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                             <div class="selectgroup-label d-flex align-items-center w-100">
@@ -163,6 +164,11 @@
                                 <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
                                 <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                                 <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
+                                <span class="icon flex-shrink-0 mx-2"
+                                      title="Archived"
+                                      v-if="!filterSelected && feed.archived">
+                                    {% inline "layers.svg" %}
+                                </span>
                                 <span class="icon flex-shrink-0 mx-2"
                                       :title="feed_errors[feed.id]"
                                       v-if="!filterSelected && feed_errors[feed.id]">
@@ -228,6 +234,15 @@
                     <button class="dropdown-item" @click="updateFeedLink(current.feed)" v-if="current.feed.feed_link">
                         <span class="icon mr-1">{% inline "edit.svg" %}</span>
                         Change Link
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" @click="archiveFeed(current.feed)" v-if="!current.feed.archived">
+                        <span class="icon mr-1">{% inline "layers.svg" %}</span>
+                        Archive Feed
+                    </button>
+                    <button class="dropdown-item" @click="unarchiveFeed(current.feed)" v-if="current.feed.archived">
+                        <span class="icon mr-1">{% inline "layers.svg" %}</span>
+                        Unarchive Feed
                     </button>
                     <div class="dropdown-divider"></div>
                     <header class="dropdown-header" role="heading" aria-level="2">Move to...</header>

@@ -299,6 +299,15 @@ func (s *Server) handleFeed(c *router.Context) {
 				s.db.UpdateFeedLink(id, link.(string))
 			}
 		}
+		if archived, ok := body["archived"]; ok {
+			if reflect.TypeOf(archived).Kind() == reflect.Bool {
+				if archived.(bool) {
+					s.db.ArchiveFeed(id)
+				} else {
+					s.db.UnarchiveFeed(id)
+				}
+			}
+		}
 		c.Out.WriteHeader(http.StatusOK)
 	} else if c.Req.Method == "DELETE" {
 		s.db.DeleteFeed(id)

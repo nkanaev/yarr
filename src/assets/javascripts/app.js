@@ -526,6 +526,18 @@ var vm = new Vue({
         })
       })
     },
+    archiveFeed: function(feed) {
+      api.feeds.update(feed.id, {archived: true}).then(function() {
+        feed.archived = true
+        vm.refreshStats()
+      })
+    },
+    unarchiveFeed: function(feed) {
+      api.feeds.update(feed.id, {archived: false}).then(function() {
+        feed.archived = false
+        vm.refreshStats()
+      })
+    },
     createNewFeedFolder: function() {
       var title = prompt('Enter folder name:')
       if (!title) return
