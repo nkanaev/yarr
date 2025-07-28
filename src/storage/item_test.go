@@ -328,3 +328,94 @@ func TestDeleteOldItems(t *testing.T) {
 		)
 	}
 }
+
+func TestListItemsArchivedFeedFiltering(t *testing.T) {
+	db := testDB()
+	scope := testItemsSetup(db)
+
+	// Archive feed11
+	db.ArchiveFeed(scope.feed11.Id)
+
+	// Test that items from archived feeds are still returned when no filter is applied
+	allItems := getItemGuids(db.ListItems(ItemFilter{}, 20, false, false))
+	expectedAll := []string{
+		"item111", "item112", "item113", "item121", "item122", 
+		"item211", "item212", "item011", "item012", "item013",
+	}
+	if !reflect.DeepEqual(allItems, expectedAll) {
+		t.Logf("All items - want: %#v", expectedAll)
+		t.Logf("All items - have: %#v", allItems)
+		t.Fail()
+	}
+
+	// Test filtering by archived feed
+	archivedFeedItems := getItemGuids(db.ListItems(ItemFilter{FeedID: &scope.feed11.Id}, 10, false, false))
+	expectedArchived := []string{"item111", "item112", "item113"}
+	if !reflect.DeepEqual(archivedFeedItems, expectedArchived) {
+		t.Logf("Archived feed items - want: %#v", expectedArchived)
+		t.Logf("Archived feed items - have: %#v", archivedFeedItems)
+		t.Fail()
+	}
+
+	// Test filtering by folder containing archived feed
+	folder1Items := getItemGuids(db.ListItems(ItemFilter{FolderID: &scope.folder1.Id}, 10, false, false))
+	expectedFolder1 := []string{"item111", "item112", "item113", "item121", "item122"}
+	if !reflect.DeepEqual(folder1Items, expectedFolder1) {
+		t.Logf("Folder1 items - want: %#v", expectedFolder1)
+		t.Logf("Folder1 items - have: %#v", folder1Items)
+		t.Fail()
+	}
+
+	// Test unread filtering includes items from archived feeds
+	var unread ItemStatus = UNREAD
+	unreadItems := getItemGuids(db.ListItems(ItemFilter{Status: &unread}, 10, false, false))
+	expectedUnread := []string{"item111", "item121", "item011"}
+	if !reflect.DeepEqual(unreadItems, expectedUnread) {
+		t.Logf("Unread items - want: %#v", expectedUnread)
+		t.Logf("Unread items - have: %#v", unreadItems)
+		t.Fail()
+	}
+
+	// Test starred filtering includes items from archived feeds
+	var starred ItemStatus = STARRED
+	starredItems := getItemGuids(db.ListItems(ItemFilter{Status: &starred}, 10, false, false))
+	expectedStarred := []string{"item113", "item212", "item013"}
+	if !reflect.DeepEqual(starredItems, expectedStarred) {
+		t.Logf("Starred items - want: %#v", expectedStarred)
+		t.Logf("Starred items - have: %#v", starredItems)
+		t.Fail()
+	}
+}
+
+func TestMarkItemsReadArchivedFeeds(t *testing.T) {
+	db := testDB()
+	scope := testItemsSetup(db)
+
+	// Archive feed11
+	db.ArchiveFeed(scope.feed11.Id)
+
+	// Mark all items as read - this should include items from archived feeds
+	db.MarkItemsRead(MarkFilter{})
+
+	var read ItemStatus = READ
+	readItems := getItemGuids(db.ListItems(ItemFilter{Status: &read}, 20, false, false))
+	expectedRead := []string{
+		"item111", "item112", "item121", "item122",
+		"item211", "item011", "item012",
+	}
+	if !reflect.DeepEqual(readItems, expectedRead) {
+		t.Logf("Read items - want: %#v", expectedRead)
+		t.Logf("Read items - have: %#v", readItems)
+		t.Fail()
+	}
+
+	// Verify starred items are not marked as read (even from archived feeds)
+	var starred ItemStatus = STARRED
+	starredItems := getItemGuids(db.ListItems(ItemFilter{Status: &starred}, 10, false, false))
+	expectedStarred := []string{"item113", "item212", "item013"}
+	if !reflect.DeepEqual(starredItems, expectedStarred) {
+		t.Logf("Starred items should remain - want: %#v", expectedStarred)
+		t.Logf("Starred items should remain - have: %#v", starredItems)
+		t.Fail()
+	}
+}

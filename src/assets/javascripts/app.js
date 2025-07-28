@@ -716,9 +716,16 @@ var vm = new Vue({
 
       for (var i = 0; i < this.feeds.length; i++) {
         var feed = this.feeds[i]
-        if (!this.feedStats[feed.id]) continue
-
-        var n = vm.feedStats[feed.id][filter] || 0
+        
+        var n = 0
+        if (filter === 'archived') {
+          // For archived filter, show count of 1 if feed is archived, 0 otherwise
+          n = feed.archived ? 1 : 0
+        } else {
+          // For other filters (unread, starred), use existing stats
+          if (!this.feedStats[feed.id]) continue
+          n = vm.feedStats[feed.id][filter] || 0
+        }
 
         if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = 0
 

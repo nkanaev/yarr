@@ -44,6 +44,13 @@
                         @click="filterSelected = ''">
                     <span class="icon">{% inline "assorted.svg" %}</span>
                 </button>
+                <button class="toolbar-item"
+                        :class="{active: filterSelected == 'archived'}"
+                        :aria-pressed="filterSelected == 'archived'"
+                        title="Archived"
+                        @click="filterSelected = 'archived'">
+                    <span class="icon">{% inline "archive.svg" %}</span>
+                </button>
                 <div class="flex-grow-1"></div>
                 <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" title="Settings">
                     <template v-slot:button>
@@ -129,6 +136,7 @@
                         <span class="icon mr-2">{% inline "layers.svg" %}</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">All Unread</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">All Starred</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='archived'">All Archived</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">All Feeds</span>
                         <span class="counter text-right">{{ filteredTotalStats }}</span>
                     </div>
@@ -152,11 +160,13 @@
                     </label>
                     <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
                         <label class="selectgroup"
-                              :class="{'d-none': filterSelected
-                                                 && !(current.feed.id == feed.id)
-                                                 && !filteredFeedStats[feed.id]
-                                                 && (!itemSelectedDetails || itemSelectedDetails.feed_id != feed.id),
-                                       'archived': feed.archived}"
+                              :class="{'d-none': (filterSelected === 'archived' && !feed.archived)
+                                                 || (filterSelected && filterSelected !== 'archived' && feed.archived)
+                                                 || (filterSelected
+                                                     && !(current.feed.id == feed.id)
+                                                     && !filteredFeedStats[feed.id]
+                                                     && (!itemSelectedDetails || itemSelectedDetails.feed_id != feed.id)),
+                                       'archived': feed.archived && filterSelected !== 'archived'}"
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                             <div class="selectgroup-label d-flex align-items-center w-100">
@@ -166,12 +176,12 @@
                                 <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
                                 <span class="icon flex-shrink-0 mx-2"
                                       title="Archived"
-                                      v-if="!filterSelected && feed.archived">
+                                      v-if="filterSelected !== 'archived' && !filterSelected && feed.archived">
                                     {% inline "layers.svg" %}
                                 </span>
                                 <span class="icon flex-shrink-0 mx-2"
                                       :title="feed_errors[feed.id]"
-                                      v-if="!filterSelected && feed_errors[feed.id]">
+                                      v-if="filterSelected === '' && feed_errors[feed.id]">
                                     {% inline "alert-circle.svg" %}
                                 </span>
                             </div>
