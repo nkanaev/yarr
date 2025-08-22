@@ -5,6 +5,7 @@ package parser
 
 import (
 	"encoding/xml"
+	"html"
 	"io"
 )
 
@@ -22,6 +23,8 @@ type rdfItem struct {
 
 	DublinCoreDate string `xml:"http://purl.org/dc/elements/1.1/ date"`
 	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
+
+	media
 }
 
 func ParseRDF(r io.Reader) (*Feed, error) {
@@ -37,12 +40,28 @@ func ParseRDF(r io.Reader) (*Feed, error) {
 		SiteURL: srcfeed.Link,
 	}
 	for _, srcitem := range srcfeed.Items {
+		mediaLinks := []MediaLink{}
+
+		if isLinkPossiblyAImage(srcitem.Link) {
+			mediaLinks = append(mediaLinks, MediaLink{URL: srcitem.Link, Type: "image"})
+		}
+
+		content := firstNonEmpty(srcitem.ContentEncoded, srcitem.Description)
+		if contentImage := findImageInContent(html.UnescapeString(content)); contentImage != nil {
+			mediaLinks = append(mediaLinks, MediaLink{URL: *contentImage, Type: "image"})
+		}
+
+		if len(mediaLinks) <= 0 {
+			mediaLinks = nil
+		}
+
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:    srcitem.Link,
-			URL:     srcitem.Link,
-			Date:    dateParse(srcitem.DublinCoreDate),
-			Title:   srcitem.Title,
-			Content: firstNonEmpty(srcitem.ContentEncoded, srcitem.Description),
+			GUID:       srcitem.Link,
+			URL:        srcitem.Link,
+			Date:       dateParse(srcitem.DublinCoreDate),
+			Title:      srcitem.Title,
+			Content:    content,
+			MediaLinks: mediaLinks,
 		})
 	}
 	return dstfeed, nil

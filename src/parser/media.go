@@ -1,8 +1,36 @@
 package parser
 
 import (
+	"regexp"
 	"strings"
 )
+
+var webImageFileExtensions = []string{
+	// APNG
+	".apng",
+
+	// AVIF
+	".avif",
+
+	// GIF
+	".gif",
+
+	// JPEG
+	".jpg",
+	".jpeg",
+	".jfif",
+	".pjpeg",
+	".pjp",
+
+	// PNG
+	".png",
+
+	// SVG
+	".svg",
+
+	// WebP
+	".webp",
+}
 
 type media struct {
 	MediaGroups       []mediaGroup       `xml:"http://search.yahoo.com/mrss/ group"`
@@ -32,6 +60,26 @@ type mediaThumbnail struct {
 type mediaDescription struct {
 	Type string `xml:"type,attr"`
 	Text string `xml:",chardata"`
+}
+
+func isLinkPossiblyAImage(link string) bool {
+	link = strings.ToLower(link)
+	for _, ext := range webImageFileExtensions {
+		if strings.Contains(link, ext) {
+			return true
+		}
+	}
+	return false
+}
+
+func findImageInContent(content string) *string {
+	r := regexp.MustCompile(`(?i)(?m)<img[^>]+src=["']([^"']+)["']`)
+	match := r.FindStringSubmatch(content)
+
+	if len(match) > 1 {
+		return &match[1]
+	}
+	return nil
 }
 
 func (m *media) firstMediaThumbnail() string {

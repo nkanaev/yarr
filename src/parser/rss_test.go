@@ -286,3 +286,84 @@ func TestRSSMultipleMedia(t *testing.T) {
 		t.Fatal("invalid rss")
 	}
 }
+
+func TestRSSItemEnclosureHasImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<channel>
+				<item>
+					<enclosure url="http://example.org/image" length="123456" type="image/jpeg" />
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image",
+			Type:        "image",
+			Description: "",
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid rss")
+	}
+}
+
+func TestRSSItemLinkIsImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<channel>
+				<item>
+					<link>http://example.org/image.png</link>
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image.png",
+			Type:        "image",
+			Description: "",
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid rss")
+	}
+}
+
+func TestRSSItemContentHasImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<channel>
+				<item>
+					<content:encoded><![CDATA[
+			        <p>foo</p>
+			        <img src="http://example.org/image" alt="Sample Image" />
+			      ]]></content:encoded>
+				</item>
+			</channel>
+		</rss>
+	`))
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image",
+			Type:        "image",
+			Description: "",
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid rss")
+	}
+}

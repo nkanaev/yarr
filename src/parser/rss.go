@@ -6,6 +6,7 @@ package parser
 
 import (
 	"encoding/xml"
+	"html"
 	"io"
 	"path"
 	"strings"
@@ -86,9 +87,28 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			}
 		}
 
+		for _, e := range srcitem.Enclosures {
+			if strings.HasPrefix(e.Type, "image/") {
+				mediaLinks = append(mediaLinks, MediaLink{URL: e.URL, Type: "image"})
+			}
+		}
+
+		if isLinkPossiblyAImage(srcitem.Link) {
+			mediaLinks = append(mediaLinks, MediaLink{URL: srcitem.Link, Type: "image"})
+		}
+
+		content := firstNonEmpty(srcitem.ContentEncoded, srcitem.Description, srcitem.firstMediaDescription())
+		if contentImage := findImageInContent(html.UnescapeString(content)); contentImage != nil {
+			mediaLinks = append(mediaLinks, MediaLink{URL: *contentImage, Type: "image"})
+		}
+
 		permalink := ""
 		if srcitem.GUID.IsPermaLink == "true" {
 			permalink = srcitem.GUID.GUID
+		}
+
+		if len(mediaLinks) <= 0 {
+			mediaLinks = nil
 		}
 
 		dstfeed.Items = append(dstfeed.Items, Item{
@@ -96,7 +116,7 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 			Date:       dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
 			URL:        firstNonEmpty(srcitem.OrigLink, srcitem.Link, permalink),
 			Title:      srcitem.Title,
-			Content:    firstNonEmpty(srcitem.ContentEncoded, srcitem.Description, srcitem.firstMediaDescription()),
+			Content:    content,
 			MediaLinks: mediaLinks,
 		})
 	}

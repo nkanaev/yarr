@@ -79,3 +79,59 @@ func TestRDFExtensions(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestRDFFeedItemLinkIsImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<rdf:RDF xmlns="http://purl.org/rss/1.0/"
+				xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+				xmlns:dc="http://purl.org/dc/elements/1.1/"
+				xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<item>
+				<link>http://example.com/image.gif</link>
+			</item>
+		</rdf:RDF>
+	`))
+
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.com/image.gif",
+			Type:        "image",
+			Description: "",
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
+func TestRDFFeedItemContentHasImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<rdf:RDF xmlns="http://purl.org/rss/1.0/"
+				xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+				xmlns:dc="http://purl.org/dc/elements/1.1/"
+				xmlns:content="http://purl.org/rss/1.0/modules/content/">
+			<item>
+				<content:encoded><![CDATA[<p>foo</p> <img src="http://example.com/image" />]]></content:encoded>
+			</item>
+		</rdf:RDF>
+	`))
+
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.com/image",
+			Type:        "image",
+			Description: "",
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
