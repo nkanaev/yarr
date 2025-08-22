@@ -215,6 +215,7 @@ var vm = new Vue({
   data: function() {
     var s = app.settings
     return {
+      'htmlEntitiesDecoder': document.createElement("textarea"),
       'filterSelected': s.filter,
       'folders': [],
       'feeds': [],
@@ -230,6 +231,7 @@ var vm = new Vue({
       'itemSearch': '',
       'itemSortNewestFirst': s.sort_newest_first,
       'itemListWidth': s.item_list_width || 300,
+      'itemShowImagePreview': s.item_image_preview || false,
 
       'filteredFeedStats': {},
       'filteredFolderStats': {},
@@ -298,9 +300,18 @@ var vm = new Vue({
 
       return this.itemSelectedDetails.content || ''
     },
+    // https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it#answer-7394787
+    // neat trick...
+    itemSelectedHtmlDecodedContent: function () {
+      if (!this.itemSelected) return ''
+
+      this.htmlEntitiesDecoder.innerHTML = this.itemSelectedDetails.content || ''
+      return this.htmlEntitiesDecoder.textContent
+    },
     contentImages: function() {
       if (!this.itemSelectedDetails) return []
-      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'image')
+      // Since we do not dedup based on the feed item content on the backend we do it here.
+      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'image' && !this.itemSelectedHtmlDecodedContent.includes(l.url))
     },
     contentAudios: function() {
       if (!this.itemSelectedDetails) return []
@@ -372,6 +383,10 @@ var vm = new Vue({
     'itemSearch': debounce(function(newVal) {
       this.refreshItems()
     }, 500),
+    'itemShowImagePreview': function(newVal, oldVal) {
+      if (oldVal === undefined) return  // do nothing, initial setup
+      api.settings.update({item_image_preview: newVal})
+    },
     'itemSortNewestFirst': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
       api.settings.update({sort_newest_first: newVal}).then(vm.refreshItems.bind(this, false))
@@ -390,6 +405,9 @@ var vm = new Vue({
     },
   },
   methods: {
+    feedItemImage: function(item = {}) {
+      return (item.media_links ?? []).filter(({type}) => type === "image")[0]?.url
+    },
     refreshStats: function(loopMode) {
       return api.status().then(function(data) {
         if (loopMode && !vm.itemSelected) vm.refreshItems()

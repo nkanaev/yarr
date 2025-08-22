@@ -137,6 +137,13 @@ func (feed *Feed) cleanup() {
 		if len(feed.Items[i].MediaLinks) > 0 {
 			mediaLinks := make([]MediaLink, 0)
 			for _, link := range item.MediaLinks {
+				// Keep image media links even if they appear on the feed content.
+				// They will be used to display a feed image preview and will be removed on the feed details on the frontend.
+				if link.Type == "image" {
+					mediaLinks = append(mediaLinks, link)
+					continue
+				}
+
 				if !strings.Contains(item.Content, link.URL) {
 					mediaLinks = append(mediaLinks, link)
 				}

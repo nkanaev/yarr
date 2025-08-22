@@ -76,6 +76,14 @@
 
                     <div class="dropdown-divider"></div>
 
+                    <header class="dropdown-header" role="heading" aria-level="2">Feed item image preview</header>
+                    <div class="row text-center m-0">
+                        <button class="dropdown-item px-0" :aria-pressed="itemShowImagePreview"  :class="{active: itemShowImagePreview}"  @click.stop="itemShowImagePreview=true">Show</button>
+                        <button class="dropdown-item px-0" :aria-pressed="!itemShowImagePreview" :class="{active: !itemShowImagePreview}" @click.stop="itemShowImagePreview=false">Hide</button>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
                     <header class="dropdown-header" role="heading" aria-level="2">Auto Refresh</header>
                     <div class="row text-center m-0">
                         <button class="dropdown-item col-4 px-0" :aria-pressed="!refreshRate"       :class="{active: !refreshRate}"       @click.stop="refreshRate = 0">0</button>
@@ -287,6 +295,7 @@
                             </small>
                             <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                         </div>
+                        <img v-if="itemShowImagePreview && feedItemImage(item)" :src="feedItemImage(item)" style="border-radius: 4px;">
                         <div>{{ item.title || 'untitled' }}</div>
                     </div>
                 </label>

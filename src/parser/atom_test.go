@@ -152,28 +152,6 @@ func TestAtomImageLink(t *testing.T) {
 	}
 }
 
-// found in: https://www.reddit.com/r/funny.rss
-// items come with thumbnail urls which are also present in the content
-func TestAtomImageLinkDuplicated(t *testing.T) {
-	feed, _ := Parse(strings.NewReader(`
-		<?xml version="1.0" encoding="utf-8"?>
-		<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
-			<entry>
-				<content type="html">&lt;img src="https://example.com/image.png?width=100&amp;height=100"&gt;</content>
-				<media:thumbnail url="https://example.com/image.png?width=100&height=100" />
-			</entry>
-		</feed>
-	`))
-	have := feed.Items[0].Content
-	want := `<img src="https://example.com/image.png?width=100&height=100">`
-	if want != have {
-		t.Fatalf("want: %#v\nhave: %#v\n", want, have)
-	}
-	if len(feed.Items[0].MediaLinks) != 0 {
-		t.Fatal("item media link must be excluded if present in the content")
-	}
-}
-
 func TestAtomLinkInID(t *testing.T) {
 	feed, _ := Parse(strings.NewReader(`
 		<?xml version="1.0" encoding="utf-8"?>
@@ -228,6 +206,54 @@ func TestAtomDoesntEscapeHTMLTags(t *testing.T) {
 	`))
 	have := feed.Items[0].Content
 	want := "&lt;script&gt;alert(1);&lt;/script&gt;"
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
+func TestAtomItemLinkIsImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom">
+			<entry>
+				<link href="http://example.org/image.png" />
+			</entry>
+		</feed>
+	`))
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image.png",
+			Type:        "image",
+			Description: "",
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
+func TestAtomItemContentHasImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<feed xmlns="http://www.w3.org/2005/Atom">
+			<entry>
+				<summary type="html">&#60;p&#62;foobar&#60;/p&#62;&#60;img src="http://example.org/image" /&#62;</summary>
+			</entry>
+		</feed>
+	`))
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image",
+			Type:        "image",
+			Description: "",
+		},
+	}
 	if !reflect.DeepEqual(want, have) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)

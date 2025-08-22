@@ -40,3 +40,83 @@ func TestJSONFeed(t *testing.T) {
 		t.Fatal("invalid json")
 	}
 }
+
+func TestJSONFeedItemAttachementsHasImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`{
+		"items": [
+			{
+				"attachments": [
+					{
+						"url": "http://example.org/image",
+						"mime_type": "image/png"
+					}
+				]
+			}
+		]
+	}`))
+
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image",
+			Type:        "image",
+			Description: "",
+		},
+	}
+
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid json")
+	}
+}
+
+func TestJSONFeedItemLinkIsImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`{
+		"items": [
+			{
+				"url": "http://example.org/image.jpg"
+			}
+		]
+	}`))
+
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image.jpg",
+			Type:        "image",
+			Description: "",
+		},
+	}
+
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid json")
+	}
+}
+
+func TestJSONFeedItemContentHasImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`{
+		"items": [
+			{
+				"content_html": "<p>foobar</p> <img src=\"http://example.org/image\" />"
+			}
+		]
+	}`))
+
+	have := feed.Items[0].MediaLinks
+	want := []MediaLink{
+		MediaLink{
+			URL:         "http://example.org/image",
+			Type:        "image",
+			Description: "",
+		},
+	}
+
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("invalid json")
+	}
+}

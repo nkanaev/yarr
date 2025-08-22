@@ -3,6 +3,7 @@ package parser
 
 import (
 	"encoding/xml"
+	"html"
 	"io"
 	"strings"
 
@@ -91,13 +92,28 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 
 		mediaLinks := srcitem.mediaLinks()
 
+		for _, link := range srcitem.Links {
+			if isLinkPossiblyAImage(link.Href) {
+				mediaLinks = append(mediaLinks, MediaLink{URL: link.Href, Type: "image"})
+			}
+		}
+
+		content := firstNonEmpty(srcitem.Content.String(), srcitem.Summary.String(), srcitem.firstMediaDescription())
+		if contentImage := findImageInContent(html.UnescapeString(content)); contentImage != nil {
+			mediaLinks = append(mediaLinks, MediaLink{URL: *contentImage, Type: "image"})
+		}
+
+		if len(mediaLinks) <= 0 {
+			mediaLinks = nil
+		}
+
 		link := firstNonEmpty(srcitem.OrigLink, srcitem.Links.First("alternate"), srcitem.Links.First(""), linkFromID)
 		dstfeed.Items = append(dstfeed.Items, Item{
 			GUID:       firstNonEmpty(guidFromID, srcitem.ID, link),
 			Date:       dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
 			URL:        link,
 			Title:      srcitem.Title.Text(),
-			Content:    firstNonEmpty(srcitem.Content.String(), srcitem.Summary.String(), srcitem.firstMediaDescription()),
+			Content:    content,
 			MediaLinks: mediaLinks,
 		})
 	}
