@@ -78,12 +78,20 @@
 
                     <header class="dropdown-header" role="heading" aria-level="2">Auto Refresh</header>
                     <div class="row text-center m-0">
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="!refreshRate"       :class="{active: !refreshRate}"       @click.stop="refreshRate = 0">0</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 10"  :class="{active: refreshRate == 10}"  @click.stop="refreshRate = 10">10m</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 30"  :class="{active: refreshRate == 30}"  @click.stop="refreshRate = 30">30m</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 60"  :class="{active: refreshRate == 60}"  @click.stop="refreshRate = 60">1h</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 120" :class="{active: refreshRate == 120}" @click.stop="refreshRate = 120">2h</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 240" :class="{active: refreshRate == 240}" @click.stop="refreshRate = 240">4h</button>
+                        <button class="dropdown-item col-4 px-0"
+                                @click.stop="changeRefreshRate(-1)"
+                                :disabled="!refreshRate">
+                            <span class="icon">
+                                {% inline "chevron-down.svg" %}
+                            </span>
+                        </button>
+                        <div class="col-4 d-flex align-items-center justify-content-center">{{ refreshRateTitle }}</div>
+                        <button class="dropdown-item col-4 px-0"
+                                @click.stop="changeRefreshRate(1)" :disabled="refreshRate === refreshRateOptions.at(-1).value">
+                            <span class="icon">
+                                {% inline "chevron-up.svg" %}
+                            </span>
+                        </button>
                     </div>
 
                     <div class="dropdown-divider"></div>

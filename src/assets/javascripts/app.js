@@ -252,6 +252,17 @@ var vm = new Vue({
       'refreshRate': s.refresh_rate,
       'authenticated': app.authenticated,
       'feed_errors': {},
+
+      'refreshRateOptions': [
+        { title: "0", value: 0 },
+        { title: "10m", value: 10 },
+        { title: "30m", value: 30 },
+        { title: "1h", value: 60 },
+        { title: "2h", value: 120 },
+        { title: "4h", value: 240 },
+        { title: "12h", value: 720 },
+        { title: "24h", value: 1440 },
+      ],
     }
   },
   computed: {
@@ -309,7 +320,11 @@ var vm = new Vue({
     contentVideos: function() {
       if (!this.itemSelectedDetails) return []
       return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'video')
-    }
+    },
+    refreshRateTitle: function () {
+      const entry = this.refreshRateOptions.find(o => o.value === this.refreshRate)
+      return entry ? entry.title : '0'
+    },
   },
   watch: {
     'theme': {
@@ -777,6 +792,12 @@ var vm = new Vue({
 
         if (target && scroll) scrollto(target, scroll)
       })
+    },
+    changeRefreshRate: function(offset) {
+      const curIdx = this.refreshRateOptions.findIndex(o => o.value === this.refreshRate)
+      if (curIdx <= 0 && offset < 0) return
+      if (curIdx >= (this.refreshRateOptions.length - 1) && offset > 0) return
+      this.refreshRate = this.refreshRateOptions[curIdx + offset].value
     },
   }
 })
