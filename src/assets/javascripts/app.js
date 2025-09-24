@@ -768,9 +768,16 @@ var vm = new Vue({
     // navigation helper, navigate relative to selected feed
     navigateToFeed: function(relativePosition) {
       let vm = this
-      var navigationList = Array.from(document.querySelectorAll('#col-feed-list input[name=feed]'))
-        .filter(function(r) { return r.offsetParent !== null && r.value !== 'folder:null' })
-        .map(function(r) { return r.value })
+      const navigationList = this.foldersWithFeeds
+        .filter(folder => !folder.id || !vm.mustHideFolder(folder))
+        .map((folder) => {
+          if (this.mustHideFolder(folder)) return []
+          const folds = folder.id ? [`folder:${folder.id}`] : []
+          const feeds = (folder.is_expanded || !folder.id) ? folder.feeds.filter(f => !vm.mustHideFeed(f)).map(f => `feed:${f.id}`) : []
+          return folds.concat(feeds)
+        })
+        .flat()
+      navigationList.unshift('')
 
       var currentFeedPosition = navigationList.indexOf(vm.feedSelected)
 
@@ -798,6 +805,18 @@ var vm = new Vue({
       if (curIdx <= 0 && offset < 0) return
       if (curIdx >= (this.refreshRateOptions.length - 1) && offset > 0) return
       this.refreshRate = this.refreshRateOptions[curIdx + offset].value
+    },
+    mustHideFolder: function (folder) {
+      return this.filterSelected
+        && !(this.current.folder.id == folder.id || this.current.feed.folder_id == folder.id)
+        && !this.filteredFolderStats[folder.id]
+        && (!this.itemSelectedDetails || (this.feedsById[itemSelectedDetails.feed_id] || {}).folder_id != folder.id)
+    },
+    mustHideFeed: function (feed) {
+      return this.filterSelected
+        && !(this.current.feed.id == feed.id)
+        && !this.filteredFeedStats[feed.id]
+        && (!this.itemSelectedDetails || this.itemSelectedDetails.feed_id != feed.id)
     },
   }
 })
