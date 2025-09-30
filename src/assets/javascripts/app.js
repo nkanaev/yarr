@@ -820,7 +820,7 @@ var vm = new Vue({
       return this.filterSelected
         && !(this.current.folder.id == folder.id || this.current.feed.folder_id == folder.id)
         && !this.filteredFolderStats[folder.id]
-        && (!this.itemSelectedDetails || (this.feedsById[itemSelectedDetails.feed_id] || {}).folder_id != folder.id)
+        && (!this.itemSelectedDetails || (this.feedsById[this.itemSelectedDetails.feed_id] || {}).folder_id != folder.id)
     },
     mustHideFeed: function (feed) {
       return this.filterSelected
