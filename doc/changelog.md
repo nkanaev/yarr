@@ -3,6 +3,7 @@
 - (new) serve on unix socket (thanks to @rvighne)
 - (new) more auto-refresh options: 12h & 24h (thanks to @aswerkljh for suggestion)
 - (fix) smooth scrolling on iOS (thanks to gatheraled)
+- (etc) theme-color support (thanks to @asimpson)
 - (etc) cookie security measures (thanks to Tom Fitzhenry)
 - (etc) restrict access to internal IPs for page crawler (thanks to Omar Kurt)
 
