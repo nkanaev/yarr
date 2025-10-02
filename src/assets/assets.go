@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"fmt"
 )
 
 type assetsfs struct {
@@ -19,8 +20,10 @@ var FS assetsfs
 
 func (afs assetsfs) Open(name string) (fs.File, error) {
 	if afs.embedded != nil {
+		fmt.Println("serving from embedded")
 		return afs.embedded.Open(name)
 	}
+	fmt.Println("serving local")
 	return os.DirFS("src/assets").Open(name)
 }
 

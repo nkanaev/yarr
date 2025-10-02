@@ -24,21 +24,21 @@
             <div class="p-2 toolbar d-flex align-items-center">
                 <div class="icon mx-2">{% inline "anchor.svg" %}</div>
                 <div class="flex-grow-1"></div>
-                <button class="toolbar-item"
+                <button class="toolbar-item ml-1"
                         :class="{active: filterSelected == 'unread'}"
                         :aria-pressed="filterSelected == 'unread'"
                         title="Unread"
                         @click="filterSelected = 'unread'">
                     <span class="icon">{% inline "circle-full.svg" %}</span>
                 </button>
-                <button class="toolbar-item"
+                <button class="toolbar-item mx-1"
                         :class="{active: filterSelected == 'starred'}"
                         :aria-pressed="filterSelected == 'starred'"
                         title="Starred"
                         @click="filterSelected = 'starred'">
                     <span class="icon">{% inline "star-full.svg" %}</span>
                 </button>
-                <button class="toolbar-item"
+                <button class="toolbar-item mr-1"
                         :class="{active: filterSelected == ''}"
                         :aria-pressed="filterSelected == ''"
                         title="All"

@@ -5,6 +5,7 @@ GO_TAGS    = sqlite_foreign_keys sqlite_json
 GO_LDFLAGS = -s -w -X 'main.Version=$(VERSION)' -X 'main.GitHash=$(GITHASH)'
 
 GO_FLAGS         = -tags "$(GO_TAGS)"     -ldflags="$(GO_LDFLAGS)"
+GO_FLAGS_DEBUG   = -tags "$(GO_TAGS) debug"
 GO_FLAGS_GUI     = -tags "$(GO_TAGS) gui" -ldflags="$(GO_LDFLAGS)"
 GO_FLAGS_GUI_WIN = -tags "$(GO_TAGS) gui" -ldflags="$(GO_LDFLAGS) -H windowsgui"
 
@@ -75,7 +76,7 @@ windows_arm64_gui: src/platform/versioninfo.rc
 	GOOS=windows GOARCH=arm64 go build $(GO_FLAGS_GUI_WIN) -o out/$@/yarr.exe ./cmd/yarr
 
 serve:
-	go run $(GO_FLAGS) ./cmd/yarr -db local.db
+	go run $(GO_FLAGS_DEBUG) ./cmd/yarr -db local.db
 
 test:
 	go test $(GO_FLAGS) ./...
