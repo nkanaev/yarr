@@ -513,6 +513,10 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		})
 		return
 	}
+	if isInternalFromURL(url) {
+		log.Printf("attempt to access internal IP %s from %s", url, c.Req.RemoteAddr)
+		return
+	}
 
 	body, err := worker.GetBody(url)
 	if err != nil {

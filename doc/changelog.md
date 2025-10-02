@@ -4,6 +4,7 @@
 - (new) more auto-refresh options: 12h & 24h (thanks to @aswerkljh for suggestion)
 - (fix) smooth scrolling on iOS (thanks to gatheraled)
 - (etc) cookie security measures (thanks to Tom Fitzhenry)
+- (etc) restrict access to internal IPs for page crawler (thanks to Omar Kurt)
 
 # v2.5 (2025-03-26)
 
