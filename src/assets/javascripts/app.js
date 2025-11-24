@@ -783,7 +783,9 @@ var vm = new Vue({
         .map((folder) => {
           if (this.mustHideFolder(folder)) return []
           const folds = folder.id ? [`folder:${folder.id}`] : []
-          const feeds = (folder.is_expanded || !folder.id) ? folder.feeds.filter(f => !vm.mustHideFeed(f)).map(f => `feed:${f.id}`) : []
+          const feeds = (folder.is_expanded || !folder.id)
+            ? (folder.feeds || []).filter(f => !vm.mustHideFeed(f)).map(f => `feed:${f.id}`)
+            : []
           return folds.concat(feeds)
         })
         .flat()
