@@ -65,12 +65,15 @@ var shortcutFunctions = {
   },
   showAll() {
     vm.filterSelected = ''
+    vm.itemSelected = null
   },
   showUnread() {
     vm.filterSelected = 'unread'
+    vm.itemSelected = null
   },
   showStarred() {
     vm.filterSelected = 'starred'
+    vm.itemSelected = null
   },
 }
 

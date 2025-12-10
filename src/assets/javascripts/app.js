@@ -213,6 +213,15 @@ var vm = new Vue({
     })
     this.updateMetaTheme(app.settings.theme_name)
   },
+  mounted: function() {
+    addEventListener("popstate", (event) => { return this.loadHistory(event.state) })
+
+    if (history.state !== null) {
+      this.loadHistory(history.state)
+    } else {
+      this.historyChange(this.feedSelected, this.itemSelected, this.filterSelected)
+    }
+  },
   data: function() {
     var s = app.settings
     return {
@@ -361,14 +370,14 @@ var vm = new Vue({
     },
     'filterSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
+      this.historyChange(this.feedSelected, this.itemSelected, newVal)
       api.settings.update({filter: newVal}).then(this.refreshItems.bind(this, false))
-      this.itemSelected = null
       this.computeStats()
     },
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
+      this.historyChange(newVal, this.itemSelected, this.filterSelected)
       api.settings.update({feed: newVal}).then(this.refreshItems.bind(this, false))
-      this.itemSelected = null
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0
     },
     'itemSelected': function(newVal, oldVal) {
@@ -378,6 +387,7 @@ var vm = new Vue({
         return
       }
       if (this.$refs.content) this.$refs.content.scrollTop = 0
+      this.historyChange(this.feedSelected, newVal, this.filterSelected)
 
       api.items.get(newVal).then(function(item) {
         this.itemSelectedDetails = item
@@ -579,6 +589,7 @@ var vm = new Vue({
       if (confirm('Are you sure you want to delete ' + folder.title + '?')) {
         api.folders.delete(folder.id).then(function() {
           vm.feedSelected = null
+          vm.itemSelected = null
           vm.refreshStats()
           vm.refreshFeeds()
         })
@@ -604,6 +615,7 @@ var vm = new Vue({
       if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
         api.feeds.delete(feed.id).then(function() {
           vm.feedSelected = null
+          vm.itemSelected = null
           vm.refreshStats()
           vm.refreshFeeds()
         })
@@ -625,6 +637,7 @@ var vm = new Vue({
           vm.refreshStats()
           vm.settings = ''
           vm.feedSelected = 'feed:' + result.feed.id
+          vm.itemSelected = null
         } else if (result.status === 'multiple') {
           vm.feedNewChoice = result.choice
           vm.feedNewChoiceSelected = result.choice[0].url
@@ -749,13 +762,13 @@ var vm = new Vue({
       let vm = this
       if (vm.itemSelected == null) {
         // if no item is selected, select first
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
+        if (vm.items.length !== 0) vm.itemSelected = vm.items[0]?.id
         return
       }
 
       var itemPosition = vm.items.findIndex(function(x) { return x.id === vm.itemSelected })
       if (itemPosition === -1) {
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
+        if (vm.items.length !== 0) vm.itemSelected = vm.items[0]?.id
         return
       }
 
@@ -795,6 +808,7 @@ var vm = new Vue({
 
       if (currentFeedPosition == -1) {
         vm.feedSelected = ''
+        vm.itemSelected = null
         return
       }
 
@@ -802,6 +816,7 @@ var vm = new Vue({
       if (newPosition < 0 || newPosition >= navigationList.length) return
 
       vm.feedSelected = navigationList[newPosition]
+      vm.itemSelected = null
 
       vm.$nextTick(function() {
         var scroll = document.querySelector('#feed-list-scroll')
@@ -830,6 +845,26 @@ var vm = new Vue({
         && !this.filteredFeedStats[feed.id]
         && (!this.itemSelectedDetails || this.itemSelectedDetails.feed_id != feed.id)
     },
+    loadHistory: function(state) {
+      if (!state) return
+      const {fe, it, fi} = state;
+      this.filterSelected = fi
+      this.feedSelected = fe
+      this.itemSelected = it
+    },
+    historyChange: function(nfe, nit, nfi) {
+      const newState = {fe: nfe, it: nit, fi: nfi}
+      const url = `#filter:${nfi||'all'},${nfe||'feed:all'},item:${nit||''}`
+
+      if (history.state == null) {
+        history.replaceState(newState, "", url)
+        return
+      }
+      const {fe, it, fi} = history.state || {}
+      if (fe !== nfe || it !== nit || fi !== nfi) {
+        history.pushState(newState, "", url)
+      }
+    }
   }
 })
 
