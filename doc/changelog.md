@@ -1,5 +1,9 @@
 # upcoming
 
+- (fix) articles not resetting immediately after feed/filter selection (thank to @scratchmex for the report)
+
+# v2.6 (2025-11-24)
+
 - (new) serve on unix socket (thanks to @rvighne)
 - (new) more auto-refresh options: 12h & 24h (thanks to @aswerkljh for suggestion)
 - (fix) smooth scrolling on iOS (thanks to gatheraled)
