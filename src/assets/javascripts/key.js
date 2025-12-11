@@ -72,6 +72,13 @@ var shortcutFunctions = {
   showStarred() {
     vm.filterSelected = 'starred'
   },
+  focusItems() {
+    vm.navigateToItem(0)
+  },
+  focusFeeds() {
+    vm.itemSelected = null
+    vm.navigateToFeed(0)
+  }
 }
 
 // If you edit, make sure you update the help modal
@@ -92,6 +99,8 @@ var keybindings = {
   "1": shortcutFunctions.showUnread,
   "2": shortcutFunctions.showStarred,
   "3": shortcutFunctions.showAll,
+  "ArrowLeft": shortcutFunctions.focusFeeds,
+  "ArrowRight": shortcutFunctions.focusItems,
 }
 
 var codebindings = {
@@ -111,6 +120,8 @@ var codebindings = {
   "Digit1": shortcutFunctions.showUnread,
   "Digit2": shortcutFunctions.showStarred,
   "Digit3": shortcutFunctions.showAll,
+  "ArrowLeft": shortcutFunctions.focusFeeds,
+  "ArrowRight": shortcutFunctions.focusItems,
 }
 
 function isTextBox(element) {

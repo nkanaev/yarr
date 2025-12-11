@@ -747,27 +747,27 @@ var vm = new Vue({
     // navigation helper, navigate relative to selected item
     navigateToItem: function(relativePosition) {
       let vm = this
-      if (vm.itemSelected == null) {
-        // if no item is selected, select first
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
-        return
-      }
-
       var itemPosition = vm.items.findIndex(function(x) { return x.id === vm.itemSelected })
-      if (itemPosition === -1) {
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
-        return
+      if (vm.itemSelected == null || itemPosition === -1) {
+        if (vm.items.length == 0) return
+        // if no item is selected or is invalid, select first
+        vm.itemSelected = vm.items[0].id
+        relativePosition = 0
+        itemPosition = 0
       }
 
       var newPosition = itemPosition + relativePosition
       if (newPosition < 0 || newPosition >= vm.items.length) return
-
-      vm.itemSelected = vm.items[newPosition].id
+      if (relativePosition > 0) {
+        // relativePosition=0 is regain focus, skip assign
+        vm.itemSelected = vm.items[newPosition].id
+      }
 
       vm.$nextTick(function() {
         var scroll = document.querySelector('#item-list-scroll')
 
         var handle = scroll.querySelector('input[type=radio]:checked')
+        handle.focus()
         var target = handle && handle.parentElement
 
         if (target && scroll) scrollto(target, scroll)
@@ -801,12 +801,16 @@ var vm = new Vue({
       var newPosition = currentFeedPosition+relativePosition
       if (newPosition < 0 || newPosition >= navigationList.length) return
 
-      vm.feedSelected = navigationList[newPosition]
+      if (relativePosition > 0) {
+        // relativePosition=0 is regain focus, skip assign
+        vm.feedSelected = navigationList[newPosition]
+      }
 
       vm.$nextTick(function() {
         var scroll = document.querySelector('#feed-list-scroll')
 
         var handle = scroll.querySelector('input[type=radio]:checked')
+        handle.focus()
         var target = handle && handle.parentElement
 
         if (target && scroll) scrollto(target, scroll)
