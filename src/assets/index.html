@@ -28,21 +28,21 @@
                         :class="{active: filterSelected == 'unread'}"
                         :aria-pressed="filterSelected == 'unread'"
                         title="Unread"
-                        @click="filterSelected = 'unread'">
+                        @click="filterSelected = 'unread'; selectFilter()">
                     <span class="icon">{% inline "circle-full.svg" %}</span>
                 </button>
                 <button class="toolbar-item mx-1"
                         :class="{active: filterSelected == 'starred'}"
                         :aria-pressed="filterSelected == 'starred'"
                         title="Starred"
-                        @click="filterSelected = 'starred'">
+                        @click="filterSelected = 'starred'; selectFilter()">
                     <span class="icon">{% inline "star-full.svg" %}</span>
                 </button>
                 <button class="toolbar-item mr-1"
                         :class="{active: filterSelected == ''}"
                         :aria-pressed="filterSelected == ''"
                         title="All"
-                        @click="filterSelected = ''">
+                        @click="filterSelected = ''; selectFilter()">
                     <span class="icon">{% inline "assorted.svg" %}</span>
                 </button>
                 <div class="flex-grow-1"></div>
@@ -133,7 +133,7 @@
             </div>
             <div id="feed-list-scroll" class="p-2 overflow-auto scroll-touch border-top flex-grow-1">
                 <label class="selectgroup">
-                    <input type="radio" name="feed" value="" v-model="feedSelected">
+                    <input type="radio" name="feed" value="" v-model="feedSelected" @change="selectFeed()">
                     <div class="selectgroup-label d-flex align-items-center w-100">
                         <span class="icon mr-2">{% inline "layers.svg" %}</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">All Unread</span>
@@ -146,7 +146,7 @@
                     <label class="selectgroup mt-1"
                            :class="{'d-none': mustHideFolder(folder)}"
                            v-if="folder.id">
-                        <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
+                        <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" @change="selectFeed()" v-if="folder.id">
                         <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
                             <span class="icon mr-2"
                                   :class="{expanded: folder.is_expanded}"
@@ -161,7 +161,7 @@
                         <label class="selectgroup"
                               :class="{'d-none': mustHideFeed(feed)}"
                                v-for="feed in folder.feeds">
-                            <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
+                            <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected" @change="selectFeed()">
                             <div class="selectgroup-label d-flex align-items-center w-100">
                                 <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
                                 <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
@@ -187,7 +187,7 @@
             <drag :width="itemListWidth" @resize="resizeItemList"></drag>
             <div class="px-2 toolbar d-flex align-items-center">
                 <button class="toolbar-item mr-2 d-block d-md-none"
-                        @click="feedSelected = null"
+                        @click="feedSelected = null; selectFeed()"
                         title="Show Feeds">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
@@ -358,7 +358,7 @@
                     <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
                     <div class="text-muted">
                         <div>
-                            <span class="cursor-pointer" @click="feedSelected = 'feed:'+(feedsById[itemSelectedDetails.feed_id] || {}).id">
+                            <span class="cursor-pointer" @click="feedSelected = 'feed:'+(feedsById[itemSelectedDetails.feed_id] || {}).id; selectFeed()">
                                 {{ (feedsById[itemSelectedDetails.feed_id] || {}).title }}
                             </span>
                         </div>
