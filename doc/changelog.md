@@ -1,6 +1,7 @@
 # upcoming
 
 - (fix) articles not resetting immediately after feed/filter selection (thank to @scratchmex for the report)
+- (fix) crash on empty article list with article is selected (thanks to @rksvc)
 
 # v2.6 (2025-11-24)
 
