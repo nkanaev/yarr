@@ -2,6 +2,7 @@
 
 - (fix) articles not resetting immediately after feed/filter selection (thank to @scratchmex for the report)
 - (fix) crash on empty article list with article is selected (thanks to @rksvc)
+- (fix) invalid article title in RSS feeds with media containing titles (thanks to @bwwu-git for the report)
 
 # v2.6 (2025-11-24)
 
