@@ -268,6 +268,7 @@ var vm = new Vue({
         { title: "4h", value: 240 },
         { title: "12h", value: 720 },
         { title: "24h", value: 1440 },
+        { title: "7d", value: 10080 },
       ],
     }
   },
