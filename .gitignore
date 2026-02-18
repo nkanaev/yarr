@@ -6,3 +6,4 @@
 *.db-wal
 *.syso
 versioninfo.rc
+.DS_Store

@@ -60,6 +60,9 @@ var shortcutFunctions = {
   scrollBackward: function() {
     helperFunctions.scrollContent(-1)
   },
+  closeItem: function () {
+    vm.itemSelected = null
+  },
   showAll() {
     vm.filterSelected = ''
   },
@@ -85,6 +88,7 @@ var keybindings = {
   "h": shortcutFunctions.previousFeed,
   "f": shortcutFunctions.scrollForward,
   "b": shortcutFunctions.scrollBackward,
+  "q": shortcutFunctions.closeItem,
   "1": shortcutFunctions.showUnread,
   "2": shortcutFunctions.showStarred,
   "3": shortcutFunctions.showAll,
@@ -103,6 +107,7 @@ var codebindings = {
   "KeyH": shortcutFunctions.previousFeed,
   "KeyF": shortcutFunctions.scrollForward,
   "KeyB": shortcutFunctions.scrollBackward,
+  "KeyQ": shortcutFunctions.closeItem,
   "Digit1": shortcutFunctions.showUnread,
   "Digit2": shortcutFunctions.showStarred,
   "Digit3": shortcutFunctions.showAll,

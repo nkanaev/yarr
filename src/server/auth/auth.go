@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"net/http"
 	"strings"
-	"time"
 )
 
 func IsAuthenticated(req *http.Request, username, password string) bool {
@@ -24,10 +23,12 @@ func IsAuthenticated(req *http.Request, username, password string) bool {
 
 func Authenticate(rw http.ResponseWriter, username, password, basepath string) {
 	http.SetCookie(rw, &http.Cookie{
-		Name:    "auth",
-		Value:   username + ":" + secret(username, password),
-		Expires: time.Now().Add(time.Hour * 24 * 7), // 1 week,
-		Path:    basepath,
+		Name:     "auth",
+		Value:    username + ":" + secret(username, password),
+		MaxAge:   604800, // 1 week
+		Path:     basepath,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 

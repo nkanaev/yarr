@@ -20,12 +20,12 @@ type rssFeed struct {
 }
 
 type rssItem struct {
-	GUID        rssGuid        `xml:"guid"`
-	Title       string         `xml:"title"`
+	GUID        rssGuid        `xml:"rss guid"`
+	Title       string         `xml:"rss title"`
 	Link        string         `xml:"rss link"`
 	Description string         `xml:"rss description"`
-	PubDate     string         `xml:"pubDate"`
-	Enclosures  []rssEnclosure `xml:"enclosure"`
+	PubDate     string         `xml:"rss pubDate"`
+	Enclosures  []rssEnclosure `xml:"rss enclosure"`
 
 	DublinCoreDate string `xml:"http://purl.org/dc/elements/1.1/ date"`
 	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`

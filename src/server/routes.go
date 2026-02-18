@@ -34,7 +34,7 @@ func (s *Server) handler() http.Handler {
 			BasePath: s.BasePath,
 			Username: s.Username,
 			Password: s.Password,
-			Public:   []string{"/static", "/fever"},
+			Public:   []string{"/static", "/fever", "/manifest.json"},
 			DB:       s.db,
 		}
 		r.Use(a.Handler)
@@ -520,6 +520,10 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		c.JSON(http.StatusOK, map[string]string{
 			"content": sanitizer.Sanitize(url, content),
 		})
+		return
+	}
+	if isInternalFromURL(url) {
+		log.Printf("attempt to access internal IP %s from %s", url, c.Req.RemoteAddr)
 		return
 	}
 

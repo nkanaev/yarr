@@ -1,7 +1,18 @@
 # upcoming
 
+- (fix) articles not resetting immediately after feed/filter selection (thank to @scratchmex for the report)
+- (fix) crash on empty article list with article is selected (thanks to @rksvc)
+- (fix) invalid article title in RSS feeds with media containing titles (thanks to @bwwu-git for the report)
+
+# v2.6 (2025-11-24)
+
 - (new) serve on unix socket (thanks to @rvighne)
+- (new) more auto-refresh options: 12h & 24h (thanks to @aswerkljh for suggestion)
 - (fix) smooth scrolling on iOS (thanks to gatheraled)
+- (fix) displaying youtube shorts in "Read Here" (thanks to @Dean-Corso for the report)
+- (etc) theme-color support (thanks to @asimpson)
+- (etc) cookie security measures (thanks to Tom Fitzhenry)
+- (etc) restrict access to internal IPs for page crawler (thanks to Omar Kurt)
 
 # v2.5 (2025-03-26)
 

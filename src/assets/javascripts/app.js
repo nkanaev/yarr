@@ -211,6 +211,7 @@ var vm = new Vue({
     api.feeds.list_errors().then(function(errors) {
       vm.feed_errors = errors
     })
+    this.updateMetaTheme(app.settings.theme_name)
   },
   data: function() {
     var s = app.settings
@@ -249,9 +250,25 @@ var vm = new Vue({
         'font': s.theme_font,
         'size': s.theme_size,
       },
+      'themeColors': {
+        'night': '#0e0e0e',
+        'sepia': '#f4f0e5',
+        'light': '#fff',
+      },
       'refreshRate': s.refresh_rate,
       'authenticated': app.authenticated,
       'feed_errors': {},
+
+      'refreshRateOptions': [
+        { title: "0", value: 0 },
+        { title: "10m", value: 10 },
+        { title: "30m", value: 30 },
+        { title: "1h", value: 60 },
+        { title: "2h", value: 120 },
+        { title: "4h", value: 240 },
+        { title: "12h", value: 720 },
+        { title: "24h", value: 1440 },
+      ],
     }
   },
   computed: {
@@ -309,12 +326,17 @@ var vm = new Vue({
     contentVideos: function() {
       if (!this.itemSelectedDetails) return []
       return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'video')
-    }
+    },
+    refreshRateTitle: function () {
+      const entry = this.refreshRateOptions.find(o => o.value === this.refreshRate)
+      return entry ? entry.title : '0'
+    },
   },
   watch: {
     'theme': {
       deep: true,
       handler: function(theme) {
+        this.updateMetaTheme(theme.name)
         document.body.classList.value = 'theme-' + theme.name
         api.settings.update({
           theme_name: theme.name,
@@ -339,14 +361,18 @@ var vm = new Vue({
     },
     'filterSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({filter: newVal}).then(this.refreshItems.bind(this, false))
       this.itemSelected = null
+      this.items = []
+      this.itemsHasMore = true
+      api.settings.update({filter: newVal}).then(this.refreshItems.bind(this, false))
       this.computeStats()
     },
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({feed: newVal}).then(this.refreshItems.bind(this, false))
       this.itemSelected = null
+      this.items = []
+      this.itemsHasMore = true
+      api.settings.update({feed: newVal}).then(this.refreshItems.bind(this, false))
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0
     },
     'itemSelected': function(newVal, oldVal) {
@@ -390,6 +416,9 @@ var vm = new Vue({
     },
   },
   methods: {
+    updateMetaTheme: function(theme) {
+      document.querySelector("meta[name='theme-color']").content = this.themeColors[theme]
+    },
     refreshStats: function(loopMode) {
       return api.status().then(function(data) {
         if (loopMode && !vm.itemSelected) vm.refreshItems()
@@ -772,9 +801,18 @@ var vm = new Vue({
     // navigation helper, navigate relative to selected feed
     navigateToFeed: function(relativePosition) {
       let vm = this
-      var navigationList = Array.from(document.querySelectorAll('#col-feed-list input[name=feed]'))
-        .filter(function(r) { return r.offsetParent !== null && r.value !== 'folder:null' })
-        .map(function(r) { return r.value })
+      const navigationList = this.foldersWithFeeds
+        .filter(folder => !folder.id || !vm.mustHideFolder(folder))
+        .map((folder) => {
+          if (this.mustHideFolder(folder)) return []
+          const folds = folder.id ? [`folder:${folder.id}`] : []
+          const feeds = (folder.is_expanded || !folder.id)
+            ? (folder.feeds || []).filter(f => !vm.mustHideFeed(f)).map(f => `feed:${f.id}`)
+            : []
+          return folds.concat(feeds)
+        })
+        .flat()
+      navigationList.unshift('')
 
       var currentFeedPosition = navigationList.indexOf(vm.feedSelected)
 
@@ -796,6 +834,34 @@ var vm = new Vue({
 
         if (target && scroll) scrollto(target, scroll)
       })
+    },
+    changeRefreshRate: function(offset) {
+      const curIdx = this.refreshRateOptions.findIndex(o => o.value === this.refreshRate)
+      if (curIdx <= 0 && offset < 0) return
+      if (curIdx >= (this.refreshRateOptions.length - 1) && offset > 0) return
+      this.refreshRate = this.refreshRateOptions[curIdx + offset].value
+    },
+    mustHideFolder: function (folder) {
+      return this.filterSelected
+        && !(this.current.folder.id == folder.id || this.current.feed.folder_id == folder.id)
+        && !this.filteredFolderStats[folder.id]
+        && (!this.itemSelectedDetails || (this.feedsById[this.itemSelectedDetails.feed_id] || {}).folder_id != folder.id)
+    },
+    mustHideFeed: function (feed) {
+      // Archive visibility logic
+      if (this.filterSelected === 'archived') {
+        // In archived filter, hide non-archived feeds
+        if (!feed.archived) return true
+      } else if (this.filterSelected && this.filterSelected !== 'archived') {
+        // In other filters (unread, starred), hide archived feeds
+        if (feed.archived) return true
+      }
+
+      // Standard feed visibility logic
+      return this.filterSelected
+        && !(this.current.feed.id == feed.id)
+        && !this.filteredFeedStats[feed.id]
+        && (!this.itemSelectedDetails || this.itemSelectedDetails.feed_id != feed.id)
     },
   }
 })

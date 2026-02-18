@@ -8,6 +8,7 @@
     <link rel="icon" href="./static/graphicarts/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png">
     <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script>
         window.app = window.app || {}
@@ -23,21 +24,21 @@
             <div class="p-2 toolbar d-flex align-items-center">
                 <div class="icon mx-2">{% inline "anchor.svg" %}</div>
                 <div class="flex-grow-1"></div>
-                <button class="toolbar-item"
+                <button class="toolbar-item ml-1"
                         :class="{active: filterSelected == 'unread'}"
                         :aria-pressed="filterSelected == 'unread'"
                         title="Unread"
                         @click="filterSelected = 'unread'">
                     <span class="icon">{% inline "circle-full.svg" %}</span>
                 </button>
-                <button class="toolbar-item"
+                <button class="toolbar-item mx-1"
                         :class="{active: filterSelected == 'starred'}"
                         :aria-pressed="filterSelected == 'starred'"
                         title="Starred"
                         @click="filterSelected = 'starred'">
                     <span class="icon">{% inline "star-full.svg" %}</span>
                 </button>
-                <button class="toolbar-item"
+                <button class="toolbar-item mr-1"
                         :class="{active: filterSelected == ''}"
                         :aria-pressed="filterSelected == ''"
                         title="All"
@@ -85,12 +86,20 @@
 
                     <header class="dropdown-header" role="heading" aria-level="2">Auto Refresh</header>
                     <div class="row text-center m-0">
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="!refreshRate"       :class="{active: !refreshRate}"       @click.stop="refreshRate = 0">0</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 10"  :class="{active: refreshRate == 10}"  @click.stop="refreshRate = 10">10m</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 30"  :class="{active: refreshRate == 30}"  @click.stop="refreshRate = 30">30m</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 60"  :class="{active: refreshRate == 60}"  @click.stop="refreshRate = 60">1h</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 120" :class="{active: refreshRate == 120}" @click.stop="refreshRate = 120">2h</button>
-                        <button class="dropdown-item col-4 px-0" :aria-pressed="refreshRate == 240" :class="{active: refreshRate == 240}" @click.stop="refreshRate = 240">4h</button>
+                        <button class="dropdown-item col-4 px-0"
+                                @click.stop="changeRefreshRate(-1)"
+                                :disabled="!refreshRate">
+                            <span class="icon">
+                                {% inline "chevron-down.svg" %}
+                            </span>
+                        </button>
+                        <div class="col-4 d-flex align-items-center justify-content-center">{{ refreshRateTitle }}</div>
+                        <button class="dropdown-item col-4 px-0"
+                                @click.stop="changeRefreshRate(1)" :disabled="refreshRate === refreshRateOptions.at(-1).value">
+                            <span class="icon">
+                                {% inline "chevron-up.svg" %}
+                            </span>
+                        </button>
                     </div>
 
                     <div class="dropdown-divider"></div>
@@ -143,10 +152,8 @@
                 </label>
                 <div v-for="folder in foldersWithFeeds">
                     <label class="selectgroup mt-1"
-                           :class="{'d-none': filterSelected
-                                              && !(current.folder.id == folder.id || current.feed.folder_id == folder.id)
-                                              && !filteredFolderStats[folder.id]
-                                              && (!itemSelectedDetails || (feedsById[itemSelectedDetails.feed_id] || {}).folder_id != folder.id)}">
+                           :class="{'d-none': mustHideFolder(folder)}"
+                           v-if="folder.id">
                         <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
                         <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
                             <span class="icon mr-2"
@@ -160,12 +167,7 @@
                     </label>
                     <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
                         <label class="selectgroup"
-                              :class="{'d-none': (filterSelected === 'archived' && !feed.archived)
-                                                 || (filterSelected && filterSelected !== 'archived' && feed.archived)
-                                                 || (filterSelected
-                                                     && !(current.feed.id == feed.id)
-                                                     && !filteredFeedStats[feed.id]
-                                                     && (!itemSelectedDetails || itemSelectedDetails.feed_id != feed.id)),
+                              :class="{'d-none': mustHideFeed(feed),
                                        'archived': feed.archived && filterSelected !== 'archived'}"
                                v-for="feed in folder.feeds">
                             <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
@@ -302,7 +304,7 @@
                        class="selectgroup">
                     <input type="radio" name="item" :value="item.id" v-model="itemSelected">
                     <div class="selectgroup-label d-flex flex-column">
-                        <div style="line-height: 1; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
+                        <div style="line-height: 100%; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
                             <transition name="indicator">
                                 <span class="icon icon-small mr-1" v-if="item.status=='unread'">{% inline "circle-full.svg" %}</span>
                                 <span class="icon icon-small mr-1" v-if="item.status=='starred'">{% inline "star-full.svg" %}</span>
@@ -360,10 +362,10 @@
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
                 <div class="flex-grow-1"></div>
-                <button class="toolbar-item" @click="navigateToItem(-1)" title="Previous Article" :disabled="itemSelected == items[0].id">
+                <button class="toolbar-item" @click="navigateToItem(-1)" title="Previous Article" :disabled="!items.length || itemSelected == items[0].id">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
-                <button class="toolbar-item" @click="navigateToItem(+1)" title="Next Article" :disabled="itemSelected == items[items.length - 1].id">
+                <button class="toolbar-item" @click="navigateToItem(+1)" title="Next Article" :disabled="!items.length || itemSelected == items[items.length - 1].id">
                     <span class="icon">{% inline "chevron-right.svg" %}</span>
                 </button>
                 <button class="toolbar-item" @click="itemSelected=null" title="Close Article">
@@ -444,6 +446,7 @@
                     <tr><td colspan=2>&nbsp;</td></tr>
                     <tr><td><kbd>j</kbd> <kbd>k</kbd></td>  <td>next / prev article</td></tr>
                     <tr><td><kbd>l</kbd> <kbd>h</kbd></td>  <td>next / prev feed</td></tr>
+                    <tr><td><kbd>q</kbd></td>               <td>close article</td></tr>
 
                     <tr><td colspan=2>&nbsp;</td></tr>
                     <tr><td><kbd>R</kbd></td>               <td>mark all read</td></tr>
