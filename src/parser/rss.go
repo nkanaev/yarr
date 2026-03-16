@@ -85,6 +85,11 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 				break
 			}
 		}
+		for _, e := range srcitem.Enclosures {
+			if strings.HasPrefix(e.Type, "image/") {
+				mediaLinks = append(mediaLinks, MediaLink{URL: e.URL, Type: "image"})
+			}
+		}
 
 		permalink := ""
 		if srcitem.GUID.IsPermaLink == "true" {
