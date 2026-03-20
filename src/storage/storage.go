@@ -12,6 +12,10 @@ type Storage struct {
 	db *sql.DB
 }
 
+func (s *Storage) Ping() error {
+	return s.db.Ping()
+}
+
 func New(path string) (*Storage, error) {
 	if pos := strings.IndexRune(path, '?'); pos == -1 {
 		params := "_journal=WAL&_sync=NORMAL&_busy_timeout=5000&cache=shared"
