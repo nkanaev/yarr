@@ -10,11 +10,13 @@ import (
 )
 
 type Middleware struct {
-	Username string
-	Password string
-	BasePath string
-	Public   []string
-	DB       *storage.Storage
+	Username      string
+	Password      string
+	BasePath      string
+	Public        []string
+	DB            *storage.Storage
+	SecretKeyBase string
+	SecureCookie  bool
 }
 
 func unsafeMethod(method string) bool {
@@ -28,7 +30,7 @@ func (m *Middleware) Handler(c *router.Context) {
 			return
 		}
 	}
-	if IsAuthenticated(c.Req, m.Username, m.Password) {
+	if IsAuthenticated(c.Req, m.Username, m.Password, m.SecretKeyBase) {
 		c.Next()
 		return
 	}
@@ -44,7 +46,7 @@ func (m *Middleware) Handler(c *router.Context) {
 		username := c.Req.FormValue("username")
 		password := c.Req.FormValue("password")
 		if StringsEqual(username, m.Username) && StringsEqual(password, m.Password) {
-			Authenticate(c.Out, m.Username, m.Password, m.BasePath)
+			Authenticate(c.Out, m.Username, m.Password, m.BasePath, m.SecretKeyBase, m.SecureCookie)
 			c.Redirect(rootUrl)
 			return
 		} else {

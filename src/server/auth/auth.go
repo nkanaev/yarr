@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func IsAuthenticated(req *http.Request, username, password string) bool {
+func IsAuthenticated(req *http.Request, username, password, baseKey string) bool {
 	cookie, _ := req.Cookie("auth")
 	if cookie == nil {
 		return false
@@ -18,16 +18,16 @@ func IsAuthenticated(req *http.Request, username, password string) bool {
 	if len(parts) != 2 || !StringsEqual(parts[0], username) {
 		return false
 	}
-	return StringsEqual(parts[1], secret(username, password))
+	return StringsEqual(parts[1], secret(username, password, baseKey))
 }
 
-func Authenticate(rw http.ResponseWriter, username, password, basepath string) {
+func Authenticate(rw http.ResponseWriter, username, password, basepath, baseKey string, secureCookie bool) {
 	http.SetCookie(rw, &http.Cookie{
 		Name:     "auth",
-		Value:    username + ":" + secret(username, password),
+		Value:    username + ":" + secret(username, password, baseKey),
 		MaxAge:   604800, // 1 week
 		Path:     basepath,
-		Secure:   true,
+		Secure:   secureCookie,
 		SameSite: http.SameSiteLaxMode,
 	})
 }
@@ -45,9 +45,16 @@ func StringsEqual(p1, p2 string) bool {
 	return subtle.ConstantTimeCompare([]byte(p1), []byte(p2)) == 1
 }
 
-func secret(msg, key string) string {
-	mac := hmac.New(sha256.New, []byte(key))
+func secret(msg, key, baseKey string) string {
+	hmacKey := []byte(key)
+	if baseKey != "" {
+		// Derive key using HMAC-SHA256(baseKey, key) to avoid
+		// cryptographic weakness of simple concatenation
+		derivation := hmac.New(sha256.New, []byte(baseKey))
+		derivation.Write([]byte(key))
+		hmacKey = derivation.Sum(nil)
+	}
+	mac := hmac.New(sha256.New, hmacKey)
 	mac.Write([]byte(msg))
-	src := mac.Sum(nil)
-	return hex.EncodeToString(src)
+	return hex.EncodeToString(mac.Sum(nil))
 }
