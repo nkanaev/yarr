@@ -34,12 +34,15 @@ func (s *Server) handler() http.Handler {
 			BasePath: s.BasePath,
 			Username: s.Username,
 			Password: s.Password,
-			Public:   []string{"/static", "/fever", "/manifest.json"},
-			DB:       s.db,
+			Public:   []string{"/static", "/fever", "/manifest.json", "/up"},
+			DB:            s.db,
+			SecretKeyBase: s.SecretKeyBase,
+			SecureCookie:  s.SecureCookie,
 		}
 		r.Use(a.Handler)
 	}
 
+	r.For("/up", s.handleHealth)
 	r.For("/", s.handleIndex)
 	r.For("/manifest.json", s.handleManifest)
 	r.For("/static/*path", s.handleStatic)
@@ -540,4 +543,14 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 func (s *Server) handleLogout(c *router.Context) {
 	auth.Logout(c.Out, s.BasePath)
 	c.Out.WriteHeader(http.StatusNoContent)
+}
+
+func (s *Server) handleHealth(c *router.Context) {
+	if err := s.db.Ping(); err != nil {
+		c.Out.WriteHeader(http.StatusServiceUnavailable)
+		c.Out.Write([]byte("ERROR"))
+		return
+	}
+	c.Out.WriteHeader(http.StatusOK)
+	c.Out.Write([]byte("OK"))
 }

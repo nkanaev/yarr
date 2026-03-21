@@ -1,0 +1,31 @@
+FROM golang:alpine3.21 AS builder
+RUN apk add --no-cache build-base git
+WORKDIR /src
+COPY . .
+RUN go build -tags "sqlite_foreign_keys sqlite_json" \
+    -ldflags="-s -w -X 'main.Version=$(git describe --tags --abbrev=0 2>/dev/null || echo dev)' -X 'main.GitHash=$(git rev-parse --short=8 HEAD)'" \
+    -o /usr/local/bin/yarr ./cmd/yarr
+
+FROM alpine:latest
+RUN apk add --no-cache ca-certificates sqlite
+
+COPY --from=builder /usr/local/bin/yarr /usr/local/bin/yarr
+
+RUN mkdir -p /storage/db /hooks
+
+COPY etc/hooks/pre-backup /hooks/pre-backup
+COPY etc/hooks/post-restore /hooks/post-restore
+RUN chmod +x /hooks/pre-backup /hooks/post-restore
+
+ENV DISABLE_SSL=true
+
+LABEL org.opencontainers.image.title="yarr"
+LABEL org.opencontainers.image.description="Yet Another RSS Reader - self-hosted feed aggregator"
+LABEL org.opencontainers.image.version="2.6"
+LABEL org.opencontainers.image.source="https://github.com/sroberts/yarr"
+LABEL org.opencontainers.image.licenses="MIT"
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/yarr"]
+CMD ["-addr", "0.0.0.0:80", "-db", "/storage/db/yarr.db"]

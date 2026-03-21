@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+rm -f /storage/db/yarr.db.bak
+rm -f /storage/db/yarr.db-wal /storage/db/yarr.db-shm

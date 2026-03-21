@@ -112,3 +112,43 @@ func TestFeedIcons(t *testing.T) {
 		t.Fatal("got", response2.StatusCode)
 	}
 }
+
+func TestHealthEndpoint(t *testing.T) {
+	log.SetOutput(io.Discard)
+	db, _ := storage.New(":memory:")
+	log.SetOutput(os.Stderr)
+
+	handler := NewServer(db, "127.0.0.1:8000").handler()
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", "/up", nil)
+	handler.ServeHTTP(recorder, request)
+
+	if recorder.Result().StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", recorder.Result().StatusCode)
+	}
+	body, _ := io.ReadAll(recorder.Result().Body)
+	if string(body) != "OK" {
+		t.Fatalf("expected body 'OK', got %q", string(body))
+	}
+}
+
+func TestHealthEndpoint_NotAuthGated(t *testing.T) {
+	log.SetOutput(io.Discard)
+	db, _ := storage.New(":memory:")
+	log.SetOutput(os.Stderr)
+
+	srv := NewServer(db, "127.0.0.1:8000")
+	srv.Username = "admin"
+	srv.Password = "secret"
+	srv.SecureCookie = true
+	handler := srv.handler()
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", "/up", nil)
+	handler.ServeHTTP(recorder, request)
+
+	if recorder.Result().StatusCode != 200 {
+		t.Fatalf("health endpoint should not require auth, got %d", recorder.Result().StatusCode)
+	}
+}

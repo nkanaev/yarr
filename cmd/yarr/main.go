@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/nkanaev/yarr/src/platform"
@@ -132,6 +133,16 @@ func main() {
 		log.Fatalf("Both cert & key files are required")
 	}
 
+	secretKeyBase := os.Getenv("SECRET_KEY_BASE")
+	secureCookie := true
+	if disableSSL := os.Getenv("DISABLE_SSL"); disableSSL != "" {
+		if parsed, err := strconv.ParseBool(disableSSL); err != nil {
+			log.Printf("invalid DISABLE_SSL value %q, defaulting to false", disableSSL)
+		} else if parsed {
+			secureCookie = false
+		}
+	}
+
 	store, err := storage.New(db)
 	if err != nil {
 		log.Fatal("Failed to initialise database: ", err)
@@ -153,6 +164,9 @@ func main() {
 		srv.Username = username
 		srv.Password = password
 	}
+
+	srv.SecretKeyBase = secretKeyBase
+	srv.SecureCookie = secureCookie
 
 	log.Printf("starting server at %s", srv.GetAddr())
 	if open {
