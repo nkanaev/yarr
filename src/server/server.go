@@ -27,6 +27,10 @@ type Server struct {
 	// https
 	CertFile string
 	KeyFile  string
+
+	// once
+	SecretKeyBase string
+	SecureCookie  bool
 }
 
 func NewServer(db *storage.Storage, addr string) *Server {
