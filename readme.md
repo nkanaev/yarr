@@ -91,6 +91,33 @@ docker run -d \
   yarr:once
 ```
 
+### pushing to ghcr
+
+To build and push your own image to GitHub Container Registry:
+
+```sh
+# Log in to GHCR
+echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_USERNAME --password-stdin
+
+# Build and tag for GHCR
+docker build -f etc/dockerfile.once -t ghcr.io/YOUR_USERNAME/yarr:once-latest .
+
+# Push
+docker push ghcr.io/YOUR_USERNAME/yarr:once-latest
+```
+
+For multi-arch builds (amd64 + arm64), use Docker Buildx:
+
+```sh
+docker buildx create --use
+docker buildx build -f etc/dockerfile.once \
+  --platform linux/amd64,linux/arm64 \
+  -t ghcr.io/YOUR_USERNAME/yarr:once-latest \
+  --push .
+```
+
+Automated builds are also triggered by GitHub Actions when a version tag (`v*`) is pushed or via manual workflow dispatch.
+
 See more:
 
 * [Building from source code](doc/build.md)
