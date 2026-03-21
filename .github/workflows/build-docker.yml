@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: nkanaev/yarr
+  IMAGE_NAME: sroberts/yarr
 
 jobs:
   build-and-push-image:
