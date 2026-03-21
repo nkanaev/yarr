@@ -54,6 +54,43 @@ Once mounts a persistent volume at `/storage` automatically. The database is sto
 
 The Once image listens on port 80 and includes backup/restore hooks for safe SQLite snapshots. A health check is available at `GET /up`.
 
+### pre-built images
+
+Pre-built multi-arch images (amd64/arm64) are published to GitHub Container Registry:
+
+```sh
+# Once-compatible image (port 80, /storage volume)
+docker pull ghcr.io/sroberts/yarr:once-latest
+
+# Standard image (port 7070, /data volume)
+docker pull ghcr.io/sroberts/yarr:latest
+```
+
+### building the docker image locally
+
+To build the Once-compatible image from source:
+
+```sh
+docker build -f etc/dockerfile.once -t yarr:once .
+```
+
+To build the standard image:
+
+```sh
+docker build -f etc/dockerfile -t yarr .
+```
+
+Run the locally built Once image:
+
+```sh
+docker run -d \
+  -p 8080:80 \
+  -v yarr-data:/storage \
+  -e YARR_AUTH="username:password" \
+  -e DISABLE_SSL="true" \
+  yarr:once
+```
+
 See more:
 
 * [Building from source code](doc/build.md)
