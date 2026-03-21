@@ -29,6 +29,31 @@ Usage instructions:
 
 For self-hosting, see `yarr -h` for auth, tls & server configuration flags.
 
+## deploying with once
+
+yarr is compatible with [Basecamp Once](https://github.com/basecamp/once). To deploy with authentication:
+
+```sh
+docker run -d \
+  -p 80:80 \
+  -v yarr-data:/storage \
+  -e SECRET_KEY_BASE="your-secret-key" \
+  -e YARR_AUTH="username:password" \
+  ghcr.io/sroberts/yarr:once-latest
+```
+
+Once mounts a persistent volume at `/storage` automatically. The database is stored at `/storage/db/yarr.db`.
+
+### environment variables
+
+| Variable | Description |
+|---|---|
+| `YARR_AUTH` | Username and password in `username:password` format |
+| `SECRET_KEY_BASE` | Secret key for session token signing (provided by Once) |
+| `DISABLE_SSL` | Set to `true` when running behind a reverse proxy that handles TLS (set by default in the Once image) |
+
+The Once image listens on port 80 and includes backup/restore hooks for safe SQLite snapshots. A health check is available at `GET /up`.
+
 See more:
 
 * [Building from source code](doc/build.md)
