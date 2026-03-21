@@ -1,12 +1,16 @@
 package server
 
 import (
+	"context"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
+	"time"
 
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/worker"
@@ -78,9 +82,23 @@ func (s *Server) Start() {
 	}
 
 	httpserver := &http.Server{Handler: s.handler()}
+
+	// Graceful shutdown: listen for SIGTERM/SIGINT
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
+
+	go func() {
+		<-ctx.Done()
+		log.Print("shutting down server...")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		if err := httpserver.Shutdown(shutdownCtx); err != nil {
+			log.Printf("shutdown error: %v", err)
+		}
+	}()
+
 	if s.CertFile != "" && s.KeyFile != "" {
 		err = httpserver.ServeTLS(ln, s.CertFile, s.KeyFile)
-		ln.Close()
 	} else {
 		err = httpserver.Serve(ln)
 	}
