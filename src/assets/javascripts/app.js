@@ -356,6 +356,13 @@ var vm = new Vue({
           title += ' ('+unreadCount+')'
         }
         document.title = title
+        if ('setAppBadge' in navigator) {
+          if (unreadCount) {
+            navigator.setAppBadge(unreadCount)
+          } else {
+            navigator.clearAppBadge()
+          }
+        }
         this.computeStats()
       }, 500),
     },
@@ -844,3 +851,70 @@ if ('serviceWorker' in navigator) {
     console.log('SW registration failed:', err);
   });
 }
+
+// Offline indicator
+(function() {
+  var banner = document.createElement('div')
+  banner.className = 'offline-banner'
+  banner.textContent = 'You\u2019re offline'
+  document.body.appendChild(banner)
+
+  function update() {
+    banner.classList.toggle('visible', !navigator.onLine)
+  }
+  window.addEventListener('online', update)
+  window.addEventListener('offline', update)
+  update()
+})();
+
+// Pull-to-refresh on feed list (mobile/tablet)
+(function() {
+  var scroll = document.getElementById('feed-list-scroll')
+  if (!scroll) return
+
+  var indicator = document.createElement('div')
+  indicator.className = 'pull-to-refresh'
+  var spinner = document.createElement('div')
+  spinner.className = 'pull-to-refresh-spinner'
+  indicator.appendChild(spinner)
+  scroll.parentNode.insertBefore(indicator, scroll)
+
+  var startY = 0
+  var pulling = false
+  var threshold = 60
+
+  scroll.addEventListener('touchstart', function(e) {
+    if (scroll.scrollTop === 0 && e.touches.length === 1) {
+      startY = e.touches[0].clientY
+      pulling = true
+    }
+  }, {passive: true})
+
+  scroll.addEventListener('touchmove', function(e) {
+    if (!pulling) return
+    var dy = e.touches[0].clientY - startY
+    if (dy < 0) { pulling = false; return }
+    var progress = Math.min(dy / threshold, 1)
+    indicator.style.height = (progress * 40) + 'px'
+    indicator.style.opacity = progress
+    if (progress >= 1) {
+      indicator.classList.add('ready')
+    } else {
+      indicator.classList.remove('ready')
+    }
+  }, {passive: true})
+
+  scroll.addEventListener('touchend', function() {
+    if (!pulling) return
+    pulling = false
+    var wasReady = indicator.classList.contains('ready')
+    indicator.classList.remove('ready')
+    indicator.style.height = '0'
+    indicator.style.opacity = '0'
+    if (wasReady && !vm.loading.feeds) {
+      api.feeds.refresh().then(function() {
+        vm.refreshStats()
+      })
+    }
+  })
+})();

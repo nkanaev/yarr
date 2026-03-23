@@ -530,6 +530,70 @@ a,
   border-color: #1a1a1a;
 }
 
+.theme-night .offline-banner {
+  background-color: #c0392b;
+}
+
+.theme-night .pull-to-refresh-spinner {
+  border-color: #555;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+/* offline banner */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #e74c3c;
+  color: #fff;
+  text-align: center;
+  padding: .375rem;
+  font-size: .8rem;
+  font-weight: 600;
+  transform: translateY(-100%);
+  transition: transform .3s ease;
+  pointer-events: none;
+}
+
+.offline-banner.visible {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@supports (padding: env(safe-area-inset-top)) {
+  .offline-banner.visible {
+    padding-top: calc(.375rem + env(safe-area-inset-top));
+  }
+}
+
+/* pull-to-refresh */
+.pull-to-refresh {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height .2s ease, opacity .2s ease;
+  flex-shrink: 0;
+}
+
+.pull-to-refresh-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: .15rem solid #6c757d;
+  border-radius: 50%;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+.pull-to-refresh.ready .pull-to-refresh-spinner {
+  animation: rotate .5s infinite linear;
+}
+
 /* animation */
 .indicator-enter-active, .indicator-leave-active {
   transition: all .3s;
