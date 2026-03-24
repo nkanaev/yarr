@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -34,7 +35,7 @@ func (s *Server) handler() http.Handler {
 			BasePath: s.BasePath,
 			Username: s.Username,
 			Password: s.Password,
-			Public:   []string{"/static", "/fever", "/manifest.json", "/up"},
+			Public:   []string{"/static", "/fever", "/manifest.json", "/sw.js", "/up"},
 			DB:            s.db,
 			SecretKeyBase: s.SecretKeyBase,
 			SecureCookie:  s.SecureCookie,
@@ -45,6 +46,7 @@ func (s *Server) handler() http.Handler {
 	r.For("/up", s.handleHealth)
 	r.For("/", s.handleIndex)
 	r.For("/manifest.json", s.handleManifest)
+	r.For("/sw.js", s.handleServiceWorker)
 	r.For("/static/*path", s.handleStatic)
 	r.For("/api/status", s.handleStatus)
 	r.For("/api/folders", s.handleFolderList)
@@ -84,21 +86,61 @@ func (s *Server) handleStatic(c *router.Context) {
 }
 
 func (s *Server) handleManifest(c *router.Context) {
+	startURL := "/" + strings.TrimPrefix(s.BasePath, "/")
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"$schema":     "https://json.schemastore.org/web-manifest-combined.json",
-		"name":        "yarr!",
-		"short_name":  "yarr",
-		"description": "yet another rss reader",
-		"display":     "standalone",
-		"start_url":   "/" + strings.TrimPrefix(s.BasePath, "/"),
+		"$schema":          "https://json.schemastore.org/web-manifest-combined.json",
+		"name":             "yarr!",
+		"short_name":       "yarr",
+		"description":      "yet another rss reader",
+		"display":          "standalone",
+		"start_url":        startURL,
+		"scope":            startURL,
+		"background_color": "#1a1a2e",
+		"theme_color":      "#ffffff",
+		"categories":       []string{"news", "productivity"},
 		"icons": []map[string]interface{}{
+			{
+				"src":   s.BasePath + "/static/graphicarts/favicon.svg",
+				"sizes": "any",
+				"type":  "image/svg+xml",
+			},
 			{
 				"src":   s.BasePath + "/static/graphicarts/favicon.png",
 				"sizes": "64x64",
 				"type":  "image/png",
 			},
+			{
+				"src":     s.BasePath + "/static/graphicarts/icon-192.png",
+				"sizes":   "192x192",
+				"type":    "image/png",
+				"purpose": "any",
+			},
+			{
+				"src":     s.BasePath + "/static/graphicarts/icon-512.png",
+				"sizes":   "512x512",
+				"type":    "image/png",
+				"purpose": "any",
+			},
+			{
+				"src":   s.BasePath + "/static/graphicarts/apple-touch-icon.png",
+				"sizes": "180x180",
+				"type":  "image/png",
+			},
 		},
 	})
+}
+
+func (s *Server) handleServiceWorker(c *router.Context) {
+	f, err := assets.FS.Open("sw.js")
+	if err != nil {
+		c.Out.WriteHeader(http.StatusNotFound)
+		return
+	}
+	defer f.Close()
+	c.Out.Header().Set("Content-Type", "application/javascript")
+	c.Out.Header().Set("Service-Worker-Allowed", s.BasePath+"/")
+	c.Out.Header().Set("Cache-Control", "no-cache")
+	io.Copy(c.Out, f)
 }
 
 func (s *Server) handleStatus(c *router.Context) {

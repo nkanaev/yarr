@@ -10,6 +10,16 @@ body {
   overscroll-behavior: none;
 }
 
+/* PWA standalone: safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 /* bootstrap customizations */
 
 .btn-link {
@@ -102,6 +112,7 @@ select.form-control:not([multiple]):not([size]) {
 
 .scroll-touch {
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* custom elements */
@@ -259,6 +270,23 @@ select.form-control:not([multiple]):not([size]) {
 
 .btn-outline:hover {
   background-color: #f8f9fa;
+}
+
+/* column dividers: border starts below the toolbar, not at window top */
+#col-feed-list,
+#col-item-list {
+  border-right: 1px solid;
+  border-image: linear-gradient(to bottom, transparent 2rem, #dee2e6 2rem) 1;
+}
+
+.theme-sepia #col-feed-list,
+.theme-sepia #col-item-list {
+  border-image: linear-gradient(to bottom, transparent 2rem, #e0d6ba 2rem) 1;
+}
+
+.theme-night #col-feed-list,
+.theme-night #col-item-list {
+  border-image: linear-gradient(to bottom, transparent 2rem, #1a1a1a 2rem) 1;
 }
 
 .toolbar {
@@ -519,6 +547,70 @@ a,
   border-color: #1a1a1a;
 }
 
+.theme-night .offline-banner {
+  background-color: #c0392b;
+}
+
+.theme-night .pull-to-refresh-spinner {
+  border-color: #555;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+/* offline banner */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #e74c3c;
+  color: #fff;
+  text-align: center;
+  padding: .375rem;
+  font-size: .8rem;
+  font-weight: 600;
+  transform: translateY(-100%);
+  transition: transform .3s ease;
+  pointer-events: none;
+}
+
+.offline-banner.visible {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@supports (padding: env(safe-area-inset-top)) {
+  .offline-banner.visible {
+    padding-top: calc(.375rem + env(safe-area-inset-top));
+  }
+}
+
+/* pull-to-refresh */
+.pull-to-refresh {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height .2s ease, opacity .2s ease;
+  flex-shrink: 0;
+}
+
+.pull-to-refresh-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: .15rem solid #6c757d;
+  border-radius: 50%;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+.pull-to-refresh.ready .pull-to-refresh-spinner {
+  animation: rotate .5s infinite linear;
+}
+
 /* animation */
 .indicator-enter-active, .indicator-leave-active {
   transition: all .3s;
@@ -527,6 +619,29 @@ a,
   width: 0;
   opacity: 0;
   margin: 0 !important;
+}
+
+/* PWA standalone: use dynamic viewport height where supported */
+@supports (height: 100dvh) {
+  .vh-100 {
+    height: 100dvh !important;
+  }
+}
+
+/* PWA standalone: prevent text selection on app chrome, allow in content */
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .content, .content * {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  .form-control, .toolbar-search {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 }
 
 /* responsive layout
@@ -547,6 +662,7 @@ a,
   }
   #app #col-item-list {
     width: 65% !important;
+    border-image: none !important;
     border-right-width: 0 !important;
   }
   #app #col-item {
@@ -567,11 +683,13 @@ a,
 @media (max-width: 767.98px) {
   #app #col-feed-list {
     width: 100% !important;
+    border-image: none !important;
     border-right-width: 0 !important;
   }
   #app #col-item-list {
     width: 100% !important;
     display: none !important;
+    border-image: none !important;
     border-right-width: 0 !important;
   }
   #app #col-item {
@@ -607,8 +725,32 @@ a,
     min-height: 3rem !important;
     max-height: 3rem !important;
   }
+  #col-feed-list,
+  #col-item-list {
+    border-image: linear-gradient(to bottom, transparent 3rem, #dee2e6 3rem) 1;
+  }
+  .theme-sepia #col-feed-list,
+  .theme-sepia #col-item-list {
+    border-image: linear-gradient(to bottom, transparent 3rem, #e0d6ba 3rem) 1;
+  }
+  .theme-night #col-feed-list,
+  .theme-night #col-item-list {
+    border-image: linear-gradient(to bottom, transparent 3rem, #1a1a1a 3rem) 1;
+  }
   .toolbar-item,
   .toolbar-search {
     padding: .5rem;
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .selectgroup-label {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .dropdown-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
 }
