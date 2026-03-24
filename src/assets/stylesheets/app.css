@@ -272,6 +272,23 @@ select.form-control:not([multiple]):not([size]) {
   background-color: #f8f9fa;
 }
 
+/* column dividers: border starts below the toolbar, not at window top */
+#col-feed-list,
+#col-item-list {
+  border-right: 1px solid;
+  border-image: linear-gradient(to bottom, transparent 2rem, #dee2e6 2rem) 1;
+}
+
+.theme-sepia #col-feed-list,
+.theme-sepia #col-item-list {
+  border-image: linear-gradient(to bottom, transparent 2rem, #e0d6ba 2rem) 1;
+}
+
+.theme-night #col-feed-list,
+.theme-night #col-item-list {
+  border-image: linear-gradient(to bottom, transparent 2rem, #1a1a1a 2rem) 1;
+}
+
 .toolbar {
   min-height: 2rem !important;
   max-height: 2rem !important;
@@ -645,6 +662,7 @@ a,
   }
   #app #col-item-list {
     width: 65% !important;
+    border-image: none !important;
     border-right-width: 0 !important;
   }
   #app #col-item {
@@ -665,11 +683,13 @@ a,
 @media (max-width: 767.98px) {
   #app #col-feed-list {
     width: 100% !important;
+    border-image: none !important;
     border-right-width: 0 !important;
   }
   #app #col-item-list {
     width: 100% !important;
     display: none !important;
+    border-image: none !important;
     border-right-width: 0 !important;
   }
   #app #col-item {
@@ -704,6 +724,18 @@ a,
   .toolbar {
     min-height: 3rem !important;
     max-height: 3rem !important;
+  }
+  #col-feed-list,
+  #col-item-list {
+    border-image: linear-gradient(to bottom, transparent 3rem, #dee2e6 3rem) 1;
+  }
+  .theme-sepia #col-feed-list,
+  .theme-sepia #col-item-list {
+    border-image: linear-gradient(to bottom, transparent 3rem, #e0d6ba 3rem) 1;
+  }
+  .theme-night #col-feed-list,
+  .theme-night #col-item-list {
+    border-image: linear-gradient(to bottom, transparent 3rem, #1a1a1a 3rem) 1;
   }
   .toolbar-item,
   .toolbar-search {
