@@ -242,6 +242,7 @@ var vm = new Vue({
         'newfeed': false,
         'items': false,
         'readability': false,
+        'instapaper': false,
       },
       'fonts': ['', 'serif', 'monospace'],
       'feedStats': {},
@@ -259,6 +260,8 @@ var vm = new Vue({
       'authenticated': app.authenticated,
       'feed_errors': {},
 
+      'instapaperUsername': s.instapaper_username || '',
+      'instapaperPassword': s.instapaper_password || '',
       'refreshRateOptions': [
         { title: "0", value: 0 },
         { title: "10m", value: 10 },
@@ -699,6 +702,42 @@ var vm = new Vue({
           vm.loading.readability = false
         })
       }
+    },
+    saveToInstapaper: function(item) {
+      if (!item || !item.link || item.instapaper_saved) return
+      this.loading.instapaper = true
+      api.items.saveToInstapaper(item.id).then(function(resp) {
+        vm.loading.instapaper = false
+        if (!resp.ok) {
+          return resp.json().then(function(data) {
+            alert(data.error || 'Failed to save to Instapaper')
+          })
+        }
+        return resp.json().then(function(data) {
+          vm.itemSelectedDetails.instapaper_saved = true
+          vm.itemSelectedDetails.status = 'read'
+          var itemInList = vm.items.find(function(i) { return i.id == item.id })
+          if (itemInList) {
+            itemInList.status = 'read'
+            itemInList.instapaper_saved = true
+          }
+          if (vm.feedStats[item.feed_id]) {
+            var stat = vm.feedStats[item.feed_id]
+            if (item.status == 'unread' && stat.unread > 0) {
+              stat.unread -= 1
+            }
+          }
+        })
+      }.bind(this))
+    },
+    updateInstapaperCredentials: function(key, value) {
+      if (key === 'instapaper_username') this.instapaperUsername = value
+      if (key === 'instapaper_password') this.instapaperPassword = value
+      var update = {}
+      update[key] = value
+      update['instapaper_oauth_token'] = ''
+      update['instapaper_oauth_secret'] = ''
+      api.settings.update(update)
     },
     showSettings: function(settings) {
       this.settings = settings

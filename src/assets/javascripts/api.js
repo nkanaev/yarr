@@ -83,6 +83,9 @@
       mark_read: function(query) {
         return api('put', './api/items' + param(query))
       },
+      saveToInstapaper: function(id) {
+        return api('post', './api/items/' + id + '/instapaper')
+      },
     },
     settings: {
       get: function() {

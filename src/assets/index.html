@@ -108,6 +108,20 @@
                         <button class="dropdown-item px-0" :aria-pressed="!itemSortNewestFirst" :class="{active: !itemSortNewestFirst}" @click.stop="itemSortNewestFirst=false">Old</button>
                     </div>
                     <div class="dropdown-divider"></div>
+                    <header class="dropdown-header" role="heading" aria-level="2">Instapaper</header>
+                    <div class="px-3 py-1">
+                        <input type="text"
+                               class="form-control form-control-sm mb-1"
+                               placeholder="Username or email"
+                               :value="instapaperUsername"
+                               @change="updateInstapaperCredentials('instapaper_username', $event.target.value)">
+                        <input type="password"
+                               class="form-control form-control-sm"
+                               placeholder="Password"
+                               :value="instapaperPassword"
+                               @change="updateInstapaperCredentials('instapaper_password', $event.target.value)">
+                    </div>
+                    <div class="dropdown-divider"></div>
                     <header class="dropdown-header" role="heading" aria-level="2">Subscriptions</header>
                     <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
                         <input type="file"
@@ -340,6 +354,16 @@
                         title="Read Here">
                     <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
                 </button>
+                <button class="toolbar-item"
+                        :class="{active: itemSelectedDetails.instapaper_saved}"
+                        :disabled="itemSelectedDetails.instapaper_saved || loading.instapaper"
+                        @click="saveToInstapaper(itemSelectedDetails)"
+                        title="Save to Instapaper">
+                    <span class="icon" :class="{'icon-loading': loading.instapaper}">
+                        <template v-if="itemSelectedDetails.instapaper_saved">{% inline "check.svg" %}</template>
+                        <template v-else>{% inline "inbox.svg" %}</template>
+                    </span>
+                </button>
                 <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
@@ -436,6 +460,7 @@
                     <tr><td><kbd>s</kbd></td>               <td>mark starred / unstarred</td></tr>
                     <tr><td><kbd>o</kbd></td>               <td>open link</td></tr>
                     <tr><td><kbd>i</kbd></td>               <td>read here</td> </tr>
+                    <tr><td><kbd>I</kbd></td>               <td>save to Instapaper</td></tr>
                     <tr><td><kbd>f</kbd> <kbd>b</kbd></td>  <td>scroll content forward / backward</td>
                     </tr>
                 </table>
