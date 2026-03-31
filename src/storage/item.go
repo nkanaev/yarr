@@ -77,7 +77,8 @@ type Item struct {
 	Content    string     `json:"content,omitempty"`
 	Date       time.Time  `json:"date"`
 	Status     ItemStatus `json:"status"`
-	MediaLinks MediaLinks `json:"media_links"`
+	MediaLinks      MediaLinks `json:"media_links"`
+	InstapaperSaved bool       `json:"instapaper_saved"`
 }
 
 type ItemFilter struct {
@@ -258,7 +259,7 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 		order = "i.id desc"
 	}
 
-	selectCols := "i.id, i.guid, i.feed_id, i.title, i.link, i.date, i.status, i.media_links"
+	selectCols := "i.id, i.guid, i.feed_id, i.title, i.link, i.date, i.status, i.media_links, i.instapaper_saved"
 	if withContent {
 		selectCols += ", i.content"
 	} else {
@@ -281,7 +282,7 @@ func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, with
 		err = rows.Scan(
 			&x.Id, &x.GUID, &x.FeedId,
 			&x.Title, &x.Link, &x.Date,
-			&x.Status, &x.MediaLinks, &x.Content,
+			&x.Status, &x.MediaLinks, &x.InstapaperSaved, &x.Content,
 		)
 		if err != nil {
 			log.Print(err)
@@ -297,18 +298,23 @@ func (s *Storage) GetItem(id int64) *Item {
 	err := s.db.QueryRow(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
-			i.date, i.status, i.media_links
+			i.date, i.status, i.media_links, i.instapaper_saved
 		from items i
 		where i.id = ?
 	`, id).Scan(
 		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
-		&i.Date, &i.Status, &i.MediaLinks,
+		&i.Date, &i.Status, &i.MediaLinks, &i.InstapaperSaved,
 	)
 	if err != nil {
 		log.Print(err)
 		return nil
 	}
 	return i
+}
+
+func (s *Storage) SetItemInstapaperSaved(id int64, saved bool) bool {
+	_, err := s.db.Exec(`update items set instapaper_saved = ? where id = ?`, saved, id)
+	return err == nil
 }
 
 func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
