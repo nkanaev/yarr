@@ -168,6 +168,9 @@ func main() {
 	srv.SecretKeyBase = secretKeyBase
 	srv.SecureCookie = secureCookie
 
+	srv.InstapaperClientKey = os.Getenv("INSTAPAPER_CLIENT_KEY")
+	srv.InstapaperClientSecret = os.Getenv("INSTAPAPER_CLIENT_SECRET")
+
 	log.Printf("starting server at %s", srv.GetAddr())
 	if open {
 		platform.Open(srv.GetAddr())
