@@ -57,6 +57,7 @@ func (s *Server) handler() http.Handler {
 	r.For("/api/feeds/:id/icon", s.handleFeedIcon)
 	r.For("/api/feeds/:id", s.handleFeed)
 	r.For("/api/items", s.handleItemList)
+	r.For("/api/items/:id/instapaper", s.handleItemInstapaper)
 	r.For("/api/items/:id", s.handleItem)
 	r.For("/api/settings", s.handleSettings)
 	r.For("/opml/import", s.handleOPMLImport)
@@ -450,6 +451,104 @@ func (s *Server) handleItemList(c *router.Context) {
 	} else {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+func (s *Server) handleItemInstapaper(c *router.Context) {
+	if c.Req.Method != "POST" {
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	if s.InstapaperClientKey == "" || s.InstapaperClientSecret == "" {
+		c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Instapaper client key/secret not configured. Set INSTAPAPER_CLIENT_KEY and INSTAPAPER_CLIENT_SECRET environment variables.",
+		})
+		return
+	}
+
+	id, err := c.VarInt64("id")
+	if err != nil {
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	item := s.db.GetItem(id)
+	if item == nil {
+		c.Out.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// Get Instapaper credentials from settings
+	username, _ := s.db.GetSettingsValue("instapaper_username").(string)
+	password, _ := s.db.GetSettingsValue("instapaper_password").(string)
+	if username == "" || password == "" {
+		c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Instapaper credentials not configured. Add your username and password in Settings.",
+		})
+		return
+	}
+
+	client := &InstapaperClient{
+		ConsumerKey:    s.InstapaperClientKey,
+		ConsumerSecret: s.InstapaperClientSecret,
+	}
+
+	// Get or create OAuth token
+	oauthToken, _ := s.db.GetSettingsValue("instapaper_oauth_token").(string)
+	oauthSecret, _ := s.db.GetSettingsValue("instapaper_oauth_secret").(string)
+	if oauthToken == "" {
+		oauthToken, oauthSecret, err = client.GetAccessToken(username, password)
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusUnauthorized, map[string]string{
+				"error": "Instapaper authentication failed. Check your username and password.",
+			})
+			return
+		}
+		s.db.UpdateSettings(map[string]interface{}{
+			"instapaper_oauth_token":  oauthToken,
+			"instapaper_oauth_secret": oauthSecret,
+		})
+	}
+
+	// Save bookmark
+	err = client.AddBookmark(oauthToken, oauthSecret, item.Link, item.Title)
+	if err != nil {
+		// Token may be stale — clear and retry once
+		log.Printf("instapaper save failed, retrying with fresh token: %v", err)
+		s.db.UpdateSettings(map[string]interface{}{
+			"instapaper_oauth_token":  "",
+			"instapaper_oauth_secret": "",
+		})
+		oauthToken, oauthSecret, err = client.GetAccessToken(username, password)
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusUnauthorized, map[string]string{
+				"error": "Instapaper authentication failed. Check your username and password.",
+			})
+			return
+		}
+		s.db.UpdateSettings(map[string]interface{}{
+			"instapaper_oauth_token":  oauthToken,
+			"instapaper_oauth_secret": oauthSecret,
+		})
+		err = client.AddBookmark(oauthToken, oauthSecret, item.Link, item.Title)
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusBadGateway, map[string]string{
+				"error": "Failed to save to Instapaper: " + err.Error(),
+			})
+			return
+		}
+	}
+
+	// Update item state
+	s.db.SetItemInstapaperSaved(id, true)
+	s.db.UpdateItemStatus(id, storage.READ)
+
+	// Return updated item
+	updatedItem := s.db.GetItem(id)
+	c.JSON(http.StatusOK, updatedItem)
 }
 
 func (s *Server) handleSettings(c *router.Context) {
