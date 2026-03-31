@@ -18,6 +18,7 @@ var migrations = []func(*sql.Tx) error{
 	m08_normalize_datetime,
 	m09_change_item_index,
 	m10_add_item_medialinks,
+	m11_add_instapaper_saved,
 }
 
 var maxVersion = int64(len(migrations))
@@ -327,5 +328,10 @@ func m10_add_item_medialinks(tx *sql.Tx) error {
 		alter table items drop column podcast_url;
 	`
 	_, err := tx.Exec(sql)
+	return err
+}
+
+func m11_add_instapaper_saved(tx *sql.Tx) error {
+	_, err := tx.Exec(`alter table items add column instapaper_saved boolean not null default 0`)
 	return err
 }
