@@ -35,10 +35,6 @@ type Server struct {
 	// once
 	SecretKeyBase string
 	SecureCookie  bool
-
-	// instapaper
-	InstapaperClientKey    string
-	InstapaperClientSecret string
 }
 
 func NewServer(db *storage.Storage, addr string) *Server {

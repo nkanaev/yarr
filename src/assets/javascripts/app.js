@@ -738,8 +738,6 @@ var vm = new Vue({
       if (key === 'instapaper_password') this.instapaperPassword = value
       var update = {}
       update[key] = value
-      update['instapaper_oauth_token'] = ''
-      update['instapaper_oauth_secret'] = ''
       api.settings.update(update)
     },
     showSettings: function(settings) {
