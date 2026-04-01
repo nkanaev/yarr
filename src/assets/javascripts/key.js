@@ -39,6 +39,11 @@ var shortcutFunctions = {
       vm.toggleItemStarred(vm.itemSelectedDetails)
     }
   },
+  saveToInstapaper: function() {
+    if (vm.itemSelected != null) {
+      vm.saveToInstapaper(vm.itemSelectedDetails)
+    }
+  },
   focusSearch: function() {
     document.getElementById("searchbar").focus()
   },
@@ -81,6 +86,7 @@ var keybindings = {
   "r": shortcutFunctions.toggleItemRead,
   "R": shortcutFunctions.markAllRead,
   "s": shortcutFunctions.toggleItemStarred,
+  "I": shortcutFunctions.saveToInstapaper,
   "/": shortcutFunctions.focusSearch,
   "j": shortcutFunctions.nextItem,
   "k": shortcutFunctions.previousItem,
