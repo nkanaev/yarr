@@ -728,7 +728,10 @@ var vm = new Vue({
             }
           }
         })
-      }.bind(this))
+      }.bind(this)).catch(function() {
+        vm.loading.instapaper = false
+        alert('Failed to save to Instapaper. Check your connection.')
+      })
     },
     updateInstapaperCredentials: function(key, value) {
       if (key === 'instapaper_username') this.instapaperUsername = value

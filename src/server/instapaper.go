@@ -122,7 +122,8 @@ func (c *InstapaperClient) GetAccessToken(username, password string) (token, sec
 	return vals.Get("oauth_token"), vals.Get("oauth_token_secret"), nil
 }
 
-func (c *InstapaperClient) AddBookmark(oauthToken, oauthTokenSecret, articleURL, title string) error {
+// AddBookmark saves a URL to Instapaper. Returns the HTTP status code and any error.
+func (c *InstapaperClient) AddBookmark(oauthToken, oauthTokenSecret, articleURL, title string) (int, error) {
 	extra := map[string]string{
 		"url": articleURL,
 	}
@@ -132,14 +133,14 @@ func (c *InstapaperClient) AddBookmark(oauthToken, oauthTokenSecret, articleURL,
 
 	resp, err := c.signedRequest("POST", instapaperAddBookmarkURL, extra, oauthToken, oauthTokenSecret)
 	if err != nil {
-		return fmt.Errorf("instapaper add bookmark failed: %w", err)
+		return 0, fmt.Errorf("instapaper add bookmark failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("instapaper add bookmark rejected (status %d): %s", resp.StatusCode, string(body))
+		return resp.StatusCode, fmt.Errorf("instapaper add bookmark rejected (status %d): %s", resp.StatusCode, string(body))
 	}
 
-	return nil
+	return resp.StatusCode, nil
 }

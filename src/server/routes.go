@@ -512,10 +512,10 @@ func (s *Server) handleItemInstapaper(c *router.Context) {
 	}
 
 	// Save bookmark
-	err = client.AddBookmark(oauthToken, oauthSecret, item.Link, item.Title)
-	if err != nil {
-		// Token may be stale — clear and retry once
-		log.Printf("instapaper save failed, retrying with fresh token: %v", err)
+	statusCode, err := client.AddBookmark(oauthToken, oauthSecret, item.Link, item.Title)
+	if err != nil && statusCode == http.StatusUnauthorized {
+		// Token is stale — clear and retry once with fresh token
+		log.Printf("instapaper save got 401, retrying with fresh token: %v", err)
 		s.db.UpdateSettings(map[string]interface{}{
 			"instapaper_oauth_token":  "",
 			"instapaper_oauth_secret": "",
@@ -532,14 +532,14 @@ func (s *Server) handleItemInstapaper(c *router.Context) {
 			"instapaper_oauth_token":  oauthToken,
 			"instapaper_oauth_secret": oauthSecret,
 		})
-		err = client.AddBookmark(oauthToken, oauthSecret, item.Link, item.Title)
-		if err != nil {
-			log.Print(err)
-			c.JSON(http.StatusBadGateway, map[string]string{
-				"error": "Failed to save to Instapaper: " + err.Error(),
-			})
-			return
-		}
+		statusCode, err = client.AddBookmark(oauthToken, oauthSecret, item.Link, item.Title)
+	}
+	if err != nil {
+		log.Print(err)
+		c.JSON(http.StatusBadGateway, map[string]string{
+			"error": "Failed to save to Instapaper.",
+		})
+		return
 	}
 
 	// Update item state
