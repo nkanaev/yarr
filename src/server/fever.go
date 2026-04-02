@@ -375,7 +375,10 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 		if c.Req.Form.Get("as") != "read" {
 			c.Out.WriteHeader(http.StatusBadRequest)
 		}
-		markFilter := storage.MarkFilter{FolderID: &id}
+		markFilter := storage.MarkFilter{}
+		if id > 0 {
+			markFilter.FolderID = &id
+		} 
 		x, _ := strconv.ParseInt(c.Req.Form.Get("before"), 10, 64)
 		if x > 0 {
 			before := time.Unix(x, 0).UTC()
