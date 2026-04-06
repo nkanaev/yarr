@@ -1,0 +1,21 @@
+services:
+  yarr:
+    build: .
+    ports:
+      - "7070:7070"
+    volumes:
+      - yarr-data:/data
+    environment:
+      - OLLAMA_URL=192.168.88.155:11434
+      - EMBED_MODEL=${EMBED_MODEL:-nomic-embed-text}
+      - CHAT_MODEL=${CHAT_MODEL:-deepseek-r1:7b}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GROK_API_KEY=${GROK_API_KEY:-}
+      - EMBED_PROVIDER=${EMBED_PROVIDER:-auto}
+      - LLM_PROVIDER=${LLM_PROVIDER:-auto}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  yarr-data:

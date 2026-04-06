@@ -8,3 +8,7 @@
 *.syso
 versioninfo.rc
 .DS_Store
+.env
+ai/.venv/
+data/
+__pycache__/
