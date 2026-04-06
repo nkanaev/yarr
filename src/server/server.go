@@ -27,6 +27,8 @@ type Server struct {
 	// https
 	CertFile string
 	KeyFile  string
+	// ai service
+	AiServiceURL string
 }
 
 func NewServer(db *storage.Storage, addr string) *Server {
@@ -48,6 +50,8 @@ func (h *Server) GetAddr() string {
 }
 
 func (s *Server) Start() {
+	s.worker.AiServiceURL = s.AiServiceURL
+
 	refreshRate := s.db.GetSettingsValueInt64("refresh_rate")
 	s.worker.FindFavicons()
 	s.worker.StartFeedCleaner()

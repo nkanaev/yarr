@@ -1,7 +1,10 @@
 package worker
 
 import (
+	"bytes"
+	"encoding/json"
 	"log"
+	"net/http"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -12,11 +15,12 @@ import (
 const NUM_WORKERS = 4
 
 type Worker struct {
-	db      *storage.Storage
-	pending *int32
-	refresh *time.Ticker
-	reflock sync.Mutex
-	stopper chan bool
+	db           *storage.Storage
+	pending      *int32
+	refresh      *time.Ticker
+	reflock      sync.Mutex
+	stopper      chan bool
+	AiServiceURL string
 }
 
 func NewWorker(db *storage.Storage) *Worker {
@@ -120,11 +124,13 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 	for _, feed := range feeds {
 		srcqueue <- feed
 	}
+	var updatedFeedIds []int64
 	for i := 0; i < len(feeds); i++ {
 		items := <-dstqueue
 		if len(items) > 0 {
 			w.db.CreateItems(items)
 			w.db.SetFeedSize(items[0].FeedId, len(items))
+			updatedFeedIds = append(updatedFeedIds, items[0].FeedId)
 		}
 		atomic.AddInt32(w.pending, -1)
 		w.db.SyncSearch()
@@ -133,6 +139,29 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 	close(dstqueue)
 
 	log.Printf("Finished refreshing %d feeds", len(feeds))
+
+	if len(updatedFeedIds) > 0 {
+		go w.notifyAiService(updatedFeedIds)
+	}
+}
+
+func (w *Worker) notifyAiService(feedIds []int64) {
+	if w.AiServiceURL == "" {
+		return
+	}
+	body, err := json.Marshal(map[string]interface{}{"feed_ids": feedIds})
+	if err != nil {
+		log.Printf("AI webhook: marshal error: %v", err)
+		return
+	}
+	url := w.AiServiceURL + "/index-feeds"
+	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
+	if err != nil {
+		log.Printf("AI webhook: %v", err)
+		return
+	}
+	resp.Body.Close()
+	log.Printf("AI webhook: notified about %d feeds (status %d)", len(feedIds), resp.StatusCode)
 }
 
 func (w *Worker) worker(srcqueue <-chan storage.Feed, dstqueue chan<- []storage.Item) {

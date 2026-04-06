@@ -48,7 +48,7 @@ func parseAuthfile(authfile io.Reader) (username, password string, err error) {
 func main() {
 	platform.FixConsoleIfNeeded()
 
-	var addr, db, authfile, auth, certfile, keyfile, basepath, logfile string
+	var addr, db, authfile, auth, certfile, keyfile, basepath, logfile, aiURL string
 	var ver, open bool
 
 	flag.CommandLine.SetOutput(os.Stdout)
@@ -69,6 +69,7 @@ func main() {
 	flag.StringVar(&keyfile, "key-file", opt("YARR_KEYFILE", ""), "`path` to key file for https")
 	flag.StringVar(&db, "db", opt("YARR_DB", ""), "storage file `path`")
 	flag.StringVar(&logfile, "log-file", opt("YARR_LOGFILE", ""), "`path` to log file to use instead of stdout")
+	flag.StringVar(&aiURL, "ai-url", opt("YARR_AI_URL", ""), "URL of AI service (e.g. http://localhost:8484)")
 	flag.BoolVar(&ver, "version", false, "print application version")
 	flag.BoolVar(&open, "open", false, "open the server in browser")
 	flag.Parse()
@@ -152,6 +153,11 @@ func main() {
 	if username != "" && password != "" {
 		srv.Username = username
 		srv.Password = password
+	}
+
+	if aiURL != "" {
+		srv.AiServiceURL = aiURL
+		log.Printf("AI service: %s", aiURL)
 	}
 
 	log.Printf("starting server at %s", srv.GetAddr())
