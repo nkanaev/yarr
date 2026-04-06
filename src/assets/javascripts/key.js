@@ -1,138 +1,169 @@
-var helperFunctions = {
-  scrollContent: function(direction) {
-    var padding = 40
-    var scroll = document.querySelector('.content')
-    if (!scroll) return
+'use strict';
 
-    var height = scroll.getBoundingClientRect().height
-    var newpos = scroll.scrollTop + (height - padding) * direction
+// Keyboard shortcuts for yarr (HTMX version)
+// No dependency on Vue — operates directly on DOM + HTMX
 
-    if (typeof scroll.scrollTo == 'function') {
-      scroll.scrollTo({top: newpos, left: 0, behavior: 'smooth'})
+(function() {
+
+  function scrollContent(direction) {
+    var scroll = document.getElementById('article-content-scroll');
+    if (!scroll) return;
+    var height = scroll.getBoundingClientRect().height;
+    var padding = 40;
+    var newpos = scroll.scrollTop + (height - padding) * direction;
+    if (typeof scroll.scrollTo === 'function') {
+      scroll.scrollTo({ top: newpos, left: 0, behavior: 'smooth' });
     } else {
-      scroll.scrollTop = newpos
+      scroll.scrollTop = newpos;
     }
   }
-}
-var shortcutFunctions = {
-  openItemLink: function() {
-    if (vm.itemSelectedDetails && vm.itemSelectedDetails.link) {
-      window.open(vm.itemSelectedDetails.link, '_blank', 'noopener,noreferrer')
-    }
-  },
-  toggleReadability: function() {
-    vm.toggleReadability()
-  },
-  toggleItemRead: function() {
-    if (vm.itemSelected != null) {
-      vm.toggleItemRead(vm.itemSelectedDetails)
-    }
-  },
-  markAllRead: function() {
-    // same condition as 'Mark all read button'
-    if (vm.filterSelected == 'unread'){
-      vm.markItemsRead()
-    }
-  },
-  toggleItemStarred: function() {
-    if (vm.itemSelected != null) {
-      vm.toggleItemStarred(vm.itemSelectedDetails)
-    }
-  },
-  focusSearch: function() {
-    document.getElementById("searchbar").focus()
-  },
-  nextItem(){
-    vm.navigateToItem(+1)
-  },
-  previousItem() {
-    vm.navigateToItem(-1)
-  },
-  nextFeed(){
-    vm.navigateToFeed(+1)
-  },
-  previousFeed() {
-    vm.navigateToFeed(-1)
-  },
-  scrollForward: function() {
-    helperFunctions.scrollContent(+1)
-  },
-  scrollBackward: function() {
-    helperFunctions.scrollContent(-1)
-  },
-  closeItem: function () {
-    vm.itemSelected = null
-  },
-  showAll() {
-    vm.filterSelected = ''
-  },
-  showUnread() {
-    vm.filterSelected = 'unread'
-  },
-  showStarred() {
-    vm.filterSelected = 'starred'
-  },
-}
 
-// If you edit, make sure you update the help modal
-var keybindings = {
-  "o": shortcutFunctions.openItemLink,
-  "i": shortcutFunctions.toggleReadability,
-  "r": shortcutFunctions.toggleItemRead,
-  "R": shortcutFunctions.markAllRead,
-  "s": shortcutFunctions.toggleItemStarred,
-  "/": shortcutFunctions.focusSearch,
-  "j": shortcutFunctions.nextItem,
-  "k": shortcutFunctions.previousItem,
-  "l": shortcutFunctions.nextFeed,
-  "h": shortcutFunctions.previousFeed,
-  "f": shortcutFunctions.scrollForward,
-  "b": shortcutFunctions.scrollBackward,
-  "q": shortcutFunctions.closeItem,
-  "1": shortcutFunctions.showUnread,
-  "2": shortcutFunctions.showStarred,
-  "3": shortcutFunctions.showAll,
-}
-
-var codebindings = {
-  "KeyO": shortcutFunctions.openItemLink,
-  "KeyI": shortcutFunctions.toggleReadability,
-  //"r": shortcutFunctions.toggleItemRead,
-  //"KeyR": shortcutFunctions.markAllRead,
-  "KeyS": shortcutFunctions.toggleItemStarred,
-  "Slash": shortcutFunctions.focusSearch,
-  "KeyJ": shortcutFunctions.nextItem,
-  "KeyK": shortcutFunctions.previousItem,
-  "KeyL": shortcutFunctions.nextFeed,
-  "KeyH": shortcutFunctions.previousFeed,
-  "KeyF": shortcutFunctions.scrollForward,
-  "KeyB": shortcutFunctions.scrollBackward,
-  "KeyQ": shortcutFunctions.closeItem,
-  "Digit1": shortcutFunctions.showUnread,
-  "Digit2": shortcutFunctions.showStarred,
-  "Digit3": shortcutFunctions.showAll,
-}
-
-function isTextBox(element) {
-  var tagName = element.tagName.toLowerCase()
-  // Input elements that aren't text
-  var inputBlocklist = ['button','checkbox','color','file','hidden','image','radio','range','reset','search','submit']
-
-  return tagName === 'textarea' ||
-    ( tagName === 'input'
-      && inputBlocklist.indexOf(element.getAttribute('type').toLowerCase()) == -1
-    )
-}
-
-document.addEventListener('keydown',function(event) {
-  // Ignore while focused on text or
-  // when using modifier keys (to not clash with browser behaviour)
-  if (isTextBox(event.target) || event.metaKey || event.ctrlKey || event.altKey) {
-    return
+  function getSelectedItemRadio() {
+    return document.querySelector('#item-list-scroll input[name=item]:checked');
   }
-  var keybindFunction = keybindings[event.key] || codebindings[event.code]
-  if (keybindFunction) {
-    event.preventDefault()
-    keybindFunction()
+
+  function getItemRadios() {
+    return Array.from(document.querySelectorAll('#item-list-scroll input[name=item]'));
   }
-})
+
+  function navigateItem(offset) {
+    var radios = getItemRadios();
+    if (radios.length === 0) return;
+
+    var current = getSelectedItemRadio();
+    var idx = current ? radios.indexOf(current) : -1;
+    var next = idx + offset;
+
+    if (next < 0 || next >= radios.length) return;
+
+    radios[next].checked = true;
+    radios[next].dispatchEvent(new Event('change', { bubbles: true }));
+
+    // Scroll into view
+    var label = radios[next].closest('.selectgroup');
+    if (label) {
+      label.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function getFeedRadios() {
+    return Array.from(document.querySelectorAll('#feed-list-content input[name=feed]'));
+  }
+
+  function navigateFeed(offset) {
+    var radios = getFeedRadios().filter(function(r) {
+      // Skip hidden feeds
+      var label = r.closest('.selectgroup');
+      return label && !label.classList.contains('d-none') && label.style.display !== 'none';
+    });
+    if (radios.length === 0) return;
+
+    var current = document.querySelector('#feed-list-content input[name=feed]:checked');
+    var idx = current ? radios.indexOf(current) : -1;
+    var next = idx + offset;
+
+    if (next < 0 || next >= radios.length) return;
+
+    radios[next].checked = true;
+    radios[next].dispatchEvent(new Event('change', { bubbles: true }));
+
+    // Update app state
+    document.getElementById('app').classList.add('feed-selected');
+    document.getElementById('app').classList.remove('item-selected');
+
+    var label = radios[next].closest('.selectgroup');
+    if (label) label.scrollIntoView({ block: 'nearest' });
+  }
+
+  var shortcuts = {
+    'o': function() {
+      var link = document.querySelector('#item-content-inner a[rel="noopener noreferrer"]');
+      if (link) window.open(link.href, '_blank', 'noopener,noreferrer');
+    },
+    'i': function() {
+      var btn = document.getElementById('btn-readability');
+      if (btn) btn.click();
+    },
+    'r': function() {
+      var btn = document.querySelector('#item-content-inner .toolbar-item[title*="Unread"]');
+      if (btn) btn.click();
+    },
+    'R': function() {
+      var btn = document.getElementById('btn-mark-read');
+      if (btn && btn.style.display !== 'none') btn.click();
+    },
+    's': function() {
+      var btn = document.querySelector('#item-content-inner .toolbar-item[title*="Star"]');
+      if (btn) btn.click();
+    },
+    '/': function() {
+      var search = document.getElementById('searchbar');
+      if (search) search.focus();
+    },
+    'j': function() { navigateItem(1); },
+    'k': function() { navigateItem(-1); },
+    'l': function() { navigateFeed(1); },
+    'h': function() { navigateFeed(-1); },
+    'f': function() { scrollContent(1); },
+    'b': function() { scrollContent(-1); },
+    'q': function() {
+      document.getElementById('app').classList.remove('item-selected');
+      document.getElementById('col-item-content').innerHTML = '';
+    },
+    '1': function() {
+      var btn = document.querySelector('[data-filter="unread"]');
+      if (btn) btn.click();
+    },
+    '2': function() {
+      var btn = document.querySelector('[data-filter="starred"]');
+      if (btn) btn.click();
+    },
+    '3': function() {
+      var btn = document.querySelector('[data-filter=""]');
+      if (btn) btn.click();
+    },
+  };
+
+  // Code-based bindings for non-QWERTY layouts
+  var codeBindings = {
+    'KeyO': shortcuts['o'],
+    'KeyI': shortcuts['i'],
+    'KeyS': shortcuts['s'],
+    'Slash': shortcuts['/'],
+    'KeyJ': shortcuts['j'],
+    'KeyK': shortcuts['k'],
+    'KeyL': shortcuts['l'],
+    'KeyH': shortcuts['h'],
+    'KeyF': shortcuts['f'],
+    'KeyB': shortcuts['b'],
+    'KeyQ': shortcuts['q'],
+    'Digit1': shortcuts['1'],
+    'Digit2': shortcuts['2'],
+    'Digit3': shortcuts['3'],
+  };
+
+  function isTextInput(el) {
+    var tag = el.tagName.toLowerCase();
+    if (tag === 'textarea') return true;
+    if (tag === 'input') {
+      var type = (el.getAttribute('type') || 'text').toLowerCase();
+      var blocked = ['button','checkbox','color','file','hidden','image','radio','range','reset','submit'];
+      return blocked.indexOf(type) === -1;
+    }
+    return el.isContentEditable;
+  }
+
+  document.addEventListener('keydown', function(e) {
+    // Skip in text inputs or with modifiers
+    if (isTextInput(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+    // Skip in dialogs
+    if (e.target.closest('dialog')) return;
+
+    var fn = shortcuts[e.key] || codeBindings[e.code];
+    if (fn) {
+      e.preventDefault();
+      fn();
+    }
+  });
+
+})();

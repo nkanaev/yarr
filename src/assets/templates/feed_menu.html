@@ -1,0 +1,80 @@
+{% define "feed_menu" %}
+<div id="feed-menu-content">
+{% if eq .Type "feed" %}
+    <header class="dropdown-header" role="heading" aria-level="2">{% .Feed.Title %}</header>
+    {% if .Feed.Link %}
+    <a class="dropdown-item" href="{% .Feed.Link %}" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">
+        <span class="icon me-1">{% inline "globe.svg" %}</span>
+        Website
+    </a>
+    {% end %}
+    {% if .Feed.FeedLink %}
+    <a class="dropdown-item" href="{% .Feed.FeedLink %}" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer">
+        <span class="icon me-1">{% inline "rss.svg" %}</span>
+        Feed Link
+    </a>
+    {% end %}
+    {% if or .Feed.Link .Feed.FeedLink %}
+    <div class="dropdown-divider"></div>
+    {% end %}
+    <button class="dropdown-item" onclick="yarr.renameFeed({% .Feed.Id %}, '{% .Feed.Title %}')">
+        <span class="icon me-1">{% inline "edit.svg" %}</span>
+        Rename
+    </button>
+    {% if .Feed.FeedLink %}
+    <button class="dropdown-item" onclick="yarr.changeFeedLink({% .Feed.Id %}, '{% .Feed.FeedLink %}')">
+        <span class="icon me-1">{% inline "edit.svg" %}</span>
+        Change Link
+    </button>
+    {% end %}
+    <div class="dropdown-divider"></div>
+    {% if not .Feed.Archived %}
+    <button class="dropdown-item" onclick="yarr.archiveFeed({% .Feed.Id %}, true)">
+        <span class="icon me-1">{% inline "archive.svg" %}</span>
+        Archive Feed
+    </button>
+    {% else %}
+    <button class="dropdown-item" onclick="yarr.archiveFeed({% .Feed.Id %}, false)">
+        <span class="icon me-1">{% inline "unarchive.svg" %}</span>
+        Unarchive Feed
+    </button>
+    {% end %}
+    <div class="dropdown-divider"></div>
+    <header class="dropdown-header" role="heading" aria-level="2">Move to...</header>
+    {% range .Folders %}
+    {% if ne .Id $.Feed.FolderIdVal %}
+    <button class="dropdown-item" onclick="yarr.moveFeed({% $.Feed.Id %}, {% .Id %})">
+        <span class="icon me-1">{% inline "folder.svg" %}</span>
+        {% .Title %}
+    </button>
+    {% end %}
+    {% end %}
+    {% if .Feed.FolderId %}
+    <button class="dropdown-item text-muted" onclick="yarr.moveFeed({% .Feed.Id %}, null)">
+        <span class="icon me-1">{% inline "folder-minus.svg" %}</span>
+        --
+    </button>
+    {% end %}
+    <button class="dropdown-item text-muted" onclick="yarr.moveFeedToNewFolder({% .Feed.Id %})">
+        <span class="icon me-1">{% inline "folder-plus.svg" %}</span>
+        new folder
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item text-danger" onclick="yarr.deleteFeed({% .Feed.Id %}, '{% .Feed.Title %}')">
+        <span class="icon me-1">{% inline "trash.svg" %}</span>
+        Delete
+    </button>
+{% else if eq .Type "folder" %}
+    <header class="dropdown-header" role="heading" aria-level="2">{% .Folder.Title %}</header>
+    <button class="dropdown-item" onclick="yarr.renameFolder({% .Folder.Id %}, '{% .Folder.Title %}')">
+        <span class="icon me-1">{% inline "edit.svg" %}</span>
+        Rename
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item text-danger" onclick="yarr.deleteFolder({% .Folder.Id %}, '{% .Folder.Title %}')">
+        <span class="icon me-1">{% inline "trash.svg" %}</span>
+        Delete
+    </button>
+{% end %}
+</div>
+{% end %}

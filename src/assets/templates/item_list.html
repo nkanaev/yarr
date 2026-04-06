@@ -1,0 +1,44 @@
+{% define "item_list" %}
+{% if .Items %}
+<div class="p-2 overflow-auto scroll-touch flex-grow-1" id="item-list-scroll" style="min-height: 0">
+    {% range .Items %}
+    <label class="selectgroup" id="item-row-{% .Id %}">
+        <input type="radio" name="item" value="{% .Id %}"
+               hx-get="./partials/items/{% .Id %}"
+               hx-target="#col-item-content"
+               hx-swap="innerHTML"
+               hx-trigger="change"
+               hx-push-url="false"
+               hx-on::after-request="document.getElementById('app').classList.add('item-selected')">
+        <div class="selectgroup-label d-flex flex-column">
+            <div style="line-height: 100%; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
+                {% if eq .StatusStr "unread" %}
+                <span class="icon icon-small me-1">{% inline "circle-full.svg" %}</span>
+                {% else if eq .StatusStr "starred" %}
+                <span class="icon icon-small me-1">{% inline "star-full.svg" %}</span>
+                {% end %}
+                <small class="flex-fill text-truncate me-1">{% .FeedTitle %}{% if .FolderTitle %} · {% .FolderTitle %}{% end %}</small>
+                <small class="flex-shrink-0">{% .DateRepr %}</small>
+            </div>
+            <div>{% if .Title %}{% .Title %}{% else %}untitled{% end %}</div>
+        </div>
+    </label>
+    {% end %}
+    {% if .HasMore %}
+    <div hx-get="./partials/items"
+         hx-trigger="revealed"
+         hx-swap="outerHTML"
+         hx-vals='{% .NextPageVals %}'
+         class="btn btn-link btn-block loading my-3"></div>
+    {% end %}
+</div>
+{% if .FeedError %}
+<div class="px-3 py-2 border-top text-danger text-break">{% .FeedError %}</div>
+{% end %}
+{% else %}
+<div class="empty-state flex-grow-1">
+    <span class="icon">{% inline "layers.svg" %}</span>
+    <p>{% if .SearchActive %}No results for "{% .Search %}"{% else %}No articles to show{% end %}</p>
+</div>
+{% end %}
+{% end %}

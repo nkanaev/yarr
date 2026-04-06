@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>yarr!</title>
-    <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css">
     <link rel="stylesheet" href="./static/stylesheets/app.css">
     <link rel="icon" href="./static/graphicarts/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png">
@@ -22,7 +21,7 @@
         }
     </style>
 </head>
-<body class="theme-{% .settings.theme_name %}">
+<body data-theme="{% .settings.theme_name %}">
     <form action="" method="post">
         <img src="./static/graphicarts/anchor.svg" alt="">
         {% if .error %}

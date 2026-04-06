@@ -1,869 +1,841 @@
 'use strict';
 
-var TITLE = document.title
+// yarr - vanilla JS app layer for HTMX-driven UI
+window.yarr = window.yarr || {};
 
-function scrollto(target, scroll) {
-  var padding = 10
-  var targetRect = target.getBoundingClientRect()
-  var scrollRect = scroll.getBoundingClientRect()
+(function(yarr) {
+  var TITLE = document.title;
+  var settings = yarr.settings || {};
+  var _confirmCb = null;
+  var _promptCb = null;
+  var _pollTimer = null;
 
-  // target
-  var relativeOffset = targetRect.y - scrollRect.y
-  var absoluteOffset = relativeOffset + scroll.scrollTop
-
-  if (padding <= relativeOffset && relativeOffset + targetRect.height <= scrollRect.height - padding) return
-
-  var newPos = scroll.scrollTop
-  if (relativeOffset < padding) {
-    newPos = absoluteOffset - padding
-  } else {
-    newPos = absoluteOffset - scrollRect.height + targetRect.height + padding
+  // --- API helper ---
+  function api(method, endpoint, data) {
+    var opts = {
+      method: method,
+      headers: {'Content-Type': 'application/json', 'x-requested-by': 'yarr'}
+    };
+    if (data) opts.body = JSON.stringify(data);
+    return fetch(endpoint, opts);
   }
-  scroll.scrollTop = Math.round(newPos)
-}
 
-var debounce = function(callback, wait) {
-  var timeout
-  return function() {
-    var ctx = this, args = arguments
-    clearTimeout(timeout)
-    timeout = setTimeout(function() {
-      callback.apply(ctx, args)
-    }, wait)
+  // --- Toast ---
+  yarr.toast = function(message, type) {
+    var container = document.getElementById('toast-container');
+    if (!container) return;
+    var el = document.createElement('div');
+    el.className = 'toast' + (type === 'error' ? ' toast-error' : '');
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(function() {
+      el.classList.add('toast-out');
+      setTimeout(function() { el.remove(); }, 200);
+    }, 3000);
+  };
+
+  // --- Theme ---
+  var themeColors = { light: '#fff', sepia: '#f4f0e5', night: '#0e0e0e' };
+
+  yarr.setTheme = function(name) {
+    document.body.setAttribute('data-theme', name);
+    document.querySelector("meta[name='theme-color']").content = themeColors[name] || '#fff';
+    // Update theme dots
+    document.querySelectorAll('[data-theme-dot]').forEach(function(dot) {
+      dot.classList.toggle('active', dot.getAttribute('data-theme-dot') === name);
+    });
+    settings.theme_name = name;
+    api('put', './api/settings', { theme_name: name });
+  };
+
+  // --- Filter ---
+  yarr.setFilter = function(btn, filter) {
+    // Update active state on filter buttons
+    btn.closest('.toolbar').querySelectorAll('.toolbar-item[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-filter') === filter);
+    });
+    // Update hidden filter input
+    var hidden = document.getElementById('item-filter-status');
+    if (hidden) hidden.value = filter;
+    // Show/hide mark-read button
+    var markRead = document.getElementById('btn-mark-read');
+    if (markRead) markRead.style.display = filter === 'unread' ? '' : 'none';
+    // Clear selection
+    document.getElementById('app').classList.remove('item-selected');
+    document.getElementById('col-item-content').innerHTML = '';
+    // Persist
+    settings.filter = filter;
+    api('put', './api/settings', { filter: filter });
+  };
+
+  // --- Sort ---
+  yarr.setSortOrder = function(newestFirst) {
+    settings.sort_newest_first = newestFirst;
+    api('put', './api/settings', { sort_newest_first: newestFirst }).then(function() {
+      // Reload items
+      htmx.ajax('GET', './partials/items', { target: '#item-list-content', swap: 'innerHTML' });
+    });
+  };
+
+  // --- Refresh Rate ---
+  yarr.setRefreshRate = function(val) {
+    val = parseInt(val, 10);
+    settings.refresh_rate = val;
+    api('put', './api/settings', { refresh_rate: val });
+  };
+
+  // --- Column Resize ---
+  function initDrag(handleId, minW, maxW, settingKey) {
+    var handle = document.getElementById(handleId);
+    if (!handle) return;
+    var startX, initW, col;
+    handle.addEventListener('mousedown', function(e) {
+      startX = e.clientX;
+      col = handle.parentElement;
+      initW = col.offsetWidth;
+      var onMove = function(e) {
+        var w = Math.min(Math.max(minW, initW + e.clientX - startX), maxW);
+        col.style.width = w + 'px';
+      };
+      var onUp = function() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        var w = parseInt(col.style.width, 10);
+        if (w) {
+          var update = {};
+          update[settingKey] = w;
+          api('put', './api/settings', update);
+        }
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
   }
-}
 
-Vue.directive('scroll', {
-  inserted: function(el, binding) {
-    el.addEventListener('scroll', debounce(function(event) {
-      binding.value(event, el)
-    }, 200))
-  },
-})
-
-Vue.directive('focus', {
-  inserted: function(el) {
-    el.focus()
-  }
-})
-
-Vue.component('drag', {
-  props: ['width'],
-  template: '<div class="drag"></div>',
-  mounted: function() {
-    var self = this
-    var startX = undefined
-    var initW = undefined
-    var onMouseMove = function(e) {
-      var offset = e.clientX - startX
-      var newWidth = initW + offset
-      self.$emit('resize', newWidth)
-    }
-    var onMouseUp = function(e) {
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
-    }
-    this.$el.addEventListener('mousedown', function(e) {
-      startX = e.clientX
-      initW = self.width
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
-    })
-  },
-})
-
-Vue.component('dropdown', {
-  props: ['class', 'toggle-class', 'ref', 'drop', 'title'],
-  data: function() {
-    return {open: false}
-  },
-  template: `
-    <div class="dropdown" :class="$attrs.class">
-      <button ref="btn" @click="toggle" :class="btnToggleClass" :title="$props.title"><slot name="button"></slot></button>
-      <div ref="menu" class="dropdown-menu" :class="{show: open}"><slot v-if="open"></slot></div>
-    </div>
-  `,
-  computed: {
-    btnToggleClass: function() {
-      var c = this.$props.toggleClass || ''
-      c += ' dropdown-toggle dropdown-toggle-no-caret'
-      c += this.open ? ' show' : ''
-      return c.trim()
-    }
-  },
-  methods: {
-    toggle: function(e) {
-      this.open ? this.hide() : this.show()
-    },
-    show: function(e) {
-      this.open = true
-      this.$refs.menu.style.top = this.$refs.btn.offsetHeight + 'px'
-      var drop = this.$props.drop
-
-      if (drop === 'right') {
-        this.$refs.menu.style.left = 'auto'
-        this.$refs.menu.style.right = '0'
-      } else if (drop === 'center') {
-        this.$nextTick(function() {
-          var btnWidth = this.$refs.btn.getBoundingClientRect().width
-          var menuWidth = this.$refs.menu.getBoundingClientRect().width
-          this.$refs.menu.style.left = '-' + ((menuWidth - btnWidth) / 2) + 'px'
-        }.bind(this))
-      }
-
-      document.addEventListener('click', this.clickHandler)
-    },
-    hide: function() {
-      this.open = false
-      document.removeEventListener('click', this.clickHandler)
-    },
-    clickHandler: function(e) {
-      var dropdown = e.target.closest('.dropdown')
-      if (dropdown == null || dropdown != this.$el) return this.hide()
-      if (e.target.closest('.dropdown-item') != null) return this.hide()
-    }
-  },
-})
-
-Vue.component('modal', {
-  props: ['open'],
-  template: `
-    <div class="modal custom-modal" tabindex="-1" v-if="$props.open">
-      <div class="modal-dialog">
-        <div class="modal-content" ref="content">
-          <div class="modal-body">
-            <slot v-if="$props.open"></slot>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  data: function() {
-    return {opening: false}
-  },
-  watch: {
-    'open': function(newVal) {
-      if (newVal) {
-        this.opening = true
-        document.addEventListener('click', this.handleClick)
-      } else {
-        document.removeEventListener('click', this.handleClick)
-      }
-    },
-  },
-  methods: {
-    handleClick: function(e) {
-      if (this.opening) {
-        this.opening = false
-        return
-      }
-      if (e.target.closest('.modal-content') == null) this.$emit('hide')
-    },
-  },
-})
-
-function dateRepr(d) {
-  var sec = (new Date().getTime() - d.getTime()) / 1000
-  var neg = sec < 0
-  var out = ''
-
-  sec = Math.abs(sec)
-  if (sec < 2700)  // less than 45 minutes
-    out = Math.round(sec / 60) + 'm'
-  else if (sec < 86400)  // less than 24 hours
-    out = Math.round(sec / 3600) + 'h'
-  else if (sec < 604800)  // less than a week
-    out = Math.round(sec / 86400) + 'd'
-  else
-    out = d.toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"})
-
-  if (neg) return '-' + out
-  return out
-}
-
-Vue.component('relative-time', {
-  props: ['val'],
-  data: function() {
-    var d = new Date(this.val)
-    return {
-      'date': d,
-      'formatted': dateRepr(d),
-      'interval': null,
-    }
-  },
-  template: '<time :datetime="val">{{ formatted }}</time>',
-  mounted: function() {
-    this.interval = setInterval(function() {
-      this.formatted = dateRepr(this.date)
-    }.bind(this), 600000)  // every 10 minutes
-  },
-  destroyed: function() {
-    clearInterval(this.interval)
-  },
-})
-
-var vm = new Vue({
-  created: function() {
-    this.refreshStats()
-      .then(this.refreshFeeds.bind(this))
-      .then(this.refreshItems.bind(this, false))
-
-    api.feeds.list_errors().then(function(errors) {
-      vm.feed_errors = errors
-    })
-    this.updateMetaTheme(app.settings.theme_name)
-  },
-  data: function() {
-    var s = app.settings
-    return {
-      'filterSelected': s.filter,
-      'folders': [],
-      'feeds': [],
-      'feedSelected': s.feed,
-      'feedListWidth': s.feed_list_width || 300,
-      'feedNewChoice': [],
-      'feedNewChoiceSelected': '',
-      'items': [],
-      'itemsHasMore': true,
-      'itemSelected': null,
-      'itemSelectedDetails': null,
-      'itemSelectedReadability': '',
-      'itemSearch': '',
-      'itemSortNewestFirst': s.sort_newest_first,
-      'itemListWidth': s.item_list_width || 300,
-
-      'filteredFeedStats': {},
-      'filteredFolderStats': {},
-      'filteredTotalStats': null,
-
-      'settings': '',
-      'loading': {
-        'feeds': 0,
-        'newfeed': false,
-        'items': false,
-        'readability': false,
-      },
-      'fonts': ['', 'serif', 'monospace'],
-      'feedStats': {},
-      'theme': {
-        'name': s.theme_name,
-        'font': s.theme_font,
-        'size': s.theme_size,
-      },
-      'themeColors': {
-        'night': '#0e0e0e',
-        'sepia': '#f4f0e5',
-        'light': '#fff',
-      },
-      'refreshRate': s.refresh_rate,
-      'authenticated': app.authenticated,
-      'feed_errors': {},
-
-      'refreshRateOptions': [
-        { title: "0", value: 0 },
-        { title: "10m", value: 10 },
-        { title: "30m", value: 30 },
-        { title: "1h", value: 60 },
-        { title: "2h", value: 120 },
-        { title: "4h", value: 240 },
-        { title: "12h", value: 720 },
-        { title: "24h", value: 1440 },
-      ],
-    }
-  },
-  computed: {
-    foldersWithFeeds: function() {
-      var feedsByFolders = this.feeds.reduce(function(folders, feed) {
-        if (!folders[feed.folder_id])
-          folders[feed.folder_id] = [feed]
-        else
-          folders[feed.folder_id].push(feed)
-        return folders
-      }, {})
-      var folders = this.folders.slice().map(function(folder) {
-        folder.feeds = feedsByFolders[folder.id]
-        return folder
-      })
-      folders.push({id: null, feeds: feedsByFolders[null]})
-      return folders
-    },
-    feedsById: function() {
-      return this.feeds.reduce(function(acc, f) { acc[f.id] = f; return acc }, {})
-    },
-    foldersById: function() {
-      return this.folders.reduce(function(acc, f) { acc[f.id] = f; return acc }, {})
-    },
-    current: function() {
-      var parts = (this.feedSelected || '').split(':', 2)
-      var type = parts[0]
-      var guid = parts[1]
-
-      var folder = {}, feed = {}
-
-      if (type == 'feed')
-        feed = this.feedsById[guid] || {}
-      if (type == 'folder')
-        folder = this.foldersById[guid] || {}
-
-      return {type: type, feed: feed, folder: folder}
-    },
-    itemSelectedContent: function() {
-      if (!this.itemSelected) return ''
-
-      if (this.itemSelectedReadability)
-        return this.itemSelectedReadability
-
-      return this.itemSelectedDetails.content || ''
-    },
-    contentImages: function() {
-      if (!this.itemSelectedDetails) return []
-      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'image')
-    },
-    contentAudios: function() {
-      if (!this.itemSelectedDetails) return []
-      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'audio')
-    },
-    contentVideos: function() {
-      if (!this.itemSelectedDetails) return []
-      return (this.itemSelectedDetails.media_links || []).filter(l => l.type === 'video')
-    },
-    refreshRateTitle: function () {
-      const entry = this.refreshRateOptions.find(o => o.value === this.refreshRate)
-      return entry ? entry.title : '0'
-    },
-  },
-  watch: {
-    'theme': {
-      deep: true,
-      handler: function(theme) {
-        this.updateMetaTheme(theme.name)
-        document.body.classList.value = 'theme-' + theme.name
-        api.settings.update({
-          theme_name: theme.name,
-          theme_font: theme.font,
-          theme_size: theme.size,
-        })
-      },
-    },
-    'feedStats': {
-      deep: true,
-      handler: debounce(function() {
-        var title = TITLE
-        var unreadCount = Object.values(this.feedStats).reduce(function(acc, stat) {
-          return acc + stat.unread
-        }, 0)
-        if (unreadCount) {
-          title += ' ('+unreadCount+')'
-        }
-        document.title = title
-        this.computeStats()
-      }, 500),
-    },
-    'filterSelected': function(newVal, oldVal) {
-      if (oldVal === undefined) return  // do nothing, initial setup
-      this.itemSelected = null
-      this.items = []
-      this.itemsHasMore = true
-      api.settings.update({filter: newVal}).then(this.refreshItems.bind(this, false))
-      this.computeStats()
-    },
-    'feedSelected': function(newVal, oldVal) {
-      if (oldVal === undefined) return  // do nothing, initial setup
-      this.itemSelected = null
-      this.items = []
-      this.itemsHasMore = true
-      api.settings.update({feed: newVal}).then(this.refreshItems.bind(this, false))
-      if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0
-    },
-    'itemSelected': function(newVal, oldVal) {
-      this.itemSelectedReadability = ''
-      if (newVal === null) {
-        this.itemSelectedDetails = null
-        return
-      }
-      if (this.$refs.content) this.$refs.content.scrollTop = 0
-
-      api.items.get(newVal).then(function(item) {
-        this.itemSelectedDetails = item
-        if (this.itemSelectedDetails.status == 'unread') {
-          api.items.update(this.itemSelectedDetails.id, {status: 'read'}).then(function() {
-            this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
-            var itemInList = this.items.find(function(i) { return i.id == item.id })
-            if (itemInList) itemInList.status = 'read'
-            this.itemSelectedDetails.status = 'read'
-          }.bind(this))
-        }
-      }.bind(this))
-    },
-    'itemSearch': debounce(function(newVal) {
-      this.refreshItems()
-    }, 500),
-    'itemSortNewestFirst': function(newVal, oldVal) {
-      if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({sort_newest_first: newVal}).then(vm.refreshItems.bind(this, false))
-    },
-    'feedListWidth': debounce(function(newVal, oldVal) {
-      if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({feed_list_width: newVal})
-    }, 1000),
-    'itemListWidth': debounce(function(newVal, oldVal) {
-      if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({item_list_width: newVal})
-    }, 1000),
-    'refreshRate': function(newVal, oldVal) {
-      if (oldVal === undefined) return  // do nothing, initial setup
-      api.settings.update({refresh_rate: newVal})
-    },
-  },
-  methods: {
-    updateMetaTheme: function(theme) {
-      document.querySelector("meta[name='theme-color']").content = this.themeColors[theme]
-    },
-    refreshStats: function(loopMode) {
-      return api.status().then(function(data) {
-        if (loopMode && !vm.itemSelected) vm.refreshItems()
-
-        vm.loading.feeds = data.running
-        if (data.running) {
-          setTimeout(vm.refreshStats.bind(vm, true), 500)
-        }
-        vm.feedStats = data.stats.reduce(function(acc, stat) {
-          acc[stat.feed_id] = stat
-          return acc
-        }, {})
-
-        api.feeds.list_errors().then(function(errors) {
-          vm.feed_errors = errors
-        })
-      })
-    },
-    getItemsQuery: function() {
-      var query = {}
-      if (this.feedSelected) {
-        var parts = this.feedSelected.split(':', 2)
-        var type = parts[0]
-        var guid = parts[1]
-        if (type == 'feed') {
-          query.feed_id = guid
-        } else if (type == 'folder') {
-          query.folder_id = guid
-        }
-      }
-      if (this.filterSelected) {
-        query.status = this.filterSelected
-      }
-      if (this.itemSearch) {
-        query.search = this.itemSearch
-      }
-      if (!this.itemSortNewestFirst) {
-        query.oldest_first = true
-      }
-      return query
-    },
-    refreshFeeds: function() {
-      return Promise
-        .all([api.folders.list(), api.feeds.list()])
-        .then(function(values) {
-          vm.folders = values[0]
-          vm.feeds = values[1]
-        })
-    },
-    refreshItems: function(loadMore = false) {
-      if (this.feedSelected === null) {
-        vm.items = []
-        vm.itemsHasMore = false
-        return
-      }
-
-      var query = this.getItemsQuery()
-      if (loadMore) {
-        query.after = vm.items[vm.items.length-1].id
-      }
-
-      this.loading.items = true
-      return api.items.list(query).then(function(data) {
-        if (loadMore) {
-          vm.items = vm.items.concat(data.list)
-        } else {
-          vm.items = data.list
-        }
-        vm.itemsHasMore = data.has_more
-        vm.loading.items = false
-
-        // load more if there's some space left at the bottom of the item list.
-        vm.$nextTick(function() {
-          if (vm.itemsHasMore && !vm.loading.items && vm.itemListCloseToBottom()) {
-            vm.refreshItems(true)
+  // --- Dropdown ---
+  yarr.toggleDropdown = function(id) {
+    var el = document.getElementById(id);
+    var menu = el.querySelector('.dropdown-menu');
+    var isOpen = menu.classList.contains('show');
+    // Close all dropdowns first
+    document.querySelectorAll('.dropdown-menu.show').forEach(function(m) { m.classList.remove('show'); });
+    if (!isOpen) {
+      menu.classList.add('show');
+      // Close on click outside
+      setTimeout(function() {
+        var handler = function(e) {
+          if (!el.contains(e.target) || e.target.closest('.dropdown-item')) {
+            menu.classList.remove('show');
+            document.removeEventListener('click', handler);
           }
-        })
-      })
-    },
-    itemListCloseToBottom: function() {
-      // approx. vertical space at the bottom of the list (loading el & paddings) when 1rem = 16px
-      var bottomSpace = 70
-      var scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16
+        };
+        document.addEventListener('click', handler);
+      }, 0);
+    }
+  };
 
-      var el = this.$refs.itemlist
+  yarr.closeDropdown = function(id) {
+    var el = document.getElementById(id);
+    if (el) el.querySelector('.dropdown-menu').classList.remove('show');
+  };
 
-      if (el.scrollHeight === 0) return false  // element is invisible (responsive design)
+  // --- Dialogs ---
+  yarr.showDialog = function(id) {
+    var d = document.getElementById(id);
+    if (d) d.showModal();
+  };
 
-      var closeToBottom = (el.scrollHeight - el.scrollTop - el.offsetHeight) < bottomSpace * scale
-      return closeToBottom
-    },
-    loadMoreItems: function(event, el) {
-      if (!this.itemsHasMore) return
-      if (this.loading.items) return
-      if (this.itemListCloseToBottom()) return this.refreshItems(true)
-      if (this.itemSelected && this.itemSelected === this.items[this.items.length - 1].id) return this.refreshItems(true)
-    },
-    markItemsRead: function() {
-      var query = this.getItemsQuery()
-      api.items.mark_read(query).then(function() {
-        vm.items = []
-        vm.itemsPage = {'cur': 1, 'num': 1}
-        vm.itemSelected = null
-        vm.itemsHasMore = false
-        vm.refreshStats()
-      })
-    },
-    toggleFolderExpanded: function(folder) {
-      folder.is_expanded = !folder.is_expanded
-      api.folders.update(folder.id, {is_expanded: folder.is_expanded})
-    },
-    formatDate: function(datestr) {
-      var options = {
-        year: "numeric", month: "long", day: "numeric",
-        hour: '2-digit', minute: '2-digit',
-      }
-      return new Date(datestr).toLocaleDateString(undefined, options)
-    },
-    moveFeed: function(feed, folder) {
-      var folder_id = folder ? folder.id : null
-      api.feeds.update(feed.id, {folder_id: folder_id}).then(function() {
-        feed.folder_id = folder_id
-        vm.refreshStats()
-      })
-    },
-    moveFeedToNewFolder: function(feed) {
-      var title = prompt('Enter folder name:')
-      if (!title) return
-      api.folders.create({'title': title}).then(function(folder) {
-        api.feeds.update(feed.id, {folder_id: folder.id}).then(function() {
-          vm.refreshFeeds().then(function() {
-            vm.refreshStats()
-          })
-        })
-      })
-    },
-    archiveFeed: function(feed) {
-      api.feeds.update(feed.id, {archived: true}).then(function() {
-        feed.archived = true
-        vm.refreshStats()
-      })
-    },
-    unarchiveFeed: function(feed) {
-      api.feeds.update(feed.id, {archived: false}).then(function() {
-        feed.archived = false
-        vm.refreshStats()
-      })
-    },
-    createNewFeedFolder: function() {
-      var title = prompt('Enter folder name:')
-      if (!title) return
-      api.folders.create({'title': title}).then(function(result) {
-        vm.refreshFeeds().then(function() {
-          vm.$nextTick(function() {
-            if (vm.$refs.newFeedFolder) {
-              vm.$refs.newFeedFolder.value = result.id
-            }
-          })
-        })
-      })
-    },
-    renameFolder: function(folder) {
-      var newTitle = prompt('Enter new title', folder.title)
-      if (newTitle) {
-        api.folders.update(folder.id, {title: newTitle}).then(function() {
-          folder.title = newTitle
-          this.folders.sort(function(a, b) {
-            return a.title.localeCompare(b.title)
-          })
-        }.bind(this))
-      }
-    },
-    deleteFolder: function(folder) {
-      if (confirm('Are you sure you want to delete ' + folder.title + '?')) {
-        api.folders.delete(folder.id).then(function() {
-          vm.feedSelected = null
-          vm.refreshStats()
-          vm.refreshFeeds()
-        })
-      }
-    },
-    updateFeedLink: function(feed) {
-      var newLink = prompt('Enter feed link', feed.feed_link)
-      if (newLink) {
-        api.feeds.update(feed.id, {feed_link: newLink}).then(function() {
-          feed.feed_link = newLink
-        })
-      }
-    },
-    renameFeed: function(feed) {
-      var newTitle = prompt('Enter new title', feed.title)
-      if (newTitle) {
-        api.feeds.update(feed.id, {title: newTitle}).then(function() {
-          feed.title = newTitle
-        })
-      }
-    },
-    deleteFeed: function(feed) {
-      if (confirm('Are you sure you want to delete ' + feed.title + '?')) {
-        api.feeds.delete(feed.id).then(function() {
-          vm.feedSelected = null
-          vm.refreshStats()
-          vm.refreshFeeds()
-        })
-      }
-    },
-    createFeed: function(event) {
-      var form = event.target
-      var data = {
-        url: form.querySelector('input[name=url]').value,
-        folder_id: parseInt(form.querySelector('select[name=folder_id]').value) || null,
-      }
-      if (this.feedNewChoiceSelected) {
-        data.url = this.feedNewChoiceSelected
-      }
-      this.loading.newfeed = true
-      api.feeds.create(data).then(function(result) {
+  yarr.confirm = function(message, callback) {
+    document.getElementById('confirm-message').textContent = message;
+    _confirmCb = callback;
+    document.getElementById('confirm-dialog').showModal();
+  };
+
+  yarr.confirmAction = function() {
+    if (_confirmCb) { _confirmCb(); _confirmCb = null; }
+  };
+
+  yarr.prompt = function(message, defaultVal, callback) {
+    document.getElementById('prompt-message').textContent = message;
+    document.getElementById('prompt-input').value = defaultVal || '';
+    _promptCb = callback;
+    document.getElementById('prompt-dialog').showModal();
+    setTimeout(function() { document.getElementById('prompt-input').focus(); }, 50);
+  };
+
+  yarr.promptAction = function(val) {
+    if (_promptCb) { _promptCb(val); _promptCb = null; }
+  };
+
+  // --- Feed Management ---
+  yarr.createFeed = function(event) {
+    event.preventDefault();
+    var form = event.target;
+    var url = form.querySelector('[name=url]').value;
+    var folderId = form.querySelector('[name=folder_id]').value || null;
+
+    var btn = document.getElementById('add-feed-btn');
+    btn.classList.add('loading');
+
+    api('post', './api/feeds', { url: url, folder_id: folderId ? parseInt(folderId) : null })
+      .then(function(r) { return r.json(); })
+      .then(function(result) {
+        btn.classList.remove('loading');
         if (result.status === 'success') {
-          vm.refreshFeeds()
-          vm.refreshStats()
-          vm.settings = ''
-          vm.feedSelected = 'feed:' + result.feed.id
+          document.getElementById('feed-dialog').close();
+          yarr.toast('Feed added');
+          // Reload feed list
+          htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
         } else if (result.status === 'multiple') {
-          vm.feedNewChoice = result.choice
-          vm.feedNewChoiceSelected = result.choice[0].url
+          // Show choices
+          var choiceDiv = document.getElementById('feed-choice');
+          var html = '<p class="mb-2">Multiple feeds found. Choose one:</p>';
+          result.choice.forEach(function(c) {
+            html += '<label class="selectgroup"><input type="radio" name="feedToAdd" value="' + c.url + '"' +
+                    (c.url === result.choice[0].url ? ' checked' : '') + '>' +
+                    '<div class="selectgroup-label"><div class="text-truncate">' + (c.title || '') +
+                    '</div><div class="text-truncate light">' + c.url + '</div></div></label>';
+          });
+          choiceDiv.innerHTML = html;
+          choiceDiv.style.display = '';
+          form.querySelector('[name=url]').readOnly = true;
         } else {
-          alert('No feeds found at the given url.')
+          yarr.toast('No feeds found at the given URL', 'error');
         }
-        vm.loading.newfeed = false
       })
-    },
-    toggleItemStatus: function(item, targetstatus, fallbackstatus) {
-      var oldstatus = item.status
-      var newstatus = item.status !== targetstatus ? targetstatus : fallbackstatus
+      .catch(function() {
+        btn.classList.remove('loading');
+        yarr.toast('Error adding feed', 'error');
+      });
+  };
 
-      var updateStats = function(status, incr) {
-        if ((status == 'unread') || (status == 'starred')) {
-          this.feedStats[item.feed_id][status] += incr
-        }
-      }.bind(this)
+  yarr.createFolderInline = function(event) {
+    event.preventDefault();
+    yarr.prompt('Enter folder name:', '', function(title) {
+      if (!title) return;
+      api('post', './api/folders', { title: title })
+        .then(function(r) { return r.json(); })
+        .then(function(folder) {
+          var select = document.getElementById('feed-folder');
+          var opt = document.createElement('option');
+          opt.value = folder.id;
+          opt.textContent = folder.title;
+          opt.selected = true;
+          select.appendChild(opt);
+        });
+    });
+  };
 
-      api.items.update(item.id, {status: newstatus}).then(function() {
-        updateStats(oldstatus, -1)
-        updateStats(newstatus, +1)
+  // --- Folder Expand/Collapse ---
+  yarr.toggleFolder = function(id, expand) {
+    api('put', './api/folders/' + id, { is_expanded: expand }).then(function() {
+      htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+    });
+  };
 
-        var itemInList = this.items.find(function(i) { return i.id == item.id })
-        if (itemInList) itemInList.status = newstatus
-        item.status = newstatus
-      }.bind(this))
-    },
-    toggleItemStarred: function(item) {
-      this.toggleItemStatus(item, 'starred', 'read')
-    },
-    toggleItemRead: function(item) {
-      this.toggleItemStatus(item, 'unread', 'read')
-    },
-    importOPML: function(event) {
-      var input = event.target
-      var form = document.querySelector('#opml-import-form')
-      this.$refs.menuDropdown.hide()
-      api.upload_opml(form).then(function() {
-        input.value = ''
-        vm.refreshFeeds()
-        vm.refreshStats()
-      })
-    },
-    logout: function() {
-      api.logout().then(function() {
-        document.location.reload()
-      })
-    },
-    toggleReadability: function() {
-      if (this.itemSelectedReadability) {
-        this.itemSelectedReadability = null
-        return
-      }
-      var item = this.itemSelectedDetails
-      if (!item) return
-      if (item.link) {
-        this.loading.readability = true
-        api.crawl(item.link).then(function(data) {
-          vm.itemSelectedReadability = data && data.content
-          vm.loading.readability = false
-        })
-      }
-    },
-    showSettings: function(settings) {
-      this.settings = settings
-
-      if (settings === 'create') {
-        vm.feedNewChoice = []
-        vm.feedNewChoiceSelected = ''
-      }
-    },
-    resizeFeedList: function(width) {
-      this.feedListWidth = Math.min(Math.max(200, width), 700)
-    },
-    resizeItemList: function(width) {
-      this.itemListWidth = Math.min(Math.max(200, width), 700)
-    },
-    resetFeedChoice: function() {
-      this.feedNewChoice = []
-      this.feedNewChoiceSelected = ''
-    },
-    incrFont: function(x) {
-      this.theme.size = +(this.theme.size + (0.1 * x)).toFixed(1)
-    },
-    fetchAllFeeds: function() {
-      if (this.loading.feeds) return
-      api.feeds.refresh().then(function() {
-        vm.refreshStats()
-      })
-    },
-    computeStats: function() {
-      var filter = this.filterSelected
-      if (!filter) {
-        this.filteredFeedStats = {}
-        this.filteredFolderStats = {}
-        this.filteredTotalStats = null
-        return
-      }
-
-      var statsFeeds = {}, statsFolders = {}, statsTotal = 0
-
-      for (var i = 0; i < this.feeds.length; i++) {
-        var feed = this.feeds[i]
-        
-        var n = 0
-        if (filter === 'archived') {
-          // For archived filter, show count of 1 if feed is archived, 0 otherwise
-          n = feed.archived ? 1 : 0
-        } else {
-          // For other filters (unread, starred), use existing stats
-          if (!this.feedStats[feed.id]) continue
-          n = vm.feedStats[feed.id][filter] || 0
-        }
-
-        if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = 0
-
-        statsFeeds[feed.id] = n
-        statsFolders[feed.folder_id] += n
-        statsTotal += n
-      }
-
-      this.filteredFeedStats = statsFeeds
-      this.filteredFolderStats = statsFolders
-      this.filteredTotalStats = statsTotal
-    },
-    // navigation helper, navigate relative to selected item
-    navigateToItem: function(relativePosition) {
-      let vm = this
-      if (vm.itemSelected == null) {
-        // if no item is selected, select first
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
-        return
-      }
-
-      var itemPosition = vm.items.findIndex(function(x) { return x.id === vm.itemSelected })
-      if (itemPosition === -1) {
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id
-        return
-      }
-
-      var newPosition = itemPosition + relativePosition
-      if (newPosition < 0 || newPosition >= vm.items.length) return
-
-      vm.itemSelected = vm.items[newPosition].id
-
-      vm.$nextTick(function() {
-        var scroll = document.querySelector('#item-list-scroll')
-
-        var handle = scroll.querySelector('input[type=radio]:checked')
-        var target = handle && handle.parentElement
-
-        if (target && scroll) scrollto(target, scroll)
-
-        vm.loadMoreItems()
-      })
-    },
-    // navigation helper, navigate relative to selected feed
-    navigateToFeed: function(relativePosition) {
-      let vm = this
-      const navigationList = this.foldersWithFeeds
-        .filter(folder => !folder.id || !vm.mustHideFolder(folder))
-        .map((folder) => {
-          if (this.mustHideFolder(folder)) return []
-          const folds = folder.id ? [`folder:${folder.id}`] : []
-          const feeds = (folder.is_expanded || !folder.id)
-            ? (folder.feeds || []).filter(f => !vm.mustHideFeed(f)).map(f => `feed:${f.id}`)
-            : []
-          return folds.concat(feeds)
-        })
-        .flat()
-      navigationList.unshift('')
-
-      var currentFeedPosition = navigationList.indexOf(vm.feedSelected)
-
-      if (currentFeedPosition == -1) {
-        vm.feedSelected = ''
-        return
-      }
-
-      var newPosition = currentFeedPosition+relativePosition
-      if (newPosition < 0 || newPosition >= navigationList.length) return
-
-      vm.feedSelected = navigationList[newPosition]
-
-      vm.$nextTick(function() {
-        var scroll = document.querySelector('#feed-list-scroll')
-
-        var handle = scroll.querySelector('input[type=radio]:checked')
-        var target = handle && handle.parentElement
-
-        if (target && scroll) scrollto(target, scroll)
-      })
-    },
-    changeRefreshRate: function(offset) {
-      const curIdx = this.refreshRateOptions.findIndex(o => o.value === this.refreshRate)
-      if (curIdx <= 0 && offset < 0) return
-      if (curIdx >= (this.refreshRateOptions.length - 1) && offset > 0) return
-      this.refreshRate = this.refreshRateOptions[curIdx + offset].value
-    },
-    mustHideFolder: function (folder) {
-      return this.filterSelected
-        && !(this.current.folder.id == folder.id || this.current.feed.folder_id == folder.id)
-        && !this.filteredFolderStats[folder.id]
-        && (!this.itemSelectedDetails || (this.feedsById[this.itemSelectedDetails.feed_id] || {}).folder_id != folder.id)
-    },
-    mustHideFeed: function (feed) {
-      // Archive visibility logic
-      if (this.filterSelected === 'archived') {
-        // In archived filter, hide non-archived feeds
-        if (!feed.archived) return true
-      } else if (this.filterSelected && this.filterSelected !== 'archived') {
-        // In other filters (unread, starred), hide archived feeds
-        if (feed.archived) return true
-      }
-
-      // Standard feed visibility logic
-      return this.filterSelected
-        && !(this.current.feed.id == feed.id)
-        && !this.filteredFeedStats[feed.id]
-        && (!this.itemSelectedDetails || this.itemSelectedDetails.feed_id != feed.id)
-    },
+  // --- Feed/Folder Context Menu ---
+  function getSelectedFeed() {
+    var checked = document.querySelector('#feed-list-content input[name=feed]:checked');
+    return checked ? checked.value : '';
   }
-})
 
-vm.$mount('#app')
+  yarr.showFeedMenu = function() {
+    var sel = getSelectedFeed();
+    if (!sel) return;
+    // Load menu content via fetch, then show dropdown
+    fetch('./partials/feed-menu?sel=' + encodeURIComponent(sel), {
+      headers: { 'HX-Request': 'true' }
+    }).then(function(r) { return r.text(); }).then(function(html) {
+      document.getElementById('feed-menu-content').innerHTML = html;
+      yarr.toggleDropdown('feed-context-menu');
+    });
+  };
+
+  yarr.renameFeed = function(id, currentTitle) {
+    yarr.closeDropdown('feed-context-menu');
+    yarr.prompt('Enter new title:', currentTitle, function(title) {
+      if (!title) return;
+      api('put', './api/feeds/' + id, { title: title }).then(function() {
+        yarr.toast('Feed renamed');
+        htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+      });
+    });
+  };
+
+  yarr.changeFeedLink = function(id, currentLink) {
+    yarr.closeDropdown('feed-context-menu');
+    yarr.prompt('Enter feed link:', currentLink, function(link) {
+      if (!link) return;
+      api('put', './api/feeds/' + id, { feed_link: link }).then(function() {
+        yarr.toast('Feed link updated');
+      });
+    });
+  };
+
+  yarr.deleteFeed = function(id, title) {
+    yarr.closeDropdown('feed-context-menu');
+    yarr.confirm('Are you sure you want to delete ' + title + '?', function() {
+      api('delete', './api/feeds/' + id).then(function() {
+        yarr.toast('Feed deleted');
+        // Deselect and reload
+        var allRadio = document.querySelector('#feed-list-content input[name=feed][value=""]');
+        if (allRadio) { allRadio.checked = true; allRadio.dispatchEvent(new Event('change', {bubbles: true})); }
+        htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+      });
+    });
+  };
+
+  yarr.archiveFeed = function(id, archive) {
+    yarr.closeDropdown('feed-context-menu');
+    api('put', './api/feeds/' + id, { archived: archive }).then(function() {
+      yarr.toast(archive ? 'Feed archived' : 'Feed unarchived');
+      htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+    });
+  };
+
+  yarr.moveFeed = function(feedId, folderId) {
+    yarr.closeDropdown('feed-context-menu');
+    api('put', './api/feeds/' + feedId, { folder_id: folderId }).then(function() {
+      yarr.toast('Feed moved');
+      htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+    });
+  };
+
+  yarr.moveFeedToNewFolder = function(feedId) {
+    yarr.closeDropdown('feed-context-menu');
+    yarr.prompt('Enter folder name:', '', function(title) {
+      if (!title) return;
+      api('post', './api/folders', { title: title })
+        .then(function(r) { return r.json(); })
+        .then(function(folder) {
+          return api('put', './api/feeds/' + feedId, { folder_id: folder.id });
+        })
+        .then(function() {
+          yarr.toast('Feed moved to new folder');
+          htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+        });
+    });
+  };
+
+  yarr.renameFolder = function(id, currentTitle) {
+    yarr.closeDropdown('feed-context-menu');
+    yarr.prompt('Enter new title:', currentTitle, function(title) {
+      if (!title) return;
+      api('put', './api/folders/' + id, { title: title }).then(function() {
+        yarr.toast('Folder renamed');
+        htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+      });
+    });
+  };
+
+  yarr.deleteFolder = function(id, title) {
+    yarr.closeDropdown('feed-context-menu');
+    yarr.confirm('Are you sure you want to delete ' + title + '?', function() {
+      api('delete', './api/folders/' + id).then(function() {
+        yarr.toast('Folder deleted');
+        var allRadio = document.querySelector('#feed-list-content input[name=feed][value=""]');
+        if (allRadio) { allRadio.checked = true; allRadio.dispatchEvent(new Event('change', {bubbles: true})); }
+        htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+      });
+    });
+  };
+
+  // --- OPML ---
+  yarr.importOPML = function(input) {
+    var form = document.getElementById('opml-import-form');
+    fetch('./opml/import', {
+      method: 'post',
+      headers: { 'x-requested-by': 'yarr' },
+      body: new FormData(form)
+    }).then(function() {
+      input.value = '';
+      yarr.toast('OPML imported');
+      htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+      yarr.pollStatus();
+    });
+  };
+
+  // --- Status Polling ---
+  yarr.pollStatus = function() {
+    if (_pollTimer) return;
+    var statusEl = document.getElementById('feed-status');
+    var statusText = document.getElementById('feed-status-text');
+    statusEl.style.display = '';
+    var poll = function() {
+      api('get', './api/status').then(function(r) { return r.json(); }).then(function(data) {
+        if (data.running > 0) {
+          statusText.textContent = 'Refreshing (' + data.running + ' left)';
+          _pollTimer = setTimeout(poll, 500);
+        } else {
+          statusEl.style.display = 'none';
+          _pollTimer = null;
+          // Reload feed list to get updated counts
+          htmx.ajax('GET', './partials/feeds', { target: '#feed-list-content', swap: 'outerHTML' });
+        }
+      });
+    };
+    poll();
+  };
+
+  // --- Density / Triage Mode ---
+  yarr.toggleDensity = function() {
+    var list = document.getElementById('item-list-scroll');
+    if (list) list.classList.toggle('density-compact');
+    var btn = document.getElementById('btn-density-toggle');
+    if (btn) btn.classList.toggle('active');
+  };
+
+  // --- Reader Mode ---
+  yarr.toggleReaderMode = function() {
+    document.getElementById('app').classList.toggle('reader-mode');
+  };
+
+  // --- Topics View ---
+  var _topicsActive = false;
+  var _topicsLoaded = false;
+
+  yarr.toggleTopicsView = function() {
+    _topicsActive = !_topicsActive;
+    var feedScroll = document.getElementById('feed-list-scroll');
+    var topicsView = document.getElementById('topics-view');
+    var btn = document.getElementById('btn-topics');
+
+    if (_topicsActive) {
+      feedScroll.style.display = 'none';
+      topicsView.style.display = '';
+      btn.classList.add('active');
+      if (!_topicsLoaded) {
+        yarr.loadTopics();
+      }
+    } else {
+      feedScroll.style.display = '';
+      topicsView.style.display = 'none';
+      btn.classList.remove('active');
+    }
+  };
+
+  yarr.loadTopics = function() {
+    var container = document.getElementById('topics-view');
+    container.innerHTML = '<div class="empty-state"><span class="icon loading"></span><p>Loading topics...</p></div>';
+
+    // Fetch clusters, tags, and health in parallel
+    Promise.all([
+      fetch('./api/ai/clusters').then(function(r) { return r.json(); }).catch(function() { return { clusters: [] }; }),
+      fetch('./api/ai/tags').then(function(r) { return r.json(); }).catch(function() { return []; }),
+      fetch('./api/ai/health').then(function(r) { return r.json(); }).catch(function() { return {}; })
+    ]).then(function(results) {
+      var clusterData = results[0];
+      var tagsData = results[1];
+      var health = results[2];
+
+      // Toolbar with action buttons
+      var html = '<div class="topics-toolbar">'
+        + '<button class="btn btn-default" onclick="yarr.reindexArticles(this)" title="Embed all articles into the AI index">'
+        + 'Reindex' + (health.chroma_docs ? ' (' + health.chroma_docs + ')' : '') + '</button>'
+        + '<button class="btn btn-default" onclick="yarr.rebuildTopics(this)" title="Run clustering to discover topics">'
+        + 'Rebuild Topics</button>'
+        + '</div>';
+
+      // Clusters section
+      if (clusterData.clusters && clusterData.clusters.length > 0) {
+        html += '<div class="topic-section-header">Topics</div>';
+        clusterData.clusters.forEach(function(c) {
+          html += '<div class="topic-entry" data-topic-type="cluster" data-topic-tag="' + escapeAttr(c.label) + '" onclick="yarr.selectTopic(this)">'
+            + '<span class="flex-fill text-truncate">' + escapeHtml(c.label) + '</span>'
+            + '<span class="topic-badge">' + c.article_count + '</span>'
+            + '</div>';
+        });
+      }
+
+      // Tags section — only show tags that differ from cluster labels
+      var clusterLabels = new Set((clusterData.clusters || []).map(function(c) { return c.label; }));
+      var uniqueTags = (tagsData || []).filter(function(t) { return !clusterLabels.has(t.tag); });
+      if (uniqueTags.length > 0) {
+        html += '<div class="topic-section-header mt-3">Tags</div>';
+        uniqueTags.slice(0, 30).forEach(function(t) {
+          html += '<div class="topic-entry" data-topic-type="tag" data-topic-tag="' + escapeAttr(t.tag) + '" onclick="yarr.selectTopic(this)">'
+            + '<span class="flex-fill text-truncate">' + escapeHtml(t.tag) + '</span>'
+            + '<span class="topic-badge">' + t.article_count + '</span>'
+            + '</div>';
+        });
+      }
+
+      if (!clusterData.clusters?.length && !(tagsData && tagsData.length)) {
+        html += '<div class="empty-state"><p>No topics yet. Reindex articles and rebuild topics.</p></div>';
+      }
+
+      container.innerHTML = html;
+      _topicsLoaded = true;
+    });
+  };
+
+  // --- AI Progress Bar ---
+  var _aiPollTimer = null;
+  var _aiActiveBtn = null;
+
+  function showAiStatus(text) {
+    var bar = document.getElementById('ai-status');
+    var txt = document.getElementById('ai-status-text');
+    txt.textContent = text;
+    bar.style.display = '';
+  }
+
+  function hideAiStatus() {
+    document.getElementById('ai-status').style.display = 'none';
+    if (_aiPollTimer) { clearInterval(_aiPollTimer); _aiPollTimer = null; }
+    if (_aiActiveBtn) {
+      _aiActiveBtn.classList.remove('loading');
+      _aiActiveBtn.disabled = false;
+      _aiActiveBtn = null;
+    }
+  }
+
+  function startTaskPoll() {
+    if (_aiPollTimer) return;
+    _aiPollTimer = setInterval(function() {
+      fetch('./api/ai/task-status').then(function(r) { return r.json(); }).then(function(task) {
+        if (task.type) {
+          showAiStatus(task.detail || 'Processing...');
+        } else {
+          var lastDetail = document.getElementById('ai-status-text').textContent;
+          hideAiStatus();
+          if (lastDetail.indexOf('Complete') >= 0) {
+            yarr.toast(lastDetail);
+          } else {
+            yarr.toast('AI task complete');
+          }
+          _topicsLoaded = false;
+          yarr.loadTopics();
+        }
+      }).catch(function() {});
+    }, 2000);
+  }
+
+  // Check for running AI task on page load (survives reload)
+  yarr.checkTaskStatus = function() {
+    fetch('./api/ai/task-status').then(function(r) { return r.json(); }).then(function(task) {
+      if (task.type) {
+        showAiStatus(task.detail || 'Processing...');
+        startTaskPoll();
+      }
+    }).catch(function() {});
+  };
+
+  yarr.reindexArticles = function(btn) {
+    btn.classList.add('loading');
+    btn.disabled = true;
+    _aiActiveBtn = btn;
+    showAiStatus('Indexing: starting...');
+    api('post', './api/ai/reindex').then(function() {
+      startTaskPoll();
+    });
+  };
+
+  yarr.rebuildTopics = function(btn) {
+    btn.classList.add('loading');
+    btn.disabled = true;
+    _aiActiveBtn = btn;
+    showAiStatus('Clustering: starting...');
+    api('post', './api/ai/recluster').then(function() {
+      startTaskPoll();
+    });
+  };
+
+  yarr.selectTopic = function(el) {
+    // Deselect all
+    document.querySelectorAll('#topics-view .topic-entry.active').forEach(function(e) { e.classList.remove('active'); });
+    el.classList.add('active');
+
+    var tag = el.getAttribute('data-topic-tag');
+    document.getElementById('app').classList.add('feed-selected');
+
+    // Fetch articles for this tag
+    fetch('./api/ai/articles?tag=' + encodeURIComponent(tag))
+      .then(function(r) { return r.json(); })
+      .then(function(articles) {
+        var itemList = document.getElementById('item-list-content');
+        if (!articles || articles.length === 0) {
+          itemList.innerHTML = '<div class="empty-state flex-grow-1"><p>No articles for this topic</p></div>';
+          return;
+        }
+        var html = '<div class="p-2 overflow-auto scroll-touch flex-grow-1" id="topic-articles-scroll" style="min-height:0">';
+        articles.forEach(function(a) {
+          html += '<div class="selectgroup topic-article-row" data-item-id="' + (a.id || 0) + '" data-item-url="' + escapeAttr(a.url || '') + '">'
+            + '<div class="selectgroup-label d-flex flex-column cursor-pointer">'
+            + '<div style="line-height:100%;opacity:.7;margin-bottom:.1rem" class="d-flex align-items-center">'
+            + '<small class="flex-fill text-truncate me-1">' + escapeHtml((a.feed_name || '') + (a.folder ? ' · ' + a.folder : '')) + '</small>'
+            + '<small class="flex-shrink-0">' + escapeHtml(dateRepr(a.published)) + '</small>'
+            + '</div>'
+            + '<div>' + escapeHtml(a.title || 'untitled') + '</div>'
+            + '</div></div>';
+        });
+        html += '</div>';
+        itemList.innerHTML = html;
+      })
+      .catch(function() {
+        document.getElementById('item-list-content').innerHTML = '<div class="empty-state flex-grow-1"><p>Could not load articles</p></div>';
+      });
+  };
+
+  var _months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function dateRepr(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    var sec = (Date.now() - d.getTime()) / 1000;
+    var neg = sec < 0;
+    if (neg) sec = -sec;
+    var out;
+    if (sec < 2700) out = Math.round(sec / 60) + 'm';
+    else if (sec < 86400) out = Math.round(sec / 3600) + 'h';
+    else if (sec < 604800) out = Math.round(sec / 86400) + 'd';
+    else out = _months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    return neg ? '-' + out : out;
+  }
+
+  function escapeHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function escapeAttr(s) {
+    return s.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // --- Search ---
+  function initSearch() {
+    var searchbar = document.getElementById('searchbar');
+    var clearBtn = document.getElementById('search-clear');
+    if (!searchbar || !clearBtn) return;
+    searchbar.addEventListener('input', function() {
+      clearBtn.style.display = this.value ? '' : 'none';
+    });
+  }
+
+  // --- Reading Progress ---
+  function initReadingProgress() {
+    document.addEventListener('scroll', function(e) {
+      var scroll = e.target;
+      if (!scroll.id || scroll.id !== 'article-content-scroll') return;
+      var bar = document.getElementById('reading-progress');
+      if (!bar) return;
+      var pct = scroll.scrollTop / (scroll.scrollHeight - scroll.clientHeight) * 100;
+      bar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+    }, true);
+  }
+
+  // --- AI Chat Panel ---
+  var _chatHistory = [];
+  var _chatEventSource = null;
+
+  yarr.openChat = function() {
+    var panel = document.getElementById('chat-panel');
+    panel.style.display = 'flex';
+    document.getElementById('chat-input').focus();
+  };
+
+  yarr.closeChat = function() {
+    document.getElementById('chat-panel').style.display = 'none';
+    if (_chatEventSource) { _chatEventSource.close(); _chatEventSource = null; }
+  };
+
+  yarr.sendChat = function(event) {
+    event.preventDefault();
+    var input = document.getElementById('chat-input');
+    var query = input.value.trim();
+    if (!query) return;
+    input.value = '';
+
+    var messages = document.getElementById('chat-messages');
+
+    // Add user message
+    var userMsg = document.createElement('div');
+    userMsg.className = 'chat-msg chat-msg-user';
+    userMsg.textContent = query;
+    messages.appendChild(userMsg);
+
+    // Add assistant placeholder
+    var assistantMsg = document.createElement('div');
+    assistantMsg.className = 'chat-msg chat-msg-assistant streaming-cursor';
+    messages.appendChild(assistantMsg);
+    messages.scrollTop = messages.scrollHeight;
+
+    // Stream response via SSE
+    var body = JSON.stringify({ query: query, history: _chatHistory });
+    fetch('./api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+      body: body
+    }).then(function(response) {
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = '';
+      var fullResponse = '';
+
+      function processChunk(result) {
+        if (result.done) {
+          assistantMsg.classList.remove('streaming-cursor');
+          _chatHistory.push({ role: 'user', content: query });
+          _chatHistory.push({ role: 'assistant', content: fullResponse });
+          // Keep last 6 messages (3 turns)
+          if (_chatHistory.length > 6) _chatHistory = _chatHistory.slice(-6);
+          return;
+        }
+        buffer += decoder.decode(result.value, { stream: true });
+        var lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          if (line.startsWith('event: sources')) {
+            // Next data line has sources
+            continue;
+          }
+          if (line.startsWith('data: ')) {
+            var data = line.slice(6);
+            if (data === '[DONE]') continue;
+            // Check for sources JSON
+            try {
+              var parsed = JSON.parse(data);
+              if (parsed.sources) {
+                var srcDiv = document.createElement('div');
+                srcDiv.className = 'chat-msg-sources';
+                srcDiv.innerHTML = parsed.sources.map(function(s, idx) {
+                  return '<div>[' + (idx+1) + '] <a href="' + s.url + '" target="_blank" rel="noopener">' + (s.title || s.url) + '</a></div>';
+                }).join('');
+                assistantMsg.appendChild(srcDiv);
+                continue;
+              }
+              if (parsed.error) {
+                assistantMsg.textContent += '\n[Error: ' + parsed.error + ']';
+                continue;
+              }
+            } catch(e) {}
+            // Regular text token
+            fullResponse += data;
+            assistantMsg.firstChild
+              ? assistantMsg.firstChild.textContent = fullResponse
+              : assistantMsg.textContent = fullResponse;
+          }
+        }
+        messages.scrollTop = messages.scrollHeight;
+        return reader.read().then(processChunk);
+      }
+
+      return reader.read().then(processChunk);
+    }).catch(function(err) {
+      assistantMsg.classList.remove('streaming-cursor');
+      assistantMsg.textContent = 'Error: Could not connect to AI service. Is it running?';
+    });
+  };
+
+  // --- AI Briefing Panel ---
+  var _briefingEventSource = null;
+
+  yarr.openBriefing = function() {
+    document.getElementById('briefing-panel').style.display = 'flex';
+    yarr.loadBriefing();
+  };
+
+  yarr.closeBriefing = function() {
+    document.getElementById('briefing-panel').style.display = 'none';
+    if (_briefingEventSource) { _briefingEventSource.close(); _briefingEventSource = null; }
+  };
+
+  yarr.loadBriefing = function() {
+    var since = document.getElementById('briefing-since').value;
+    var content = document.getElementById('briefing-content');
+    content.innerHTML = '<div class="streaming-cursor" id="briefing-text"></div>';
+
+    var fullText = '';
+    fetch('./api/ai/briefing?since=' + since, {
+      headers: { 'Accept': 'text/event-stream' }
+    }).then(function(response) {
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = '';
+      var textEl = document.getElementById('briefing-text');
+
+      function processChunk(result) {
+        if (result.done) {
+          textEl.classList.remove('streaming-cursor');
+          // Simple markdown rendering: paragraphs
+          textEl.innerHTML = fullText
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\[([\d,\s]+)\]/g, '<sup>[$1]</sup>')
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/^/, '<p>').replace(/$/, '</p>')
+            .replace(/###\s*(.*?)<\/p>/g, '<h3>$1</h3>')
+            .replace(/##\s*(.*?)<\/p>/g, '<h2>$1</h2>');
+          return;
+        }
+        buffer += decoder.decode(result.value, { stream: true });
+        var lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          if (line.startsWith('data: ')) {
+            var data = line.slice(6);
+            if (data === '[DONE]') continue;
+            fullText += data;
+            textEl.textContent = fullText;
+          }
+        }
+        content.scrollTop = content.scrollHeight;
+        return reader.read().then(processChunk);
+      }
+
+      return reader.read().then(processChunk);
+    }).catch(function(err) {
+      content.innerHTML = '<div class="empty-state"><p>Could not connect to AI service. Is it running?</p></div>';
+    });
+  };
+
+  // --- Close dropdowns on outside click ---
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu.show').forEach(function(m) { m.classList.remove('show'); });
+    }
+  });
+
+  // --- Close dialogs on backdrop click ---
+  document.querySelectorAll('dialog').forEach(function(d) {
+    d.addEventListener('click', function(e) {
+      if (e.target === d) d.close();
+    });
+  });
+
+  // --- Delegated click handler for topic article rows ---
+  document.addEventListener('click', function(e) {
+    var row = e.target.closest('.topic-article-row');
+    if (!row) return;
+    var itemId = parseInt(row.getAttribute('data-item-id'), 10);
+    var url = row.getAttribute('data-item-url');
+    if (itemId && itemId > 0) {
+      htmx.ajax('GET', './partials/items/' + itemId, { target: '#col-item-content', swap: 'innerHTML' });
+      document.getElementById('app').classList.add('item-selected');
+    } else if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  });
+
+  // --- Init ---
+  document.addEventListener('DOMContentLoaded', function() {
+    initDrag('drag-feed', 200, 700, 'feed_list_width');
+    initDrag('drag-item', 200, 700, 'item_list_width');
+    initSearch();
+    initReadingProgress();
+
+    // Check if feeds are refreshing on load
+    if (document.getElementById('feed-status').style.display !== 'none') {
+      yarr.pollStatus();
+    }
+
+    // Check if an AI task is running (survives page reload)
+    yarr.checkTaskStatus();
+  });
+
+})(window.yarr);

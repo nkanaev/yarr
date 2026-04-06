@@ -1,0 +1,77 @@
+{% define "feed_list" %}
+<div id="feed-list-content" class="p-2">
+    <label class="selectgroup">
+        <input type="radio" name="feed" value=""
+               {% if eq .FeedSelected "" %}checked{% end %}
+               hx-get="./partials/items"
+               hx-target="#item-list-content"
+               hx-swap="innerHTML"
+               hx-vals='{"status": "{% .Filter %}"}'
+               hx-trigger="change"
+               hx-push-url="false">
+        <div class="selectgroup-label d-flex align-items-center w-100">
+            <span class="icon me-2">{% inline "layers.svg" %}</span>
+            <span class="flex-fill text-left text-truncate">
+                {% if eq .Filter "unread" %}All Unread
+                {% else if eq .Filter "starred" %}All Starred
+                {% else if eq .Filter "archived" %}All Archived
+                {% else %}All Feeds{% end %}
+            </span>
+            {% if .TotalCount %}<span class="counter text-right">{% .TotalCount %}</span>{% end %}
+        </div>
+    </label>
+    {% range .FoldersWithFeeds %}
+        {% if .Folder.Id %}
+        <label class="selectgroup mt-1"{% if .Hidden %} style="display:none"{% end %}>
+            <input type="radio" name="feed" value="folder:{% .Folder.Id %}"
+                   {% if eq $.FeedSelected (printf "folder:%d" .Folder.Id) %}checked{% end %}
+                   hx-get="./partials/items"
+                   hx-target="#item-list-content"
+                   hx-swap="innerHTML"
+                   hx-vals='{"folder_id": "{% .Folder.Id %}", "status": "{% $.Filter %}"}'
+                   hx-trigger="change"
+                   hx-push-url="false">
+            <div class="selectgroup-label d-flex align-items-center w-100">
+                <span class="icon me-2{% if .Folder.IsExpanded %} expanded{% end %}"
+                      onclick="event.preventDefault(); event.stopPropagation(); yarr.toggleFolder({% .Folder.Id %}, {% if .Folder.IsExpanded %}false{% else %}true{% end %});">
+                    {% inline "chevron-right.svg" %}
+                </span>
+                <span class="flex-fill text-left text-truncate">{% .Folder.Title %}</span>
+                {% if .FolderCount %}<span class="counter text-right">{% .FolderCount %}</span>{% end %}
+            </div>
+        </label>
+        {% end %}
+        <div{% if .Folder.Id %} class="ps-3"{% end %}
+            {% if and .Folder.Id (not .Folder.IsExpanded) %}style="display:none"{% end %}>
+            {% range .Feeds %}
+            <label class="selectgroup{% if .Hidden %} d-none{% end %}{% if .Feed.Archived %} archived{% end %}"
+                   {% if .Hidden %}style="display:none"{% end %}>
+                <input type="radio" name="feed" value="feed:{% .Feed.Id %}"
+                       {% if eq $.FeedSelected (printf "feed:%d" .Feed.Id) %}checked{% end %}
+                       hx-get="./partials/items"
+                       hx-target="#item-list-content"
+                       hx-swap="innerHTML"
+                       hx-vals='{"feed_id": "{% .Feed.Id %}", "status": "{% $.Filter %}"}'
+                       hx-trigger="change"
+                       hx-push-url="false">
+                <div class="selectgroup-label d-flex align-items-center w-100">
+                    {% if not .Feed.HasIcon %}
+                    <span class="icon me-2">{% inline "rss.svg" %}</span>
+                    {% else %}
+                    <span class="icon me-2"><img src="./api/feeds/{% .Feed.Id %}/icon" alt="" loading="lazy"></span>
+                    {% end %}
+                    <span class="flex-fill text-left text-truncate">{% .Feed.Title %}</span>
+                    {% if .FeedCount %}<span class="counter text-right">{% .FeedCount %}</span>{% end %}
+                    {% if .Feed.Archived %}
+                    <span class="icon flex-shrink-0 ms-2" title="Archived">{% inline "layers.svg" %}</span>
+                    {% end %}
+                    {% if .Error %}
+                    <span class="icon flex-shrink-0 ms-2" title="{% .Error %}">{% inline "alert-circle.svg" %}</span>
+                    {% end %}
+                </div>
+            </label>
+            {% end %}
+        </div>
+    {% end %}
+</div>
+{% end %}

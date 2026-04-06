@@ -1,0 +1,90 @@
+{% define "item_content" %}
+<div id="item-content-inner" class="d-flex flex-column" style="flex: 1 1 0; min-height: 0">
+    <div class="toolbar px-2 d-flex align-items-center">
+        <button class="toolbar-item" title="Star (s)"
+                hx-put="./partials/items/{% .Item.Id %}"
+                hx-headers='{"Content-Type": "application/json", "x-requested-by": "yarr"}'
+                hx-vals='{"status": "{% if eq .Item.StatusStr "starred" %}read{% else %}starred{% end %}"}'
+                hx-target="#col-item-content"
+                hx-swap="innerHTML">
+            {% if eq .Item.StatusStr "starred" %}
+            <span class="icon">{% inline "star-full.svg" %}</span>
+            {% else %}
+            <span class="icon">{% inline "star.svg" %}</span>
+            {% end %}
+        </button>
+        <button class="toolbar-item" title="Mark Unread (r)"
+                hx-put="./partials/items/{% .Item.Id %}"
+                hx-headers='{"Content-Type": "application/json", "x-requested-by": "yarr"}'
+                hx-vals='{"status": "{% if eq .Item.StatusStr "unread" %}read{% else %}unread{% end %}"}'
+                hx-target="#col-item-content"
+                hx-swap="innerHTML">
+            {% if eq .Item.StatusStr "unread" %}
+            <span class="icon">{% inline "circle-full.svg" %}</span>
+            {% else %}
+            <span class="icon">{% inline "circle.svg" %}</span>
+            {% end %}
+        </button>
+        <button class="toolbar-item" title="Read Here (i)" id="btn-readability"
+                hx-get="./page"
+                hx-vals='{"url": "{% .Item.Link %}"}'
+                hx-target="#article-body"
+                hx-swap="innerHTML"
+                hx-indicator="#btn-readability .icon">
+            <span class="icon">{% inline "book-open.svg" %}</span>
+        </button>
+        <a class="toolbar-item" href="{% .Item.Link %}" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link (o)">
+            <span class="icon">{% inline "external-link.svg" %}</span>
+        </a>
+        <button class="toolbar-item" title="Focus Mode"
+                onclick="yarr.toggleReaderMode()">
+            <span class="icon">{% inline "layers.svg" %}</span>
+        </button>
+        <div class="flex-grow-1"></div>
+        <button class="toolbar-item" title="Previous Article" id="btn-prev-item">
+            <span class="icon">{% inline "chevron-left.svg" %}</span>
+        </button>
+        <button class="toolbar-item" title="Next Article" id="btn-next-item">
+            <span class="icon">{% inline "chevron-right.svg" %}</span>
+        </button>
+        <button class="toolbar-item" title="Close (q)" onclick="document.getElementById('app').classList.remove('item-selected'); document.getElementById('col-item-content').innerHTML = '';">
+            <span class="icon">{% inline "x.svg" %}</span>
+        </button>
+    </div>
+    <div class="content px-4 pt-3 pb-5 border-top overflow-auto scroll-touch flex-grow-1{% if eq .ThemeFont "serif" %} font-serif{% end %}{% if eq .ThemeFont "monospace" %} font-monospace{% end %}"
+         style="min-height: 0;{% if .ThemeSize %} font-size: {% .ThemeSize %}rem{% end %}"
+         id="article-content-scroll">
+        <div id="reading-progress"></div>
+        <div class="content-wrapper">
+            <h1><b>{% if .Item.Title %}{% .Item.Title %}{% else %}untitled{% end %}</b></h1>
+            <div class="text-muted">
+                <div>
+                    <span class="cursor-pointer"
+                          onclick="var r=document.querySelector('input[name=feed][value=\'feed:{% .Item.FeedId %}\']'); if(r){r.checked=true; r.dispatchEvent(new Event('change'));}">
+                        {% .FeedTitle %}
+                    </span>
+                </div>
+                <time>{% .FormattedDate %}</time>
+            </div>
+            <hr>
+            {% if .Images %}
+            <div>
+                {% range .Images %}
+                <figure>
+                    <img src="{% .URL %}" loading="lazy">
+                    {% if .Description %}<figcaption>{% .Description %}</figcaption>{% end %}
+                </figure>
+                {% end %}
+            </div>
+            {% end %}
+            {% range .Audios %}
+            <audio class="w-100" controls src="{% .URL %}"></audio>
+            {% end %}
+            {% range .Videos %}
+            <video class="w-100" controls src="{% .URL %}"></video>
+            {% end %}
+            <div id="article-body">{% .Content %}</div>
+        </div>
+    </div>
+</div>
+{% end %}
