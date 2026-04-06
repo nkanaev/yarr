@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.backends"
+
+[project]
+name = "yarr-ai"
+version = "0.1.0"
+description = "AI service for yarr RSS reader — hybrid search, clustering, briefing, RAG chat"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104",
+    "uvicorn[standard]>=0.24",
+    "sse-starlette>=1.6",
+    "httpx>=0.25",
+    "chromadb>=0.4",
+    "rank-bm25>=0.2.2",
+    "hdbscan>=0.8.33",
+    "umap-learn>=0.5",
+    "scikit-learn>=1.3",
+    "numpy",
+    "trafilatura>=1.6",
+    "beautifulsoup4>=4.12",
+]
