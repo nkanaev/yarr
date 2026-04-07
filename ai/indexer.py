@@ -208,6 +208,10 @@ def reindex_all(config, collection, embed_provider=None, on_progress=None) -> in
             all_chunks.extend(article["chunks"])
             offsets.append((start, len(all_chunks)))
 
+        batch_num = batch_start // REINDEX_BATCH_SIZE + 1
+        total_batches = (new_total + REINDEX_BATCH_SIZE - 1) // REINDEX_BATCH_SIZE
+        progress(f"Embedding: {batch_start}/{new_total} articles (batch {batch_num}/{total_batches})")
+
         try:
             if embed_provider is not None:
                 # Direct batched embed — one call for all chunks in the batch
@@ -268,8 +272,6 @@ def reindex_all(config, collection, embed_provider=None, on_progress=None) -> in
             existing_hashes.add(article["content_hash"])
 
         count += len(batch)
-        batch_num = batch_start // REINDEX_BATCH_SIZE + 1
-        total_batches = (new_total + REINDEX_BATCH_SIZE - 1) // REINDEX_BATCH_SIZE
         log.info("Indexed batch %d/%d (%d articles, %d total)", batch_num, total_batches, len(batch), count)
         progress(f"Indexing: {count}/{new_total} articles (batch {batch_num}/{total_batches})")
 
