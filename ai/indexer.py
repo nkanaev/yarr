@@ -176,6 +176,8 @@ def reindex_all(config, collection, embed_provider=None, on_progress=None) -> in
                 result["chunks"] = [c for c in result["chunks"] if c and c.strip()]
                 if result["chunks"]:
                     pending.append(result)
+                    existing_urls.add(result["url"])
+                    existing_hashes.add(result["content_hash"])
         except Exception as e:
             scan_errors += 1
             log.warning("Failed to process item %s: %s", item.get("link", "?"), e)
