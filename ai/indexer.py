@@ -8,7 +8,7 @@ from datetime import datetime
 from .article_extractor import html_to_text
 from .chunker import chunk_text
 from .store import add_chunks, article_exists
-from .yarr_db import get_items_by_ids, list_items, list_all_items, get_feed_folder_map, open_db
+from .yarr_db import get_items_by_ids, list_items, iter_all_items, get_feed_folder_map, open_db
 
 log = logging.getLogger(__name__)
 
@@ -21,16 +21,17 @@ def generate_article_id(url: str) -> str:
     return hashlib.md5(url.encode()).hexdigest()
 
 
-def _get_existing_urls(collection) -> set[str]:
-    """Pre-fetch all indexed URLs for O(1) dedup."""
+def _get_existing_ids(collection) -> tuple[set[str], set[str]]:
+    """Pre-fetch all indexed URLs and content hashes in a single ChromaDB call."""
     data = collection.get(include=["metadatas"])
-    return {m.get("url", "") for m in data["metadatas"]}
-
-
-def _get_existing_hashes(collection) -> set[str]:
-    """Pre-fetch content hashes for cross-URL dedup."""
-    data = collection.get(include=["metadatas"])
-    return {m.get("content_hash", "") for m in data["metadatas"] if m.get("content_hash")}
+    urls: set[str] = set()
+    hashes: set[str] = set()
+    for m in data["metadatas"]:
+        if url := m.get("url", ""):
+            urls.add(url)
+        if h := m.get("content_hash", ""):
+            hashes.add(h)
+    return urls, hashes
 
 
 def _process_item(item: dict, config, existing_urls: set, existing_hashes: set) -> dict | None:
@@ -96,8 +97,7 @@ def index_items(config, collection, item_ids: list[int]) -> int:
     if not items:
         return 0
 
-    existing_urls = _get_existing_urls(collection)
-    existing_hashes = _get_existing_hashes(collection)
+    existing_urls, existing_hashes = _get_existing_ids(collection)
 
     count = 0
     for item in items:
@@ -147,46 +147,43 @@ def reindex_all(config, collection, embed_provider=None, on_progress=None) -> in
         if on_progress:
             on_progress(msg)
 
-    conn = open_db(config.yarr_db)
-    try:
-        all_items = list_all_items(conn)
-    finally:
-        conn.close()
-
-    total = len(all_items)
-    log.info("Found %d total items in yarr DB", total)
-    progress(f"Found {total} articles, checking already indexed...")
-
-    existing_urls = _get_existing_urls(collection)
-    existing_hashes = _get_existing_hashes(collection)
+    # Pre-fetch existing URLs and hashes in a single ChromaDB call
+    existing_urls, existing_hashes = _get_existing_ids(collection)
     already = len(existing_urls)
-    progress(f"{total} articles total, {already} already indexed — scanning new ones...")
+    progress(f"Checking already indexed ({already} found), scanning new articles...")
 
-    # --- Phase 1: scan all articles, process into chunks (no API calls) ---
+    # --- Phase 1: stream articles from DB in batches, process into chunks (no API calls) ---
+    # Articles are streamed 500 at a time so full HTML content is never all in memory at once.
     pending: list[dict] = []
     skipped = 0
     scan_errors = 0
+    scanned = 0
 
-    for i, item in enumerate(all_items):
-        try:
-            result = _process_item(item, config, existing_urls, existing_hashes)
-            if result is None:
-                skipped += 1
-            else:
-                result["chunks"] = [c for c in result["chunks"] if c and c.strip()]
-                if result["chunks"]:
-                    pending.append(result)
-                    existing_urls.add(result["url"])
-                    existing_hashes.add(result["content_hash"])
-        except Exception as e:
-            scan_errors += 1
-            log.warning("Failed to process item %s: %s", item.get("link", "?"), e)
+    conn = open_db(config.yarr_db)
+    try:
+        for item in iter_all_items(conn, batch_size=500):
+            scanned += 1
+            try:
+                result = _process_item(item, config, existing_urls, existing_hashes)
+                if result is None:
+                    skipped += 1
+                else:
+                    result["chunks"] = [c for c in result["chunks"] if c and c.strip()]
+                    if result["chunks"]:
+                        pending.append(result)
+                        existing_urls.add(result["url"])
+                        existing_hashes.add(result["content_hash"])
+            except Exception as e:
+                scan_errors += 1
+                log.warning("Failed to process item %s: %s", item.get("link", "?"), e)
 
-        if (i + 1) % 500 == 0:
-            progress(f"Scanning: {i + 1}/{total} articles ({len(pending)} to index, {skipped} skipped)")
+            if scanned % 500 == 0:
+                progress(f"Scanning: {scanned} articles ({len(pending)} to index, {skipped} skipped)")
+    finally:
+        conn.close()
 
     new_total = len(pending)
-    log.info("Scan complete: %d new articles to index (%d skipped, %d errors)", new_total, skipped, scan_errors)
+    log.info("Scan complete: %d new articles to index (%d scanned, %d skipped, %d errors)", new_total, scanned, skipped, scan_errors)
     progress(f"Scan complete: {new_total} new articles to embed and index...")
 
     if not pending:

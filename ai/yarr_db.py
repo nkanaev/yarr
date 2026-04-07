@@ -115,6 +115,35 @@ def list_all_items(conn: sqlite3.Connection) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def iter_all_items(conn: sqlite3.Connection, batch_size: int = 500):
+    """Stream ALL items in cursor-based batches to avoid loading all HTML into memory.
+
+    Uses WHERE id > last_id (keyset pagination) for efficiency — no OFFSET scans.
+    Yields one item dict at a time.
+    """
+    last_id = 0
+    while True:
+        rows = conn.execute(
+            """
+            SELECT i.id, i.title, i.link, i.content, i.date, i.status,
+                   i.feed_id, f.title as feed_title,
+                   COALESCE(fo.title, 'uncategorized') as folder_name
+            FROM items i
+            JOIN feeds f ON f.id = i.feed_id
+            LEFT JOIN folders fo ON fo.id = f.folder_id
+            WHERE i.id > ?
+            ORDER BY i.id
+            LIMIT ?
+            """,
+            (last_id, batch_size),
+        ).fetchall()
+        if not rows:
+            break
+        for row in rows:
+            yield dict(row)
+        last_id = rows[-1]["id"]
+
+
 def get_feed_folder_map(conn: sqlite3.Connection) -> dict[int, dict]:
     """Build feed_id -> {folder, feed_name} mapping."""
     feeds = list_feeds(conn)
