@@ -596,9 +596,8 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		url = newUrl
 	}
 	if content := silo.VideoIFrame(url); content != "" {
-		c.JSON(http.StatusOK, map[string]string{
-			"content": sanitizer.Sanitize(url, content),
-		})
+		c.Out.Header().Set("Content-Type", "text/html; charset=utf-8")
+		c.Out.Write([]byte(sanitizer.Sanitize(url, content)))
 		return
 	}
 	if isInternalFromURL(url) {
@@ -614,15 +613,13 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 	}
 	content, err := readability.ExtractContent(strings.NewReader(body))
 	if err != nil {
-		c.JSON(http.StatusOK, map[string]string{
-			"content": "error: " + err.Error(),
-		})
+		c.Out.Header().Set("Content-Type", "text/html; charset=utf-8")
+		c.Out.Write([]byte("<p class=\"text-danger\">Could not extract content: " + err.Error() + "</p>"))
 		return
 	}
 	content = sanitizer.Sanitize(url, content)
-	c.JSON(http.StatusOK, map[string]string{
-		"content": content,
-	})
+	c.Out.Header().Set("Content-Type", "text/html; charset=utf-8")
+	c.Out.Write([]byte(content))
 }
 
 func (s *Server) handleLogout(c *router.Context) {
