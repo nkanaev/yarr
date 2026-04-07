@@ -599,7 +599,7 @@ window.yarr = window.yarr || {};
           yarr.loadTopics();
         }
       }).catch(function() {});
-    }, 2000);
+    }, 5000);
   }
 
   // Check for running AI task on page load (survives reload)
