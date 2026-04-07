@@ -8,7 +8,8 @@
                hx-swap="innerHTML"
                hx-vals='{"status": "{% .Filter %}"}'
                hx-trigger="change"
-               hx-push-url="false">
+               hx-push-url="false"
+               hx-on::after-request="document.getElementById('app').classList.add('feed-selected'); document.getElementById('app').classList.remove('item-selected')">
         <div class="selectgroup-label d-flex align-items-center w-100">
             <span class="icon me-2">{% inline "layers.svg" %}</span>
             <span class="flex-fill text-left text-truncate">
@@ -30,7 +31,8 @@
                    hx-swap="innerHTML"
                    hx-vals='{"folder_id": "{% .Folder.Id %}", "status": "{% $.Filter %}"}'
                    hx-trigger="change"
-                   hx-push-url="false">
+                   hx-push-url="false"
+                   hx-on::after-request="document.getElementById('app').classList.add('feed-selected'); document.getElementById('app').classList.remove('item-selected')">
             <div class="selectgroup-label d-flex align-items-center w-100">
                 <span class="icon me-2{% if .Folder.IsExpanded %} expanded{% end %}"
                       onclick="event.preventDefault(); event.stopPropagation(); yarr.toggleFolder({% .Folder.Id %}, {% if .Folder.IsExpanded %}false{% else %}true{% end %});">
@@ -53,7 +55,8 @@
                        hx-swap="innerHTML"
                        hx-vals='{"feed_id": "{% .Feed.Id %}", "status": "{% $.Filter %}"}'
                        hx-trigger="change"
-                       hx-push-url="false">
+                       hx-push-url="false"
+                       hx-on::after-request="document.getElementById('app').classList.add('feed-selected'); document.getElementById('app').classList.remove('item-selected')">
                 <div class="selectgroup-label d-flex align-items-center w-100">
                     {% if not .Feed.HasIcon %}
                     <span class="icon me-2">{% inline "rss.svg" %}</span>

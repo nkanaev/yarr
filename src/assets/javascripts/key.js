@@ -18,34 +18,6 @@
     }
   }
 
-  function getSelectedItemRadio() {
-    return document.querySelector('#item-list-scroll input[name=item]:checked');
-  }
-
-  function getItemRadios() {
-    return Array.from(document.querySelectorAll('#item-list-scroll input[name=item]'));
-  }
-
-  function navigateItem(offset) {
-    var radios = getItemRadios();
-    if (radios.length === 0) return;
-
-    var current = getSelectedItemRadio();
-    var idx = current ? radios.indexOf(current) : -1;
-    var next = idx + offset;
-
-    if (next < 0 || next >= radios.length) return;
-
-    radios[next].checked = true;
-    radios[next].dispatchEvent(new Event('change', { bubbles: true }));
-
-    // Scroll into view
-    var label = radios[next].closest('.selectgroup');
-    if (label) {
-      label.scrollIntoView({ block: 'nearest' });
-    }
-  }
-
   function getFeedRadios() {
     return Array.from(document.querySelectorAll('#feed-list-content input[name=feed]'));
   }
@@ -100,8 +72,8 @@
       var search = document.getElementById('searchbar');
       if (search) search.focus();
     },
-    'j': function() { navigateItem(1); },
-    'k': function() { navigateItem(-1); },
+    'j': function() { if (window.yarr && yarr.selectArticleAtOffset) yarr.selectArticleAtOffset(1); },
+    'k': function() { if (window.yarr && yarr.selectArticleAtOffset) yarr.selectArticleAtOffset(-1); },
     'l': function() { navigateFeed(1); },
     'h': function() { navigateFeed(-1); },
     'f': function() { scrollContent(1); },

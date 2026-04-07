@@ -1,5 +1,5 @@
 {% define "item_content" %}
-<div id="item-content-inner" class="d-flex flex-column" style="flex: 1 1 0; min-height: 0">
+<div id="item-content-inner" class="d-flex flex-column" style="flex: 1 1 0; min-height: 0" data-item-id="{% .Item.Id %}">
     <div class="toolbar px-2 d-flex align-items-center">
         <button class="toolbar-item" title="Star (s)"
                 hx-put="./partials/items/{% .Item.Id %}"
@@ -26,11 +26,14 @@
             {% end %}
         </button>
         <button class="toolbar-item" title="Read Here (i)" id="btn-readability"
+                onclick="if(this.classList.contains('active')){var el=document.getElementById('article-body');var o=el.getAttribute('data-original');if(o){el.innerHTML=o;el.removeAttribute('data-original')}this.classList.remove('active');return false}"
                 hx-get="./page"
                 hx-vals='{"url": "{% .Item.Link %}"}'
                 hx-target="#article-body"
                 hx-swap="innerHTML"
-                hx-indicator="#btn-readability .icon">
+                hx-indicator="#btn-readability .icon"
+                hx-on::before-request="var el=document.getElementById('article-body'); if(!el.getAttribute('data-original')){el.setAttribute('data-original',el.innerHTML)}"
+                hx-on::after-request="document.getElementById('btn-readability').classList.add('active')">
             <span class="icon">{% inline "book-open.svg" %}</span>
         </button>
         <a class="toolbar-item" href="{% .Item.Link %}" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link (o)">
@@ -41,10 +44,10 @@
             <span class="icon">{% inline "layers.svg" %}</span>
         </button>
         <div class="flex-grow-1"></div>
-        <button class="toolbar-item" title="Previous Article" id="btn-prev-item">
+        <button class="toolbar-item" title="Previous Article" id="btn-prev-item" onclick="yarr.selectArticleAtOffset(-1)">
             <span class="icon">{% inline "chevron-left.svg" %}</span>
         </button>
-        <button class="toolbar-item" title="Next Article" id="btn-next-item">
+        <button class="toolbar-item" title="Next Article" id="btn-next-item" onclick="yarr.selectArticleAtOffset(1)">
             <span class="icon">{% inline "chevron-right.svg" %}</span>
         </button>
         <button class="toolbar-item" title="Close (q)" onclick="document.getElementById('app').classList.remove('item-selected'); document.getElementById('col-item-content').innerHTML = '';">

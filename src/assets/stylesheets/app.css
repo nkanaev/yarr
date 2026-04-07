@@ -1011,10 +1011,10 @@ kbd {
 /* Tablet: 768-991px */
 @media (min-width: 768px) and (max-width: 991.98px) {
   #app #col-feed-list {
-    width: 35%;
+    width: 35% !important;
   }
   #app #col-item-list {
-    width: 65%;
+    width: 65% !important;
     border-right-width: 0;
   }
   #app #col-item {
@@ -1035,16 +1035,16 @@ kbd {
 /* Mobile: <768px */
 @media (max-width: 767.98px) {
   #app #col-feed-list {
-    width: 100%;
+    width: 100% !important;
     border-right-width: 0;
   }
   #app #col-item-list {
-    width: 100%;
+    width: 100% !important;
     display: none;
     border-right-width: 0;
   }
   #app #col-item {
-    width: 100%;
+    width: 100% !important;
     display: none;
   }
 
@@ -1065,10 +1065,32 @@ kbd {
   }
   .toolbar-item,
   .toolbar-search {
-    padding: 0.5rem;
+    padding: 0.375rem 0.5rem;
   }
   .d-md-none { display: block; }
   .d-md-block { display: block; }
+
+  #item-list-scroll {
+    padding: 0.25rem;
+  }
+
+  .selectgroup-label {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .selectgroup + .selectgroup {
+    margin-top: 0.125rem;
+  }
+
+  .input-icon input {
+    min-width: 0;
+  }
+
+  #app #item-content-inner .toolbar-item,
+  #app #item-content-inner .toolbar {
+    min-height: 2.75rem;
+    max-height: 2.75rem;
+  }
 }
 
 @media (min-width: 992px) {
@@ -1265,4 +1287,9 @@ kbd {
 .htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator {
   opacity: 1;
+}
+
+#btn-readability.htmx-request .icon {
+  animation: stroke 2s infinite normal;
+  stroke-dasharray: 60;
 }

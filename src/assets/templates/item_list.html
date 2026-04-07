@@ -9,7 +9,7 @@
                hx-swap="innerHTML"
                hx-trigger="change"
                hx-push-url="false"
-               hx-on::after-request="document.getElementById('app').classList.add('item-selected')">
+               hx-on::after-request="document.getElementById('app').classList.add('item-selected'); if (window.yarr && yarr.updateArticleNavButtons) { yarr.updateArticleNavButtons(); }">
         <div class="selectgroup-label d-flex flex-column">
             <div style="line-height: 100%; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
                 {% if eq .StatusStr "unread" %}
