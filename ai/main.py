@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 # Suppress noisy trafilatura warnings for empty/invalid HTML
 logging.getLogger("trafilatura").setLevel(logging.CRITICAL)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 async def ensure_models(config: Config):

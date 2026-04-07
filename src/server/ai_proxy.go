@@ -1,6 +1,8 @@
 package server
 
 import (
+	"context"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -51,6 +53,9 @@ func (s *Server) handleAiProxy(c *router.Context) {
 	client := &http.Client{Timeout: 5 * time.Minute}
 	resp, err := client.Do(proxyReq)
 	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			return
+		}
 		log.Printf("AI proxy: request failed: %v", err)
 		c.Out.WriteHeader(http.StatusBadGateway)
 		c.Out.Write([]byte(`{"error":"AI service unavailable"}`))
