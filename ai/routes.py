@@ -135,10 +135,12 @@ async def full_reindex(request: Request, background_tasks: BackgroundTasks):
     def progress(msg):
         task_state["detail"] = msg
 
+    embed_prov = request.app.state.embed_provider
+
     def do_reindex():
         task_state.update({"type": "reindex", "started_at": datetime.utcnow().isoformat(), "detail": "Starting..."})
         try:
-            count = reindex_all(config, collection, on_progress=progress)
+            count = reindex_all(config, collection, embed_provider=embed_prov, on_progress=progress)
             if count > 0:
                 progress("Rebuilding search index...")
                 bm25, docs = build_bm25_index(collection)

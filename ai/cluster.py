@@ -248,10 +248,10 @@ Topic name: True Crime Podcast"""
             {"role": "user", "content": user_msg},
         ]
 
-        # Rate limiting: 8-second delay between calls (stays well under 15 RPM)
+        # Rate limiting: small delay between calls (Tier 1: 1000 RPM for gemini-2.5-flash)
         if idx > 0:
             import time
-            time.sleep(8)
+            time.sleep(0.1)
 
         try:
             content = _call_llm_for_label(msgs, llm_provider, model, ollama_url)
@@ -586,7 +586,7 @@ def run_clustering(config, llm_provider=None, embed_provider=None, on_progress=N
     # Merge duplicate labels via LLM
     progress("Merging similar topic labels...")
     import time
-    time.sleep(8)  # Rate limit buffer before merge call
+    time.sleep(0.1)  # Small buffer before merge call (Tier 1: 1000 RPM)
     cluster_names = merge_similar_labels(cluster_names, llm_provider=llm_provider, model=config.label_model, ollama_url=config.ollama_url)
 
     cluster_map = build_cluster_map(articles, labels, embeddings, cluster_names)

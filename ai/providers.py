@@ -181,7 +181,7 @@ GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
 
 class GeminiEmbed:
-    BATCH_SIZE = 50  # Tier 1 allows 10,000 RPM
+    BATCH_SIZE = 100  # Tier 1 allows 3,000 RPM; 100 is Gemini batchEmbedContents max
 
     def __init__(self, model: str, api_key: str):
         self.model = model
@@ -210,10 +210,6 @@ class GeminiEmbed:
                 {"model": f"models/{self.model}", "content": {"parts": [{"text": t}]}}
                 for t in batch
             ]
-
-            # Proactive throttle: ~25 RPS (1500 RPM) for free tier, higher for Tier 1
-            if i > 0:
-                time.sleep(0.04)
 
             for attempt in range(5):
                 resp = httpx.post(
@@ -305,7 +301,7 @@ class GeminiLLM:
                 )
                 if resp.status_code == 429:
                     retry_after = resp.headers.get("Retry-After")
-                    wait = int(retry_after) if retry_after else 10 * (2 ** attempt)  # 10, 20, 40, 80...
+                    wait = int(retry_after) if retry_after else 2 * (2 ** attempt)  # 2, 4, 8, 16, 32...
                     log.warning("Gemini generate rate limited, retrying in %ds (attempt %d/6)...", wait, attempt + 1)
                     import asyncio
                     await asyncio.sleep(wait)
