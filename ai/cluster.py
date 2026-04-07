@@ -13,32 +13,60 @@ import numpy as np
 log = logging.getLogger(__name__)
 
 
-def get_article_embeddings(collection) -> tuple[list[dict], np.ndarray]:
-    """Extract per-article embeddings by averaging chunk embeddings."""
-    data = collection.get(include=["embeddings", "metadatas"])
-    if not data["ids"]:
+def get_article_embeddings(collection, on_progress=None) -> tuple[list[dict], np.ndarray]:
+    """Extract per-article embeddings by averaging chunk embeddings.
+
+    Fetches chunks in batches to avoid loading all embeddings (~1.2GB) at once.
+    Accumulates per-article embedding sums and counts, then divides at the end.
+    """
+    total_chunks = collection.count()
+    if total_chunks == 0:
         return [], np.array([])
 
-    # Group chunks by URL
-    articles_map: dict[str, dict] = {}
-    for i, meta in enumerate(data["metadatas"]):
-        url = meta.get("url", "")
-        if url not in articles_map:
-            articles_map[url] = {
-                "url": url,
-                "title": meta.get("title", ""),
-                "published": meta.get("published", ""),
-                "folder": meta.get("folder", ""),
-                "feed_name": meta.get("feed_name", ""),
-                "embeddings": [],
-            }
-        articles_map[url]["embeddings"].append(data["embeddings"][i])
+    BATCH = 5000
+    # Accumulate sum + count per URL to compute mean without holding all vectors
+    articles_meta: dict[str, dict] = {}   # url -> metadata fields
+    articles_sum: dict[str, np.ndarray] = {}  # url -> running sum of embeddings
+    articles_count: dict[str, int] = {}   # url -> chunk count
+
+    for offset in range(0, total_chunks, BATCH):
+        if on_progress:
+            on_progress(f"Loading embeddings: {min(offset + BATCH, total_chunks)}/{total_chunks} chunks...")
+        data = collection.get(
+            include=["embeddings", "metadatas"],
+            limit=BATCH,
+            offset=offset,
+        )
+        if not data["ids"]:
+            break
+
+        for i, meta in enumerate(data["metadatas"]):
+            url = meta.get("url", "")
+            emb = np.array(data["embeddings"][i])
+            if url not in articles_meta:
+                articles_meta[url] = {
+                    "url": url,
+                    "title": meta.get("title", ""),
+                    "published": meta.get("published", ""),
+                    "folder": meta.get("folder", ""),
+                    "feed_name": meta.get("feed_name", ""),
+                }
+                articles_sum[url] = emb
+                articles_count[url] = 1
+            else:
+                articles_sum[url] += emb
+                articles_count[url] += 1
+
+        # Batch data goes out of scope here — GC can reclaim embeddings
 
     articles = []
     embeddings = []
-    for info in articles_map.values():
-        articles.append({k: v for k, v in info.items() if k != "embeddings"})
-        embeddings.append(np.mean(info["embeddings"], axis=0))
+    for url, meta in articles_meta.items():
+        articles.append(meta)
+        embeddings.append(articles_sum[url] / articles_count[url])
+
+    # Free the accumulators
+    del articles_sum, articles_count, articles_meta
 
     return articles, np.array(embeddings)
 
@@ -518,7 +546,7 @@ def run_clustering(config, llm_provider=None, embed_provider=None, on_progress=N
     collection, _ = init_store(config.chroma_path, ep)
 
     progress("Extracting article embeddings...")
-    articles, embeddings = get_article_embeddings(collection)
+    articles, embeddings = get_article_embeddings(collection, on_progress=progress)
 
     if len(articles) < config.min_cluster_size:
         log.info("Not enough articles for clustering (%d)", len(articles))
