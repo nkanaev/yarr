@@ -2,7 +2,7 @@ name: Docker
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feat/cluster-db-storage]
     tags: ['v*']
 
 env:

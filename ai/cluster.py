@@ -3,9 +3,7 @@
 import json
 import logging
 import re
-from collections import defaultdict
 from datetime import datetime
-from pathlib import Path
 
 import httpx
 import numpy as np
@@ -339,24 +337,26 @@ def assign_noise_to_nearest(
 
 def stabilize_labels(
     new_centroids: dict[int, np.ndarray],
-    previous_clusters: dict | None,
+    previous_centroids: list[dict] | None,
     threshold: float = 0.85,
 ) -> dict[int, str | None]:
     """Match new clusters to previous ones by centroid similarity.
 
+    previous_centroids: list of {cluster_id, label, centroid_b64} as returned
+                        by GET /api/ai/clusters/centroids, or None.
     Returns mapping: new_cluster_id -> old_label or None (needs new label).
     """
-    if not previous_clusters:
+    if not previous_centroids:
         return {cid: None for cid in new_centroids}
 
-    old_clusters = previous_clusters.get("clusters", [])
-    old_centroids = {}
-    old_labels = {}
-    for c in old_clusters:
-        cid = c["id"]
-        if c.get("centroid"):
-            old_centroids[cid] = np.array(c["centroid"])
-            old_labels[cid] = c.get("label", "")
+    import base64
+    old_centroids: dict[int, np.ndarray] = {}
+    old_labels: dict[int, str] = {}
+    for entry in previous_centroids:
+        cid = entry["cluster_id"]
+        blob = base64.b64decode(entry["centroid"])
+        old_centroids[cid] = np.frombuffer(blob, dtype=np.float64)
+        old_labels[cid] = entry["label"]
 
     result: dict[int, str | None] = {}
     for new_id, new_centroid in new_centroids.items():
@@ -376,53 +376,76 @@ def stabilize_labels(
     return result
 
 
-def build_cluster_map(
+def build_cluster_run(
     articles: list[dict],
     labels: np.ndarray,
     embeddings: np.ndarray,
     cluster_names: dict[int, str],
 ) -> dict:
-    """Build JSON-serializable cluster map."""
+    """Build cluster run data for POSTing to Go."""
     centroids = compute_centroids(embeddings, labels)
 
-    clusters = []
+    import base64
+    cluster_labels = []
+    centroid_payloads = []
     for cid in sorted(set(labels)):
         if cid == -1:
             continue
+        cid_int = int(cid)
         mask = labels == cid
-        cluster_articles = [articles[i] for i in np.where(mask)[0]]
-        clusters.append({
-            "id": int(cid),
-            "label": cluster_names.get(int(cid), f"Cluster {cid}"),
-            "article_count": int(np.sum(mask)),
-            "centroid": centroids[int(cid)].tolist() if int(cid) in centroids else [],
-            "articles": cluster_articles,
-        })
-
-    clusters.sort(key=lambda x: x["article_count"], reverse=True)
+        label = cluster_names.get(cid_int, f"Cluster {cid_int}")
+        article_count = int(np.sum(mask))
+        cluster_labels.append({"label": label, "article_count": article_count})
+        if cid_int in centroids:
+            # Store as float64 bytes, base64-encoded for JSON transport
+            vec = centroids[cid_int].astype(np.float64)
+            centroid_payloads.append({
+                "cluster_id": cid_int,
+                "label": label,
+                "centroid": base64.b64encode(vec.tobytes()).decode("ascii"),
+            })
 
     noise_count = int(np.sum(labels == -1))
     return {
         "generated_at": datetime.utcnow().isoformat(),
         "algorithm": "hdbscan",
-        "n_clusters": len(clusters),
         "n_articles": len(articles),
         "n_noise": noise_count,
-        "clusters": clusters,
+        "clusters": cluster_labels,
+        "centroids": centroid_payloads,
     }
 
 
-def save_cluster_map(cluster_map: dict, output_path: str) -> None:
-    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w") as f:
-        json.dump(cluster_map, f, indent=2, default=str)
+def post_cluster_run(yarr_api_url: str, cluster_run: dict) -> bool:
+    """POST cluster run data to Go's /api/ai/clusters endpoint.
 
-
-def load_previous_clusters(path: str) -> dict | None:
+    Returns True on success, False on failure.
+    """
+    url = yarr_api_url.rstrip("/") + "/api/ai/clusters"
     try:
-        with open(path) as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+        resp = httpx.post(url, json=cluster_run, timeout=30.0)
+        resp.raise_for_status()
+        log.info("Cluster run saved to Go DB via %s (%d labels, %d centroids)",
+                 url, len(cluster_run["clusters"]), len(cluster_run["centroids"]))
+        return True
+    except Exception as e:
+        log.error("Failed to POST cluster run to %s: %s", url, e)
+        return False
+
+
+def fetch_previous_centroids(yarr_api_url: str) -> list[dict] | None:
+    """GET previous centroids from Go's /api/ai/clusters/centroids endpoint.
+
+    Returns list of {cluster_id, label, centroid} or None if unavailable.
+    """
+    url = yarr_api_url.rstrip("/") + "/api/ai/clusters/centroids"
+    try:
+        resp = httpx.get(url, timeout=10.0)
+        resp.raise_for_status()
+        data = resp.json()
+        return data if data else None
+    except Exception as e:
+        log.warning("Could not fetch previous centroids from %s: %s", url, e)
         return None
 
 
@@ -534,7 +557,7 @@ JSON:"""
 
 
 def run_clustering(config, llm_provider=None, embed_provider=None, on_progress=None) -> dict | None:
-    """Full clustering pipeline. Returns cluster map or None."""
+    """Full clustering pipeline. Returns cluster run dict or None."""
     from .store import init_store, update_article_tags
     from .providers import OllamaEmbed
 
@@ -574,10 +597,11 @@ def run_clustering(config, llm_provider=None, embed_provider=None, on_progress=N
     progress(f"Found {n_clusters} clusters, selecting representatives...")
     representatives = get_representative_articles(embeddings, labels, articles, n=10)
 
-    # Label stability
-    output_path = str(Path(config.chroma_path).parent / "clusters.json")
-    previous = load_previous_clusters(output_path)
-    stable = stabilize_labels(centroids, previous)
+    # Label stability — fetch previous centroids from Go DB
+    previous_centroids = None
+    if config.yarr_api_url:
+        previous_centroids = fetch_previous_centroids(config.yarr_api_url)
+    stable = stabilize_labels(centroids, previous_centroids)
 
     # LLM-label new/changed clusters AND clusters with generic "Cluster N" labels
     to_label = {
@@ -617,8 +641,12 @@ def run_clustering(config, llm_provider=None, embed_provider=None, on_progress=N
     time.sleep(0.1)  # Small buffer before merge call (Tier 1: 1000 RPM)
     cluster_names = merge_similar_labels(cluster_names, llm_provider=llm_provider, model=config.label_model, ollama_url=config.ollama_url)
 
-    cluster_map = build_cluster_map(articles, labels, embeddings, cluster_names)
-    save_cluster_map(cluster_map, output_path)
+    # Build and save cluster run to Go DB
+    cluster_run = build_cluster_run(articles, labels, embeddings, cluster_names)
+    if config.yarr_api_url:
+        post_cluster_run(config.yarr_api_url, cluster_run)
+    else:
+        log.warning("YARR_API_URL not set — cluster results not saved to DB")
 
     # Update ChromaDB tags
     progress(f"Updating tags for {len(articles)} articles...")
@@ -630,4 +658,4 @@ def run_clustering(config, llm_provider=None, embed_provider=None, on_progress=N
 
     log.info("Clustering complete: %d clusters", len(cluster_names))
     progress(f"Complete: {len(cluster_names)} clusters found")
-    return cluster_map
+    return cluster_run

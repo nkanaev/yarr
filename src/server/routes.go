@@ -65,6 +65,10 @@ func (s *Server) handler() http.Handler {
 	r.For("/logout", s.handleLogout)
 	r.For("/fever/", s.handleFever)
 
+	// AI cluster endpoints served directly by Go (registered before the wildcard proxy)
+	r.For("/api/ai/clusters", s.handleAiClusters)
+	r.For("/api/ai/clusters/centroids", s.handleAiClusterCentroids)
+
 	if s.AiServiceURL != "" {
 		r.For("/api/ai/*path", s.handleAiProxy)
 	}
