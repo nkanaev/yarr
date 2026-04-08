@@ -2,7 +2,7 @@ name: Docker
 
 on:
   push:
-    branches: [main, master, feat/cluster-db-storage, feat/vue-restore]
+    branches: [main, master, 'feat/*']
     tags: ['v*']
 
 env:
