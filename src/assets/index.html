@@ -3,360 +3,602 @@
 <head>
     <meta charset="UTF-8">
     <title>yarr!</title>
+    <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css">
     <link rel="stylesheet" href="./static/stylesheets/app.css">
     <link rel="icon" href="./static/graphicarts/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png">
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="{% .themeColor %}">
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script>
-        window.yarr = {
-            settings: {% .settingsJSON %},
-            authenticated: {% .authenticated %}
-        };
+        window.app = window.app || {}
+        window.app.settings = {% .settings %}
+        window.app.authenticated = {% .authenticated %}
+        window.app.aiEnabled = {% .aiEnabled %}
     </script>
 </head>
-<body data-theme="{% .settings.theme_name %}">
-    <div id="app" class="{% if .feedSelected %}feed-selected{% end %}">
+<body class="theme-{% .settings.theme_name %}">
+    <div id="app" class="d-flex" :class="{'feed-selected': feedSelected !== null, 'item-selected': itemSelected !== null}" v-cloak>
         <!-- feed list -->
-        <div id="col-feed-list" style="width: {% .feedListWidth %}px">
-            <div class="drag" id="drag-feed"></div>
+        <div id="col-feed-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
+            <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
             <div class="p-2 toolbar d-flex align-items-center">
-                <div class="icon ms-2 me-1">{% inline "anchor.svg" %}</div>
-                <button class="toolbar-item ms-1" title="AI Briefing" onclick="yarr.openBriefing()" id="btn-briefing">
-                    <span class="icon">{% inline "zap.svg" %}</span>
+                <div class="icon mx-2">{% inline "anchor.svg" %}</div>
+                <div class="flex-grow-1"></div>
+                <button class="toolbar-item ml-1"
+                        :class="{active: filterSelected == 'unread'}"
+                        :aria-pressed="filterSelected == 'unread'"
+                        title="Unread"
+                        @click="filterSelected = 'unread'">
+                    <span class="icon">{% inline "circle-full.svg" %}</span>
                 </button>
-                <button class="toolbar-item ms-1" title="AI Chat" onclick="yarr.openChat()" id="btn-chat">
-                    <span class="icon">{% inline "message-circle.svg" %}</span>
+                <button class="toolbar-item mx-1"
+                        :class="{active: filterSelected == 'starred'}"
+                        :aria-pressed="filterSelected == 'starred'"
+                        title="Starred"
+                        @click="filterSelected = 'starred'">
+                    <span class="icon">{% inline "star-full.svg" %}</span>
                 </button>
-                <button class="toolbar-item ms-1" title="Topics View" onclick="yarr.toggleTopicsView()" id="btn-topics">
+                <button class="toolbar-item mr-1"
+                        :class="{active: filterSelected == ''}"
+                        :aria-pressed="filterSelected == ''"
+                        title="All"
+                        @click="filterSelected = ''">
+                    <span class="icon">{% inline "assorted.svg" %}</span>
+                </button>
+                <button class="toolbar-item"
+                        :class="{active: filterSelected == 'archived'}"
+                        :aria-pressed="filterSelected == 'archived'"
+                        title="Archived"
+                        @click="filterSelected = 'archived'">
+                    <span class="icon">{% inline "archive.svg" %}</span>
+                </button>
+                <button class="toolbar-item ml-1"
+                        v-if="aiEnabled"
+                        id="btn-topics"
+                        :class="{active: topicsActive}"
+                        title="Topics"
+                        @click="toggleTopicsView()">
                     <span class="icon">{% inline "layers.svg" %}</span>
                 </button>
                 <div class="flex-grow-1"></div>
-                <button class="toolbar-item ms-1{% if eq .filter "unread" %} active{% end %}"
-                        title="Unread (1)"
-                        data-filter="unread"
-                        hx-get="./partials/items"
-                        hx-target="#item-list-content"
-                        hx-swap="innerHTML"
-                        hx-vals='{"status": "unread"}'
-                        onclick="yarr.setFilter(this, 'unread')">
-                    <span class="icon">{% inline "circle-full.svg" %}</span>
+                <button class="toolbar-item ml-1"
+                        v-if="aiEnabled"
+                        id="btn-briefing"
+                        title="AI Briefing"
+                        @click="openBriefing()">
+                    <span class="icon">{% inline "zap.svg" %}</span>
                 </button>
-                <button class="toolbar-item ms-1{% if eq .filter "starred" %} active{% end %}"
-                        title="Starred (2)"
-                        data-filter="starred"
-                        hx-get="./partials/items"
-                        hx-target="#item-list-content"
-                        hx-swap="innerHTML"
-                        hx-vals='{"status": "starred"}'
-                        onclick="yarr.setFilter(this, 'starred')">
-                    <span class="icon">{% inline "star-full.svg" %}</span>
+                <button class="toolbar-item"
+                        v-if="aiEnabled"
+                        id="btn-chat"
+                        title="AI Chat"
+                        @click="openChat()">
+                    <span class="icon">{% inline "message-circle.svg" %}</span>
                 </button>
-                <button class="toolbar-item ms-1{% if eq .filter "" %} active{% end %}"
-                        title="All (3)"
-                        data-filter=""
-                        hx-get="./partials/items"
-                        hx-target="#item-list-content"
-                        hx-swap="innerHTML"
-                        hx-vals='{}'
-                        onclick="yarr.setFilter(this, '')">
-                    <span class="icon">{% inline "assorted.svg" %}</span>
-                </button>
-                <button class="toolbar-item ms-1{% if eq .filter "archived" %} active{% end %}"
-                        title="Archived"
-                        data-filter="archived"
-                        hx-get="./partials/items"
-                        hx-target="#item-list-content"
-                        hx-swap="innerHTML"
-                        hx-vals='{"status": "archived"}'
-                        onclick="yarr.setFilter(this, 'archived')">
-                    <span class="icon">{% inline "archive.svg" %}</span>
-                </button>
-                <div class="flex-grow-1"></div>
-                <div class="dropdown" id="main-menu">
-                    <button class="toolbar-item" title="Settings" onclick="yarr.toggleDropdown('main-menu')">
+                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" title="Settings">
+                    <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    </template>
+
+                    <button class="dropdown-item" @click="showSettings('create')">
+                        <span class="icon mr-1">{% inline "plus.svg" %}</span>
+                        New Feed
                     </button>
-                    <div class="dropdown-menu" style="right: 0; left: auto;">
-                        <button class="dropdown-item" onclick="yarr.showDialog('feed-dialog'); yarr.closeDropdown('main-menu')">
-                            <span class="icon me-1">{% inline "plus.svg" %}</span>
-                            New Feed
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" @click="fetchAllFeeds()">
+                        <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
+                        Refresh Feeds
+                    </button>
+
+                    <div class="dropdown-divider"></div>
+
+                    <header class="dropdown-header" role="heading" aria-level="2">Theme</header>
+                    <div class="row text-center m-0">
+                        <button class="btn btn-link col-4 px-0 rounded-0"
+                                :class="'theme-'+t"
+                                :aria-label="t"
+                                :aria-pressed="theme.name == t"
+                                @click.stop="theme.name = t"
+                                v-for="t in ['light', 'sepia', 'night']">
+                            <span class="icon" v-if="theme.name == t">{% inline "check.svg" %}</span>
                         </button>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item"
-                                hx-post="./api/feeds/refresh"
-                                hx-headers='{"x-requested-by": "yarr"}'
-                                hx-swap="none"
-                                onclick="yarr.closeDropdown('main-menu'); yarr.pollStatus()">
-                            <span class="icon me-1">{% inline "rotate-cw.svg" %}</span>
-                            Refresh Feeds
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <header class="dropdown-header" role="heading" aria-level="2">Auto Refresh</header>
+                    <div class="row text-center m-0">
+                        <button class="dropdown-item col-4 px-0"
+                                @click.stop="changeRefreshRate(-1)"
+                                :disabled="!refreshRate">
+                            <span class="icon">
+                                {% inline "chevron-down.svg" %}
+                            </span>
                         </button>
-                        <div class="dropdown-divider"></div>
-                        <header class="dropdown-header" role="heading" aria-level="2">Theme</header>
-                        <div class="row text-center m-0">
-                            <button class="col-4 d-flex align-items-center justify-content-center py-2" onclick="yarr.setTheme('light')">
-                                <span class="theme-dot theme-dot-light{% if eq .settings.theme_name "light" %} active{% end %}" data-theme-dot="light"></span>
-                            </button>
-                            <button class="col-4 d-flex align-items-center justify-content-center py-2" onclick="yarr.setTheme('sepia')">
-                                <span class="theme-dot theme-dot-sepia{% if eq .settings.theme_name "sepia" %} active{% end %}" data-theme-dot="sepia"></span>
-                            </button>
-                            <button class="col-4 d-flex align-items-center justify-content-center py-2" onclick="yarr.setTheme('night')">
-                                <span class="theme-dot theme-dot-night{% if eq .settings.theme_name "night" %} active{% end %}" data-theme-dot="night"></span>
-                            </button>
+                        <div class="col-4 d-flex align-items-center justify-content-center">{{ refreshRateTitle }}</div>
+                        <button class="dropdown-item col-4 px-0"
+                                @click.stop="changeRefreshRate(1)" :disabled="refreshRate === refreshRateOptions.at(-1).value">
+                            <span class="icon">
+                                {% inline "chevron-up.svg" %}
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <header class="dropdown-header" role="heading" aria-level="2">Show first</header>
+                    <div class="d-flex text-center">
+                        <button class="dropdown-item px-0" :aria-pressed="itemSortNewestFirst"  :class="{active: itemSortNewestFirst}"  @click.stop="itemSortNewestFirst=true">New</button>
+                        <button class="dropdown-item px-0" :aria-pressed="!itemSortNewestFirst" :class="{active: !itemSortNewestFirst}" @click.stop="itemSortNewestFirst=false">Old</button>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <header class="dropdown-header" role="heading" aria-level="2">Subscriptions</header>
+                    <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
+                        <input type="file"
+                               id="opml-import"
+                               @change="importOPML"
+                               name="opml"
+                               style="opacity: 0; width: 1px; height: 0; position: absolute; z-index: -1;">
+                        <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" @click.stop="">
+                            <span class="icon mr-1">{% inline "download.svg" %}</span>
+                            Import
+                        </label>
+                    </form>
+                    <a class="dropdown-item" href="./opml/export">
+                        <span class="icon mr-1">{% inline "upload.svg" %}</span>
+                        Export
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" @click="showSettings('shortcuts')">
+                        <span class="icon mr-1">{% inline "help-circle.svg" %}</span>
+                        Shortcuts
+                    </button>
+                    <div class="dropdown-divider" v-if="authenticated"></div>
+                    <button class="dropdown-item" v-if="authenticated" @click="logout()">
+                        <span class="icon mr-1">{% inline "log-out.svg" %}</span>
+                        Log out
+                    </button>
+                </dropdown>
+            </div>
+            <div id="feed-list-scroll" v-show="!topicsActive" class="p-2 overflow-auto scroll-touch border-top flex-grow-1">
+                <label class="selectgroup">
+                    <input type="radio" name="feed" value="" v-model="feedSelected">
+                    <div class="selectgroup-label d-flex align-items-center w-100">
+                        <span class="icon mr-2">{% inline "layers.svg" %}</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">All Unread</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">All Starred</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='archived'">All Archived</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">All Feeds</span>
+                        <span class="counter text-right">{{ filteredTotalStats }}</span>
+                    </div>
+                </label>
+                <div v-for="folder in foldersWithFeeds">
+                    <label class="selectgroup mt-1"
+                           :class="{'d-none': mustHideFolder(folder)}"
+                           v-if="folder.id">
+                        <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
+                        <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
+                            <span class="icon mr-2"
+                                  :class="{expanded: folder.is_expanded}"
+                                  @click.prevent="toggleFolderExpanded(folder)">
+                                {% inline "chevron-right.svg" %}
+                            </span>
+                            <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
+                            <span class="counter text-right">{{ filteredFolderStats[folder.id] || '' }}</span>
                         </div>
-                        <div class="dropdown-divider"></div>
-                        <header class="dropdown-header" role="heading" aria-level="2">Auto Refresh</header>
-                        <div class="px-3 py-2">
-                            <select class="form-control" onchange="yarr.setRefreshRate(this.value)" style="font-size: 0.9rem">
-                                {% range .refreshRateOptions %}
-                                <option value="{% .Value %}"{% if eq .Value $.refreshRate %} selected{% end %}>{% .Title %}</option>
-                                {% end %}
-                            </select>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <header class="dropdown-header" role="heading" aria-level="2">Show first</header>
-                        <div class="d-flex text-center">
-                            <button class="dropdown-item justify-content-center{% if .sortNewestFirst %} active{% end %}"
-                                    onclick="yarr.setSortOrder(true); yarr.closeDropdown('main-menu')">New</button>
-                            <button class="dropdown-item justify-content-center{% if not .sortNewestFirst %} active{% end %}"
-                                    onclick="yarr.setSortOrder(false); yarr.closeDropdown('main-menu')">Old</button>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <header class="dropdown-header" role="heading" aria-level="2">Subscriptions</header>
-                        <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
-                            <input type="file" id="opml-import" name="opml" onchange="yarr.importOPML(this)"
-                                   style="position:absolute;top:-999px;left:-999px;opacity:0;width:1px;height:0;z-index:-1">
-                            <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" onclick="event.stopPropagation()">
-                                <span class="icon me-1">{% inline "download.svg" %}</span>
-                                Import
-                            </label>
-                        </form>
-                        <a class="dropdown-item" href="./opml/export">
-                            <span class="icon me-1">{% inline "upload.svg" %}</span>
-                            Export
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item" onclick="yarr.showDialog('shortcuts-dialog'); yarr.closeDropdown('main-menu')">
-                            <span class="icon me-1">{% inline "help-circle.svg" %}</span>
-                            Shortcuts
-                        </button>
-                        {% if .authenticated %}
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item"
-                                hx-post="./logout"
-                                hx-headers='{"x-requested-by": "yarr"}'
-                                hx-on::after-request="location.reload()">
-                            <span class="icon me-1">{% inline "log-out.svg" %}</span>
-                            Log out
-                        </button>
-                        {% end %}
+                    </label>
+                    <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
+                        <label class="selectgroup"
+                              :class="{'d-none': mustHideFeed(feed),
+                                       'archived': feed.archived && filterSelected !== 'archived'}"
+                               v-for="feed in folder.feeds">
+                            <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
+                            <div class="selectgroup-label d-flex align-items-center w-100">
+                                <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
+                                <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
+                                <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
+                                <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
+                                <span class="icon flex-shrink-0 mx-2"
+                                      title="Archived"
+                                      v-if="filterSelected !== 'archived' && !filterSelected && feed.archived">
+                                    {% inline "layers.svg" %}
+                                </span>
+                                <span class="icon flex-shrink-0 mx-2"
+                                      :title="feed_errors[feed.id]"
+                                      v-if="filterSelected === '' && feed_errors[feed.id]">
+                                    {% inline "alert-circle.svg" %}
+                                </span>
+                            </div>
+                        </label>
                     </div>
                 </div>
             </div>
-            <div id="feed-list-scroll" class="border-top flex-grow-1 overflow-auto scroll-touch" style="min-height: 0">
-                {% template "feed_list" .feedListData %}
-            </div>
-            <div id="topics-view" class="border-top flex-grow-1 overflow-auto scroll-touch p-2" style="min-height: 0; display: none">
-                <div class="empty-state">
-                    <span class="icon">{% inline "layers.svg" %}</span>
-                    <p>Loading topics...</p>
+            <!-- topics view (replaces feed list when active) -->
+            <div id="topics-view" v-show="topicsActive" v-if="aiEnabled">
+                <div v-if="topicsLoading" class="p-3 text-center text-muted">
+                    <span class="icon loading"></span>
+                </div>
+                <div v-else>
+                    <div class="topics-toolbar">
+                        <button class="btn btn-default btn-sm" @click="reindexArticles($event)" title="Index articles for AI search">
+                            Reindex ({{ topicsHealth.chroma_docs || 0 }})
+                        </button>
+                        <button class="btn btn-default btn-sm" @click="rebuildTopics($event)" title="Rebuild topic clusters">
+                            Rebuild Topics
+                        </button>
+                    </div>
+                    <div v-if="topicClusters.length">
+                        <div class="topic-section-header">Topics</div>
+                        <div v-for="cluster in topicClusters"
+                             class="topic-entry"
+                             :class="{active: selectedTopic === cluster.label}"
+                             @click="selectTopic(cluster.label)">
+                            <span class="flex-fill text-truncate">{{ cluster.label }}</span>
+                            <span class="topic-badge">{{ cluster.article_count }}</span>
+                        </div>
+                    </div>
+                    <div v-if="topicTags.length">
+                        <div class="topic-section-header">Tags</div>
+                        <div v-for="tag in topicTags"
+                             class="topic-entry"
+                             :class="{active: selectedTopic === tag.tag}"
+                             @click="selectTopic(tag.tag)">
+                            <span class="flex-fill text-truncate">{{ tag.tag }}</span>
+                            <span class="topic-badge">{{ tag.article_count }}</span>
+                        </div>
+                    </div>
+                    <div v-if="selectedTopic && topicArticles.length">
+                        <div class="topic-section-header">Articles</div>
+                        <div v-for="article in topicArticles"
+                             class="topic-article-row"
+                             @click="openTopicArticle(article)">
+                            <div class="topic-article-title">{{ article.title || article.url }}</div>
+                            <div class="topic-article-meta">{{ article.feed_name }} &middot; {{ formatDate(article.published) }}</div>
+                        </div>
+                    </div>
+                    <div v-if="!topicClusters.length && !topicTags.length" class="p-3 text-center text-muted">
+                        <div>No topics yet.</div>
+                        <div class="mt-1" style="font-size:0.85rem">Reindex your articles to get started.</div>
+                    </div>
                 </div>
             </div>
-            <div id="feed-status" class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0" style="{% if not .loading %}display:none{% end %}">
-                <span class="icon loading ms-2 me-2"></span>
-                <span class="text-truncate cursor-default noselect" id="feed-status-text">Refreshing</span>
-            </div>
-            <div id="ai-status" class="ai-status-bar d-flex align-items-center border-top flex-shrink-0" style="display:none">
-                <span class="icon loading ms-2 me-2"></span>
-                <span class="flex-fill text-truncate cursor-default noselect" id="ai-status-text"></span>
+            <div class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0" v-if="loading.feeds">
+                <span class="icon loading mx-2"></span>
+                <span class="text-truncate cursor-default noselect">Refreshing ({{ loading.feeds }} left)</span>
             </div>
         </div>
         <!-- item list -->
-        <div id="col-item-list" style="width: {% .itemListWidth %}px">
-            <div class="drag" id="drag-item"></div>
+        <div id="col-item-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: itemListWidth+'px'}">
+            <drag :width="itemListWidth" @resize="resizeItemList"></drag>
             <div class="px-2 toolbar d-flex align-items-center">
-                <button class="toolbar-item me-2 d-md-none"
-                        onclick="document.getElementById('app').classList.remove('feed-selected', 'item-selected')"
+                <button class="toolbar-item mr-2 d-block d-md-none"
+                        @click="feedSelected = null"
                         title="Show Feeds">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
-                <div class="input-icon flex-grow-1 position-relative">
+                <div class="input-icon flex-grow-1">
                     <span class="icon">{% inline "search.svg" %}</span>
-                    <input id="searchbar" type="text" class="d-block toolbar-search" placeholder=""
-                           hx-get="./partials/items"
-                           hx-target="#item-list-content"
-                           hx-swap="innerHTML"
-                           hx-trigger="input changed delay:500ms, search"
-                           hx-include="[name='feed'],[name='item-filter-status']"
-                           name="search">
-                    <button class="search-clear" id="search-clear" style="display:none"
-                            onclick="var s=document.getElementById('searchbar'); s.value=''; s.dispatchEvent(new Event('search')); this.style.display='none';">
-                        <span class="icon">{% inline "x.svg" %}</span>
-                    </button>
+                    <!-- id used by keybindings -->
+                    <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" @keydown.enter="$event.target.blur()">
                 </div>
-                <button class="toolbar-item ms-2" title="Mark All Read (R)"
-                        id="btn-mark-read"
-                        hx-put="./api/items"
-                        hx-headers='{"x-requested-by": "yarr"}'
-                        hx-swap="none"
-                        hx-on::after-request="htmx.ajax('GET', './partials/items', {target:'#item-list-content', swap:'innerHTML'}); htmx.ajax('GET', './partials/feeds', {target:'#feed-list-content', swap:'outerHTML'});"
-                        style="{% if ne .filter "unread" %}display:none{% end %}">
+                <button class="toolbar-item ml-2"
+                        @click="markItemsRead()"
+                        v-if="filterSelected == 'unread'"
+                        title="Mark All Read">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
-                <button class="toolbar-item ms-1" title="Compact view"
+                <button class="toolbar-item ml-1"
                         id="btn-density-toggle"
-                        onclick="yarr.toggleDensity()">
+                        :class="{active: densityCompact}"
+                        title="Compact view"
+                        @click="toggleDensity()">
                     <span class="icon">{% inline "sliders.svg" %}</span>
                 </button>
-                <div class="dropdown" id="feed-context-menu">
-                    <button class="toolbar-item ms-2" title="Feed Settings"
-                            onclick="yarr.showFeedMenu()">
+
+                <button class="btn btn-link toolbar-item px-2 ml-2" v-if="!current.type" disabled>
+                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                </button>
+                <dropdown class="settings-dropdown"
+                          toggle-class="btn btn-link toolbar-item px-2 ml-2"
+                          drop="right"
+                          title="Feed Settings"
+                          v-if="current.type == 'feed'">
+                    <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    </template>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ current.feed.title }}</header>
+                    <a class="dropdown-item" :href="current.feed.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.link">
+                        <span class="icon mr-1">{% inline "globe.svg" %}</span>
+                        Website
+                    </a>
+                    <a class="dropdown-item" :href="current.feed.feed_link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.feed_link">
+                        <span class="icon mr-1">{% inline "rss.svg" %}</span>
+                        Feed Link
+                    </a>
+                    <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
+                    <button class="dropdown-item" @click="renameFeed(current.feed)">
+                        <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                        Rename
                     </button>
-                    <div class="dropdown-menu" style="right: 0; left: auto;">
-                        <div id="feed-menu-content">
-                            <!-- loaded dynamically via HTMX -->
+                    <button class="dropdown-item" @click="updateFeedLink(current.feed)" v-if="current.feed.feed_link">
+                        <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                        Change Link
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" @click="archiveFeed(current.feed)" v-if="!current.feed.archived">
+                        <span class="icon mr-1">{% inline "layers.svg" %}</span>
+                        Archive Feed
+                    </button>
+                    <button class="dropdown-item" @click="unarchiveFeed(current.feed)" v-if="current.feed.archived">
+                        <span class="icon mr-1">{% inline "layers.svg" %}</span>
+                        Unarchive Feed
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <header class="dropdown-header" role="heading" aria-level="2">Move to...</header>
+                    <button class="dropdown-item"
+                        v-if="folder.id != current.feed.folder_id"
+                        v-for="folder in folders"
+                        @click="moveFeed(current.feed, folder)">
+                        <span class="icon mr-1">{% inline "folder.svg" %}</span>
+                        {{ folder.title }}
+                    </button>
+                    <button class="dropdown-item text-muted" @click="moveFeed(current.feed, null)" v-if="current.feed.folder_id">
+                        <span class="icon mr-1">{% inline "folder-minus.svg" %}</span>
+                        ──
+                    </button>
+                    <button class="dropdown-item text-muted" @click="moveFeedToNewFolder(current.feed)">
+                        <span class="icon mr-1">{% inline "folder-plus.svg" %}</span>
+                        new folder
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item text-danger" @click.prevent="deleteFeed(current.feed)">
+                        <span class="icon mr-1">{% inline "trash.svg" %}</span>
+                        Delete
+                    </button>
+                </dropdown>
+                <dropdown class="settings-dropdown"
+                          toggle-class="btn btn-link toolbar-item px-2 ml-2"
+                          title="Folder Settings"
+                          drop="right"
+                          v-if="current.type == 'folder'">
+                    <template v-slot:button>
+                        <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    </template>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ current.folder.title }}</header>
+                    <button class="dropdown-item" @click="renameFolder(current.folder)">
+                        <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                        Rename
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">
+                        <span class="icon mr-1">{% inline "trash.svg" %}</span>
+                        Delete
+                    </button>
+                </dropdown>
+            </div>
+            <div id="item-list-scroll" class="p-2 overflow-auto scroll-touch border-top flex-grow-1" :class="{'density-compact': densityCompact}" v-scroll="loadMoreItems" ref="itemlist">
+                <label v-for="item in items" :key="item.id"
+                       class="selectgroup">
+                    <input type="radio" name="item" :value="item.id" v-model="itemSelected">
+                    <div class="selectgroup-label d-flex flex-column">
+                        <div style="line-height: 100%; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
+                            <transition name="indicator">
+                                <span class="icon icon-small mr-1" v-if="item.status=='unread'">{% inline "circle-full.svg" %}</span>
+                                <span class="icon icon-small mr-1" v-if="item.status=='starred'">{% inline "star-full.svg" %}</span>
+                            </transition>
+                            <small class="flex-fill text-truncate mr-1">
+                                {{ (feedsById[item.feed_id] || {}).title }}
+                            </small>
+                            <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                         </div>
+                        <div>{{ item.title || 'untitled' }}</div>
                     </div>
+                </label>
+                <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
+            </div>
+            <div class="px-3 py-2 border-top text-danger text-break" v-if="feed_errors[current.feed.id]">
+                {{ feed_errors[current.feed.id] }}
+            </div>
+        </div>
+        <!-- item show -->
+        <div id="col-item" class="vh-100 d-flex flex-column w-100" style="min-width: 0;">
+            <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
+                <button class="toolbar-item"
+                        @click="toggleItemStarred(itemSelectedDetails)"
+                        title="Mark Starred">
+                    <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
+                    <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
+                </button>
+                <button class="toolbar-item"
+                        title="Mark Unread"
+                        @click="toggleItemRead(itemSelectedDetails)">
+                    <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
+                    <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
+                </button>
+                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" title="Appearance">
+                    <template v-slot:button>
+                        <span class="icon">{% inline "sliders.svg" %}</span>
+                    </template>
+
+                    <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">sans-serif</button>
+                    <button class="dropdown-item font-serif" :class="{active: theme.font == 'serif'}" @click.stop="theme.font = 'serif'">serif</button>
+                    <button class="dropdown-item font-monospace" :class="{active: theme.font == 'monospace'}" @click.stop="theme.font = 'monospace'">monospace</button>
+
+                    <div class="d-flex text-center">
+                        <button class="dropdown-item" style="font-size: 0.8rem" @click.stop="incrFont(-1)">A</button>
+                        <button class="dropdown-item" style="font-size: 1.2rem" @click.stop="incrFont(1)">A</button>
+                    </div>
+                </dropdown>
+                <button class="toolbar-item"
+                        :class="{active: itemSelectedReadability}"
+                        @click="toggleReadability()"
+                        title="Read Here">
+                    <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
+                </button>
+                <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link">
+                    <span class="icon">{% inline "external-link.svg" %}</span>
+                </a>
+                <button class="toolbar-item"
+                        :class="{active: readerMode}"
+                        @click="toggleReaderMode()"
+                        title="Focus Mode">
+                    <span class="icon">{% inline "layers.svg" %}</span>
+                </button>
+                <div class="flex-grow-1"></div>
+                <button class="toolbar-item" @click="navigateToItem(-1)" title="Previous Article" :disabled="!items.length || itemSelected == items[0].id">
+                    <span class="icon">{% inline "chevron-left.svg" %}</span>
+                </button>
+                <button class="toolbar-item" @click="navigateToItem(+1)" title="Next Article" :disabled="!items.length || itemSelected == items[items.length - 1].id">
+                    <span class="icon">{% inline "chevron-right.svg" %}</span>
+                </button>
+                <button class="toolbar-item" @click="itemSelected=null" title="Close Article">
+                    <span class="icon">{% inline "x.svg" %}</span>
+                </button>
+            </div>
+            <div v-if="itemSelectedDetails"
+                 ref="content"
+                 class="content px-4 pt-3 pb-5 border-top overflow-auto scroll-touch"
+                 :class="{'font-serif': theme.font == 'serif', 'font-monospace': theme.font == 'monospace'}"
+                 :style="{'font-size': theme.size + 'rem'}"
+                 style="position: relative;"
+                 @scroll="updateReadingProgress">
+                <div id="reading-progress"></div>
+                <div class="content-wrapper">
+                    <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
+                    <div class="text-muted">
+                        <div>
+                            <span class="cursor-pointer" @click="feedSelected = 'feed:'+(feedsById[itemSelectedDetails.feed_id] || {}).id">
+                                {{ (feedsById[itemSelectedDetails.feed_id] || {}).title }}
+                            </span>
+                        </div>
+                        <time>{{ formatDate(itemSelectedDetails.date) }}</time>
+                    </div>
+                    <hr>
+                    <div v-if="!itemSelectedReadability">
+                        <div v-if="contentImages.length">
+                            <figure v-for="media in contentImages">
+                                <img :src="media.url" loading="lazy">
+                                <figcaption v-if="media.description">{{ media.description }}</figcaption>
+                            </figure>
+                        </div>
+                        <audio class="w-100" controls v-for="media in contentAudios" :src="media.url"></audio>
+                        <video class="w-100" controls v-for="media in contentVideos" :src="media.url"></video>
+                    </div>
+                    <div v-html="itemSelectedContent"></div>
                 </div>
             </div>
-            <div class="border-top flex-grow-1 overflow-hidden d-flex flex-column" id="item-list-content" style="min-height: 0">
-                {% template "item_list" .itemListData %}
-            </div>
         </div>
-        <!-- item content -->
-        <div id="col-item" style="min-width: 0;">
-            <div id="col-item-content" class="flex-grow-1 d-flex flex-column" style="min-height: 0">
-                <!-- populated by HTMX when an item is selected -->
+        <modal :open="!!settings" @hide="settings = ''">
+            <button class="btn btn-link outline-none float-right p-2 mr-n2 mt-n2" style="line-height: 1" @click="settings = ''">
+                <span class="icon">{% inline "x.svg" %}</span>
+            </button>
+            <div v-if="settings=='create'">
+                <p class="cursor-default"><b>New Feed</b></p>
+                <form action="" @submit.prevent="createFeed(event)" class="mt-4">
+                    <label for="feed-url">URL</label>
+                    <input id="feed-url" name="url" type="url" class="form-control" required autocomplete="off" :readonly="feedNewChoice.length > 0" placeholder="https://example.com/feed" v-focus>
+                    <label for="feed-folder" class="mt-3 d-block">
+                        Folder
+                        <a href="#" class="float-right text-decoration-none" @click.prevent="createNewFeedFolder()">new folder</a>
+                    </label>
+                    <select class="form-control" id="feed-folder" name="folder_id" ref="newFeedFolder">
+                        <option value="">---</option>
+                        <option :value="folder.id" v-for="folder in folders" :selected="folder.id === current.feed.folder_id || folder.id === current.folder.id">{{ folder.title }}</option>
+                    </select>
+                    <div class="mt-4" v-if="feedNewChoice.length">
+                        <p class="mb-2">
+                            Multiple feeds found. Choose one below:
+                            <a href="#" class="float-right text-decoration-none" @click.prevent="resetFeedChoice()">cancel</a>
+                        </p>
+                        <label class="selectgroup" v-for="choice in feedNewChoice">
+                            <input type="radio" name="feedToAdd" :value="choice.url" v-model="feedNewChoiceSelected">
+                            <div class="selectgroup-label">
+                                <div class="text-truncate">{{ choice.title }}</div>
+                                <div class="text-truncate" :class="{light: choice.title}">{{ choice.url }}</div>
+                            </div>
+                        </label>
+                    </div>
+                    <button class="btn btn-block btn-default mt-3" :class="{loading: loading.newfeed}" type="submit">Add</button>
+                </form>
             </div>
-        </div>
+            <div v-else-if="settings=='shortcuts'">
+                <p class="cursor-default"><b>Keyboard Shortcuts</b></p>
+
+                <table class="table table-borderless table-sm table-compact m-0">
+                    <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td>
+                                                            <td>show unread / starred / all feeds</td></tr>
+                    <tr><td><kbd>/</kbd></td>               <td>focus the search bar</td></tr>
+
+                    <tr><td colspan=2>&nbsp;</td></tr>
+                    <tr><td><kbd>j</kbd> <kbd>k</kbd></td>  <td>next / prev article</td></tr>
+                    <tr><td><kbd>l</kbd> <kbd>h</kbd></td>  <td>next / prev feed</td></tr>
+                    <tr><td><kbd>q</kbd></td>               <td>close article</td></tr>
+
+                    <tr><td colspan=2>&nbsp;</td></tr>
+                    <tr><td><kbd>R</kbd></td>               <td>mark all read</td></tr>
+                    <tr><td><kbd>r</kbd></td>               <td>mark read / unread</td></tr>
+                    <tr><td><kbd>s</kbd></td>               <td>mark starred / unstarred</td></tr>
+                    <tr><td><kbd>o</kbd></td>               <td>open link</td></tr>
+                    <tr><td><kbd>i</kbd></td>               <td>read here</td> </tr>
+                    <tr><td><kbd>f</kbd> <kbd>b</kbd></td>  <td>scroll content forward / backward</td>
+                    </tr>
+                </table>
+            </div>
+        </modal>
     </div>
 
-    <!-- Chat Panel (slide-out) -->
-    <div id="chat-panel" class="chat-panel" style="display:none">
-        <div class="chat-header toolbar d-flex align-items-center px-3 border-bottom">
-            <span class="icon me-2">{% inline "message-circle.svg" %}</span>
-            <b class="flex-grow-1">AI Chat</b>
-            <button class="toolbar-item" onclick="yarr.closeChat()" title="Close">
+    <!-- AI Chat Panel (outside #app so it overlays) -->
+    <div id="chat-panel">
+        <div class="toolbar px-2 d-flex align-items-center">
+            <span class="icon mr-2">{% inline "message-circle.svg" %}</span>
+            <span class="flex-fill cursor-default noselect">AI Chat</span>
+            <button class="toolbar-item" onclick="vm.closeChat()" title="Close">
                 <span class="icon">{% inline "x.svg" %}</span>
             </button>
         </div>
-        <div id="chat-messages" class="chat-messages overflow-auto scroll-touch flex-grow-1 p-3"></div>
-        <div class="chat-input border-top p-2">
-            <form onsubmit="yarr.sendChat(event); return false;" class="d-flex" style="gap: 0.5rem">
-                <input id="chat-input" type="text" class="form-control flex-grow-1" placeholder="Ask about your articles..." autocomplete="off">
-                <button type="submit" class="btn btn-default" id="chat-send">
+        <div id="chat-messages" class="border-top"></div>
+        <div class="chat-input border-top">
+            <form onsubmit="vm.sendChat(event)">
+                <input id="chat-input" type="text" class="form-control" placeholder="Ask about your articles..." autocomplete="off">
+                <button type="submit" class="btn btn-default">
                     <span class="icon">{% inline "chevron-right.svg" %}</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Briefing Panel (replaces content) -->
-    <div id="briefing-panel" style="display:none">
-        <div class="toolbar d-flex align-items-center px-3 border-bottom">
-            <span class="icon me-2">{% inline "zap.svg" %}</span>
-            <b class="flex-grow-1">Briefing</b>
-            <select id="briefing-since" class="form-control" style="width:auto; font-size:0.85rem; margin-right:0.5rem" onchange="yarr.loadBriefing()">
+    <!-- AI Briefing Panel (outside #app) -->
+    <div id="briefing-panel">
+        <div class="toolbar px-2 d-flex align-items-center border-bottom">
+            <span class="icon mr-2">{% inline "zap.svg" %}</span>
+            <span class="flex-fill cursor-default noselect">Briefing</span>
+            <select id="briefing-since" class="toolbar-search mr-2" style="width:auto;" onchange="vm.loadBriefing()">
                 <option value="24h">Last 24h</option>
                 <option value="48h">Last 48h</option>
                 <option value="7d" selected>Last 7 days</option>
                 <option value="30d">Last 30 days</option>
             </select>
-            <button class="toolbar-item" onclick="yarr.closeBriefing()" title="Close">
+            <button class="toolbar-item" onclick="vm.closeBriefing()" title="Close">
                 <span class="icon">{% inline "x.svg" %}</span>
             </button>
         </div>
-        <div id="briefing-content" class="content px-4 pt-3 pb-5 overflow-auto scroll-touch" style="max-width: 50rem; margin: 0 auto;">
-            <div class="empty-state">
-                <span class="icon">{% inline "zap.svg" %}</span>
-                <p>Click to generate a briefing of your recent articles</p>
-            </div>
-        </div>
+        <div id="briefing-content" class="px-4 pt-3 pb-5"></div>
     </div>
 
-    <!-- Hidden input to track current filter status for HTMX includes -->
-    <input type="hidden" name="item-filter-status" id="item-filter-status" value="{% .filter %}">
-
-    <!-- Dialogs -->
-    <dialog id="feed-dialog">
-        <div class="dialog-body">
-            <button class="dialog-close" onclick="this.closest('dialog').close()">
-                <span class="icon">{% inline "x.svg" %}</span>
-            </button>
-            <p class="cursor-default"><b>New Feed</b></p>
-            <form id="add-feed-form" class="mt-4" onsubmit="yarr.createFeed(event); return false;">
-                <label for="feed-url">URL</label>
-                <input id="feed-url" name="url" type="url" class="form-control" required autocomplete="off" placeholder="https://example.com/feed">
-                <label for="feed-folder" class="mt-3 d-block">
-                    Folder
-                    <a href="#" class="float-right" style="text-decoration:none" onclick="yarr.createFolderInline(event)">new folder</a>
-                </label>
-                <select class="form-control" id="feed-folder" name="folder_id">
-                    <option value="">---</option>
-                    {% range .folders %}
-                    <option value="{% .Id %}">{% .Title %}</option>
-                    {% end %}
-                </select>
-                <div id="feed-choice" style="display:none" class="mt-4"></div>
-                <button class="btn btn-block btn-default mt-3" type="submit" id="add-feed-btn">Add</button>
-            </form>
-        </div>
-    </dialog>
-
-    <dialog id="shortcuts-dialog">
-        <div class="dialog-body">
-            <button class="dialog-close" onclick="this.closest('dialog').close()">
-                <span class="icon">{% inline "x.svg" %}</span>
-            </button>
-            <p class="cursor-default"><b>Keyboard Shortcuts</b></p>
-            <table class="table-compact m-0 mt-3">
-                <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>show unread / starred / all feeds</td></tr>
-                <tr><td><kbd>/</kbd></td><td>focus the search bar</td></tr>
-                <tr><td colspan="2">&nbsp;</td></tr>
-                <tr><td><kbd>j</kbd> <kbd>k</kbd></td><td>next / prev article</td></tr>
-                <tr><td><kbd>l</kbd> <kbd>h</kbd></td><td>next / prev feed</td></tr>
-                <tr><td><kbd>q</kbd></td><td>close article</td></tr>
-                <tr><td colspan="2">&nbsp;</td></tr>
-                <tr><td><kbd>R</kbd></td><td>mark all read</td></tr>
-                <tr><td><kbd>r</kbd></td><td>mark read / unread</td></tr>
-                <tr><td><kbd>s</kbd></td><td>mark starred / unstarred</td></tr>
-                <tr><td><kbd>o</kbd></td><td>open link</td></tr>
-                <tr><td><kbd>i</kbd></td><td>read here</td></tr>
-                <tr><td><kbd>f</kbd> <kbd>b</kbd></td><td>scroll content forward / backward</td></tr>
-            </table>
-        </div>
-    </dialog>
-
-    <dialog id="confirm-dialog">
-        <div class="dialog-body">
-            <p id="confirm-message"></p>
-            <div class="d-flex mt-4" style="gap: 0.5rem">
-                <button class="btn btn-default flex-fill" onclick="this.closest('dialog').close()">Cancel</button>
-                <button class="btn btn-default flex-fill text-danger" id="confirm-ok" onclick="yarr.confirmAction(); this.closest('dialog').close()">Delete</button>
-            </div>
-        </div>
-    </dialog>
-
-    <dialog id="prompt-dialog">
-        <div class="dialog-body">
-            <p id="prompt-message"></p>
-            <form onsubmit="yarr.promptAction(document.getElementById('prompt-input').value); this.closest('dialog').close(); return false;" class="mt-3">
-                <input id="prompt-input" type="text" class="form-control" required autocomplete="off">
-                <div class="d-flex mt-3" style="gap: 0.5rem">
-                    <button type="button" class="btn btn-default flex-fill" onclick="this.closest('dialog').close()">Cancel</button>
-                    <button type="submit" class="btn btn-default flex-fill">OK</button>
-                </div>
-            </form>
-        </div>
-    </dialog>
+    <!-- AI Task Status Bar -->
+    <div id="ai-status">
+        <span class="icon loading"></span>
+        <span id="ai-status-text" class="flex-fill text-truncate cursor-default noselect"></span>
+    </div>
 
     <!-- Toast container -->
     <div id="toast-container"></div>
 
-    <!-- Scripts -->
-    <script src="./static/javascripts/htmx.min.js"></script>
+    <!-- external -->
+    <script src="./static/javascripts/vue.min.js"></script>
+    <!-- internal -->
+    <script src="./static/javascripts/api.js"></script>
     <script src="./static/javascripts/app.js"></script>
     <script src="./static/javascripts/key.js"></script>
 </body>

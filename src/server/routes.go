@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -57,10 +56,6 @@ func (s *Server) handler() http.Handler {
 	r.For("/api/settings", s.handleSettings)
 	r.For("/opml/import", s.handleOPMLImport)
 	r.For("/opml/export", s.handleOPMLExport)
-	r.For("/partials/feeds", s.handlePartialFeedList)
-	r.For("/partials/feed-menu", s.handlePartialFeedMenu)
-	r.For("/partials/items", s.handlePartialItems)
-	r.For("/partials/items/:id", s.handlePartialItemContent)
 	r.For("/page", s.handlePageCrawl)
 	r.For("/logout", s.handleLogout)
 	r.For("/fever/", s.handleFever)
@@ -77,80 +72,11 @@ func (s *Server) handler() http.Handler {
 	return r
 }
 
-type RefreshRateOption struct {
-	Title string
-	Value int64
-}
-
 func (s *Server) handleIndex(c *router.Context) {
-	settings := s.db.GetSettings()
-
-	filter := ""
-	if f, ok := settings["filter"].(string); ok {
-		filter = f
-	}
-	feedSelected := ""
-	if f, ok := settings["feed"].(string); ok {
-		feedSelected = f
-	}
-	sortNewestFirst := true
-	if sn, ok := settings["sort_newest_first"].(bool); ok {
-		sortNewestFirst = sn
-	}
-	feedListWidth := 300
-	if w, ok := settings["feed_list_width"].(float64); ok {
-		feedListWidth = int(w)
-	}
-	itemListWidth := 300
-	if w, ok := settings["item_list_width"].(float64); ok {
-		itemListWidth = int(w)
-	}
-	var refreshRate int64
-	if r, ok := settings["refresh_rate"].(float64); ok {
-		refreshRate = int64(r)
-	}
-
-	themeColors := map[string]string{
-		"light": "#fff",
-		"sepia": "#f4f0e5",
-		"night": "#0e0e0e",
-	}
-	themeName := "light"
-	if t, ok := settings["theme_name"].(string); ok {
-		themeName = t
-	}
-
-	// Build settings JSON for JS
-	settingsJSON, _ := json.Marshal(settings)
-
-	// Build feed list data
-	feedListData := s.buildFeedListData(settings)
-
-	// Build initial item list
-	// Create a mock context for item list building
-	itemListData := s.buildInitialItemList(settings)
-
-	refreshRateOptions := []RefreshRateOption{
-		{"Off", 0}, {"10m", 10}, {"30m", 30}, {"1h", 60},
-		{"2h", 120}, {"4h", 240}, {"12h", 720}, {"24h", 1440},
-	}
-
 	c.HTML(http.StatusOK, assets.Template("index.html"), map[string]interface{}{
-		"settings":           settings,
-		"settingsJSON":       template.JS(settingsJSON),
-		"authenticated":      s.Username != "" && s.Password != "",
-		"filter":             filter,
-		"feedSelected":       feedSelected,
-		"sortNewestFirst":    sortNewestFirst,
-		"feedListWidth":      feedListWidth,
-		"itemListWidth":      itemListWidth,
-		"refreshRate":        refreshRate,
-		"refreshRateOptions": refreshRateOptions,
-		"themeColor":         themeColors[themeName],
-		"loading":            s.worker.FeedsPending() > 0,
-		"feedListData":       feedListData,
-		"itemListData":       itemListData,
-		"folders":            s.db.ListFolders(),
+		"settings":      s.db.GetSettings(),
+		"authenticated": s.Username != "" && s.Password != "",
+		"aiEnabled":     s.AiServiceURL != "",
 	})
 }
 
@@ -601,8 +527,9 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 		url = newUrl
 	}
 	if content := silo.VideoIFrame(url); content != "" {
-		c.Out.Header().Set("Content-Type", "text/html; charset=utf-8")
-		c.Out.Write([]byte(sanitizer.Sanitize(url, content)))
+		c.JSON(http.StatusOK, map[string]string{
+			"content": sanitizer.Sanitize(url, content),
+		})
 		return
 	}
 	if isInternalFromURL(url) {
@@ -618,13 +545,15 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 	}
 	content, err := readability.ExtractContent(strings.NewReader(body))
 	if err != nil {
-		c.Out.Header().Set("Content-Type", "text/html; charset=utf-8")
-		c.Out.Write([]byte("<p class=\"text-danger\">Could not extract content: " + err.Error() + "</p>"))
+		c.JSON(http.StatusOK, map[string]string{
+			"content": "error: " + err.Error(),
+		})
 		return
 	}
 	content = sanitizer.Sanitize(url, content)
-	c.Out.Header().Set("Content-Type", "text/html; charset=utf-8")
-	c.Out.Write([]byte(content))
+	c.JSON(http.StatusOK, map[string]string{
+		"content": content,
+	})
 }
 
 func (s *Server) handleLogout(c *router.Context) {
