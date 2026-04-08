@@ -29,6 +29,18 @@
     }).join('&')
   }
 
+  var topicFilters = function(filters) {
+    var query = {}
+    if (!filters) return query
+    if (filters.status !== undefined && filters.status !== null && filters.status !== '') {
+      query.status = filters.status
+    }
+    if (filters.since) {
+      query.since = filters.since
+    }
+    return query
+  }
+
   window.api = {
     feeds: {
       list: function() {
@@ -122,8 +134,8 @@
           headers: {'Accept': 'text/event-stream'},
         })
       },
-      clusters: function() {
-        return api('get', './api/ai/clusters').then(json)
+      clusters: function(filters) {
+        return api('get', './api/ai/clusters' + param(topicFilters(filters))).then(json)
       },
       tags: function() {
         return api('get', './api/ai/tags').then(json)
@@ -131,8 +143,10 @@
       health: function() {
         return api('get', './api/ai/health').then(json)
       },
-      articles: function(tag) {
-        return api('get', './api/ai/articles?tag=' + encodeURIComponent(tag)).then(json)
+      articles: function(tag, filters) {
+        var query = topicFilters(filters)
+        query.tag = tag
+        return api('get', './api/ai/articles' + param(query)).then(json)
       },
       reindex: function() {
         return api('post', './api/ai/reindex')
