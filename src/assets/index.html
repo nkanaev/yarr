@@ -248,15 +248,7 @@
                             <span class="topic-badge">{{ tag.article_count }}</span>
                         </div>
                     </div>
-                    <div v-if="selectedTopic && topicArticles.length">
-                        <div class="topic-section-header">Articles</div>
-                        <div v-for="article in topicArticles"
-                             class="topic-article-row"
-                             @click="openTopicArticle(article)">
-                            <div class="topic-article-title">{{ article.title || article.url }}</div>
-                            <div class="topic-article-meta">{{ article.feed_name }} &middot; {{ formatDate(article.published) }}</div>
-                        </div>
-                    </div>
+
                     <div v-if="!topicClusters.length && !topicTags.length" class="p-3 text-center text-muted">
                         <div>No topics yet.</div>
                         <div class="mt-1" style="font-size:0.85rem">Reindex your articles to get started.</div>
@@ -273,7 +265,7 @@
             <drag :width="itemListWidth" @resize="resizeItemList"></drag>
             <div class="px-2 toolbar d-flex align-items-center">
                 <button class="toolbar-item mr-2 d-block d-md-none"
-                        @click="feedSelected = null"
+                        @click="feedSelected = null; selectedTopic = null"
                         title="Show Feeds">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
@@ -388,7 +380,7 @@
                                 <span class="icon icon-small mr-1" v-if="item.status=='starred'">{% inline "star-full.svg" %}</span>
                             </transition>
                             <small class="flex-fill text-truncate mr-1">
-                                {{ (feedsById[item.feed_id] || {}).title }}
+                                {{ item._feedName || (feedsById[item.feed_id] || {}).title }}
                             </small>
                             <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                         </div>

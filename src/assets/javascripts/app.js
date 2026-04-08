@@ -297,7 +297,7 @@ var vm = new Vue({
       'topicsLoaded': false,
       'topicClusters': [],
       'topicTags': [],
-      'topicArticles': [],
+
       'topicsHealth': {},
       'selectedTopic': null,
 
@@ -404,6 +404,8 @@ var vm = new Vue({
     },
     'feedSelected': function(newVal, oldVal) {
       if (oldVal === undefined) return  // do nothing, initial setup
+      // topic selections are handled by selectTopic(), not the normal feed flow
+      if (newVal && newVal.indexOf('topic:') === 0) return
       this.itemSelected = null
       this.items = []
       this.itemsHasMore = true
@@ -975,24 +977,29 @@ var vm = new Vue({
     selectTopic: function(tag) {
       if (this.selectedTopic === tag) {
         this.selectedTopic = null
-        this.topicArticles = []
         return
       }
       this.selectedTopic = tag
-      this.topicArticles = []
+      this.itemSelected = null
+      this.items = []
+      this.itemsHasMore = false
+      this.feedSelected = 'topic:' + tag
       api.ai.articles(tag).then(function(articles) {
-        vm.topicArticles = Array.isArray(articles) ? articles : []
-      }).catch(function() {
-        vm.topicArticles = []
+        var list = Array.isArray(articles) ? articles : []
+        vm.items = list.map(function(a) {
+          return {
+            id: a.id,
+            title: a.title || a.url || 'untitled',
+            date: a.published,
+            feed_id: null,
+            status: 'read',
+            _feedName: a.feed_name || '',
+          }
+        })
+      }).catch(function(err) {
+        console.error('selectTopic error:', err)
+        vm.items = []
       })
-    },
-    openTopicArticle: function(article) {
-      if (article.id && article.id > 0) {
-        this.itemSelected = article.id
-        this.topicsActive = false
-      } else if (article.url) {
-        window.open(article.url, '_blank', 'noopener,noreferrer')
-      }
     },
 
     // ── AI Task Status Polling ─────────────────────────────────────────────

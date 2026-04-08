@@ -1009,28 +1009,6 @@ body.theme-night #toast-container .toast.toast-error {
   opacity: 1;
 }
 
-.topic-article-row {
-  padding: 0.35rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.topic-article-row:hover {
-  background: #f8f9fa;
-}
-
-.topic-article-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.topic-article-meta {
-  font-size: 0.75rem;
-  opacity: 0.6;
-}
-
 /* topics theme: sepia */
 .theme-sepia #topics-view,
 .theme-sepia .topics-toolbar {
@@ -1042,10 +1020,6 @@ body.theme-night #toast-container .toast.toast-error {
 .theme-sepia .topic-entry.active {
   background: #8a7a5a;
 }
-.theme-sepia .topic-article-row:hover {
-  background: #e0d6ba;
-}
-
 /* topics theme: night */
 .theme-night #topics-view,
 .theme-night .topics-toolbar {
@@ -1060,6 +1034,4 @@ body.theme-night #toast-container .toast.toast-error {
 .theme-night .topic-badge {
   background: rgba(255,255,255,0.1);
 }
-.theme-night .topic-article-row:hover {
-  background: #1a1a1a;
-}
+
