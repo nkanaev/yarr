@@ -293,52 +293,10 @@ async def tags(request: Request):
 
 @router.get("/articles")
 async def articles(request: Request):
-    """List articles filtered by tag, topic (folder), or since time."""
-    from .store import list_articles as store_list_articles
-    collection = request.app.state.collection
-    config = request.app.state.config
-    if not collection:
-        return JSONResponse([])
-
-    tag = request.query_params.get("tag")
-    topic = request.query_params.get("topic")
-    since = parse_since(request.query_params.get("since"))
-
-    results = store_list_articles(collection, folder=topic, tag=tag)
-
-    if since is not None:
-        results = [a for a in results if a.get("published_ts", 0) >= since]
-
-    # Look up yarr item IDs by URL for in-app navigation
-    url_to_id: dict[str, int] = {}
-    if config.yarr_db and results:
-        try:
-            from .yarr_db import open_db
-            conn = open_db(config.yarr_db)
-            urls = [a.get("url", "") for a in results if a.get("url")]
-            if urls:
-                placeholders = ",".join("?" for _ in urls)
-                rows = conn.execute(
-                    f"SELECT id, link FROM items WHERE link IN ({placeholders})",
-                    urls,
-                ).fetchall()
-                url_to_id = {row["link"]: row["id"] for row in rows}
-            conn.close()
-        except Exception as e:
-            log.warning("Could not look up item IDs: %s", e)
-
-    return JSONResponse([
-        {
-            "id": url_to_id.get(a.get("url", ""), 0),
-            "url": a.get("url", ""),
-            "title": a.get("title", ""),
-            "published": a.get("published", ""),
-            "folder": a.get("folder", ""),
-            "feed_name": a.get("feed_name", ""),
-            "tags": a.get("tags", ""),
-        }
-        for a in results
-    ])
+    """Article listing is now served directly by Go at /api/ai/articles.
+    This stub is kept so the Python router doesn't 404 if hit directly.
+    """
+    return JSONResponse([])
 
 
 @router.get("/dedup-groups")

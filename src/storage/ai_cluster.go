@@ -25,6 +25,38 @@ type ClusterSummary struct {
 	Clusters    []ClusterLabel `json:"clusters"`
 }
 
+// ArticleTag maps an article URL to a cluster tag label.
+type ArticleTag struct {
+	URL string `json:"url"`
+	Tag string `json:"tag"`
+}
+
+// ArticleResult is returned by GetArticlesByTag.
+type ArticleResult struct {
+	ID        int64  `json:"id"`
+	URL       string `json:"url"`
+	Title     string `json:"title"`
+	Published string `json:"published"`
+	Folder    string `json:"folder"`
+	FeedName  string `json:"feed_name"`
+	Tag       string `json:"tag"`
+}
+
+func m13_add_ai_article_tags(tx *sql.Tx) error {
+	sql := `
+		create table ai_article_tags (
+			id  integer primary key autoincrement,
+			url text    not null,
+			tag text    not null
+		);
+
+		create index idx_ai_article_tags_tag on ai_article_tags(tag);
+		create index idx_ai_article_tags_url on ai_article_tags(url);
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
 func m12_add_ai_cluster_tables(tx *sql.Tx) error {
 	sql := `
 		create table ai_cluster_runs (
@@ -203,4 +235,66 @@ func (s *Storage) GetClusterCentroids() ([]ClusterCentroid, error) {
 		centroids = append(centroids, c)
 	}
 	return centroids, rows.Err()
+}
+
+// SaveArticleTags replaces all article-tag mappings in a single transaction.
+func (s *Storage) SaveArticleTags(tags []ArticleTag) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.Exec(`delete from ai_article_tags`); err != nil {
+		return err
+	}
+
+	stmt, err := tx.Prepare(`insert into ai_article_tags (url, tag) values (?, ?)`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, t := range tags {
+		if _, err := stmt.Exec(t.URL, t.Tag); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
+// GetArticlesByTag returns articles for a given tag label, joined with item metadata.
+func (s *Storage) GetArticlesByTag(tag string, limit int) ([]ArticleResult, error) {
+	rows, err := s.db.Query(`
+		select
+			i.id,
+			i.link,
+			i.title,
+			coalesce(i.date, '') as published,
+			coalesce(fo.title, 'uncategorized') as folder,
+			f.title as feed_name,
+			at.tag
+		from ai_article_tags at
+		join items i on i.link = at.url
+		join feeds f on f.id = i.feed_id
+		left join folders fo on fo.id = f.folder_id
+		where at.tag = ?
+		order by i.date desc
+		limit ?
+	`, tag, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []ArticleResult
+	for rows.Next() {
+		var a ArticleResult
+		if err := rows.Scan(&a.ID, &a.URL, &a.Title, &a.Published, &a.Folder, &a.FeedName, &a.Tag); err != nil {
+			return nil, err
+		}
+		results = append(results, a)
+	}
+	return results, rows.Err()
 }

@@ -20,6 +20,7 @@ var migrations = []func(*sql.Tx) error{
 	m10_add_item_medialinks,
 	m11_add_feed_archived,
 	m12_add_ai_cluster_tables,
+	m13_add_ai_article_tags,
 }
 
 var maxVersion = int64(len(migrations))

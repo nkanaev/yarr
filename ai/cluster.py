@@ -433,6 +433,23 @@ def post_cluster_run(yarr_api_url: str, cluster_run: dict) -> bool:
         return False
 
 
+def post_article_tags(yarr_api_url: str, article_tags: list[dict]) -> bool:
+    """POST article-tag mapping to Go's /api/ai/articles endpoint.
+
+    article_tags: list of {"url": str, "tag": str}
+    Returns True on success, False on failure.
+    """
+    url = yarr_api_url.rstrip("/") + "/api/ai/articles"
+    try:
+        resp = httpx.post(url, json=article_tags, timeout=60.0)
+        resp.raise_for_status()
+        log.info("Article tags saved to Go DB via %s (%d entries)", url, len(article_tags))
+        return True
+    except Exception as e:
+        log.error("Failed to POST article tags to %s: %s", url, e)
+        return False
+
+
 def fetch_previous_centroids(yarr_api_url: str) -> list[dict] | None:
     """GET previous centroids from Go's /api/ai/clusters/centroids endpoint.
 
@@ -648,13 +665,18 @@ def run_clustering(config, llm_provider=None, embed_provider=None, on_progress=N
     else:
         log.warning("YARR_API_URL not set — cluster results not saved to DB")
 
-    # Update ChromaDB tags
+    # Update ChromaDB tags and build article-tag mapping for Go DB
     progress(f"Updating tags for {len(articles)} articles...")
+    article_tags: list[dict] = []
     for cid_int, name in cluster_names.items():
         mask = labels == cid_int
         for i in np.where(mask)[0]:
             url = articles[i]["url"]
             update_article_tags(collection, url, name)
+            article_tags.append({"url": url, "tag": name})
+
+    if config.yarr_api_url and article_tags:
+        post_article_tags(config.yarr_api_url, article_tags)
 
     log.info("Clustering complete: %d clusters", len(cluster_names))
     progress(f"Complete: {len(cluster_names)} clusters found")

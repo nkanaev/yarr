@@ -94,6 +94,42 @@ func (s *Server) handleAiClusters(c *router.Context) {
 	}
 }
 
+func (s *Server) handleAiArticles(c *router.Context) {
+	if c.Req.Method == "GET" {
+		tag := c.Req.URL.Query().Get("tag")
+		if tag == "" {
+			c.JSON(http.StatusBadRequest, map[string]string{"error": "tag parameter required"})
+			return
+		}
+		results, err := s.db.GetArticlesByTag(tag, 500)
+		if err != nil {
+			log.Print(err)
+			c.Out.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if results == nil {
+			c.JSON(http.StatusOK, []interface{}{})
+			return
+		}
+		c.JSON(http.StatusOK, results)
+	} else if c.Req.Method == "POST" {
+		var tags []storage.ArticleTag
+		if err := json.NewDecoder(c.Req.Body).Decode(&tags); err != nil {
+			log.Print(err)
+			c.Out.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if err := s.db.SaveArticleTags(tags); err != nil {
+			log.Print(err)
+			c.Out.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		c.Out.WriteHeader(http.StatusCreated)
+	} else {
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
 func (s *Server) handleAiClusterCentroids(c *router.Context) {
 	if c.Req.Method != "GET" {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)

@@ -28,12 +28,15 @@ def open_db(path: str) -> sqlite3.Connection:
     return conn
 
 
-def check_tables_exist(conn: sqlite3.Connection) -> bool:
-    """Verify that m12 migration has already run (Go binary was started at least once)."""
-    row = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='ai_cluster_runs'"
-    ).fetchone()
-    return row is not None
+def check_tables_exist(conn: sqlite3.Connection) -> tuple[bool, bool]:
+    """Check which AI tables exist. Returns (m12_exists, m13_exists)."""
+    tables = {
+        row[0]
+        for row in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'ai_%'"
+        ).fetchall()
+    }
+    return "ai_cluster_runs" in tables, "ai_article_tags" in tables
 
 
 def migrate(clusters_json_path: str, yarr_db_path: str) -> None:
@@ -61,10 +64,19 @@ def migrate(clusters_json_path: str, yarr_db_path: str) -> None:
 
     conn = open_db(yarr_db_path)
 
-    if not check_tables_exist(conn):
+    m12_exists, m13_exists = check_tables_exist(conn)
+    if not m12_exists:
         print(
             "Error: AI cluster tables not found in yarr.db.\n"
-            "Start the new yarr binary at least once to run migration m12, then re-run this script.",
+            "Start the new yarr binary at least once to run migrations m12+m13, then re-run this script.",
+            file=sys.stderr,
+        )
+        conn.close()
+        sys.exit(1)
+    if not m13_exists:
+        print(
+            "Error: ai_article_tags table not found in yarr.db.\n"
+            "Start the new yarr binary at least once to run migration m13, then re-run this script.",
             file=sys.stderr,
         )
         conn.close()
@@ -133,6 +145,24 @@ def migrate(clusters_json_path: str, yarr_db_path: str) -> None:
             centroid_rows,
         )
 
+    # Insert article-tag mapping from clusters[].articles[].url
+    print("Building article-tag mapping...")
+    article_tag_rows = []
+    for c in clusters:
+        label = c.get("label", "")
+        for article in c.get("articles", []):
+            url = article.get("url", "")
+            if url and label:
+                article_tag_rows.append((url, label))
+
+    # Clear existing and insert fresh
+    cur.execute("DELETE FROM ai_article_tags")
+    if article_tag_rows:
+        cur.executemany(
+            "INSERT INTO ai_article_tags (url, tag) VALUES (?, ?)",
+            article_tag_rows,
+        )
+
     conn.commit()
     conn.close()
 
@@ -140,6 +170,7 @@ def migrate(clusters_json_path: str, yarr_db_path: str) -> None:
     print(f"\nMigration complete:")
     print(f"  {len(label_rows)} cluster labels inserted")
     print(f"  {len(centroid_rows)} centroids stored ({centroid_bytes / 1024:.1f} KB)")
+    print(f"  {len(article_tag_rows)} article-tag mappings inserted")
     if skipped_centroids:
         print(f"  {skipped_centroids} centroids skipped (encoding errors)")
     print(f"\nYou can now delete clusters.json to reclaim disk space:")
