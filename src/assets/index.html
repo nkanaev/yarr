@@ -215,7 +215,7 @@
                 </div>
             </div>
             <!-- topics view (replaces feed list when active) -->
-            <div id="topics-view" v-show="topicsActive" v-if="aiEnabled">
+            <div id="topics-view" v-if="aiEnabled && topicsActive" v-cloak>
                 <div v-if="topicsLoading" class="p-3 text-center text-muted">
                     <span class="icon loading"></span>
                 </div>
@@ -228,9 +228,30 @@
                             Rebuild Topics
                         </button>
                     </div>
-                    <div v-if="topicClusters.length">
+                    <div class="topics-filters">
+                        <select v-model="topicStatusFilter" class="form-control form-control-sm">
+                            <option value="-1">All statuses</option>
+                            <option value="0">Unread</option>
+                            <option value="2">Starred</option>
+                        </select>
+                        <select v-model="topicTimeFilter" class="form-control form-control-sm">
+                            <option value="">Any time</option>
+                            <option value="1">Last day</option>
+                            <option value="7">Last week</option>
+                            <option value="14">Last 2 weeks</option>
+                            <option value="30">Last month</option>
+                            <option value="custom">Custom date</option>
+                        </select>
+                        <input v-if="topicTimeFilter === 'custom'" v-model="topicCustomSince" type="date" class="form-control form-control-sm" />
+                        <input v-model="topicSearchQuery" type="text" class="form-control form-control-sm" placeholder="Filter topics" />
+                        <label class="topics-hide-small">
+                            <input type="checkbox" v-model="topicHideSmall" />
+                            Hide small
+                        </label>
+                    </div>
+                    <div v-if="filteredTopicClusters.length">
                         <div class="topic-section-header">Topics</div>
-                        <div v-for="cluster in topicClusters"
+                        <div v-for="cluster in filteredTopicClusters"
                              class="topic-entry"
                              :class="{active: selectedTopic === cluster.label}"
                              @click="selectTopic(cluster.label)">
@@ -238,9 +259,9 @@
                             <span class="topic-badge">{{ cluster.article_count }}</span>
                         </div>
                     </div>
-                    <div v-if="topicTags.length">
+                    <div v-if="filteredTopicTags.length">
                         <div class="topic-section-header">Tags</div>
-                        <div v-for="tag in topicTags"
+                        <div v-for="tag in filteredTopicTags"
                              class="topic-entry"
                              :class="{active: selectedTopic === tag.tag}"
                              @click="selectTopic(tag.tag)">
@@ -249,9 +270,9 @@
                         </div>
                     </div>
 
-                    <div v-if="!topicClusters.length && !topicTags.length" class="p-3 text-center text-muted">
-                        <div>No topics yet.</div>
-                        <div class="mt-1" style="font-size:0.85rem">Reindex your articles to get started.</div>
+                    <div v-if="!filteredTopicClusters.length && !filteredTopicTags.length" class="p-3 text-center text-muted">
+                        <div>{{ (topicClusters.length || topicTags.length) ? 'No topics match these filters.' : 'No topics yet.' }}</div>
+                        <div class="mt-1" style="font-size:0.85rem" v-if="!topicClusters.length && !topicTags.length">Reindex your articles to get started.</div>
                     </div>
                 </div>
             </div>

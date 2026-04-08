@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/nkanaev/yarr/src/server/router"
 	"github.com/nkanaev/yarr/src/storage"
@@ -27,11 +28,36 @@ type centroidPayload struct {
 	Centroid  string `json:"centroid"` // base64-encoded raw float64 bytes
 }
 
+func parseAiTopicFilters(c *router.Context) (int64, string, bool) {
+	status := int64(-1)
+	rawStatus := c.Req.URL.Query().Get("status")
+	if rawStatus != "" {
+		parsedStatus, err := strconv.ParseInt(rawStatus, 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid status"})
+			return 0, "", false
+		}
+		if parsedStatus != -1 && parsedStatus != int64(storage.UNREAD) && parsedStatus != int64(storage.READ) && parsedStatus != int64(storage.STARRED) {
+			c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid status"})
+			return 0, "", false
+		}
+		status = parsedStatus
+	}
+
+	since := c.Req.URL.Query().Get("since")
+	return status, since, true
+}
+
 func (s *Server) handleAiClusters(c *router.Context) {
 	if c.Req.Method == "GET" {
-		summary, err := s.db.GetClusterSummary()
+		status, since, ok := parseAiTopicFilters(c)
+		if !ok {
+			return
+		}
+
+		summary, err := s.db.GetClusterSummary(status, since)
 		if err != nil {
-			log.Print(err)
+			log.Printf("GetClusterSummary failed (status=%d since=%q): %v", status, since, err)
 			c.Out.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -101,7 +127,13 @@ func (s *Server) handleAiArticles(c *router.Context) {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": "tag parameter required"})
 			return
 		}
-		results, err := s.db.GetArticlesByTag(tag, 500)
+
+		status, since, ok := parseAiTopicFilters(c)
+		if !ok {
+			return
+		}
+
+		results, err := s.db.GetArticlesByTag(tag, 500, status, since)
 		if err != nil {
 			log.Print(err)
 			c.Out.WriteHeader(http.StatusInternalServerError)

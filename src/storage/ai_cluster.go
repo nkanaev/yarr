@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"strings"
 )
 
 // ClusterLabel represents a topic label with its article count.
@@ -33,13 +34,14 @@ type ArticleTag struct {
 
 // ArticleResult is returned by GetArticlesByTag.
 type ArticleResult struct {
-	ID        int64  `json:"id"`
-	URL       string `json:"url"`
-	Title     string `json:"title"`
-	Published string `json:"published"`
-	Folder    string `json:"folder"`
-	FeedName  string `json:"feed_name"`
-	Tag       string `json:"tag"`
+	ID        int64      `json:"id"`
+	URL       string     `json:"url"`
+	Title     string     `json:"title"`
+	Published string     `json:"published"`
+	Folder    string     `json:"folder"`
+	FeedName  string     `json:"feed_name"`
+	Tag       string     `json:"tag"`
+	Status    ItemStatus `json:"status"`
 }
 
 func m13_add_ai_article_tags(tx *sql.Tx) error {
@@ -153,7 +155,7 @@ func (s *Storage) SaveClusterRun(
 
 // GetClusterSummary returns the merged cluster summary from the latest run.
 // Returns nil if no run exists.
-func (s *Storage) GetClusterSummary() (*ClusterSummary, error) {
+func (s *Storage) GetClusterSummary(status int64, since string) (*ClusterSummary, error) {
 	row := s.db.QueryRow(`
 		select r.id, r.generated_at, r.n_articles
 		from ai_cluster_runs r
@@ -163,43 +165,96 @@ func (s *Storage) GetClusterSummary() (*ClusterSummary, error) {
 
 	var runID int64
 	var generatedAt string
-	var nArticles int
-	if err := row.Scan(&runID, &generatedAt, &nArticles); err != nil {
+	var runArticles int
+	if err := row.Scan(&runID, &generatedAt, &runArticles); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
 
-	// Merge labels with the same name (sub-clusters share labels)
-	rows, err := s.db.Query(`
-		select label, sum(article_count) as article_count
-		from ai_cluster_labels
-		where run_id = ?
-		group by label
-		order by sum(article_count) desc
-	`, runID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+	var (
+		clusters      []ClusterLabel
+		totalArticles int
+	)
 
-	var clusters []ClusterLabel
-	for rows.Next() {
-		var l ClusterLabel
-		if err := rows.Scan(&l.Label, &l.ArticleCount); err != nil {
+	if status < 0 && since == "" {
+		// Fast path: default topics view uses precomputed cluster counts.
+		rows, err := s.db.Query(`
+			select label, sum(article_count) as article_count
+			from ai_cluster_labels
+			where run_id = ?
+			group by label
+			order by sum(article_count) desc
+		`, runID)
+		if err != nil {
 			return nil, err
 		}
-		clusters = append(clusters, l)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
+		defer rows.Close()
+
+		for rows.Next() {
+			var l ClusterLabel
+			if err := rows.Scan(&l.Label, &l.ArticleCount); err != nil {
+				return nil, err
+			}
+			clusters = append(clusters, l)
+			totalArticles += l.ArticleCount
+		}
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		if totalArticles == 0 {
+			totalArticles = runArticles
+		}
+	} else {
+		query := `
+			select lbl.label, count(distinct at.url) as article_count
+			from (
+				select distinct label
+				from ai_cluster_labels
+				where run_id = ?
+			) lbl
+			join ai_article_tags at on at.tag = lbl.label
+			join items i on i.link = at.url
+		`
+		args := []interface{}{runID}
+		clauses := make([]string, 0, 2)
+		if status >= 0 {
+			clauses = append(clauses, "i.status = ?")
+			args = append(args, status)
+		}
+		if since != "" {
+			clauses = append(clauses, "i.date >= ?")
+			args = append(args, since)
+		}
+		if len(clauses) > 0 {
+			query += " where " + strings.Join(clauses, " and ")
+		}
+		query += " group by lbl.label order by article_count desc"
+
+		rows, err := s.db.Query(query, args...)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var l ClusterLabel
+			if err := rows.Scan(&l.Label, &l.ArticleCount); err != nil {
+				return nil, err
+			}
+			clusters = append(clusters, l)
+			totalArticles += l.ArticleCount
+		}
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
 	}
 
 	return &ClusterSummary{
 		GeneratedAt: generatedAt,
 		NClusters:   len(clusters),
-		NArticles:   nArticles,
+		NArticles:   totalArticles,
 		Clusters:    clusters,
 	}, nil
 }
@@ -265,8 +320,8 @@ func (s *Storage) SaveArticleTags(tags []ArticleTag) error {
 }
 
 // GetArticlesByTag returns articles for a given tag label, joined with item metadata.
-func (s *Storage) GetArticlesByTag(tag string, limit int) ([]ArticleResult, error) {
-	rows, err := s.db.Query(`
+func (s *Storage) GetArticlesByTag(tag string, limit int, status int64, since string) ([]ArticleResult, error) {
+	query := `
 		select
 			max(i.id),
 			at.url,
@@ -274,16 +329,30 @@ func (s *Storage) GetArticlesByTag(tag string, limit int) ([]ArticleResult, erro
 			coalesce(max(i.date), '') as published,
 			coalesce(max(fo.title), 'uncategorized') as folder,
 			max(f.title) as feed_name,
-			at.tag
+			at.tag,
+			max(i.status) as status
 		from ai_article_tags at
 		join items i on i.link = at.url
 		join feeds f on f.id = i.feed_id
 		left join folders fo on fo.id = f.folder_id
-		where at.tag = ?
+		where at.tag = ?`
+	args := []interface{}{tag}
+	if status >= 0 {
+		query += " and i.status = ?"
+		args = append(args, status)
+	}
+	if since != "" {
+		query += " and i.date >= ?"
+		args = append(args, since)
+	}
+	query += `
 		group by at.url
 		order by published desc
 		limit ?
-	`, tag, limit)
+	`
+	args = append(args, limit)
+
+	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +361,7 @@ func (s *Storage) GetArticlesByTag(tag string, limit int) ([]ArticleResult, erro
 	var results []ArticleResult
 	for rows.Next() {
 		var a ArticleResult
-		if err := rows.Scan(&a.ID, &a.URL, &a.Title, &a.Published, &a.Folder, &a.FeedName, &a.Tag); err != nil {
+		if err := rows.Scan(&a.ID, &a.URL, &a.Title, &a.Published, &a.Folder, &a.FeedName, &a.Tag, &a.Status); err != nil {
 			return nil, err
 		}
 		results = append(results, a)

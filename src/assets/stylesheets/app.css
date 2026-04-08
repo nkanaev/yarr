@@ -968,6 +968,36 @@ body.theme-night #toast-container .toast.toast-error {
   padding: 0.25rem 0.5rem;
 }
 
+.topics-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.topics-filters .form-control {
+  height: 30px;
+  font-size: 0.8rem;
+}
+
+.topics-filters select {
+  min-width: 120px;
+}
+
+.topics-filters input[type="text"] {
+  min-width: 160px;
+  flex: 1;
+}
+
+.topics-hide-small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
 .topic-section-header {
   font-size: 0.75rem;
   font-weight: 600;
@@ -1020,6 +1050,9 @@ body.theme-night #toast-container .toast.toast-error {
 .theme-sepia .topic-entry.active {
   background: #8a7a5a;
 }
+.theme-sepia .topics-hide-small {
+  color: #7b6e52;
+}
 /* topics theme: night */
 .theme-night #topics-view,
 .theme-night .topics-toolbar {
@@ -1034,4 +1067,6 @@ body.theme-night #toast-container .toast.toast-error {
 .theme-night .topic-badge {
   background: rgba(255,255,255,0.1);
 }
-
+.theme-night .topics-hide-small {
+  color: #a0a0a0;
+}

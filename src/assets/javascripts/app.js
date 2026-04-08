@@ -297,6 +297,11 @@ var vm = new Vue({
       'topicsLoaded': false,
       'topicClusters': [],
       'topicTags': [],
+      'topicStatusFilter': '-1',
+      'topicTimeFilter': '',
+      'topicCustomSince': '',
+      'topicSearchQuery': '',
+      'topicHideSmall': false,
 
       'topicsHealth': {},
       'selectedTopic': null,
@@ -366,6 +371,22 @@ var vm = new Vue({
       const entry = this.refreshRateOptions.find(o => o.value === this.refreshRate)
       return entry ? entry.title : '0'
     },
+    filteredTopicClusters: function() {
+      var query = (this.topicSearchQuery || '').trim().toLowerCase()
+      return this.topicClusters.filter(function(cluster) {
+        if (this.topicHideSmall && (cluster.article_count || 0) < 3) return false
+        if (!query) return true
+        return (cluster.label || '').toLowerCase().indexOf(query) !== -1
+      }.bind(this))
+    },
+    filteredTopicTags: function() {
+      var query = (this.topicSearchQuery || '').trim().toLowerCase()
+      return this.topicTags.filter(function(tag) {
+        if (this.topicHideSmall && (tag.article_count || 0) < 3) return false
+        if (!query) return true
+        return (tag.tag || '').toLowerCase().indexOf(query) !== -1
+      }.bind(this))
+    },
   },
   watch: {
     'theme': {
@@ -411,6 +432,22 @@ var vm = new Vue({
       this.itemsHasMore = true
       api.settings.update({feed: newVal}).then(this.refreshItems.bind(this, false))
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0
+    },
+    'topicStatusFilter': function(newVal, oldVal) {
+      if (oldVal === undefined) return
+      this.onTopicFilterChange()
+    },
+    'topicTimeFilter': function(newVal, oldVal) {
+      if (oldVal === undefined) return
+      if (newVal !== 'custom') {
+        this.topicCustomSince = ''
+      }
+      this.onTopicFilterChange()
+    },
+    'topicCustomSince': function(newVal, oldVal) {
+      if (oldVal === undefined) return
+      if (this.topicTimeFilter !== 'custom') return
+      this.onTopicFilterChange()
     },
     'itemSelected': function(newVal, oldVal) {
       this.itemSelectedReadability = ''
@@ -952,10 +989,42 @@ var vm = new Vue({
         this.loadTopics()
       }
     },
+    topicSinceValue: function() {
+      if (this.topicTimeFilter === 'custom') {
+        if (!this.topicCustomSince) return ''
+        return this.topicCustomSince + ' 00:00:00'
+      }
+      var days = parseInt(this.topicTimeFilter, 10)
+      if (!days) return ''
+      var since = new Date()
+      since.setHours(0, 0, 0, 0)
+      since.setDate(since.getDate() - days)
+      var yyyy = since.getFullYear()
+      var mm = String(since.getMonth() + 1).padStart(2, '0')
+      var dd = String(since.getDate()).padStart(2, '0')
+      return yyyy + '-' + mm + '-' + dd + ' 00:00:00'
+    },
+    topicApiFilters: function() {
+      return {
+        status: this.topicStatusFilter,
+        since: this.topicSinceValue(),
+      }
+    },
+    onTopicFilterChange: function() {
+      if (!this.topicsActive) {
+        this.topicsLoaded = false
+        return
+      }
+      this.loadTopics()
+      if (this.selectedTopic) {
+        this.selectTopic(this.selectedTopic, true)
+      }
+    },
     loadTopics: function() {
       this.topicsLoading = true
+      var filters = this.topicApiFilters()
       Promise.all([
-        api.ai.clusters().catch(function() { return {clusters: []} }),
+        api.ai.clusters(filters).catch(function() { return {clusters: []} }),
         api.ai.tags().catch(function() { return [] }),
         api.ai.health().catch(function() { return {} }),
       ]).then(function(results) {
@@ -974,8 +1043,8 @@ var vm = new Vue({
         vm.topicsLoading = false
       })
     },
-    selectTopic: function(tag) {
-      if (this.selectedTopic === tag) {
+    selectTopic: function(tag, forceReload) {
+      if (!forceReload && this.selectedTopic === tag) {
         this.selectedTopic = null
         return
       }
@@ -984,7 +1053,7 @@ var vm = new Vue({
       this.items = []
       this.itemsHasMore = false
       this.feedSelected = 'topic:' + tag
-      api.ai.articles(tag).then(function(articles) {
+      api.ai.articles(tag, this.topicApiFilters()).then(function(articles) {
         var list = Array.isArray(articles) ? articles : []
         vm.items = list.map(function(a) {
           return {
@@ -992,7 +1061,7 @@ var vm = new Vue({
             title: a.title || a.url || 'untitled',
             date: a.published,
             feed_id: null,
-            status: 'read',
+            status: a.status || 'read',
             _feedName: a.feed_name || '',
           }
         })
