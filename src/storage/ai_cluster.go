@@ -268,19 +268,20 @@ func (s *Storage) SaveArticleTags(tags []ArticleTag) error {
 func (s *Storage) GetArticlesByTag(tag string, limit int) ([]ArticleResult, error) {
 	rows, err := s.db.Query(`
 		select
-			i.id,
-			i.link,
-			i.title,
-			coalesce(i.date, '') as published,
-			coalesce(fo.title, 'uncategorized') as folder,
-			f.title as feed_name,
+			max(i.id),
+			at.url,
+			max(i.title),
+			coalesce(max(i.date), '') as published,
+			coalesce(max(fo.title), 'uncategorized') as folder,
+			max(f.title) as feed_name,
 			at.tag
 		from ai_article_tags at
 		join items i on i.link = at.url
 		join feeds f on f.id = i.feed_id
 		left join folders fo on fo.id = f.folder_id
 		where at.tag = ?
-		order by i.date desc
+		group by at.url
+		order by published desc
 		limit ?
 	`, tag, limit)
 	if err != nil {
