@@ -4,14 +4,12 @@ import json
 import logging
 import re
 from datetime import datetime, timedelta
-from pathlib import Path
-
 from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import JSONResponse
 from sse_starlette.sse import EventSourceResponse
 
 from .briefing import generate_briefing
-from .cluster import load_previous_clusters, run_clustering
+from .cluster import run_clustering
 from .dedup import find_dedup_groups
 from .indexer import index_items, reindex_all
 from .search import build_bm25_index
@@ -277,31 +275,10 @@ async def search(request: Request):
 
 @router.get("/clusters")
 async def clusters(request: Request):
-    """List topic clusters."""
-    config = request.app.state.config
-    cluster_path = str(Path(config.chroma_path).parent / "clusters.json")
-    cluster_map = load_previous_clusters(cluster_path)
-
-    if cluster_map is None:
-        return JSONResponse({"clusters": [], "message": "No clusters yet. POST /recluster to generate."})
-
-    # Return simplified view
-    # Merge clusters with the same label
-    merged: dict[str, int] = {}
-    for c in cluster_map.get("clusters", []):
-        label = c["label"]
-        merged[label] = merged.get(label, 0) + c["article_count"]
-
-    simplified = [
-        {"label": label, "article_count": count}
-        for label, count in sorted(merged.items(), key=lambda x: x[1], reverse=True)
-    ]
-
-    return JSONResponse({
-        "generated_at": cluster_map.get("generated_at", ""),
-        "n_clusters": len(simplified),
-        "clusters": simplified,
-    })
+    """List topic clusters — now served directly by Go via /api/ai/clusters.
+    This endpoint is kept as a fallback but should not be reached in normal operation.
+    """
+    return JSONResponse({"clusters": [], "message": "Clusters are served by the Go server at /api/ai/clusters."})
 
 
 @router.get("/tags")
@@ -316,52 +293,10 @@ async def tags(request: Request):
 
 @router.get("/articles")
 async def articles(request: Request):
-    """List articles filtered by tag, topic (folder), or since time."""
-    from .store import list_articles as store_list_articles
-    collection = request.app.state.collection
-    config = request.app.state.config
-    if not collection:
-        return JSONResponse([])
-
-    tag = request.query_params.get("tag")
-    topic = request.query_params.get("topic")
-    since = parse_since(request.query_params.get("since"))
-
-    results = store_list_articles(collection, folder=topic, tag=tag)
-
-    if since is not None:
-        results = [a for a in results if a.get("published_ts", 0) >= since]
-
-    # Look up yarr item IDs by URL for in-app navigation
-    url_to_id: dict[str, int] = {}
-    if config.yarr_db and results:
-        try:
-            from .yarr_db import open_db
-            conn = open_db(config.yarr_db)
-            urls = [a.get("url", "") for a in results if a.get("url")]
-            if urls:
-                placeholders = ",".join("?" for _ in urls)
-                rows = conn.execute(
-                    f"SELECT id, link FROM items WHERE link IN ({placeholders})",
-                    urls,
-                ).fetchall()
-                url_to_id = {row["link"]: row["id"] for row in rows}
-            conn.close()
-        except Exception as e:
-            log.warning("Could not look up item IDs: %s", e)
-
-    return JSONResponse([
-        {
-            "id": url_to_id.get(a.get("url", ""), 0),
-            "url": a.get("url", ""),
-            "title": a.get("title", ""),
-            "published": a.get("published", ""),
-            "folder": a.get("folder", ""),
-            "feed_name": a.get("feed_name", ""),
-            "tags": a.get("tags", ""),
-        }
-        for a in results
-    ])
+    """Article listing is now served directly by Go at /api/ai/articles.
+    This stub is kept so the Python router doesn't 404 if hit directly.
+    """
+    return JSONResponse([])
 
 
 @router.get("/dedup-groups")
@@ -401,10 +336,7 @@ async def health(request: Request):
     if engine and engine.bm25_docs:
         bm25_docs = len(engine.bm25_docs)
 
-    cluster_path = str(Path(config.chroma_path).parent / "clusters.json")
-    cluster_map = load_previous_clusters(cluster_path)
-    n_clusters = cluster_map.get("n_clusters", 0) if cluster_map else 0
-
+    # n_clusters is now served by Go directly — not tracked here
     status = "ok" if ollama_ok else "degraded"
     if not collection:
         status = "error"
@@ -414,7 +346,6 @@ async def health(request: Request):
         "ollama": ollama_ok,
         "chroma_docs": chroma_docs,
         "bm25_docs": bm25_docs,
-        "clusters": n_clusters,
     })
 
 

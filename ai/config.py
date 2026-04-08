@@ -40,6 +40,8 @@ class Config:
     min_cluster_size: int = 10
     host: str = "0.0.0.0"
     port: int = 8484
+    # URL of the yarr Go server — used by Python to POST cluster results
+    yarr_api_url: str = ""
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -50,6 +52,7 @@ class Config:
         return cls(
             yarr_db=os.environ.get("YARR_DB", ""),
             chroma_path=os.environ.get("CHROMA_PATH", "./data/chroma"),
+            yarr_api_url=os.environ.get("YARR_API_URL", ""),
             ollama_url=ollama_url,
             embed_model=os.environ.get("EMBED_MODEL", "nomic-embed-text"),
             chat_model=os.environ.get("CHAT_MODEL", "deepseek-r1:7b"),
