@@ -173,55 +173,82 @@ func (s *Storage) GetClusterSummary(status int64, since string) (*ClusterSummary
 		return nil, err
 	}
 
-	query := `
-		select lbl.label, count(distinct at.url) as article_count
-		from (
-			select distinct label
+	var (
+		clusters      []ClusterLabel
+		totalArticles int
+	)
+
+	if status < 0 && since == "" {
+		// Fast path: default topics view uses precomputed cluster counts.
+		rows, err := s.db.Query(`
+			select label, sum(article_count) as article_count
 			from ai_cluster_labels
 			where run_id = ?
-		) as lbl
-		join ai_article_tags at on at.tag = lbl.label
-		join items i on i.link = at.url
-	`
-	args := []interface{}{runID}
-	clauses := make([]string, 0, 2)
-	if status >= 0 {
-		clauses = append(clauses, "i.status = ?")
-		args = append(args, status)
-	}
-	if since != "" {
-		clauses = append(clauses, "i.date >= ?")
-		args = append(args, since)
-	}
-	if len(clauses) > 0 {
-		query += " where " + strings.Join(clauses, " and ")
-	}
-	query += " group by lbl.label order by article_count desc"
-
-	rows, err := s.db.Query(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var clusters []ClusterLabel
-	for rows.Next() {
-		var l ClusterLabel
-		if err := rows.Scan(&l.Label, &l.ArticleCount); err != nil {
+			group by label
+			order by sum(article_count) desc
+		`, runID)
+		if err != nil {
 			return nil, err
 		}
-		clusters = append(clusters, l)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
+		defer rows.Close()
 
-	totalArticles := 0
-	for _, cluster := range clusters {
-		totalArticles += cluster.ArticleCount
-	}
-	if totalArticles == 0 && status < 0 && since == "" {
-		totalArticles = runArticles
+		for rows.Next() {
+			var l ClusterLabel
+			if err := rows.Scan(&l.Label, &l.ArticleCount); err != nil {
+				return nil, err
+			}
+			clusters = append(clusters, l)
+			totalArticles += l.ArticleCount
+		}
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		if totalArticles == 0 {
+			totalArticles = runArticles
+		}
+	} else {
+		query := `
+			select lbl.label, count(distinct at.url) as article_count
+			from (
+				select distinct label
+				from ai_cluster_labels
+				where run_id = ?
+			) lbl
+			join ai_article_tags at on at.tag = lbl.label
+			join items i on i.link = at.url
+		`
+		args := []interface{}{runID}
+		clauses := make([]string, 0, 2)
+		if status >= 0 {
+			clauses = append(clauses, "i.status = ?")
+			args = append(args, status)
+		}
+		if since != "" {
+			clauses = append(clauses, "i.date >= ?")
+			args = append(args, since)
+		}
+		if len(clauses) > 0 {
+			query += " where " + strings.Join(clauses, " and ")
+		}
+		query += " group by lbl.label order by article_count desc"
+
+		rows, err := s.db.Query(query, args...)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var l ClusterLabel
+			if err := rows.Scan(&l.Label, &l.ArticleCount); err != nil {
+				return nil, err
+			}
+			clusters = append(clusters, l)
+			totalArticles += l.ArticleCount
+		}
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
 	}
 
 	return &ClusterSummary{

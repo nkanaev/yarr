@@ -215,7 +215,7 @@
                 </div>
             </div>
             <!-- topics view (replaces feed list when active) -->
-            <div id="topics-view" v-show="topicsActive" v-if="aiEnabled">
+            <div id="topics-view" v-if="aiEnabled && topicsActive" v-cloak>
                 <div v-if="topicsLoading" class="p-3 text-center text-muted">
                     <span class="icon loading"></span>
                 </div>

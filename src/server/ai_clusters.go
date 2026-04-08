@@ -57,7 +57,7 @@ func (s *Server) handleAiClusters(c *router.Context) {
 
 		summary, err := s.db.GetClusterSummary(status, since)
 		if err != nil {
-			log.Print(err)
+			log.Printf("GetClusterSummary failed (status=%d since=%q): %v", status, since, err)
 			c.Out.WriteHeader(http.StatusInternalServerError)
 			return
 		}
