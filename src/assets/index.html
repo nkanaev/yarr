@@ -26,6 +26,19 @@
                 <div class="icon mx-2">{% inline "anchor.svg" %}</div>
                 <div class="flex-grow-1"></div>
                 <button class="toolbar-item ml-1"
+                        :class="{active: filterSelected == 'ranked'}"
+                        :aria-pressed="filterSelected == 'ranked'"
+                        title="For You"
+                        @click="filterSelected = 'ranked'">
+                    <span class="icon">{% inline "zap.svg" %}</span>
+                </button>
+                <button class="toolbar-item"
+                        v-if="filterSelected == 'ranked'"
+                        title="How ranking works"
+                        @click="showSettings('ranking-help')">
+                    <span class="icon">{% inline "help-circle.svg" %}</span>
+                </button>
+                <button class="toolbar-item ml-1"
                         :class="{active: filterSelected == 'unread'}"
                         :aria-pressed="filterSelected == 'unread'"
                         title="Unread"
@@ -166,6 +179,7 @@
                     <input type="radio" name="feed" value="" v-model="feedSelected">
                     <div class="selectgroup-label d-flex align-items-center w-100">
                         <span class="icon mr-2">{% inline "layers.svg" %}</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='ranked'">For You</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">All Unread</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">All Starred</span>
                         <span class="flex-fill text-left text-truncate" v-if="filterSelected=='archived'">All Archived</span>
@@ -403,9 +417,12 @@
                             <small class="flex-fill text-truncate mr-1">
                                 {{ item._feedName || (feedsById[item.feed_id] || {}).title }}
                             </small>
+                            <small class="ranking-score flex-shrink-0 ml-1" v-if="filterSelected == 'ranked' && item.score">{{ Math.round(item.score) }}</small>
                             <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                         </div>
-                        <div>{{ item.title || 'untitled' }}</div>
+                        <div>{{ item.title || 'untitled' }}
+                            <small class="relevance-reason" v-if="filterSelected == 'ranked' && item.relevance_reason">{{ item.relevance_reason }}</small>
+                        </div>
                     </div>
                 </label>
                 <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
@@ -429,6 +446,19 @@
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
+                <span class="toolbar-separator"></span>
+                <button class="toolbar-item"
+                        :class="{active: itemReaction == 'like'}"
+                        @click="toggleReaction('like')"
+                        title="Like">
+                    <span class="icon">{% inline "thumbs-up.svg" %}</span>
+                </button>
+                <button class="toolbar-item"
+                        :class="{active: itemReaction == 'dislike'}"
+                        @click="toggleReaction('dislike')"
+                        title="Dislike">
+                    <span class="icon">{% inline "thumbs-down.svg" %}</span>
+                </button>
                 <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" title="Appearance">
                     <template v-slot:button>
                         <span class="icon">{% inline "sliders.svg" %}</span>
@@ -449,7 +479,7 @@
                         title="Read Here">
                     <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
                 </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link">
+                <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link" @click="trackClickThrough(itemSelectedDetails)">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
                 <button class="toolbar-item"
@@ -539,8 +569,8 @@
                 <p class="cursor-default"><b>Keyboard Shortcuts</b></p>
 
                 <table class="table table-borderless table-sm table-compact m-0">
-                    <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td>
-                                                            <td>show unread / starred / all feeds</td></tr>
+                    <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></td>
+                                                            <td>show unread / starred / all / for you</td></tr>
                     <tr><td><kbd>/</kbd></td>               <td>focus the search bar</td></tr>
 
                     <tr><td colspan=2>&nbsp;</td></tr>
@@ -552,11 +582,101 @@
                     <tr><td><kbd>R</kbd></td>               <td>mark all read</td></tr>
                     <tr><td><kbd>r</kbd></td>               <td>mark read / unread</td></tr>
                     <tr><td><kbd>s</kbd></td>               <td>mark starred / unstarred</td></tr>
+                    <tr><td><kbd>+</kbd> <kbd>-</kbd></td>  <td>like / dislike article</td></tr>
                     <tr><td><kbd>o</kbd></td>               <td>open link</td></tr>
                     <tr><td><kbd>i</kbd></td>               <td>read here</td> </tr>
                     <tr><td><kbd>f</kbd> <kbd>b</kbd></td>  <td>scroll content forward / backward</td>
                     </tr>
                 </table>
+            </div>
+        </modal>
+        <modal :open="settings=='ranking-help'" @hide="settings = ''">
+            <button class="btn btn-link outline-none float-right p-2 mr-n2 mt-n2" style="line-height: 1" @click="settings = ''">
+                <span class="icon">{% inline "x.svg" %}</span>
+            </button>
+            <div v-if="settings=='ranking-help'">
+                <p class="cursor-default"><b>How "For You" works</b></p>
+
+                <p><b>What is For You?</b><br>
+                Instead of showing articles in reverse-chronological order, "For You" ranks every article by how likely you are to find it valuable — based on your reading habits and reactions.</p>
+
+                <p><b>Signals we use</b></p>
+                <ul class="pl-3" style="line-height: 1.8">
+                    <li>&#128077;&#128078; <b>Reactions</b> — thumbs up/down are the strongest signal</li>
+                    <li>&#11088; <b>Stars</b> — treated as a strong like (2&times; weight)</li>
+                    <li>&#128214; <b>Read here</b> — opening an article inline is a strong engagement signal (0.5&times; weight). Works for both articles and embedded videos.</li>
+                    <li>&#128279; <b>External link clicks</b> — weak positive signal (0.3&times; weight)</li>
+                    <li>&#9200; <b>Freshness</b> — newer articles get a small boost</li>
+                    <li>&#128270; <b>Exploration</b> — unrated sources get a diversity boost to prevent filter bubbles</li>
+                </ul>
+
+                <p><b>Why you might see an article</b></p>
+                <ul class="pl-3" style="line-height: 1.8">
+                    <li><i>From a source you like</i> — you've liked articles from this feed</li>
+                    <li><i>Matches your interests</i> — you've liked articles in this topic cluster</li>
+                    <li><i>Related to: keyword</i> — title keywords match your history</li>
+                    <li><i>Discover new content</i> — this source hasn't been rated yet</li>
+                </ul>
+
+                <p><b>How to improve your feed</b><br>
+                React with &#128077;/&#128078; as you read, or use <kbd>+</kbd> / <kbd>-</kbd> keyboard shortcuts. Opening articles with "Read here" (<kbd>i</kbd>) also contributes — both for text articles and embedded videos. The algorithm updates immediately — a few dozen interactions is enough to see meaningful personalisation.</p>
+
+                <hr>
+
+                <button class="btn btn-link p-0" style="font-size: 0.85rem" @click="rankingHelpShowTech = !rankingHelpShowTech">
+                    {{ rankingHelpShowTech ? '&#9650; Hide technical details' : '&#9660; Show technical details' }}
+                </button>
+                <div v-if="rankingHelpShowTech" class="mt-2">
+                    <pre class="ranking-help-formula">score = 50
+      + feed_affinity   &times; 0.25   (liked/disliked feeds)
+      + topic_affinity  &times; 0.25   (AI topic clusters)
+      + recency         &times; 0.20   (linear, 0&rarr;20 days)
+      + keyword         &times; 0.15   (title keywords, &ge;5 interactions)
+      + exploration     &times; 0.15   (diversity bonus)
+      clamped to [0, 100]</pre>
+                    <table class="table table-sm table-borderless mt-2" style="font-size: 0.82rem">
+                        <tr><td>Decay rate</td><td><code>exp(&minus;0.015 &times; days)</code> &asymp; &minus;10%/week</td></tr>
+                        <tr><td>Star weight</td><td>2&times; a like reaction</td></tr>
+                        <tr><td>Read here weight</td><td>0.5&times; a like reaction (feed affinity only)</td></tr>
+                        <tr><td>Click weight</td><td>0.3&times; a like reaction</td></tr>
+                        <tr><td>Keyword threshold</td><td>Activates after &ge;5 article interactions for that word</td></tr>
+                        <tr><td>Exploration boost</td><td>+15 for feeds/topics with &lt;5 total reactions</td></tr>
+                        <tr><td>Cold start</td><td>score &asymp; 50 + recency + exploration (diversity-weighted recency)</td></tr>
+                    </table>
+                </div>
+
+                <hr>
+
+                <p class="cursor-default"><b>Your preferences</b></p>
+                <div v-if="rankingStats">
+                    <p>&#128077; {{ rankingStats.total_likes }} likes &nbsp;&middot;&nbsp; &#128078; {{ rankingStats.total_dislikes }} dislikes &nbsp;&middot;&nbsp; &#128279; {{ rankingStats.total_clicks }} clicks &nbsp;&middot;&nbsp; &#128214; {{ rankingStats.total_read_heres }} read-heres</p>
+                    <p v-if="!rankingStats.total_likes && !rankingStats.total_dislikes && !rankingStats.total_clicks && !rankingStats.total_read_heres" class="text-muted" style="font-size: 0.85rem">
+                        Start reacting to articles to build your profile.
+                    </p>
+                    <div v-if="rankingStats.top_feeds && rankingStats.top_feeds.length" class="mt-2">
+                        <p class="mb-1" style="font-size: 0.85rem"><b>Top feeds you like</b></p>
+                        <table class="table table-sm table-borderless m-0" style="font-size: 0.82rem">
+                            <tr v-for="fa in rankingStats.top_feeds">
+                                <td class="text-truncate" style="max-width: 200px">{{ fa.title }}</td>
+                                <td class="text-right text-muted">{{ fa.score.toFixed(1) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div v-if="rankingStats.top_topics && rankingStats.top_topics.length" class="mt-2">
+                        <p class="mb-1" style="font-size: 0.85rem"><b>Top topics you like</b></p>
+                        <table class="table table-sm table-borderless m-0" style="font-size: 0.82rem">
+                            <tr v-for="ta in rankingStats.top_topics">
+                                <td class="text-truncate" style="max-width: 200px">{{ ta.topic }}</td>
+                                <td class="text-right text-muted">{{ ta.score.toFixed(1) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div v-else class="text-muted" style="font-size: 0.85rem">Loading...</div>
+
+                <button class="btn btn-danger btn-sm mt-3" @click="resetRankingPreferences()">
+                    Reset all preferences
+                </button>
             </div>
         </modal>
     </div>

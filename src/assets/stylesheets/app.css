@@ -1070,3 +1070,63 @@ body.theme-night #toast-container .toast.toast-error {
 .theme-night .topics-hide-small {
   color: #a0a0a0;
 }
+
+/* ── Ranking Help Formula ────────────────────────────────────────────────────── */
+.ranking-help-formula {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #212529;
+  background: rgba(128, 128, 128, 0.08);
+  padding: 0.5rem 0.75rem;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  margin: 0;
+}
+.theme-sepia .ranking-help-formula {
+  color: #5b4c2f;
+  background: rgba(138, 122, 90, 0.12);
+}
+.theme-night .ranking-help-formula {
+  color: #d0d0d0;
+  background: rgba(255, 255, 255, 0.05);
+}
+/* Inline code inside modal should inherit text color, not Bootstrap's pink */
+.modal-body code {
+  color: inherit;
+}
+
+/* ── Ranking ────────────────────────────────────────────────────────────────── */
+.ranking-score {
+  display: inline-block;
+  background: #5a7abf;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0 4px;
+  border-radius: 3px;
+  min-width: 1.4em;
+  text-align: center;
+  line-height: 1.4;
+}
+.relevance-reason {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+.toolbar-separator {
+  display: inline-block;
+  width: 1px;
+  height: 1.2rem;
+  background: rgba(128, 128, 128, 0.3);
+  margin: 0 4px;
+  vertical-align: middle;
+}
+/* ranking theme: sepia */
+.theme-sepia .ranking-score {
+  background: #8a7a5a;
+}
+/* ranking theme: night */
+.theme-night .ranking-score {
+  background: #3a5a8c;
+}

@@ -72,6 +72,15 @@ var shortcutFunctions = {
   showStarred() {
     vm.filterSelected = 'starred'
   },
+  likeItem() {
+    vm.toggleReaction('like')
+  },
+  dislikeItem() {
+    vm.toggleReaction('dislike')
+  },
+  showRanked() {
+    vm.filterSelected = 'ranked'
+  },
 }
 
 // If you edit, make sure you update the help modal
@@ -92,6 +101,10 @@ var keybindings = {
   "1": shortcutFunctions.showUnread,
   "2": shortcutFunctions.showStarred,
   "3": shortcutFunctions.showAll,
+  "4": shortcutFunctions.showRanked,
+  "+": shortcutFunctions.likeItem,
+  "=": shortcutFunctions.likeItem,
+  "-": shortcutFunctions.dislikeItem,
 }
 
 var codebindings = {
@@ -111,6 +124,9 @@ var codebindings = {
   "Digit1": shortcutFunctions.showUnread,
   "Digit2": shortcutFunctions.showStarred,
   "Digit3": shortcutFunctions.showAll,
+  "Digit4": shortcutFunctions.showRanked,
+  "Equal": shortcutFunctions.likeItem,
+  "Minus": shortcutFunctions.dislikeItem,
 }
 
 function isTextBox(element) {

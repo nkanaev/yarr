@@ -21,6 +21,9 @@ var migrations = []func(*sql.Tx) error{
 	m11_add_feed_archived,
 	m12_add_ai_cluster_tables,
 	m13_add_ai_article_tags,
+	m14_add_ranking_tables,
+	m15_retype_ranking_timestamps,
+	m16_add_read_heres_table,
 }
 
 var maxVersion = int64(len(migrations))
@@ -336,6 +339,51 @@ func m10_add_item_medialinks(tx *sql.Tx) error {
 func m11_add_feed_archived(tx *sql.Tx) error {
 	sql := `
 		alter table feeds add column archived boolean not null default false;
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+// m15_retype_ranking_timestamps recreates reactions and click_throughs with
+// 'datetime' column type for created_at so the mattn/go-sqlite3 driver
+// automatically parses the values into time.Time on scan (same as items.date).
+func m15_retype_ranking_timestamps(tx *sql.Tx) error {
+	sql := `
+		CREATE TABLE reactions_new (
+			id         INTEGER PRIMARY KEY AUTOINCREMENT,
+			item_id    INTEGER NOT NULL UNIQUE REFERENCES items(id) ON DELETE CASCADE,
+			reaction   TEXT    NOT NULL CHECK(reaction IN ('like','dislike')),
+			created_at datetime NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
+		);
+		INSERT INTO reactions_new (id, item_id, reaction, created_at)
+			SELECT id, item_id, reaction, created_at FROM reactions;
+		DROP TABLE reactions;
+		ALTER TABLE reactions_new RENAME TO reactions;
+		CREATE INDEX idx_reactions_created_at ON reactions(created_at);
+
+		CREATE TABLE click_throughs_new (
+			id         INTEGER PRIMARY KEY AUTOINCREMENT,
+			item_id    INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+			created_at datetime NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
+		);
+		INSERT INTO click_throughs_new (id, item_id, created_at)
+			SELECT id, item_id, created_at FROM click_throughs;
+		DROP TABLE click_throughs;
+		ALTER TABLE click_throughs_new RENAME TO click_throughs;
+		CREATE INDEX idx_click_throughs_item ON click_throughs(item_id);
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m16_add_read_heres_table(tx *sql.Tx) error {
+	sql := `
+		CREATE TABLE read_heres (
+			id         INTEGER PRIMARY KEY AUTOINCREMENT,
+			item_id    INTEGER NOT NULL UNIQUE REFERENCES items(id) ON DELETE CASCADE,
+			created_at datetime NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
+		);
+		CREATE INDEX idx_read_heres_created_at ON read_heres(created_at);
 	`
 	_, err := tx.Exec(sql)
 	return err

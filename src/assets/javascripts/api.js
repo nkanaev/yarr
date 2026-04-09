@@ -119,6 +119,29 @@
     crawl: function(url) {
       return api('get', './page?url=' + encodeURIComponent(url)).then(json)
     },
+    ranking: {
+      react: function(itemId, reaction) {
+        return api('post', './api/reactions', {item_id: itemId, reaction: reaction})
+      },
+      getReaction: function(itemId) {
+        return api('get', './api/reactions?item_id=' + itemId).then(json)
+      },
+      clickThrough: function(itemId) {
+        return api('post', './api/click-throughs', {item_id: itemId})
+      },
+      readHere: function(itemId) {
+        return api('post', './api/read-heres', {item_id: itemId})
+      },
+      list: function(query) {
+        return api('get', './api/items/ranked' + param(query)).then(json)
+      },
+      preferences: function() {
+        return api('get', './api/preferences').then(json)
+      },
+      resetPreferences: function() {
+        return api('delete', './api/preferences')
+      },
+    },
     ai: {
       // Returns raw Response for SSE streaming (POST with JSON body)
       chat: function(query, history) {
