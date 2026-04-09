@@ -367,7 +367,7 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 		markFilter := storage.MarkFilter{FeedID: &id}
 		x, _ := strconv.ParseInt(c.Req.Form.Get("before"), 10, 64)
 		if x > 0 {
-			before := time.Unix(x, 0)
+			before := time.Unix(x, 0).UTC()
 			markFilter.Before = &before
 		}
 		s.db.MarkItemsRead(markFilter)
@@ -378,7 +378,7 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 		markFilter := storage.MarkFilter{FolderID: &id}
 		x, _ := strconv.ParseInt(c.Req.Form.Get("before"), 10, 64)
 		if x > 0 {
-			before := time.Unix(x, 0)
+			before := time.Unix(x, 0).UTC()
 			markFilter.Before = &before
 		}
 		s.db.MarkItemsRead(markFilter)

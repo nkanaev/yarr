@@ -248,6 +248,35 @@ func TestRSSIsPermalink(t *testing.T) {
 	}
 }
 
+// https://github.com/nkanaev/yarr/issues/284
+func TestRSSEnclosureImage(t *testing.T) {
+	feed, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0">
+			<channel>
+				<item>
+					<title>Post with image</title>
+					<link>http://example.com/post/1</link>
+					<enclosure url="http://example.com/photo.jpg" type="image/jpeg" length="123456"/>
+				</item>
+			</channel>
+		</rss>
+	`))
+	if len(feed.Items[0].MediaLinks) != 1 {
+		t.Fatalf("Expected 1 media link, got %d: %#v", len(feed.Items[0].MediaLinks), feed.Items[0].MediaLinks)
+	}
+	have := feed.Items[0].MediaLinks[0]
+	want := MediaLink{
+		URL:  "http://example.com/photo.jpg",
+		Type: "image",
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.FailNow()
+	}
+}
+
 func TestRSSMultipleMedia(t *testing.T) {
 	feed, _ := Parse(strings.NewReader(`
 		<?xml version="1.0" encoding="UTF-8"?>
