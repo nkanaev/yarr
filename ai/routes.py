@@ -11,7 +11,7 @@ from sse_starlette.sse import EventSourceResponse
 from .briefing import generate_briefing
 from .cluster import run_clustering
 from .dedup import find_dedup_groups
-from .indexer import index_items, reindex_all
+from .indexer import index_items, index_and_assign_items, reindex_all
 from .search import build_bm25_index
 
 log = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ async def webhook_index(request: Request, background_tasks: BackgroundTasks):
         return JSONResponse({"status": "no items"}, status_code=200)
 
     def do_index():
-        count = index_items(config, collection, item_ids)
+        count, _new_urls = index_and_assign_items(config, collection, item_ids)
         if count > 0:
             bm25, docs = build_bm25_index(collection)
             engine = request.app.state.chat_engine
@@ -98,7 +98,7 @@ async def webhook_index_feeds(request: Request, background_tasks: BackgroundTask
             conn.close()
 
         if all_item_ids:
-            count = index_items(config, collection, all_item_ids)
+            count, _new_urls = index_and_assign_items(config, collection, all_item_ids)
             if count > 0:
                 bm25, docs = build_bm25_index(collection)
                 engine = request.app.state.chat_engine
@@ -336,6 +336,16 @@ async def health(request: Request):
     if engine and engine.bm25_docs:
         bm25_docs = len(engine.bm25_docs)
 
+    # Centroid count — indicates whether incremental topic assignment is active
+    centroid_count = 0
+    if config.yarr_api_url:
+        from .cluster import fetch_previous_centroids
+        try:
+            prev = fetch_previous_centroids(config.yarr_api_url)
+            centroid_count = len(prev) if prev else 0
+        except Exception:
+            pass
+
     # n_clusters is now served by Go directly — not tracked here
     status = "ok" if ollama_ok else "degraded"
     if not collection:
@@ -346,6 +356,7 @@ async def health(request: Request):
         "ollama": ollama_ok,
         "chroma_docs": chroma_docs,
         "bm25_docs": bm25_docs,
+        "centroid_count": centroid_count,
     })
 
 

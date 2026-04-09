@@ -433,6 +433,43 @@ def post_cluster_run(yarr_api_url: str, cluster_run: dict) -> bool:
         return False
 
 
+def load_centroid_matrix(
+    previous_centroids: list[dict],
+) -> tuple[list[int], list[str], "np.ndarray"] | None:
+    """Decode persisted centroids into a matrix for cosine-similarity lookup.
+
+    Args:
+        previous_centroids: list of {cluster_id, label, centroid (base64 float64 bytes)}
+                            as returned by GET /api/ai/clusters/centroids.
+
+    Returns:
+        (cluster_ids, labels, centroid_matrix) where centroid_matrix is (k, d) float64,
+        or None if the input is empty or malformed.
+    """
+    import base64
+    if not previous_centroids:
+        return None
+
+    cluster_ids: list[int] = []
+    labels: list[str] = []
+    vectors: list[np.ndarray] = []
+
+    for entry in previous_centroids:
+        try:
+            blob = base64.b64decode(entry["centroid"])
+            vec = np.frombuffer(blob, dtype=np.float64).copy()
+            cluster_ids.append(int(entry["cluster_id"]))
+            labels.append(str(entry["label"]))
+            vectors.append(vec)
+        except Exception as e:
+            log.warning("Skipping malformed centroid (cluster_id=%s): %s", entry.get("cluster_id"), e)
+
+    if not vectors:
+        return None
+
+    return cluster_ids, labels, np.array(vectors)
+
+
 def post_article_tags(yarr_api_url: str, article_tags: list[dict]) -> bool:
     """POST article-tag mapping to Go's /api/ai/articles endpoint.
 
@@ -447,6 +484,26 @@ def post_article_tags(yarr_api_url: str, article_tags: list[dict]) -> bool:
         return True
     except Exception as e:
         log.error("Failed to POST article tags to %s: %s", url, e)
+        return False
+
+
+def post_article_tags_append(yarr_api_url: str, article_tags: list[dict]) -> bool:
+    """POST article-tag mappings to Go's /api/ai/articles/append endpoint.
+
+    Unlike post_article_tags (which replaces everything), this is append-only:
+    it upserts only the provided URLs without touching existing rows.
+
+    article_tags: list of {"url": str, "tag": str}
+    Returns True on success, False on failure.
+    """
+    url = yarr_api_url.rstrip("/") + "/api/ai/articles/append"
+    try:
+        resp = httpx.post(url, json=article_tags, timeout=60.0)
+        resp.raise_for_status()
+        log.info("Appended %d article tags via %s", len(article_tags), url)
+        return True
+    except Exception as e:
+        log.error("Failed to append article tags to %s: %s", url, e)
         return False
 
 

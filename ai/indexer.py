@@ -5,9 +5,11 @@ import hashlib
 import logging
 from datetime import datetime
 
+import numpy as np
+
 from .article_extractor import html_to_text
 from .chunker import chunk_text
-from .store import add_chunks, article_exists
+from .store import add_chunks, article_exists, update_article_tags
 from .yarr_db import get_items_by_ids, list_items, iter_all_items, get_feed_folder_map, open_db
 
 log = logging.getLogger(__name__)
@@ -86,8 +88,11 @@ def _process_item(item: dict, config, existing_urls: set, existing_hashes: set) 
     }
 
 
-def index_items(config, collection, item_ids: list[int]) -> int:
-    """Index specific items by ID (webhook handler)."""
+def index_items(config, collection, item_ids: list[int]) -> tuple[int, list[str]]:
+    """Index specific items by ID (webhook handler).
+
+    Returns (count_indexed, list_of_new_urls).
+    """
     conn = open_db(config.yarr_db)
     try:
         items = get_items_by_ids(conn, item_ids)
@@ -95,11 +100,12 @@ def index_items(config, collection, item_ids: list[int]) -> int:
         conn.close()
 
     if not items:
-        return 0
+        return 0, []
 
     existing_urls, existing_hashes = _get_existing_ids(collection)
 
     count = 0
+    new_urls: list[str] = []
     for item in items:
         try:
             result = _process_item(item, config, existing_urls, existing_hashes)
@@ -126,10 +132,149 @@ def index_items(config, collection, item_ids: list[int]) -> int:
             continue
         existing_urls.add(result["url"])
         existing_hashes.add(result["content_hash"])
+        new_urls.append(result["url"])
         count += 1
 
     log.info("Indexed %d/%d items", count, len(items))
-    return count
+    return count, new_urls
+
+
+def _article_mean_embedding(collection, url: str) -> "np.ndarray | None":
+    """Return the mean embedding vector for all chunks of a given article URL.
+
+    Returns None if no chunks are found or embeddings are unavailable.
+    """
+    try:
+        data = collection.get(
+            where={"url": {"$eq": url}},
+            include=["embeddings"],
+        )
+    except Exception as e:
+        log.warning("ChromaDB get embeddings failed for %s: %s", url, e)
+        return None
+
+    embeddings = data.get("embeddings") or []
+    if not embeddings:
+        return None
+
+    try:
+        vecs = np.array(embeddings, dtype=np.float64)
+        return vecs.mean(axis=0)
+    except Exception as e:
+        log.warning("Failed to compute mean embedding for %s: %s", url, e)
+        return None
+
+
+def assign_articles_to_clusters(
+    collection,
+    urls: list[str],
+    cluster_ids: list[int],
+    cluster_labels: list[str],
+    centroid_matrix: "np.ndarray",
+    min_similarity: float = 0.55,
+) -> list[dict]:
+    """Assign a list of article URLs to the nearest existing cluster.
+
+    For each URL:
+    - Fetches the mean embedding from ChromaDB.
+    - Computes cosine similarity against every centroid (single dot product).
+    - Assigns the best-matching label if similarity >= min_similarity.
+    - Updates the ChromaDB tags metadata for the article.
+
+    Returns a list of {"url": ..., "tag": ...} for all successfully assigned articles.
+    """
+    if not urls or centroid_matrix is None or len(centroid_matrix) == 0:
+        return []
+
+    # Normalise centroids once for cosine similarity via dot product
+    norms = np.linalg.norm(centroid_matrix, axis=1, keepdims=True)
+    norms = np.where(norms == 0, 1.0, norms)
+    normed_centroids = centroid_matrix / norms
+
+    assigned: list[dict] = []
+    skipped_threshold = 0
+    skipped_no_emb = 0
+
+    for url in urls:
+        vec = _article_mean_embedding(collection, url)
+        if vec is None:
+            skipped_no_emb += 1
+            continue
+
+        vec_norm = np.linalg.norm(vec)
+        if vec_norm == 0:
+            skipped_no_emb += 1
+            continue
+        normed_vec = vec / vec_norm
+
+        sims = normed_centroids.dot(normed_vec)
+        best_idx = int(np.argmax(sims))
+        best_sim = float(sims[best_idx])
+
+        if best_sim < min_similarity:
+            skipped_threshold += 1
+            log.debug("Incremental assign: %s skipped (best_sim=%.3f < %.2f)", url, best_sim, min_similarity)
+            continue
+
+        label = cluster_labels[best_idx]
+        update_article_tags(collection, url, label)
+        assigned.append({"url": url, "tag": label})
+
+    log.info(
+        "Incremental assign: %d/%d new articles tagged (threshold=%.2f), "
+        "skipped %d (below threshold), %d (no embedding)",
+        len(assigned), len(urls), min_similarity, skipped_threshold, skipped_no_emb,
+    )
+    return assigned
+
+
+def index_and_assign_items(config, collection, item_ids: list[int]) -> tuple[int, list[str]]:
+    """Index items and immediately assign them to existing clusters (if centroids exist).
+
+    This is the main entry point for the webhook handlers. It:
+    1. Embeds new articles via index_items().
+    2. Loads persisted centroids from the Go DB.
+    3. Assigns each new article to its nearest cluster.
+    4. POSTs the {url, tag} pairs to /api/ai/articles/append (append-only).
+
+    Returns (count_indexed, new_urls) — same shape as index_items().
+    """
+    from .cluster import fetch_previous_centroids, load_centroid_matrix, post_article_tags_append
+
+    count, new_urls = index_items(config, collection, item_ids)
+
+    if count == 0 or not new_urls:
+        return count, new_urls
+
+    if not config.yarr_api_url:
+        log.info("Incremental assign: YARR_API_URL not set — skipping topic assignment")
+        return count, new_urls
+
+    previous_centroids = fetch_previous_centroids(config.yarr_api_url)
+    if not previous_centroids:
+        log.info("Incremental assign: no prior centroids — skipping topic assignment")
+        return count, new_urls
+
+    centroid_data = load_centroid_matrix(previous_centroids)
+    if centroid_data is None:
+        log.warning("Incremental assign: centroid matrix could not be loaded — skipping")
+        return count, new_urls
+
+    cluster_ids, cluster_labels, centroid_matrix = centroid_data
+
+    article_tags = assign_articles_to_clusters(
+        collection,
+        new_urls,
+        cluster_ids,
+        cluster_labels,
+        centroid_matrix,
+        min_similarity=config.assign_min_similarity,
+    )
+
+    if article_tags:
+        post_article_tags_append(config.yarr_api_url, article_tags)
+
+    return count, new_urls
 
 
 def reindex_all(config, collection, embed_provider=None, on_progress=None) -> int:
