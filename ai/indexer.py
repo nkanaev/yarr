@@ -153,12 +153,14 @@ def _article_mean_embedding(collection, url: str) -> "np.ndarray | None":
         log.warning("ChromaDB get embeddings failed for %s: %s", url, e)
         return None
 
-    embeddings = data.get("embeddings") or []
-    if not embeddings:
+    embeddings = data.get("embeddings")
+    if embeddings is None:
         return None
 
     try:
         vecs = np.array(embeddings, dtype=np.float64)
+        if vecs.size == 0:
+            return None
         return vecs.mean(axis=0)
     except Exception as e:
         log.warning("Failed to compute mean embedding for %s: %s", url, e)
