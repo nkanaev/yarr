@@ -72,6 +72,7 @@ func (s *Server) handler() http.Handler {
 	r.For("/api/ai/clusters", s.handleAiClusters)
 	r.For("/api/ai/clusters/centroids", s.handleAiClusterCentroids)
 	r.For("/api/ai/articles", s.handleAiArticles)
+	r.For("/api/ai/articles/append", s.handleAiArticlesAppend)
 
 	if s.AiServiceURL != "" {
 		r.For("/api/ai/*path", s.handleAiProxy)

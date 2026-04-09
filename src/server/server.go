@@ -58,6 +58,7 @@ func (s *Server) Start() {
 	refreshRate := s.db.GetSettingsValueInt64("refresh_rate")
 	s.worker.FindFavicons()
 	s.worker.StartFeedCleaner()
+	s.worker.StartReclusterer()
 	s.worker.SetRefreshRate(refreshRate)
 	if refreshRate > 0 {
 		s.worker.RefreshFeeds()
