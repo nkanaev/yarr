@@ -81,10 +81,23 @@ serve:
 test:
 	go test $(GO_FLAGS) ./...
 
+docker-build:
+	docker compose build
+
+docker-up:
+	docker compose up -d --build
+
+docker-down:
+	docker compose down
+
+docker-logs:
+	docker compose logs -f yarr
+
 .PHONY: \
 	host \
 	darwin_amd64 darwin_amd64_gui \
 	darwin_arm64 darwin_arm64_gui \
 	windows_amd64 windows_amd64_gui \
 	windows_arm64 windows_arm64_gui \
-	serve test
+	serve test \
+	docker-build docker-up docker-down docker-logs

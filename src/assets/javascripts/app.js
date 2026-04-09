@@ -210,6 +210,8 @@ var vm = new Vue({
     this._briefingReader = null
     this._aiPollTimer = null
     this._lastAiDetail = ''
+    // Ranking: track which item we've already sent a read-here signal for
+    this._readHereFiredFor = null
 
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
@@ -281,6 +283,12 @@ var vm = new Vue({
         { title: "12h", value: 720 },
         { title: "24h", value: 1440 },
       ],
+
+      // Ranking / reaction state
+      'itemReaction': '',
+      'rankedPage': 1,
+      'rankingStats': null,
+      'rankingHelpShowTech': false,
 
       // AI feature flags
       'aiEnabled': !!(app.aiEnabled),
@@ -420,6 +428,12 @@ var vm = new Vue({
       this.itemSelected = null
       this.items = []
       this.itemsHasMore = true
+      this.rankedPage = 1
+      // For ranked mode, we don't need a feedSelected to load items
+      if (newVal === 'ranked') {
+        this.refreshItems(false)
+        return
+      }
       api.settings.update({filter: newVal}).then(this.refreshItems.bind(this, false))
       this.computeStats()
     },
@@ -450,7 +464,19 @@ var vm = new Vue({
       this.onTopicFilterChange()
     },
     'itemSelected': function(newVal, oldVal) {
+      // In ranked mode, remove the previously-read article from the list when
+      // navigating away — it's been consumed and shouldn't stay visible.
+      if (this.filterSelected === 'ranked' && oldVal != null && oldVal !== newVal) {
+        var oldItem = this.items.find(function(i) { return i.id === oldVal })
+        if (oldItem && oldItem.status === 'read') {
+          this.items = this.items.filter(function(i) { return i.id !== oldVal })
+          vm.$nextTick(vm.loadMoreItems)
+        }
+      }
+
       this.itemSelectedReadability = ''
+      this.itemReaction = ''
+      this._readHereFiredFor = null
       // reset reading progress
       var prog = document.getElementById('reading-progress')
       if (prog) prog.style.width = '0'
@@ -464,13 +490,20 @@ var vm = new Vue({
         this.itemSelectedDetails = item
         if (this.itemSelectedDetails.status == 'unread') {
           api.items.update(this.itemSelectedDetails.id, {status: 'read'}).then(function() {
-            this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
+            if (this.feedStats[this.itemSelectedDetails.feed_id]) {
+              this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1
+            }
             var itemInList = this.items.find(function(i) { return i.id == item.id })
             if (itemInList) itemInList.status = 'read'
             this.itemSelectedDetails.status = 'read'
           }.bind(this))
         }
       }.bind(this))
+
+      // Fetch reaction for this item
+      api.ranking.getReaction(newVal).then(function(data) {
+        vm.itemReaction = data.reaction || ''
+      }).catch(function() {})
     },
     'itemSearch': debounce(function(newVal) {
       this.refreshItems()
@@ -546,10 +579,40 @@ var vm = new Vue({
         })
     },
     refreshItems: function(loadMore = false) {
-      if (this.feedSelected === null) {
+      if (this.feedSelected === null && this.filterSelected !== 'ranked') {
         vm.items = []
         vm.itemsHasMore = false
         return
+      }
+
+      // Ranked mode uses a different endpoint with page-based pagination
+      if (this.filterSelected === 'ranked') {
+        if (!loadMore) {
+          vm.rankedPage = 1
+        }
+        var rankedQuery = {}
+        if (this.feedSelected) {
+          var parts = this.feedSelected.split(':', 2)
+          if (parts[0] == 'feed') rankedQuery.feed_id = parts[1]
+          if (parts[0] == 'folder') rankedQuery.folder_id = parts[1]
+        }
+        rankedQuery.page = vm.rankedPage
+        this.loading.items = true
+        return api.ranking.list(rankedQuery).then(function(data) {
+          if (loadMore) {
+            vm.items = vm.items.concat(data.list)
+          } else {
+            vm.items = data.list
+          }
+          vm.itemsHasMore = data.has_more
+          vm.rankedPage++
+          vm.loading.items = false
+          vm.$nextTick(function() {
+            if (vm.itemsHasMore && !vm.loading.items && vm.itemListCloseToBottom()) {
+              vm.refreshItems(true)
+            }
+          })
+        })
       }
 
       var query = this.getItemsQuery()
@@ -755,6 +818,18 @@ var vm = new Vue({
     toggleItemRead: function(item) {
       this.toggleItemStatus(item, 'unread', 'read')
     },
+    toggleReaction: function(reaction) {
+      if (!this.itemSelectedDetails) return
+      var newReaction = this.itemReaction === reaction ? '' : reaction
+      this.itemReaction = newReaction
+      api.ranking.react(this.itemSelectedDetails.id, newReaction).catch(function(err) {
+        console.error('toggleReaction error:', err)
+      })
+    },
+    trackClickThrough: function(item) {
+      if (!item || !item.id) return
+      api.ranking.clickThrough(item.id).catch(function() {})
+    },
     importOPML: function(event) {
       var input = event.target
       var form = document.querySelector('#opml-import-form')
@@ -783,6 +858,12 @@ var vm = new Vue({
         api.crawl(item.link).then(function(data) {
           vm.itemSelectedReadability = data && data.content
           vm.loading.readability = false
+          // Fire read-here signal on successful crawl (not on errors or empty content).
+          // Deduplicate per-item per-session via _readHereFiredFor.
+          if (data && data.content && !data.content.startsWith('error:') && vm._readHereFiredFor !== item.id) {
+            vm._readHereFiredFor = item.id
+            api.ranking.readHere(item.id).catch(function() {})
+          }
         })
       }
     },
@@ -793,6 +874,26 @@ var vm = new Vue({
         vm.feedNewChoice = []
         vm.feedNewChoiceSelected = ''
       }
+      if (settings === 'ranking-help') {
+        this.rankingHelpShowTech = false
+        this.loadRankingStats()
+      }
+    },
+    loadRankingStats: function() {
+      api.ranking.preferences().then(function(stats) {
+        vm.rankingStats = stats
+      }).catch(function() {
+        vm.rankingStats = null
+      })
+    },
+    resetRankingPreferences: function() {
+      if (!confirm('Reset all reactions, clicks, and learned preferences? This cannot be undone.')) return
+      api.ranking.resetPreferences().then(function() {
+        vm.toast('Preferences reset')
+        vm.loadRankingStats()
+      }).catch(function() {
+        vm.toast('Failed to reset preferences', 'error')
+      })
     },
     resizeFeedList: function(width) {
       this.feedListWidth = Math.min(Math.max(200, width), 700)

@@ -51,6 +51,14 @@ func (s *Server) handler() http.Handler {
 	r.For("/api/feeds/errors", s.handleFeedErrors)
 	r.For("/api/feeds/:id/icon", s.handleFeedIcon)
 	r.For("/api/feeds/:id", s.handleFeed)
+	// Ranking endpoints — must be registered before /api/items/:id to avoid
+	// the wildcard swallowing "ranked" as an integer id (which causes a 400).
+	r.For("/api/reactions", s.handleReactions)
+	r.For("/api/click-throughs", s.handleClickThroughs)
+	r.For("/api/read-heres", s.handleReadHeres)
+	r.For("/api/items/ranked", s.handleRankedItems)
+	r.For("/api/preferences", s.handlePreferences)
+
 	r.For("/api/items", s.handleItemList)
 	r.For("/api/items/:id", s.handleItem)
 	r.For("/api/settings", s.handleSettings)

@@ -52,6 +52,9 @@ func (h *Server) GetAddr() string {
 func (s *Server) Start() {
 	s.worker.AiServiceURL = s.AiServiceURL
 
+	// Ensure keyword index is populated for ranking
+	go s.db.EnsureKeywordIndex()
+
 	refreshRate := s.db.GetSettingsValueInt64("refresh_rate")
 	s.worker.FindFavicons()
 	s.worker.StartFeedCleaner()

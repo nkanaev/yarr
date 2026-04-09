@@ -129,6 +129,7 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 		items := <-dstqueue
 		if len(items) > 0 {
 			w.db.CreateItems(items)
+			w.db.IndexNewItemKeywords(items)
 			w.db.SetFeedSize(items[0].FeedId, len(items))
 			updatedFeedIds = append(updatedFeedIds, items[0].FeedId)
 		}
