@@ -13,6 +13,7 @@ import (
 )
 
 const NUM_WORKERS = 4
+const reclusterInterval = 24 * time.Hour
 
 type Worker struct {
 	db           *storage.Storage
@@ -39,6 +40,19 @@ func (w *Worker) StartFeedCleaner() {
 		for {
 			<-ticker.C
 			w.db.DeleteOldItems()
+		}
+	}()
+}
+
+func (w *Worker) StartReclusterer() {
+	if w.AiServiceURL == "" {
+		return
+	}
+	log.Printf("recluster schedule: enabled (%s)", reclusterInterval)
+	ticker := time.NewTicker(reclusterInterval)
+	go func() {
+		for range ticker.C {
+			w.triggerRecluster()
 		}
 	}()
 }
@@ -143,6 +157,29 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 
 	if len(updatedFeedIds) > 0 {
 		go w.notifyAiService(updatedFeedIds)
+	}
+}
+
+func (w *Worker) triggerRecluster() {
+	if w.AiServiceURL == "" {
+		return
+	}
+	log.Print("recluster schedule: firing")
+	url := w.AiServiceURL + "/recluster"
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Post(url, "application/json", nil)
+	if err != nil {
+		log.Printf("recluster schedule: error %v", err)
+		return
+	}
+	defer resp.Body.Close()
+	switch resp.StatusCode {
+	case http.StatusAccepted:
+		log.Print("recluster schedule: accepted (status 202)")
+	case http.StatusConflict:
+		log.Print("recluster schedule: busy (status 409), will retry next interval")
+	default:
+		log.Printf("recluster schedule: unexpected status %d", resp.StatusCode)
 	}
 }
 
