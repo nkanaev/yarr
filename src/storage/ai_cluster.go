@@ -326,7 +326,7 @@ func (s *Storage) GetArticlesByTag(tag string, limit int, status int64, since st
 			max(i.id),
 			at.url,
 			max(i.title),
-			coalesce(max(i.date), '') as published,
+			strftime('%Y-%m-%dT%H:%M:%SZ', max(i.date)) as published,
 			coalesce(max(fo.title), 'uncategorized') as folder,
 			max(f.title) as feed_name,
 			at.tag,
