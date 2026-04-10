@@ -162,6 +162,29 @@ func (s *Server) handleAiArticles(c *router.Context) {
 	}
 }
 
+// handleAiArticlesAppend handles POST /api/ai/articles/append.
+// Unlike handleAiArticles POST (which replaces all tags), this upserts only
+// the provided URLs without touching any other existing rows.
+func (s *Server) handleAiArticlesAppend(c *router.Context) {
+	if c.Req.Method != "POST" {
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var tags []storage.ArticleTag
+	if err := json.NewDecoder(c.Req.Body).Decode(&tags); err != nil {
+		log.Print(err)
+		c.Out.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if err := s.db.UpsertArticleTags(tags); err != nil {
+		log.Print(err)
+		c.Out.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	c.Out.WriteHeader(http.StatusCreated)
+}
+
 func (s *Server) handleAiClusterCentroids(c *router.Context) {
 	if c.Req.Method != "GET" {
 		c.Out.WriteHeader(http.StatusMethodNotAllowed)

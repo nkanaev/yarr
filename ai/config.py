@@ -38,6 +38,7 @@ class Config:
     max_history: int = 3
     dedup_threshold: float = 0.92
     min_cluster_size: int = 10
+    assign_min_similarity: float = 0.55  # min cosine sim for incremental topic assignment
     host: str = "0.0.0.0"
     port: int = 8484
     # URL of the yarr Go server — used by Python to POST cluster results
@@ -73,6 +74,7 @@ class Config:
             max_history=int(os.environ.get("MAX_HISTORY", "3")),
             dedup_threshold=float(os.environ.get("DEDUP_THRESHOLD", "0.92")),
             min_cluster_size=int(os.environ.get("MIN_CLUSTER_SIZE", "10")),
+            assign_min_similarity=float(os.environ.get("ASSIGN_MIN_SIMILARITY", "0.55")),
             host=os.environ.get("AI_HOST", "0.0.0.0"),
             port=int(os.environ.get("AI_PORT", "8484")),
         )

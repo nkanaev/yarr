@@ -326,7 +326,7 @@ func (s *Storage) GetArticlesByTag(tag string, limit int, status int64, since st
 			max(i.id),
 			at.url,
 			max(i.title),
-			coalesce(max(i.date), '') as published,
+			strftime('%Y-%m-%dT%H:%M:%SZ', max(i.date)) as published,
 			coalesce(max(fo.title), 'uncategorized') as folder,
 			max(f.title) as feed_name,
 			at.tag,
@@ -367,4 +367,43 @@ func (s *Storage) GetArticlesByTag(tag string, limit int, status int64, since st
 		results = append(results, a)
 	}
 	return results, rows.Err()
+}
+
+// UpsertArticleTags inserts or replaces article-tag mappings for the given URLs
+// without touching rows for URLs not in the payload (append-only semantics).
+// Each URL in the payload has its existing row(s) deleted before re-inserting,
+// so calling this twice for the same URL is idempotent.
+func (s *Storage) UpsertArticleTags(tags []ArticleTag) error {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	delStmt, err := tx.Prepare(`delete from ai_article_tags where url = ?`)
+	if err != nil {
+		return err
+	}
+	defer delStmt.Close()
+
+	insStmt, err := tx.Prepare(`insert into ai_article_tags (url, tag) values (?, ?)`)
+	if err != nil {
+		return err
+	}
+	defer insStmt.Close()
+
+	for _, t := range tags {
+		if _, err := delStmt.Exec(t.URL); err != nil {
+			return err
+		}
+		if _, err := insStmt.Exec(t.URL, t.Tag); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
 }
