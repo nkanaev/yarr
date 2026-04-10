@@ -83,6 +83,7 @@ func m14_add_ranking_tables(tx *sql.Tx) error {
 // ── Keyword Extraction ─────────────────────────────────────────────────────────
 
 var stopWords = map[string]bool{
+	// English stopwords
 	"the": true, "a": true, "an": true, "and": true, "or": true, "but": true,
 	"in": true, "on": true, "at": true, "to": true, "for": true, "of": true,
 	"with": true, "by": true, "from": true, "as": true, "is": true, "was": true,
@@ -100,6 +101,39 @@ var stopWords = map[string]bool{
 	"new": true, "about": true, "into": true, "over": true, "after": true,
 	"also": true, "back": true, "use": true, "two": true, "way": true,
 	"your": true, "our": true, "out": true, "up": true, "one": true,
+
+	// Spanish stopwords
+	// Articles
+	"el": true, "la": true, "los": true, "las": true, "un": true, "una": true,
+	"unos": true, "unas": true, "lo": true,
+	// Prepositions
+	"de": true, "del": true, "al": true, "en": true, "con": true, "por": true,
+	"para": true, "sin": true, "sobre": true, "tras": true, "entre": true,
+	"desde": true, "hasta": true, "hacia": true,
+	// Conjunctions
+	"y": true, "e": true, "o": true, "u": true, "pero": true, "si": true,
+	"porque": true, "aunque": true, "sino": true, "ni": true,
+	// Pronouns
+	"yo": true, "tú": true, "él": true, "ella": true, "usted": true,
+	"nosotros": true, "vosotros": true, "ellos": true, "ellas": true, "ustedes": true,
+	"me": true, "te": true, "se": true, "le": true, "nos": true, "os": true, "les": true,
+	"su": true, "sus": true, "mi": true, "mis": true, "tu": true, "tus": true,
+	// Common verbs
+	"es": true, "son": true, "ser": true, "está": true, "están": true, "estar": true,
+	"hay": true, "ha": true, "han": true, "sido": true,
+	"hace": true, "hacer": true, "tiene": true, "tienen": true,
+	// Adverbs/Adjectives
+	"muy": true, "más": true, "menos": true, "mucho": true, "poco": true,
+	"todo": true, "toda": true, "todos": true, "todas": true,
+	"otro": true, "otra": true, "otros": true, "otras": true,
+	"mismo": true, "misma": true, "tal": true, "tanto": true, "tan": true,
+	"bien": true, "mal": true, "ya": true, "aún": true, "también": true, "tampoco": true,
+	// Others
+	"que": true, "qué": true, "como": true, "cómo": true, "cuando": true, "cuándo": true,
+	"donde": true, "dónde": true, "quien": true, "quién": true, "cual": true, "cuál": true,
+	"este": true, "esta": true, "estos": true, "estas": true,
+	"ese": true, "esa": true, "esos": true, "esas": true,
+	"aquel": true, "aquella": true,
 }
 
 func extractKeywords(title string) []string {
