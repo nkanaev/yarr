@@ -16,11 +16,6 @@ The licenses are included, and the authorship comments are left intact.
   - allowed uri schemes
   - added svg whitelist
 
-- systray
-  https://github.com/getlantern/systray (commit:2c0986d) Apache 2.0
-
-  removed golog dependency
-
 - fixconsole
   https://github.com/apenwarr/fixconsole (commit:5a9f648) Apache 2.0
 
