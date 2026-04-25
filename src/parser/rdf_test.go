@@ -42,8 +42,16 @@ func TestRDFFeed(t *testing.T) {
 		Title:   "Mozilla Dot Org",
 		SiteURL: "http://www.mozilla.org",
 		Items: []Item{
-			{GUID: "http://www.mozilla.org/status/", URL: "http://www.mozilla.org/status/", Title: "New Status Updates"},
-			{GUID: "http://www.mozilla.org/bugs/", URL: "http://www.mozilla.org/bugs/", Title: "Bugzilla Reorganized"},
+			{
+				GUID:  "http://www.mozilla.org/status/",
+				URL:   "http://www.mozilla.org/status/",
+				Title: "New Status Updates",
+			},
+			{
+				GUID:  "http://www.mozilla.org/bugs/",
+				URL:   "http://www.mozilla.org/bugs/",
+				Title: "Bugzilla Reorganized",
+			},
 		},
 	}
 

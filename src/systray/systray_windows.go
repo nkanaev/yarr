@@ -248,7 +248,11 @@ var wt winTray
 
 // WindowProc callback function that processes messages sent to a window.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633573(v=vs.85).aspx
-func (t *winTray) wndProc(hWnd windows.Handle, message uint32, wParam, lParam uintptr) (lResult uintptr) {
+func (t *winTray) wndProc(
+	hWnd windows.Handle,
+	message uint32,
+	wParam, lParam uintptr,
+) (lResult uintptr) {
 	const (
 		WM_RBUTTONUP  = 0x0205
 		WM_LBUTTONUP  = 0x0202
@@ -494,7 +498,12 @@ func (t *winTray) convertToSubMenu(menuItemId uint32) (windows.Handle, error) {
 	return menu, nil
 }
 
-func (t *winTray) addOrUpdateMenuItem(menuItemId uint32, parentId uint32, title string, disabled, checked bool) error {
+func (t *winTray) addOrUpdateMenuItem(
+	menuItemId uint32,
+	parentId uint32,
+	title string,
+	disabled, checked bool,
+) error {
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/ms647578(v=vs.85).aspx
 	const (
 		MIIM_FTYPE   = 0x00000100
@@ -888,7 +897,13 @@ func (item *MenuItem) SetIcon(iconBytes []byte) {
 	wt.menuItemIcons[uint32(item.id)] = h
 	wt.muMenuItemIcons.Unlock()
 
-	err = wt.addOrUpdateMenuItem(uint32(item.id), item.parentId(), item.title, item.disabled, item.checked)
+	err = wt.addOrUpdateMenuItem(
+		uint32(item.id),
+		item.parentId(),
+		item.title,
+		item.disabled,
+		item.checked,
+	)
 	if err != nil {
 		log.Printf("Unable to addOrUpdateMenuItem: %v", err)
 		return
@@ -905,7 +920,13 @@ func SetTooltip(tooltip string) {
 }
 
 func addOrUpdateMenuItem(item *MenuItem) {
-	err := wt.addOrUpdateMenuItem(uint32(item.id), item.parentId(), item.title, item.disabled, item.checked)
+	err := wt.addOrUpdateMenuItem(
+		uint32(item.id),
+		item.parentId(),
+		item.title,
+		item.disabled,
+		item.checked,
+	)
 	if err != nil {
 		log.Printf("Unable to addOrUpdateMenuItem: %v", err)
 		return

@@ -191,7 +191,10 @@ func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []interfac
 			terms[idx] = word + "*"
 		}
 
-		cond = append(cond, "i.search_rowid in (select rowid from search where search match :search)")
+		cond = append(
+			cond,
+			"i.search_rowid in (select rowid from search where search match :search)",
+		)
 		args = append(args, sql.Named("search", strings.Join(terms, " ")))
 	}
 	if filter.After != nil {
@@ -199,7 +202,13 @@ func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []interfac
 		if newestFirst {
 			compare = "<"
 		}
-		cond = append(cond, fmt.Sprintf("(i.date, i.id) %s (select date, id from items where id = :after_id)", compare))
+		cond = append(
+			cond,
+			fmt.Sprintf(
+				"(i.date, i.id) %s (select date, id from items where id = :after_id)",
+				compare,
+			),
+		)
 		args = append(args, sql.Named("after_id", *filter.After))
 	}
 	if filter.IDs != nil && len(*filter.IDs) > 0 {
@@ -249,7 +258,12 @@ func (s *Storage) CountItems(filter ItemFilter) int {
 	return count
 }
 
-func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, withContent bool) []Item {
+func (s *Storage) ListItems(
+	filter ItemFilter,
+	limit int,
+	newestFirst bool,
+	withContent bool,
+) []Item {
 	predicate, args := listQueryPredicate(filter, newestFirst)
 	result := make([]Item, 0)
 
@@ -450,7 +464,8 @@ func (s *Storage) DeleteOldItems() {
 	}
 
 	for feedId, limit := range feedLimits {
-		result, err := s.db.Exec(`
+		result, err := s.db.Exec(
+			`
 			delete from items
 			where id in (
 				select i.id
@@ -463,7 +478,10 @@ func (s *Storage) DeleteOldItems() {
 			sql.Named("feed_id", feedId),
 			sql.Named("starred_status", STARRED),
 			sql.Named("limit", limit),
-			sql.Named("date_limit", time.Now().UTC().Add(-time.Hour*time.Duration(24*itemsKeepDays))),
+			sql.Named(
+				"date_limit",
+				time.Now().UTC().Add(-time.Hour*time.Duration(24*itemsKeepDays)),
+			),
 		)
 		if err != nil {
 			log.Print(err)

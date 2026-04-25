@@ -78,7 +78,8 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 		for _, e := range srcitem.Enclosures {
 			if strings.HasPrefix(e.Type, "audio/") {
 				podcastURL := e.URL
-				if srcitem.OrigEnclosureLink != "" && strings.Contains(podcastURL, path.Base(srcitem.OrigEnclosureLink)) {
+				if srcitem.OrigEnclosureLink != "" &&
+					strings.Contains(podcastURL, path.Base(srcitem.OrigEnclosureLink)) {
 					podcastURL = srcitem.OrigEnclosureLink
 				}
 				mediaLinks = append(mediaLinks, MediaLink{URL: podcastURL, Type: "audio"})
@@ -97,11 +98,15 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 		}
 
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:       firstNonEmpty(srcitem.GUID.GUID, srcitem.Link),
-			Date:       dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
-			URL:        firstNonEmpty(srcitem.OrigLink, srcitem.Link, permalink),
-			Title:      srcitem.Title,
-			Content:    firstNonEmpty(srcitem.ContentEncoded, srcitem.Description, srcitem.firstMediaDescription()),
+			GUID:  firstNonEmpty(srcitem.GUID.GUID, srcitem.Link),
+			Date:  dateParse(firstNonEmpty(srcitem.DublinCoreDate, srcitem.PubDate)),
+			URL:   firstNonEmpty(srcitem.OrigLink, srcitem.Link, permalink),
+			Title: srcitem.Title,
+			Content: firstNonEmpty(
+				srcitem.ContentEncoded,
+				srcitem.Description,
+				srcitem.firstMediaDescription(),
+			),
 			MediaLinks: mediaLinks,
 		})
 	}

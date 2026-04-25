@@ -78,7 +78,11 @@ func TestParseFallback(t *testing.T) {
 		Folders: []Folder{{
 			Title: "foldertitle",
 			Feeds: []Feed{
-				{Title: "feedtext", FeedUrl: "https://example.com/feed.xml", SiteUrl: "https://example.com"},
+				{
+					Title:   "feedtext",
+					FeedUrl: "https://example.com/feed.xml",
+					SiteUrl: "https://example.com",
+				},
 			},
 		}},
 	}

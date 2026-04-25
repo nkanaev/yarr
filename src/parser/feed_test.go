@@ -40,7 +40,12 @@ func TestSniff(t *testing.T) {
 		want := testcase.want
 		have := sniff(testcase.input)
 		if want.encoding != have.encoding || want.feedType != have.feedType {
-			t.Errorf("Invalid output\n---\n%s\n---\n\nwant=%#v\nhave=%#v", testcase.input, want, have)
+			t.Errorf(
+				"Invalid output\n---\n%s\n---\n\nwant=%#v\nhave=%#v",
+				testcase.input,
+				want,
+				have,
+			)
 		}
 	}
 }

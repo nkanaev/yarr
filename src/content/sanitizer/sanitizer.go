@@ -146,7 +146,10 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 		}
 
 		attrNames = append(attrNames, attribute.Key)
-		htmlAttrs = append(htmlAttrs, fmt.Sprintf(`%s="%s"`, attribute.Key, html.EscapeString(value)))
+		htmlAttrs = append(
+			htmlAttrs,
+			fmt.Sprintf(`%s="%s"`, attribute.Key, html.EscapeString(value)),
+		)
 	}
 
 	extraAttrNames, extraHTMLAttributes := getExtraAttributes(tagName)
@@ -161,11 +164,25 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 func getExtraAttributes(tagName string) ([]string, []string) {
 	switch tagName {
 	case "a":
-		return []string{"rel", "target", "referrerpolicy"}, []string{`rel="noopener noreferrer"`, `target="_blank"`, `referrerpolicy="no-referrer"`}
+		return []string{
+				"rel",
+				"target",
+				"referrerpolicy",
+			}, []string{
+				`rel="noopener noreferrer"`,
+				`target="_blank"`,
+				`referrerpolicy="no-referrer"`,
+			}
 	case "video", "audio":
 		return []string{"controls"}, []string{"controls"}
 	case "iframe":
-		return []string{"sandbox", "loading"}, []string{`sandbox="allow-scripts allow-same-origin allow-popups"`, `loading="lazy"`}
+		return []string{
+				"sandbox",
+				"loading",
+			}, []string{
+				`sandbox="allow-scripts allow-same-origin allow-popups"`,
+				`loading="lazy"`,
+			}
 	case "img":
 		return []string{"loading"}, []string{`loading="lazy"`, `referrerpolicy="no-referrer"`}
 	default:

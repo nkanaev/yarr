@@ -77,7 +77,8 @@ func (s *Server) handleStatic(c *router.Context) {
 		c.Out.WriteHeader(http.StatusNotFound)
 		return
 	}
-	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.FS))).ServeHTTP(c.Out, c.Req)
+	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.FS))).
+		ServeHTTP(c.Out, c.Req)
 }
 
 func (s *Server) handleManifest(c *router.Context) {
@@ -236,7 +237,10 @@ func (s *Server) handleFeedList(c *router.Context) {
 			log.Printf("Faild to discover feed for %s: %s", form.Url, err)
 			c.JSON(http.StatusOK, map[string]string{"status": "notfound"})
 		case len(result.Sources) > 0:
-			c.JSON(http.StatusOK, map[string]interface{}{"status": "multiple", "choice": result.Sources})
+			c.JSON(
+				http.StatusOK,
+				map[string]interface{}{"status": "multiple", "choice": result.Sources},
+			)
 		case result.Feed != nil:
 			feed := s.db.CreateFeed(
 				result.Feed.Title,
