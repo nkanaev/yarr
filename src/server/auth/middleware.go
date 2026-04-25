@@ -17,10 +17,6 @@ type Middleware struct {
 	DB       *storage.Storage
 }
 
-func unsafeMethod(method string) bool {
-	return method == "POST" || method == "PUT" || method == "DELETE"
-}
-
 func (m *Middleware) Handler(c *router.Context) {
 	for _, path := range m.Public {
 		if strings.HasPrefix(c.Req.URL.Path, m.BasePath+path) {

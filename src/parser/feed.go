@@ -15,7 +15,7 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-var UnknownFormat = errors.New("unknown feed format")
+var ErrUnknownFormat = errors.New("unknown feed format")
 
 type feedProbe struct {
 	feedType string
@@ -89,7 +89,7 @@ func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
 
 	out := sniff(string(lookup))
 	if out.feedType == "" {
-		return nil, UnknownFormat
+		return nil, ErrUnknownFormat
 	}
 
 	if out.encoding == "" && fallbackEncoding != "" {

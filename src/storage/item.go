@@ -251,7 +251,7 @@ func (s *Storage) CountItems(filter ItemFilter) int {
 
 func (s *Storage) ListItems(filter ItemFilter, limit int, newestFirst bool, withContent bool) []Item {
 	predicate, args := listQueryPredicate(filter, newestFirst)
-	result := make([]Item, 0, 0)
+	result := make([]Item, 0)
 
 	order := "date desc, id desc"
 	if !newestFirst {

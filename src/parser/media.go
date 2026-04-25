@@ -34,23 +34,6 @@ type mediaDescription struct {
 	Text string `xml:",chardata"`
 }
 
-func (m *media) firstMediaThumbnail() string {
-	for _, c := range m.MediaContents {
-		for _, t := range c.MediaThumbnails {
-			return t.URL
-		}
-	}
-	for _, t := range m.MediaThumbnails {
-		return t.URL
-	}
-	for _, g := range m.MediaGroups {
-		for _, t := range g.MediaThumbnails {
-			return t.URL
-		}
-	}
-	return ""
-}
-
 func (m *media) firstMediaDescription() string {
 	for _, d := range m.MediaDescriptions {
 		return plain2html(d.Text)

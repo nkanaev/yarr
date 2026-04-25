@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 	"net/http"
 	"net/url"
@@ -69,10 +68,10 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	}
 	switch {
 	case len(sources) == 0:
-		return nil, errors.New("No feeds found at the given url")
+		return nil, errors.New("no feeds found at the given url")
 	case len(sources) == 1:
 		if sources[0].Url == candidateUrl {
-			return nil, errors.New("Recursion!")
+			return nil, errors.New("recursion")
 		}
 		return DiscoverFeed(sources[0].Url)
 	}
@@ -103,7 +102,7 @@ func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
 	if siteUrl != "" {
 		if res, err := client.get(siteUrl); err == nil {
 			defer res.Body.Close()
-			if body, err := ioutil.ReadAll(res.Body); err == nil {
+			if body, err := io.ReadAll(res.Body); err == nil {
 				urls = append(urls, scraper.FindIcons(string(body), siteUrl)...)
 				if c := favicon(siteUrl); c != "" {
 					urls = append(urls, c)
@@ -126,7 +125,7 @@ func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
 			continue
 		}
 
-		content, err := ioutil.ReadAll(res.Body)
+		content, err := io.ReadAll(res.Body)
 		if err != nil {
 			continue
 		}

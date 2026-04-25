@@ -55,7 +55,7 @@ func (s *Storage) ToggleFolderExpanded(folderId int64, isExpanded bool) bool {
 }
 
 func (s *Storage) ListFolders() []Folder {
-	result := make([]Folder, 0, 0)
+	result := make([]Folder, 0)
 	rows, err := s.db.Query(`
 		select id, title, is_expanded
 		from folders
