@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"database/sql"
 	"log"
 	"time"
 )
@@ -40,8 +41,8 @@ func (s *Storage) ListHTTPStates() map[int64]HTTPState {
 func (s *Storage) GetHTTPState(feedID int64) *HTTPState {
 	row := s.db.QueryRow(`
 		select feed_id, last_refreshed, last_modified, etag
-		from http_states where feed_id = ?
-	`, feedID)
+		from http_states where feed_id = :feed_id
+	`, sql.Named("feed_id", feedID))
 
 	if row == nil {
 		return nil
@@ -60,12 +61,11 @@ func (s *Storage) GetHTTPState(feedID int64) *HTTPState {
 func (s *Storage) SetHTTPState(feedID int64, lastModified, etag string) {
 	_, err := s.db.Exec(`
 		insert into http_states (feed_id, last_modified, etag, last_refreshed)
-		values (?, ?, ?, datetime())
-		on conflict (feed_id) do update set last_modified = ?, etag = ?, last_refreshed = datetime()`,
-		// insert
-		feedID, lastModified, etag,
-		// upsert
-		lastModified, etag,
+		values (:feed_id, :last_modified, :etag, datetime())
+		on conflict (feed_id) do update set last_modified = :last_modified, etag = :etag, last_refreshed = datetime()`,
+		sql.Named("feed_id", feedID),
+		sql.Named("last_modified", lastModified),
+		sql.Named("etag", etag),
 	)
 	if err != nil {
 		log.Print(err)

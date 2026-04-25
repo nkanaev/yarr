@@ -290,7 +290,10 @@ func m08_normalize_datetime(tx *sql.Tx) error {
 		if err != nil {
 			return err
 		}
-		_, err = tx.Exec(`update items set date_arrived = ? where id = ?;`, dateArrived.UTC(), id)
+		_, err = tx.Exec(`update items set date_arrived = :date_arrived where id = :id;`,
+			sql.Named("date_arrived", dateArrived.UTC()),
+			sql.Named("id", id),
+		)
 		if err != nil {
 			return err
 		}

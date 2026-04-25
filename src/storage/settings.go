@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 )
@@ -20,7 +21,7 @@ func settingsDefaults() map[string]interface{} {
 }
 
 func (s *Storage) GetSettingsValue(key string) interface{} {
-	row := s.db.QueryRow(`select val from settings where key=?`, key)
+	row := s.db.QueryRow(`select val from settings where key=:key`, sql.Named("key", key))
 	if row == nil {
 		return settingsDefaults()[key]
 	}
@@ -81,9 +82,10 @@ func (s *Storage) UpdateSettings(kv map[string]interface{}) bool {
 			return false
 		}
 		_, err = s.db.Exec(`
-			insert into settings (key, val) values (?, ?)
-			on conflict (key) do update set val=?`,
-			key, valEncoded, valEncoded,
+			insert into settings (key, val) values (:key, :val)
+			on conflict (key) do update set val=:val`,
+			sql.Named("key", key),
+			sql.Named("val", valEncoded),
 		)
 		if err != nil {
 			log.Print(err)

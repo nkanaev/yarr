@@ -22,11 +22,14 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 	}
 	row := s.db.QueryRow(`
 		insert into feeds (title, description, link, feed_link, folder_id) 
-		values (?, ?, ?, ?, ?)
-		on conflict (feed_link) do update set folder_id = ?
+		values (:title, :description, :link, :feed_link, :folder_id)
+		on conflict (feed_link) do update set folder_id = :folder_id
         returning id`,
-		title, description, link, feedLink, folderId,
-		folderId,
+		sql.Named("title", title),
+		sql.Named("description", description),
+		sql.Named("link", link),
+		sql.Named("feed_link", feedLink),
+		sql.Named("folder_id", folderId),
 	)
 
 	var id int64
@@ -46,7 +49,7 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 }
 
 func (s *Storage) DeleteFeed(feedId int64) bool {
-	result, err := s.db.Exec(`delete from feeds where id = ?`, feedId)
+	result, err := s.db.Exec(`delete from feeds where id = :id`, sql.Named("id", feedId))
 	if err != nil {
 		log.Print(err)
 		return false
@@ -62,22 +65,34 @@ func (s *Storage) DeleteFeed(feedId int64) bool {
 }
 
 func (s *Storage) RenameFeed(feedId int64, newTitle string) bool {
-	_, err := s.db.Exec(`update feeds set title = ? where id = ?`, newTitle, feedId)
+	_, err := s.db.Exec(`update feeds set title = :title where id = :id`,
+		sql.Named("title", newTitle),
+		sql.Named("id", feedId),
+	)
 	return err == nil
 }
 
 func (s *Storage) UpdateFeedFolder(feedId int64, newFolderId *int64) bool {
-	_, err := s.db.Exec(`update feeds set folder_id = ? where id = ?`, newFolderId, feedId)
+	_, err := s.db.Exec(`update feeds set folder_id = :folder_id where id = :id`,
+		sql.Named("folder_id", newFolderId),
+		sql.Named("id", feedId),
+	)
 	return err == nil
 }
 
 func (s *Storage) UpdateFeedLink(feedId int64, newLink string) bool {
-	_, err := s.db.Exec(`update feeds set feed_link = ? where id = ?`, newLink, feedId)
+	_, err := s.db.Exec(`update feeds set feed_link = :feed_link where id = :id`,
+		sql.Named("feed_link", newLink),
+		sql.Named("id", feedId),
+	)
 	return err == nil
 }
 
 func (s *Storage) UpdateFeedIcon(feedId int64, icon *[]byte) bool {
-	_, err := s.db.Exec(`update feeds set icon = ? where id = ?`, icon, feedId)
+	_, err := s.db.Exec(`update feeds set icon = :icon where id = :id`,
+		sql.Named("icon", icon),
+		sql.Named("id", feedId),
+	)
 	return err == nil
 }
 
@@ -149,8 +164,8 @@ func (s *Storage) GetFeed(id int64) *Feed {
 		select
 			id, folder_id, title, link, feed_link,
 			icon, ifnull(icon, '') != '' as has_icon
-		from feeds where id = ?
-	`, id).Scan(
+		from feeds where id = :id
+	`, sql.Named("id", id)).Scan(
 		&f.Id, &f.FolderId, &f.Title, &f.Link, &f.FeedLink,
 		&f.Icon, &f.HasIcon,
 	)
@@ -172,9 +187,10 @@ func (s *Storage) ResetFeedErrors() {
 func (s *Storage) SetFeedError(feedID int64, lastError error) {
 	_, err := s.db.Exec(`
 		insert into feed_errors (feed_id, error)
-		values (?, ?)
+		values (:feed_id, :error)
 		on conflict (feed_id) do update set error = excluded.error`,
-		feedID, lastError.Error(),
+		sql.Named("feed_id", feedID),
+		sql.Named("error", lastError.Error()),
 	)
 	if err != nil {
 		log.Print(err)
@@ -204,9 +220,10 @@ func (s *Storage) GetFeedErrors() map[int64]string {
 func (s *Storage) SetFeedSize(feedId int64, size int) {
 	_, err := s.db.Exec(`
 		insert into feed_sizes (feed_id, size)
-		values (?, ?)
+		values (:feed_id, :size)
 		on conflict (feed_id) do update set size = excluded.size`,
-		feedId, size,
+		sql.Named("feed_id", feedId),
+		sql.Named("size", size),
 	)
 	if err != nil {
 		log.Print(err)

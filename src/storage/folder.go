@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -13,12 +14,11 @@ type Folder struct {
 func (s *Storage) CreateFolder(title string) *Folder {
 	expanded := true
 	row := s.db.QueryRow(`
-		insert into folders (title, is_expanded) values (?, ?)
-		on conflict (title) do update set title = ?
+		insert into folders (title, is_expanded) values (:title, :is_expanded)
+		on conflict (title) do update set title = :title
         returning id`,
-		title, expanded,
-		// provide title again so that we can extract row id
-		title,
+		sql.Named("title", title),
+		sql.Named("is_expanded", expanded),
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -31,7 +31,7 @@ func (s *Storage) CreateFolder(title string) *Folder {
 }
 
 func (s *Storage) DeleteFolder(folderId int64) bool {
-	_, err := s.db.Exec(`delete from folders where id = ?`, folderId)
+	_, err := s.db.Exec(`delete from folders where id = :id`, sql.Named("id", folderId))
 	if err != nil {
 		log.Print(err)
 	}
@@ -39,12 +39,18 @@ func (s *Storage) DeleteFolder(folderId int64) bool {
 }
 
 func (s *Storage) RenameFolder(folderId int64, newTitle string) bool {
-	_, err := s.db.Exec(`update folders set title = ? where id = ?`, newTitle, folderId)
+	_, err := s.db.Exec(`update folders set title = :title where id = :id`,
+		sql.Named("title", newTitle),
+		sql.Named("id", folderId),
+	)
 	return err == nil
 }
 
 func (s *Storage) ToggleFolderExpanded(folderId int64, isExpanded bool) bool {
-	_, err := s.db.Exec(`update folders set is_expanded = ? where id = ?`, isExpanded, folderId)
+	_, err := s.db.Exec(`update folders set is_expanded = :is_expanded where id = :id`,
+		sql.Named("is_expanded", isExpanded),
+		sql.Named("id", folderId),
+	)
 	return err == nil
 }
 
