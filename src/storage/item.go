@@ -135,14 +135,15 @@ func (s *Storage) CreateItems(items []Item) bool {
 			insert into items (
 				guid, feed_id, title, link, date,
 				content, media_links,
-				date_arrived, status
+				date_arrived, last_arrived, status
 			)
 			values (
 				:guid, :feed_id, :title, :link, strftime('%Y-%m-%d %H:%M:%f', :date),
 				:content, :media_links,
-				:date_arrived, :status
+				:date_arrived, :last_arrived, :status
 			)
-			on conflict (feed_id, guid) do nothing`,
+			on conflict (feed_id, guid) do update set
+				last_arrived = :last_arrived`,
 			sql.Named("guid", item.GUID),
 			sql.Named("feed_id", item.FeedId),
 			sql.Named("title", item.Title),
@@ -151,6 +152,7 @@ func (s *Storage) CreateItems(items []Item) bool {
 			sql.Named("content", item.Content),
 			sql.Named("media_links", item.MediaLinks),
 			sql.Named("date_arrived", now),
+			sql.Named("last_arrived", now),
 			sql.Named("status", UNREAD),
 		)
 		if err != nil {

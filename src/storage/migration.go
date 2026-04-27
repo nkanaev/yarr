@@ -18,6 +18,7 @@ var migrations = []func(*sql.Tx) error{
 	m08_normalize_datetime,
 	m09_change_item_index,
 	m10_add_item_medialinks,
+	m11_add_item_last_arrived,
 }
 
 var maxVersion = int64(len(migrations))
@@ -329,6 +330,12 @@ func m10_add_item_medialinks(tx *sql.Tx) error {
 		alter table items drop column image;
 		alter table items drop column podcast_url;
 	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m11_add_item_last_arrived(tx *sql.Tx) error {
+	sql := `alter table items add column last_arrived datetime`
 	_, err := tx.Exec(sql)
 	return err
 }

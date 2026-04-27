@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"testing/synctest"
 	"time"
 )
 
@@ -373,4 +374,43 @@ func TestDeleteOldItems(t *testing.T) {
 			len(feedItems),
 		)
 	}
+}
+
+func TestCreateItemsLastArrived(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		db := testDB()
+		defer db.db.Close()
+		feed := db.CreateFeed("test feed", "", "", "http://example.com/feed", nil)
+
+		item := Item{
+			GUID:   "item1",
+			FeedId: feed.Id,
+			Title:  "Title 1",
+			Date:   time.Now(),
+		}
+
+		// 1. Initial creation
+		db.CreateItems([]Item{item})
+
+		var lastArrived1 time.Time
+		err := db.db.QueryRow("select last_arrived from items where guid = ?", item.GUID).Scan(&lastArrived1)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		time.Sleep(time.Second * 10)
+
+		// 2. Update on conflict
+		db.CreateItems([]Item{item})
+
+		var lastArrived2 time.Time
+		err = db.db.QueryRow("select last_arrived from items where guid = ?", item.GUID).Scan(&lastArrived2)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !lastArrived2.After(lastArrived1) {
+			t.Errorf("expected last_arrived to be updated. old: %v, new: %v", lastArrived1, lastArrived2)
+		}
+	})
 }
