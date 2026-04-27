@@ -6,8 +6,8 @@ import (
 	"log"
 )
 
-func settingsDefaults() map[string]interface{} {
-	return map[string]interface{}{
+func settingsDefaults() map[string]any {
+	return map[string]any{
 		"filter":            "",
 		"feed":              "",
 		"feed_list_width":   300,
@@ -20,7 +20,7 @@ func settingsDefaults() map[string]interface{} {
 	}
 }
 
-func (s *Storage) GetSettingsValue(key string) interface{} {
+func (s *Storage) GetSettingsValue(key string) any {
 	row := s.db.QueryRow(`select val from settings where key=:key`, sql.Named("key", key))
 	if row == nil {
 		return settingsDefaults()[key]
@@ -30,7 +30,7 @@ func (s *Storage) GetSettingsValue(key string) interface{} {
 	if len(val) == 0 {
 		return nil
 	}
-	var valDecoded interface{}
+	var valDecoded any
 	if err := json.Unmarshal([]byte(val), &valDecoded); err != nil {
 		log.Print(err)
 		return nil
@@ -48,7 +48,7 @@ func (s *Storage) GetSettingsValueInt64(key string) int64 {
 	return 0
 }
 
-func (s *Storage) GetSettings() map[string]interface{} {
+func (s *Storage) GetSettings() map[string]any {
 	result := settingsDefaults()
 	rows, err := s.db.Query(`select key, val from settings;`)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *Storage) GetSettings() map[string]interface{} {
 	for rows.Next() {
 		var key string
 		var val []byte
-		var valDecoded interface{}
+		var valDecoded any
 
 		rows.Scan(&key, &val)
 		if err = json.Unmarshal([]byte(val), &valDecoded); err != nil {
@@ -70,7 +70,7 @@ func (s *Storage) GetSettings() map[string]interface{} {
 	return result
 }
 
-func (s *Storage) UpdateSettings(kv map[string]interface{}) bool {
+func (s *Storage) UpdateSettings(kv map[string]any) bool {
 	defaults := settingsDefaults()
 	for key, val := range kv {
 		if defaults[key] == nil {

@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/nkanaev/yarr/src/content/htmlutil"
@@ -22,10 +23,8 @@ func FindFeeds(body string, base string) map[string]string {
 	isFeedLink := func(n *html.Node) bool {
 		if n.Type == html.ElementNode && n.Data == "link" {
 			t := htmlutil.Attr(n, "type")
-			for _, tt := range linkTypes {
-				if tt == t {
-					return true
-				}
+			if slices.Contains(linkTypes, t) {
+				return true
 			}
 		}
 		return false

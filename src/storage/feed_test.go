@@ -24,7 +24,7 @@ func TestCreateFeedSameLink(t *testing.T) {
 		t.Fatal("expected feed")
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		db.CreateFeed("title", "", "", "http://example2.com/feed.xml", nil)
 	}
 

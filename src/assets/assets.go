@@ -51,7 +51,7 @@ func Template(path string) *template.Template {
 	return tmpl
 }
 
-func Render(path string, writer io.Writer, data interface{}) {
+func Render(path string, writer io.Writer, data any) {
 	tmpl := Template(path)
 	tmpl.Execute(writer, data)
 }

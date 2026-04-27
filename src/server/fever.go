@@ -53,7 +53,7 @@ type FeverFavicon struct {
 	Data string `json:"data"`
 }
 
-func writeFeverJSON(c *router.Context, data map[string]interface{}, lastRefreshed int64) {
+func writeFeverJSON(c *router.Context, data map[string]any, lastRefreshed int64) {
 	data["api_version"] = 3
 	data["auth"] = 1
 	data["last_refreshed_on_time"] = lastRefreshed
@@ -78,7 +78,7 @@ func (s *Server) feverAuth(c *router.Context) bool {
 	if s.Username != "" && s.Password != "" {
 		apiKey := c.Req.FormValue("api_key")
 		apiKey = strings.ToLower(apiKey)
-		md5HashValue := md5.Sum([]byte(fmt.Sprintf("%s:%s", s.Username, s.Password)))
+		md5HashValue := md5.Sum(fmt.Appendf(nil, "%s:%s", s.Username, s.Password))
 		hexMD5HashValue := fmt.Sprintf("%x", md5HashValue[:])
 		if !auth.StringsEqual(apiKey, hexMD5HashValue) {
 			return false
@@ -97,7 +97,7 @@ func formHasValue(values url.Values, value string) bool {
 func (s *Server) handleFever(c *router.Context) {
 	c.Req.ParseForm()
 	if !s.feverAuth(c) {
-		c.JSON(http.StatusOK, map[string]interface{}{
+		c.JSON(http.StatusOK, map[string]any{
 			"api_version":            3,
 			"auth":                   0,
 			"last_refreshed_on_time": 0,
@@ -123,7 +123,7 @@ func (s *Server) handleFever(c *router.Context) {
 	case formHasValue(c.Req.Form, "mark"):
 		s.feverMarkHandler(c)
 	default:
-		c.JSON(http.StatusOK, map[string]interface{}{
+		c.JSON(http.StatusOK, map[string]any{
 			"api_version":            3,
 			"auth":                   1,
 			"last_refreshed_on_time": getLastRefreshedOnTime(s.db.ListHTTPStates()),
@@ -168,7 +168,7 @@ func (s *Server) feverGroupsHandler(c *router.Context) {
 	for i, folder := range folders {
 		groups[i] = &FeverGroup{ID: folder.Id, Title: folder.Title}
 	}
-	writeFeverJSON(c, map[string]interface{}{
+	writeFeverJSON(c, map[string]any{
 		"groups":       groups,
 		"feeds_groups": feedGroups(s.db),
 	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
@@ -194,7 +194,7 @@ func (s *Server) feverFeedsHandler(c *router.Context) {
 			LastUpdated: lastUpdated,
 		}
 	}
-	writeFeverJSON(c, map[string]interface{}{
+	writeFeverJSON(c, map[string]any{
 		"feeds":        feverFeeds,
 		"feeds_groups": feedGroups(s.db),
 	}, getLastRefreshedOnTime(httpStates))
@@ -216,7 +216,7 @@ func (s *Server) feverFaviconsHandler(c *router.Context) {
 		favicons[i] = &FeverFavicon{ID: feed.Id, Data: data}
 	}
 
-	writeFeverJSON(c, map[string]interface{}{
+	writeFeverJSON(c, map[string]any{
 		"favicons": favicons,
 	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
@@ -280,15 +280,15 @@ func (s *Server) feverItemsHandler(c *router.Context) {
 
 	totalItems := s.db.CountItems(storage.ItemFilter{})
 
-	writeFeverJSON(c, map[string]interface{}{
+	writeFeverJSON(c, map[string]any{
 		"items":       feverItems,
 		"total_items": totalItems,
 	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
 func (s *Server) feverLinksHandler(c *router.Context) {
-	writeFeverJSON(c, map[string]interface{}{
-		"links": make([]interface{}, 0),
+	writeFeverJSON(c, map[string]any{
+		"links": make([]any, 0),
 	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
 
@@ -309,7 +309,7 @@ func (s *Server) feverUnreadItemIDsHandler(c *router.Context) {
 		}
 		itemFilter.After = &items[len(items)-1].Id
 	}
-	writeFeverJSON(c, map[string]interface{}{
+	writeFeverJSON(c, map[string]any{
 		"unread_item_ids": joinInts(itemIds),
 	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
@@ -331,7 +331,7 @@ func (s *Server) feverSavedItemIDsHandler(c *router.Context) {
 		}
 		itemFilter.After = &items[len(items)-1].Id
 	}
-	writeFeverJSON(c, map[string]interface{}{
+	writeFeverJSON(c, map[string]any{
 		"saved_item_ids": joinInts(itemIds),
 	}, getLastRefreshedOnTime(s.db.ListHTTPStates()))
 }
@@ -386,7 +386,7 @@ func (s *Server) feverMarkHandler(c *router.Context) {
 		c.Out.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	c.JSON(http.StatusOK, map[string]interface{}{
+	c.JSON(http.StatusOK, map[string]any{
 		"api_version": 3,
 		"auth":        1,
 	})

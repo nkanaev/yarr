@@ -24,7 +24,7 @@ func (c *Context) Next() {
 	c.chain[c.index](c)
 }
 
-func (c *Context) JSON(status int, data interface{}) {
+func (c *Context) JSON(status int, data any) {
 	body, err := json.Marshal(data)
 	if err != nil {
 		log.Fatal(err)
@@ -35,7 +35,7 @@ func (c *Context) JSON(status int, data interface{}) {
 	c.Out.Write([]byte("\n"))
 }
 
-func (c *Context) HTML(status int, tmpl *template.Template, data interface{}) {
+func (c *Context) HTML(status int, tmpl *template.Template, data any) {
 	c.Out.Header().Set("Content-Type", "text/html")
 	c.Out.WriteHeader(status)
 	tmpl.Execute(c.Out, data)

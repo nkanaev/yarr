@@ -169,9 +169,9 @@ func (s *Storage) CreateItems(items []Item) bool {
 	return true
 }
 
-func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []interface{}) {
+func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []any) {
 	cond := make([]string, 0)
-	args := make([]interface{}, 0)
+	args := make([]any, 0)
 	if filter.FolderID != nil {
 		cond = append(cond, "i.feed_id in (select id from feeds where folder_id = :folder_id)")
 		args = append(args, sql.Named("folder_id", *filter.FolderID))

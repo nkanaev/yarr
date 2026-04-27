@@ -141,7 +141,6 @@ func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
 func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 	result := make([]storage.Item, len(items))
 	for i, item := range items {
-		item := item
 		mediaLinks := make(storage.MediaLinks, 0)
 		for _, link := range item.MediaLinks {
 			mediaLinks = append(mediaLinks, storage.MediaLink(link))

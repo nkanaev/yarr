@@ -46,7 +46,7 @@ func TestSafeXMLReaderPartial1(t *testing.T) {
 	f = NewSafeXMLReader(f)
 
 	buf := make([]byte, 1)
-	for i := 0; i < len(want); i++ {
+	for i := range want {
 		n, err := f.Read(buf)
 		if err != nil {
 			t.Fatal(err)

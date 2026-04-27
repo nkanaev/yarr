@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -225,10 +226,8 @@ func hasRequiredAttributes(tagName string, attributes []string) bool {
 	for element, attrs := range elements {
 		if tagName == element {
 			for _, attribute := range attributes {
-				for _, attr := range attrs {
-					if attr == attribute {
-						return true
-					}
+				if slices.Contains(attrs, attribute) {
+					return true
 				}
 			}
 
@@ -285,13 +284,7 @@ func isValidIframeSource(baseURL, src string) bool {
 		return true
 	}
 
-	for _, safeDomain := range whitelist {
-		if safeDomain == domain {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(whitelist, domain)
 }
 
 func getTagAllowList() map[string][]string {
@@ -355,13 +348,7 @@ func getTagAllowList() map[string][]string {
 }
 
 func inList(needle string, haystack []string) bool {
-	for _, element := range haystack {
-		if element == needle {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(haystack, needle)
 }
 
 func isBlockedTag(tagName string) bool {
@@ -371,13 +358,7 @@ func isBlockedTag(tagName string) bool {
 		"style",
 	}
 
-	for _, element := range blacklist {
-		if element == tagName {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(blacklist, tagName)
 }
 
 /*

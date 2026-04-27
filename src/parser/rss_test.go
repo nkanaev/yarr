@@ -216,7 +216,7 @@ func TestRSSTitleHTMLTags(t *testing.T) {
 	`))
 	have := []string{feed.Items[0].Title, feed.Items[1].Title}
 	want := []string{"title in p", "very strong title"}
-	for i := 0; i < len(want); i++ {
+	for i := range want {
 		if want[i] != have[i] {
 			t.Errorf("title doesn't match\nwant: %#v\nhave: %#v\n", want[i], have[i])
 		}
@@ -241,7 +241,7 @@ func TestRSSIsPermalink(t *testing.T) {
 			URL:  "http://example.com/posts/1",
 		},
 	}
-	for i := 0; i < len(want); i++ {
+	for i := range want {
 		if !reflect.DeepEqual(want, have) {
 			t.Errorf("Failed to handle isPermalink\nwant: %#v\nhave: %#v\n", want[i], have[i])
 		}
