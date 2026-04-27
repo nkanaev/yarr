@@ -321,60 +321,75 @@ func TestMarkItemsRead(t *testing.T) {
 }
 
 func TestDeleteOldItems(t *testing.T) {
-	extraItems := 10
-
 	now := time.Now().UTC()
-	db := testDB()
-	feed := db.CreateFeed("feed", "", "", "http://test.com/feed11.xml", nil)
+	starred := STARRED
 
-	items := make([]Item, 0)
-	for i := 0; i < itemsKeepSize+extraItems; i++ {
-		istr := strconv.Itoa(i)
-		items = append(items, Item{
-			GUID:   istr,
-			FeedId: feed.Id,
-			Title:  istr,
-			Date:   now.Add(time.Hour * time.Duration(i)),
-		})
-	}
-	db.CreateItems(items)
+	t.Run("keeps at least 50 items", func(t *testing.T) {
+		db := testDB()
+		feed := db.CreateFeed("f", "", "", "http://f.xml", nil)
+		items := make([]Item, 100)
+		for i := range 100 {
+			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Hour * 24)}
+		}
+		db.CreateItems(items)
 
-	db.SetFeedSize(feed.Id, itemsKeepSize)
-	var feedSize int
-	err := db.db.QueryRow(
-		`select size from feed_sizes where feed_id = :feed_id`, sql.Named("feed_id", feed.Id),
-	).Scan(&feedSize)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if feedSize != itemsKeepSize {
-		t.Fatalf(
-			"expected feed size to get updated\nwant: %d\nhave: %d",
-			itemsKeepSize+extraItems,
-			feedSize,
-		)
-	}
+		// // Set 1 recent (latest), 100 old (100 days ago)
+		db.db.Exec(`update items set last_arrived = :la where guid = "99"`, sql.Named("la", now))
+		db.db.Exec(`update items set last_arrived = :la where guid != "99"`, sql.Named("la", now.Add(-time.Hour*24*100)))
 
-	// expire only the first 3 articles
-	_, err = db.db.Exec(
-		`update items set date_arrived = :date_arrived
-		where id in (select id from items limit 3)`,
-		sql.Named("date_arrived", now.Add(-time.Hour*time.Duration(itemsKeepDays*24))),
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
+		db.DeleteOldItems()
+		have := db.CountItems(ItemFilter{FeedID: &feed.Id})
+		if have != 50 {
+			t.Errorf("expected 50 items, have %d", have)
+		}
+	})
 
-	db.DeleteOldItems()
-	feedItems := db.ListItems(ItemFilter{FeedID: &feed.Id}, 1000, false, false)
-	if len(feedItems) != len(items)-3 {
-		t.Fatalf(
-			"invalid number of old items kept\nwant: %d\nhave: %d",
-			len(items)-3,
-			len(feedItems),
-		)
-	}
+	t.Run("keeps all less than 90 days old", func(t *testing.T) {
+		db := testDB()
+		feed := db.CreateFeed("f", "", "", "http://f.xml", nil)
+		items := make([]Item, 100)
+		for i := 0; i < 100; i++ {
+			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
+		}
+		db.CreateItems(items)
+
+		// Latest item at "now"
+		// All others at 80 days ago (keep)
+		db.db.Exec(`update items set last_arrived = :la where guid = "99"`, sql.Named("la", now))
+		db.db.Exec(`update items set last_arrived = :la where guid != "99"`, sql.Named("la", now.Add(-time.Hour*24*80)))
+
+		db.DeleteOldItems()
+		have := db.CountItems(ItemFilter{FeedID: &feed.Id})
+		if have != 100 {
+			t.Errorf("expected 100 items, have %d", have)
+		}
+	})
+
+	t.Run("keeps starred", func(t *testing.T) {
+		db := testDB()
+		feed := db.CreateFeed("f", "", "", "http://f.xml", nil)
+		items := make([]Item, 100)
+		for i := 0; i < 100; i++ {
+			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
+		}
+		db.CreateItems(items)
+
+		// Set all to 100 days ago, except one recent
+		db.db.Exec(`update items set last_arrived = :la`, sql.Named("la", now.Add(-time.Hour*24*100)))
+		db.db.Exec(`update items set last_arrived = :la where guid = "99"`, sql.Named("la", now))
+		// Star 10 old items that would otherwise be deleted (rn > 50 and old)
+		db.db.Exec(`update items set status = :s where cast(guid as integer) < 10`, sql.Named("s", starred))
+
+		db.DeleteOldItems()
+		have := db.CountItems(ItemFilter{FeedID: &feed.Id})
+		// 50 (limit) + 10 (starred) = 60 items should remain.
+		if have != 60 {
+			t.Errorf("expected 60 items, have %d", have)
+		}
+	})
 }
+
+
 
 func TestCreateItemsLastArrived(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
