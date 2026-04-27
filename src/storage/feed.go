@@ -216,16 +216,3 @@ func (s *Storage) GetFeedErrors() map[int64]string {
 	}
 	return errors
 }
-
-func (s *Storage) SetFeedSize(feedId int64, size int) {
-	_, err := s.db.Exec(`
-		insert into feed_sizes (feed_id, size)
-		values (:feed_id, :size)
-		on conflict (feed_id) do update set size = excluded.size`,
-		sql.Named("feed_id", feedId),
-		sql.Named("size", size),
-	)
-	if err != nil {
-		log.Print(err)
-	}
-}

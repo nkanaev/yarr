@@ -19,6 +19,7 @@ var migrations = []func(*sql.Tx) error{
 	m09_change_item_index,
 	m10_add_item_medialinks,
 	m11_add_item_last_arrived,
+	m12_remove_feed_sizes,
 }
 
 var maxVersion = int64(len(migrations))
@@ -337,5 +338,10 @@ func m10_add_item_medialinks(tx *sql.Tx) error {
 func m11_add_item_last_arrived(tx *sql.Tx) error {
 	sql := `alter table items add column last_arrived datetime`
 	_, err := tx.Exec(sql)
+	return err
+}
+
+func m12_remove_feed_sizes(tx *sql.Tx) error {
+	_, err := tx.Exec(`drop table if exists feed_sizes`)
 	return err
 }
