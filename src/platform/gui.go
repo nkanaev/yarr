@@ -9,7 +9,7 @@ import (
 
 func Start(s *server.Server) {
 	systrayOnReady := func() {
-		systray.SetIcon(Icon)
+		systray.SetTemplateIcon(Icon, Icon)
 		systray.SetTooltip("yarr")
 
 		menuOpen := systray.AddMenuItem("Open", "")

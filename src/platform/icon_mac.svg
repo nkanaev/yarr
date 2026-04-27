@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   fill="none"
+   stroke="currentColor"
+   stroke-width="2"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   class="feather feather-anchor"
+   version="1.1"
+   id="svg905"
+   sodipodi:docname="icon_mac.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   inkscape:export-filename="icon_mac.png"
+   inkscape:export-xdpi="2048"
+   inkscape:export-ydpi="2048"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata911">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs909">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 24 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="48 : 24 : 1"
+       inkscape:persp3d-origin="24 : 16 : 1"
+       id="perspective842" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1440"
+     inkscape:window-height="895"
+     id="namedview907"
+     showgrid="false"
+     inkscape:zoom="4.9128436"
+     inkscape:cx="31.14286"
+     inkscape:cy="52.718959"
+     inkscape:window-x="0"
+     inkscape:window-y="33"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg905"
+     inkscape:document-rotation="0"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
+  <rect
+     style="display:none;fill:#800000;stroke-width:4;stroke-linecap:round;stroke-dasharray:none"
+     id="rect3"
+     width="89.561165"
+     height="70.427643"
+     x="-21.576099"
+     y="-7.734828"
+     ry="24"
+     inkscape:label="background-test" />
+  <rect
+     style="display:none;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect913"
+     width="48"
+     height="48"
+     x="0"
+     y="0"
+     ry="24"
+     rx="0"
+     inkscape:label="circle" />
+  <path
+     id="rect2"
+     style="fill:#000000;stroke:none;stroke-width:3"
+     inkscape:label="circle-hollow"
+     d="M 24 0 C 10.704 0 0 10.704 0 24 C 0 37.296 10.704 48 24 48 C 37.296 48 48 37.296 48 24 C 48 10.704 37.296 0 24 0 z M 24 7.4550781 C 27.49085 7.4550781 30.363281 10.327509 30.363281 13.818359 C 30.363281 16.611253 28.523046 19.006548 26 19.853516 L 26 36.380859 C 31.271218 35.519062 35.266025 31.300336 36.144531 26 L 34.181641 26 A 2.0000001 2.0000001 0 0 1 32.181641 24 A 2.0000001 2.0000001 0 0 1 34.181641 22 L 38.544922 22 A 2.0002001 2.0002001 0 0 1 40.544922 24 C 40.544922 33.114118 33.114111 40.544922 24 40.544922 C 14.885889 40.544922 7.4550781 33.114118 7.4550781 24 A 2.0002001 2.0002001 0 0 1 9.4550781 22 L 13.818359 22 A 2.0000001 2.0000001 0 0 1 15.818359 24 A 2.0000001 2.0000001 0 0 1 13.818359 26 L 11.855469 26 C 12.733975 31.300336 16.728783 35.519062 22 36.380859 L 22 19.853516 C 19.476954 19.006548 17.636719 16.611253 17.636719 13.818359 C 17.636719 10.327509 20.50915 7.4550781 24 7.4550781 z M 24 11.455078 C 22.670911 11.455078 21.636719 12.48927 21.636719 13.818359 C 21.636719 15.147449 22.670911 16.181641 24 16.181641 C 25.329089 16.181641 26.363281 15.147449 26.363281 13.818359 C 26.363281 12.48927 25.329089 11.455078 24 11.455078 z " />
+  <g
+     id="g1"
+     transform="matrix(1.4545455,0,0,1.4545455,6.545454,6.545454)"
+     style="display:none;fill:none;stroke:#ffffff;stroke-width:2.75;stroke-dasharray:none;stroke-opacity:1"
+     inkscape:label="anchor_backup">
+    <circle
+       cx="12"
+       cy="5"
+       id="circle1"
+       r="3"
+       style="fill:none;stroke:#ffffff;stroke-width:2.75;stroke-dasharray:none;stroke-opacity:1" />
+    <line
+       x1="12"
+       y1="22"
+       x2="12"
+       y2="8"
+       id="line1"
+       style="fill:none;stroke:#ffffff;stroke-width:2.75;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       d="M 5,12 H 2 a 10,10 0 0 0 20,0 h -3"
+       id="path1"
+       style="fill:none;stroke:#ffffff;stroke-width:2.75;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>
