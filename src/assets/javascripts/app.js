@@ -277,6 +277,7 @@ var vm = new Vue({
       'languages': [
         {code: 'en', name: 'English' },
         {code: 'zh', name: '简体中文'},
+        {code: 'ru', name: 'Русский'},
       ]
     }
   },
