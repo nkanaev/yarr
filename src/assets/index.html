@@ -27,43 +27,43 @@
                 <button class="toolbar-item ml-1"
                         :class="{active: filterSelected == 'unread'}"
                         :aria-pressed="filterSelected == 'unread'"
-                        title="Unread"
+                        :title="$t('unread')"
                         @click="filterSelected = 'unread'">
                     <span class="icon">{% inline "circle-full.svg" %}</span>
                 </button>
                 <button class="toolbar-item mx-1"
                         :class="{active: filterSelected == 'starred'}"
                         :aria-pressed="filterSelected == 'starred'"
-                        title="Starred"
+                        :title="$t('starred')"
                         @click="filterSelected = 'starred'">
                     <span class="icon">{% inline "star-full.svg" %}</span>
                 </button>
                 <button class="toolbar-item mr-1"
                         :class="{active: filterSelected == ''}"
                         :aria-pressed="filterSelected == ''"
-                        title="All"
+                        :title="$t('all')"
                         @click="filterSelected = ''">
                     <span class="icon">{% inline "assorted.svg" %}</span>
                 </button>
                 <div class="flex-grow-1"></div>
-                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" title="Settings">
+                <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" :title="$t('settings')">
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
                     </template>
 
                     <button class="dropdown-item" @click="showSettings('create')">
                         <span class="icon mr-1">{% inline "plus.svg" %}</span>
-                        New Feed
+                        {{ $t('new_feed') }}
                     </button>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" @click="fetchAllFeeds()">
                         <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
-                        Refresh Feeds
+                        {{ $t('refresh_feeds') }}
                     </button>
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header" role="heading" aria-level="2">Theme</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ $t('theme') }}</header>
                     <div class="row text-center m-0">
                         <button class="btn btn-link col-4 px-0 rounded-0"
                                 :class="'theme-'+t"
@@ -77,7 +77,7 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header" role="heading" aria-level="2">Auto Refresh</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ $t('auto_refresh') }}</header>
                     <div class="row text-center m-0">
                         <button class="dropdown-item col-4 px-0"
                                 @click.stop="changeRefreshRate(-1)"
@@ -97,13 +97,13 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <header class="dropdown-header" role="heading" aria-level="2">Show first</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ $t('show_first') }}</header>
                     <div class="d-flex text-center">
-                        <button class="dropdown-item px-0" :aria-pressed="itemSortNewestFirst"  :class="{active: itemSortNewestFirst}"  @click.stop="itemSortNewestFirst=true">New</button>
-                        <button class="dropdown-item px-0" :aria-pressed="!itemSortNewestFirst" :class="{active: !itemSortNewestFirst}" @click.stop="itemSortNewestFirst=false">Old</button>
+                        <button class="dropdown-item px-0" :aria-pressed="itemSortNewestFirst"  :class="{active: itemSortNewestFirst}"  @click.stop="itemSortNewestFirst=true">{{ $t('new') }}</button>
+                        <button class="dropdown-item px-0" :aria-pressed="!itemSortNewestFirst" :class="{active: !itemSortNewestFirst}" @click.stop="itemSortNewestFirst=false">{{ $t('old') }}</button>
                     </div>
                     <div class="dropdown-divider"></div>
-                    <header class="dropdown-header" role="heading" aria-level="2">Subscriptions</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ $t('subscriptions') }}</header>
                     <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
                         <input type="file"
                                id="opml-import"
@@ -112,22 +112,33 @@
                                style="opacity: 0; width: 1px; height: 0; position: absolute; z-index: -1;">
                         <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" @click.stop="">
                             <span class="icon mr-1">{% inline "download.svg" %}</span>
-                            Import
+                            {{ $t('import') }}
                         </label>
                     </form>
                     <a class="dropdown-item" href="./opml/export">
                         <span class="icon mr-1">{% inline "upload.svg" %}</span>
-                        Export
+                        {{ $t('export') }}
                     </a>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" @click="showSettings('shortcuts')">
                         <span class="icon mr-1">{% inline "help-circle.svg" %}</span>
-                        Shortcuts
+                        {{ $t('shortcuts') }}
                     </button>
+                    <div class="dropdown-divider"></div>
+                    <header class="dropdown-header" role="heading" aria-level="2">ᚨ / 𐎠 / 𑖀</header>
+                    <div class="d-flex text-center">
+                        <button
+                            v-for="lang in languages"
+                            class="dropdown-item px-0"
+                            :class="{active: language==lang.code}"
+                            @click.stop="changeLanguage(lang.code)">
+                                {{ lang.name }}
+                        </button>
+                    </div>
                     <div class="dropdown-divider" v-if="authenticated"></div>
                     <button class="dropdown-item" v-if="authenticated" @click="logout()">
                         <span class="icon mr-1">{% inline "log-out.svg" %}</span>
-                        Log out
+                        {{ $t('log_out') }}
                     </button>
                 </dropdown>
             </div>
@@ -136,9 +147,9 @@
                     <input type="radio" name="feed" value="" v-model="feedSelected">
                     <div class="selectgroup-label d-flex align-items-center w-100">
                         <span class="icon mr-2">{% inline "layers.svg" %}</span>
-                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">All Unread</span>
-                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">All Starred</span>
-                        <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">All Feeds</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">{{ $t('all_unread') }}</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">{{ $t('all_starred') }}</span>
+                        <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">{{ $t('all_feeds') }}</span>
                         <span class="counter text-right">{{ filteredTotalStats }}</span>
                     </div>
                 </label>
@@ -179,7 +190,7 @@
             </div>
             <div class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0" v-if="loading.feeds">
                 <span class="icon loading mx-2"></span>
-                <span class="text-truncate cursor-default noselect">Refreshing ({{ loading.feeds }} left)</span>
+                <span class="text-truncate cursor-default noselect">{{ $t('refreshing') }} ({{ loading.feeds }} {{ $t('left') }})</span>
             </div>
         </div>
         <!-- item list -->
@@ -188,7 +199,7 @@
             <div class="px-2 toolbar d-flex align-items-center">
                 <button class="toolbar-item mr-2 d-block d-md-none"
                         @click="feedSelected = null"
-                        title="Show Feeds">
+                        :title="$t('show_feeds')">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
                 <div class="input-icon flex-grow-1">
@@ -199,7 +210,7 @@
                 <button class="toolbar-item ml-2"
                         @click="markItemsRead()"
                         v-if="filterSelected == 'unread'"
-                        title="Mark All Read">
+                        :title="$t('mark_all_read')">
                     <span class="icon">{% inline "check.svg" %}</span>
                 </button>
 
@@ -210,7 +221,7 @@
                 <dropdown class="settings-dropdown"
                           toggle-class="btn btn-link toolbar-item px-2 ml-2"
                           drop="right"
-                          title="Feed Settings"
+                          :title="$t('feed_settings')"
                           v-if="current.type == 'feed'">
                     <template v-slot:button>
                         <span class="icon">{% inline "more-horizontal.svg" %}</span>
@@ -218,23 +229,23 @@
                     <header class="dropdown-header" role="heading" aria-level="2">{{ current.feed.title }}</header>
                     <a class="dropdown-item" :href="current.feed.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.link">
                         <span class="icon mr-1">{% inline "globe.svg" %}</span>
-                        Website
+                        {{ $t('website') }}
                     </a>
                     <a class="dropdown-item" :href="current.feed.feed_link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.feed_link">
                         <span class="icon mr-1">{% inline "rss.svg" %}</span>
-                        Feed Link
+                        {{ $t('feed_link') }}
                     </a>
                     <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
                     <button class="dropdown-item" @click="renameFeed(current.feed)">
                         <span class="icon mr-1">{% inline "edit.svg" %}</span>
-                        Rename
+                        {{ $t('rename') }}
                     </button>
                     <button class="dropdown-item" @click="updateFeedLink(current.feed)" v-if="current.feed.feed_link">
                         <span class="icon mr-1">{% inline "edit.svg" %}</span>
-                        Change Link
+                        {{ $t('change_link') }}
                     </button>
                     <div class="dropdown-divider"></div>
-                    <header class="dropdown-header" role="heading" aria-level="2">Move to...</header>
+                    <header class="dropdown-header" role="heading" aria-level="2">{{ $t('move_to') }}</header>
                     <button class="dropdown-item"
                         v-if="folder.id != current.feed.folder_id"
                         v-for="folder in folders"
@@ -248,17 +259,17 @@
                     </button>
                     <button class="dropdown-item text-muted" @click="moveFeedToNewFolder(current.feed)">
                         <span class="icon mr-1">{% inline "folder-plus.svg" %}</span>
-                        new folder
+                        {{ $t('new_folder') }}
                     </button>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item text-danger" @click.prevent="deleteFeed(current.feed)">
                         <span class="icon mr-1">{% inline "trash.svg" %}</span>
-                        Delete
+                        {{ $t('delete') }}
                     </button>
                 </dropdown>
                 <dropdown class="settings-dropdown"
                           toggle-class="btn btn-link toolbar-item px-2 ml-2"
-                          title="Folder Settings"
+                          :title="$t('folder_settings')"
                           drop="right"
                           v-if="current.type == 'folder'">
                     <template v-slot:button>
@@ -267,12 +278,12 @@
                     <header class="dropdown-header" role="heading" aria-level="2">{{ current.folder.title }}</header>
                     <button class="dropdown-item" @click="renameFolder(current.folder)">
                         <span class="icon mr-1">{% inline "edit.svg" %}</span>
-                        Rename
+                        {{ $t('rename') }}
                     </button>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">
                         <span class="icon mr-1">{% inline "trash.svg" %}</span>
-                        Delete
+                        {{ $t('delete') }}
                     </button>
                 </dropdown>
             </div>
@@ -291,7 +302,7 @@
                             </small>
                             <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                         </div>
-                        <div>{{ item.title || 'untitled' }}</div>
+                        <div>{{ item.title || $t('untitled') }}</div>
                     </div>
                 </label>
                 <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
@@ -305,24 +316,24 @@
             <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
                 <button class="toolbar-item"
                         @click="toggleItemStarred(itemSelectedDetails)"
-                        title="Mark Starred">
+                        :title="$t('mark_starred')">
                     <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
                     <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
                 </button>
                 <button class="toolbar-item"
-                        title="Mark Unread"
+                        :title="$t('mark_unread')"
                         @click="toggleItemRead(itemSelectedDetails)">
                     <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
                     <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
                 </button>
-                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" title="Appearance">
+                <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" :title="$t('appearance')">
                     <template v-slot:button>
                         <span class="icon">{% inline "sliders.svg" %}</span>
                     </template>
 
-                    <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">sans-serif</button>
-                    <button class="dropdown-item font-serif" :class="{active: theme.font == 'serif'}" @click.stop="theme.font = 'serif'">serif</button>
-                    <button class="dropdown-item font-monospace" :class="{active: theme.font == 'monospace'}" @click.stop="theme.font = 'monospace'">monospace</button>
+                    <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">{{ $t('sans_serif') }}</button>
+                    <button class="dropdown-item font-serif" :class="{active: theme.font == 'serif'}" @click.stop="theme.font = 'serif'">{{ $t('serif') }}</button>
+                    <button class="dropdown-item font-monospace" :class="{active: theme.font == 'monospace'}" @click.stop="theme.font = 'monospace'">{{ $t('monospace') }}</button>
 
                     <div class="d-flex text-center">
                         <button class="dropdown-item" style="font-size: 0.8rem" @click.stop="incrFont(-1)">A</button>
@@ -332,20 +343,20 @@
                 <button class="toolbar-item"
                         :class="{active: itemSelectedReadability}"
                         @click="toggleReadability()"
-                        title="Read Here">
+                        :title="$t('read_here')">
                     <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
                 </button>
-                <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" title="Open Link">
+                <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" :title="$t('open_link')">
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
                 <div class="flex-grow-1"></div>
-                <button class="toolbar-item" @click="navigateToItem(-1)" title="Previous Article" :disabled="!items.length || itemSelected == items[0].id">
+                <button class="toolbar-item" @click="navigateToItem(-1)" title="$t('previous_article')" :disabled="!items.length || itemSelected == items[0].id">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
-                <button class="toolbar-item" @click="navigateToItem(+1)" title="Next Article" :disabled="!items.length || itemSelected == items[items.length - 1].id">
+                <button class="toolbar-item" @click="navigateToItem(+1)" title="$t('next_article')" :disabled="!items.length || itemSelected == items[items.length - 1].id">
                     <span class="icon">{% inline "chevron-right.svg" %}</span>
                 </button>
-                <button class="toolbar-item" @click="itemSelected=null" title="Close Article">
+                <button class="toolbar-item" @click="itemSelected=null" :title="$t('close_article')">
                     <span class="icon">{% inline "x.svg" %}</span>
                 </button>
             </div>
@@ -355,7 +366,7 @@
                  :class="{'font-serif': theme.font == 'serif', 'font-monospace': theme.font == 'monospace'}"
                  :style="{'font-size': theme.size + 'rem'}">
                 <div class="content-wrapper">
-                    <h1><b>{{ itemSelectedDetails.title || 'untitled' }}</b></h1>
+                    <h1><b>{{ itemSelectedDetails.title || $t('untitled') }}</b></h1>
                     <div class="text-muted">
                         <div>
                             <span class="cursor-pointer" @click="feedSelected = 'feed:'+(feedsById[itemSelectedDetails.feed_id] || {}).id">
@@ -384,13 +395,13 @@
                 <span class="icon">{% inline "x.svg" %}</span>
             </button>
             <div v-if="settings=='create'">
-                <p class="cursor-default"><b>New Feed</b></p>
+                <p class="cursor-default"><b>{{ $t('new_feed') }}</b></p>
                 <form action="" @submit.prevent="createFeed(event)" class="mt-4">
-                    <label for="feed-url">URL</label>
+                    <label for="feed-url">{{ $t('url') }}</label>
                     <input id="feed-url" name="url" type="url" class="form-control" required autocomplete="off" :readonly="feedNewChoice.length > 0" placeholder="https://example.com/feed" v-focus>
                     <label for="feed-folder" class="mt-3 d-block">
-                        Folder
-                        <a href="#" class="float-right text-decoration-none" @click.prevent="createNewFeedFolder()">new folder</a>
+                        {{ $t('folder') }}
+                        <a href="#" class="float-right text-decoration-none" @click.prevent="createNewFeedFolder()">{{ $t('new_folder') }}</a>
                     </label>
                     <select class="form-control" id="feed-folder" name="folder_id" ref="newFeedFolder">
                         <option value="">---</option>
@@ -398,8 +409,8 @@
                     </select>
                     <div class="mt-4" v-if="feedNewChoice.length">
                         <p class="mb-2">
-                            Multiple feeds found. Choose one below:
-                            <a href="#" class="float-right text-decoration-none" @click.prevent="resetFeedChoice()">cancel</a>
+                            {{ $t('multiple_feeds_found') }}
+                            <a href="#" class="float-right text-decoration-none" @click.prevent="resetFeedChoice()">{{ $t('cancel') }}</a>
                         </p>
                         <label class="selectgroup" v-for="choice in feedNewChoice">
                             <input type="radio" name="feedToAdd" :value="choice.url" v-model="feedNewChoiceSelected">
@@ -409,29 +420,29 @@
                             </div>
                         </label>
                     </div>
-                    <button class="btn btn-block btn-default mt-3" :class="{loading: loading.newfeed}" type="submit">Add</button>
+                    <button class="btn btn-block btn-default mt-3" :class="{loading: loading.newfeed}" type="submit">{{ $t('add') }}</button>
                 </form>
             </div>
             <div v-else-if="settings=='shortcuts'">
-                <p class="cursor-default"><b>Keyboard Shortcuts</b></p>
+                <p class="cursor-default"><b>{{ $t('keyboard_shortcuts') }}</b></p>
 
                 <table class="table table-borderless table-sm table-compact m-0">
                     <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td>
-                                                            <td>show unread / starred / all feeds</td></tr>
-                    <tr><td><kbd>/</kbd></td>               <td>focus the search bar</td></tr>
+                                                            <td>{{ $t('kb_show_filters') }}</td></tr>
+                    <tr><td><kbd>/</kbd></td>               <td>{{ $t('kb_focus_search') }}</td></tr>
 
                     <tr><td colspan=2>&nbsp;</td></tr>
-                    <tr><td><kbd>j</kbd> <kbd>k</kbd></td>  <td>next / prev article</td></tr>
-                    <tr><td><kbd>l</kbd> <kbd>h</kbd></td>  <td>next / prev feed</td></tr>
-                    <tr><td><kbd>q</kbd></td>               <td>close article</td></tr>
+                    <tr><td><kbd>j</kbd> <kbd>k</kbd></td>  <td>{{ $t('kb_next_prev_article') }}</td></tr>
+                    <tr><td><kbd>l</kbd> <kbd>h</kbd></td>  <td>{{ $t('kb_next_prev_feed') }}</td></tr>
+                    <tr><td><kbd>q</kbd></td>               <td>{{ $t('kb_close_article') }}</td></tr>
 
                     <tr><td colspan=2>&nbsp;</td></tr>
-                    <tr><td><kbd>R</kbd></td>               <td>mark all read</td></tr>
-                    <tr><td><kbd>r</kbd></td>               <td>mark read / unread</td></tr>
-                    <tr><td><kbd>s</kbd></td>               <td>mark starred / unstarred</td></tr>
-                    <tr><td><kbd>o</kbd></td>               <td>open link</td></tr>
-                    <tr><td><kbd>i</kbd></td>               <td>read here</td> </tr>
-                    <tr><td><kbd>f</kbd> <kbd>b</kbd></td>  <td>scroll content forward / backward</td>
+                    <tr><td><kbd>R</kbd></td>               <td>{{ $t('kb_mark_all_read') }}</td></tr>
+                    <tr><td><kbd>r</kbd></td>               <td>{{ $t('kb_mark_read') }}</td></tr>
+                    <tr><td><kbd>s</kbd></td>               <td>{{ $t('kb_mark_starred') }}</td></tr>
+                    <tr><td><kbd>o</kbd></td>               <td>{{ $t('kb_open_link') }}</td></tr>
+                    <tr><td><kbd>i</kbd></td>               <td>{{ $t('kb_read_here') }}</td> </tr>
+                    <tr><td><kbd>f</kbd> <kbd>b</kbd></td>  <td>{{ $t('kb_scroll_content') }}</td>
                     </tr>
                 </table>
             </div>
@@ -440,6 +451,7 @@
     <!-- external -->
     <script src="./static/javascripts/vue.min.js"></script>
     <!-- internal -->
+    <script src="./static/javascripts/i18n.js"></script>
     <script src="./static/javascripts/api.js"></script>
     <script src="./static/javascripts/app.js"></script>
     <script src="./static/javascripts/key.js"></script>

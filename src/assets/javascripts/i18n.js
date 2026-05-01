@@ -280,12 +280,11 @@
       "en": "Password",
       "zh": "密码"
     },
-    "language": {
-      "en": "Language",
-      "zh": "语言"
-    }
   };
   class i18n {
+    constructor() {
+      this.lang = 'en'
+    }
     setLang(lang) {
       this.lang = lang
     }

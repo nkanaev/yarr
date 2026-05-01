@@ -17,6 +17,7 @@ func settingsDefaults() map[string]any {
 		"theme_font":        "",
 		"theme_size":        1,
 		"refresh_rate":      0,
+		"language": "en",
 	}
 }
 
