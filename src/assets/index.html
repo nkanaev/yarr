@@ -126,15 +126,13 @@
                     </button>
                     <div class="dropdown-divider"></div>
                     <header class="dropdown-header" role="heading" aria-level="2">ᚨ / 𐎠 / 𑖀</header>
-                    <div class="d-flex text-center">
-                        <button
-                            v-for="lang in languages"
-                            class="dropdown-item px-0"
-                            :class="{active: language==lang.code}"
-                            @click.stop="changeLanguage(lang.code)">
-                                {{ lang.name }}
-                        </button>
-                    </div>
+                    <button
+                        v-for="lang in languages"
+                        class="dropdown-item"
+                        :class="{active: language==lang.code}"
+                        @click.stop="changeLanguage(lang.code)">
+                            {{ lang.name }}
+                    </button>
                     <div class="dropdown-divider" v-if="authenticated"></div>
                     <button class="dropdown-item" v-if="authenticated" @click="logout()">
                         <span class="icon mr-1">{% inline "log-out.svg" %}</span>
@@ -350,10 +348,10 @@
                     <span class="icon">{% inline "external-link.svg" %}</span>
                 </a>
                 <div class="flex-grow-1"></div>
-                <button class="toolbar-item" @click="navigateToItem(-1)" title="$t('previous_article')" :disabled="!items.length || itemSelected == items[0].id">
+                <button class="toolbar-item" @click="navigateToItem(-1)" :title="$t('previous_article')" :disabled="!items.length || itemSelected == items[0].id">
                     <span class="icon">{% inline "chevron-left.svg" %}</span>
                 </button>
-                <button class="toolbar-item" @click="navigateToItem(+1)" title="$t('next_article')" :disabled="!items.length || itemSelected == items[items.length - 1].id">
+                <button class="toolbar-item" @click="navigateToItem(+1)" :title="$t('next_article')" :disabled="!items.length || itemSelected == items[items.length - 1].id">
                     <span class="icon">{% inline "chevron-right.svg" %}</span>
                 </button>
                 <button class="toolbar-item" @click="itemSelected=null" :title="$t('close_article')">
