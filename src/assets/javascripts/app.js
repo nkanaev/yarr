@@ -202,6 +202,8 @@ Vue.component('relative-time', {
   },
 })
 
+Vue.use(i18n)
+
 var vm = new Vue({
   created: function() {
     this.refreshStats()
