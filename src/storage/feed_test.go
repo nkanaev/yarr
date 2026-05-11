@@ -7,7 +7,7 @@ import (
 
 func TestCreateFeed(t *testing.T) {
 	db := testDB()
-	feed1 := db.CreateFeed("title", "", "http://example.com", "http://example.com/feed.xml", nil)
+	feed1 := db.CreateFeed(CreateFeedParams{Title: "title", Link: "http://example.com", FeedLink: "http://example.com/feed.xml"})
 	if feed1 == nil || feed1.Id == 0 {
 		t.Fatal("expected feed")
 	}
@@ -19,16 +19,16 @@ func TestCreateFeed(t *testing.T) {
 
 func TestCreateFeedSameLink(t *testing.T) {
 	db := testDB()
-	feed1 := db.CreateFeed("title", "", "", "http://example1.com/feed.xml", nil)
+	feed1 := db.CreateFeed(CreateFeedParams{Title: "title", FeedLink: "http://example1.com/feed.xml"})
 	if feed1 == nil || feed1.Id == 0 {
 		t.Fatal("expected feed")
 	}
 
 	for range 10 {
-		db.CreateFeed("title", "", "", "http://example2.com/feed.xml", nil)
+		db.CreateFeed(CreateFeedParams{Title: "title", FeedLink: "http://example2.com/feed.xml"})
 	}
 
-	feed2 := db.CreateFeed("title", "", "http://example.com", "http://example1.com/feed.xml", nil)
+	feed2 := db.CreateFeed(CreateFeedParams{Title: "title", Link: "http://example.com", FeedLink: "http://example1.com/feed.xml"})
 	if feed1.Id != feed2.Id {
 		t.Fatalf("expected the same feed.\nwant: %#v\nhave: %#v", feed1, feed2)
 	}
@@ -40,8 +40,8 @@ func TestReadFeed(t *testing.T) {
 		t.Fatal("cannot get nonexistent feed")
 	}
 
-	feed1 := db.CreateFeed("feed 1", "", "http://example1.com", "http://example1.com/feed.xml", nil)
-	feed2 := db.CreateFeed("feed 2", "", "http://example2.com", "http://example2.com/feed.xml", nil)
+	feed1 := db.CreateFeed(CreateFeedParams{Title: "feed 1", Link: "http://example1.com", FeedLink: "http://example1.com/feed.xml"})
+	feed2 := db.CreateFeed(CreateFeedParams{Title: "feed 2", Link: "http://example2.com", FeedLink: "http://example2.com/feed.xml"})
 	feeds := db.ListFeeds()
 	if !reflect.DeepEqual(feeds, []Feed{*feed1, *feed2}) {
 		t.Fatalf("invalid feed list: %#v", feeds)
@@ -50,7 +50,7 @@ func TestReadFeed(t *testing.T) {
 
 func TestUpdateFeed(t *testing.T) {
 	db := testDB()
-	feed1 := db.CreateFeed("feed 1", "", "http://example1.com", "http://example1.com/feed.xml", nil)
+	feed1 := db.CreateFeed(CreateFeedParams{Title: "feed 1", Link: "http://example1.com", FeedLink: "http://example1.com/feed.xml"})
 	folder := db.CreateFolder("test")
 	icon := []byte("icon")
 
@@ -75,7 +75,7 @@ func TestUpdateFeed(t *testing.T) {
 
 func TestDeleteFeed(t *testing.T) {
 	db := testDB()
-	feed1 := db.CreateFeed("title", "", "http://example.com", "http://example.com/feed.xml", nil)
+	feed1 := db.CreateFeed(CreateFeedParams{Title: "title", Link: "http://example.com", FeedLink: "http://example.com/feed.xml"})
 
 	if db.DeleteFeed(100500) {
 		t.Error("cannot delete what does not exist")

@@ -39,10 +39,10 @@ func testItemsSetup(db *Storage) testItemScope {
 	folder1 := db.CreateFolder("folder1")
 	folder2 := db.CreateFolder("folder2")
 
-	feed11 := db.CreateFeed("feed11", "", "", "http://test.com/feed11.xml", &folder1.Id)
-	feed12 := db.CreateFeed("feed12", "", "", "http://test.com/feed12.xml", &folder1.Id)
-	feed21 := db.CreateFeed("feed21", "", "", "http://test.com/feed21.xml", &folder2.Id)
-	feed01 := db.CreateFeed("feed01", "", "", "http://test.com/feed01.xml", nil)
+	feed11 := db.CreateFeed(CreateFeedParams{Title: "feed11", FeedLink: "http://test.com/feed11.xml", FolderID: &folder1.Id})
+	feed12 := db.CreateFeed(CreateFeedParams{Title: "feed12", FeedLink: "http://test.com/feed12.xml", FolderID: &folder1.Id})
+	feed21 := db.CreateFeed(CreateFeedParams{Title: "feed21", FeedLink: "http://test.com/feed21.xml", FolderID: &folder2.Id})
+	feed01 := db.CreateFeed(CreateFeedParams{Title: "feed01", FeedLink: "http://test.com/feed01.xml"})
 
 	now := time.Now()
 	db.CreateItems([]Item{
@@ -326,7 +326,7 @@ func TestDeleteOldItems(t *testing.T) {
 
 	t.Run("keeps at least 50 items", func(t *testing.T) {
 		db := testDB()
-		feed := db.CreateFeed("f", "", "", "http://f.xml", nil)
+		feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 		items := make([]Item, 100)
 		for i := range 100 {
 			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Hour * 24)}
@@ -347,7 +347,7 @@ func TestDeleteOldItems(t *testing.T) {
 
 	t.Run("keeps all less than 90 days old", func(t *testing.T) {
 		db := testDB()
-		feed := db.CreateFeed("f", "", "", "http://f.xml", nil)
+		feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 		items := make([]Item, 100)
 		for i := 0; i < 100; i++ {
 			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
@@ -369,7 +369,7 @@ func TestDeleteOldItems(t *testing.T) {
 
 	t.Run("keeps starred", func(t *testing.T) {
 		db := testDB()
-		feed := db.CreateFeed("f", "", "", "http://f.xml", nil)
+		feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 		items := make([]Item, 100)
 		for i := 0; i < 100; i++ {
 			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
@@ -398,7 +398,7 @@ func TestCreateItemsLastArrived(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		db := testDB()
 		defer db.db.Close()
-		feed := db.CreateFeed("test feed", "", "", "http://example.com/feed", nil)
+		feed := db.CreateFeed(CreateFeedParams{Title: "test feed", FeedLink: "http://example.com/feed"})
 
 		item := Item{
 			GUID:   "item1",

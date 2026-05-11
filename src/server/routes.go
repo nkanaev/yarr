@@ -242,13 +242,12 @@ func (s *Server) handleFeedList(c *router.Context) {
 				map[string]any{"status": "multiple", "choice": result.Sources},
 			)
 		case result.Feed != nil:
-			feed := s.db.CreateFeed(
-				result.Feed.Title,
-				"",
-				result.Feed.SiteURL,
-				result.FeedLink,
-				form.FolderID,
-			)
+			feed := s.db.CreateFeed(storage.CreateFeedParams{
+				Title:    result.Feed.Title,
+				Link:     result.Feed.SiteURL,
+				FeedLink: result.FeedLink,
+				FolderID: form.FolderID,
+			})
 			items := worker.ConvertItems(result.Feed.Items, *feed)
 			if len(items) > 0 {
 				s.db.CreateItems(items)
@@ -448,12 +447,21 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 			return
 		}
 		for _, f := range doc.Feeds {
-			s.db.CreateFeed(f.Title, "", f.SiteUrl, f.FeedUrl, nil)
+			s.db.CreateFeed(storage.CreateFeedParams{
+				Title:    f.Title,
+				Link:     f.SiteUrl,
+				FeedLink: f.FeedUrl,
+			})
 		}
 		for _, f := range doc.Folders {
 			folder := s.db.CreateFolder(f.Title)
 			for _, ff := range f.AllFeeds() {
-				s.db.CreateFeed(ff.Title, "", ff.SiteUrl, ff.FeedUrl, &folder.Id)
+				s.db.CreateFeed(storage.CreateFeedParams{
+					Title:    ff.Title,
+					Link:     ff.SiteUrl,
+					FeedLink: ff.FeedUrl,
+					FolderID: &folder.Id,
+				})
 			}
 		}
 

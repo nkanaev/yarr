@@ -16,9 +16,18 @@ type Feed struct {
 	HasIcon     bool    `json:"has_icon"`
 }
 
-func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId *int64) *Feed {
+type CreateFeedParams struct {
+	Title       string
+	Description string
+	Link        string
+	FeedLink    string
+	FolderID    *int64
+}
+
+func (s *Storage) CreateFeed(params CreateFeedParams) *Feed {
+	title := params.Title
 	if title == "" {
-		title = feedLink
+		title = params.FeedLink
 	}
 	row := s.db.QueryRow(`
 		insert into feeds (title, description, link, feed_link, folder_id) 
@@ -26,10 +35,10 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 		on conflict (feed_link) do update set folder_id = :folder_id
         returning id`,
 		sql.Named("title", title),
-		sql.Named("description", description),
-		sql.Named("link", link),
-		sql.Named("feed_link", feedLink),
-		sql.Named("folder_id", folderId),
+		sql.Named("description", params.Description),
+		sql.Named("link", params.Link),
+		sql.Named("feed_link", params.FeedLink),
+		sql.Named("folder_id", params.FolderID),
 	)
 
 	var id int64
@@ -41,10 +50,10 @@ func (s *Storage) CreateFeed(title, description, link, feedLink string, folderId
 	return &Feed{
 		Id:          id,
 		Title:       title,
-		Description: description,
-		Link:        link,
-		FeedLink:    feedLink,
-		FolderId:    folderId,
+		Description: params.Description,
+		Link:        params.Link,
+		FeedLink:    params.FeedLink,
+		FolderId:    params.FolderID,
 	}
 }
 
