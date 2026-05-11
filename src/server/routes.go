@@ -141,12 +141,10 @@ func (s *Server) handleFolder(c *router.Context) {
 			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if body.Title != nil {
-			s.db.RenameFolder(id, *body.Title)
-		}
-		if body.IsExpanded != nil {
-			s.db.ToggleFolderExpanded(id, *body.IsExpanded)
-		}
+		s.db.UpdateFolder(id, storage.UpdateFolderParams{
+			Title:      body.Title,
+			IsExpanded: body.IsExpanded,
+		})
 		c.Out.WriteHeader(http.StatusOK)
 	} else if c.Req.Method == "DELETE" {
 		s.db.DeleteFolder(id)

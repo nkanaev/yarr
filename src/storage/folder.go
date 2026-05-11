@@ -38,20 +38,27 @@ func (s *Storage) DeleteFolder(folderId int64) bool {
 	return err == nil
 }
 
-func (s *Storage) RenameFolder(folderId int64, newTitle string) bool {
-	_, err := s.db.Exec(`update folders set title = :title where id = :id`,
-		sql.Named("title", newTitle),
-		sql.Named("id", folderId),
-	)
-	return err == nil
+type UpdateFolderParams struct {
+	Title      *string
+	IsExpanded *bool
 }
 
-func (s *Storage) ToggleFolderExpanded(folderId int64, isExpanded bool) bool {
-	_, err := s.db.Exec(`update folders set is_expanded = :is_expanded where id = :id`,
-		sql.Named("is_expanded", isExpanded),
+func (s *Storage) UpdateFolder(folderId int64, params UpdateFolderParams) (bool, error) {
+	_, err := s.db.Exec(`
+		update folders set
+			title       = coalesce(:title, title),
+			is_expanded = coalesce(:is_expanded, is_expanded)
+		where id = :id
+	`,
 		sql.Named("id", folderId),
+		sql.Named("title", params.Title),
+		sql.Named("is_expanded", params.IsExpanded),
 	)
-	return err == nil
+	if err != nil {
+		log.Print(err)
+		return false, err
+	}
+	return true, nil
 }
 
 func (s *Storage) ListFolders() []Folder {
