@@ -38,3 +38,7 @@ func New(path string) (*Storage, error) {
 	}
 	return &Storage{db: db}, nil
 }
+
+func (s *Storage) Close() error {
+	return s.db.Close()
+}

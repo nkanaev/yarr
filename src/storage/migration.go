@@ -20,6 +20,7 @@ var migrations = []func(*sql.Tx) error{
 	m10_add_item_medialinks,
 	m11_add_item_last_arrived,
 	m12_remove_feed_sizes,
+	m13_consolidate_feed_states,
 }
 
 var maxVersion = int64(len(migrations))
@@ -343,5 +344,34 @@ func m11_add_item_last_arrived(tx *sql.Tx) error {
 
 func m12_remove_feed_sizes(tx *sql.Tx) error {
 	_, err := tx.Exec(`drop table if exists feed_sizes`)
+	return err
+}
+
+func m13_consolidate_feed_states(tx *sql.Tx) error {
+	sql := `
+		create table feed_states (
+			feed_id        references feeds(id) on delete cascade unique,
+			last_refreshed datetime not null default 0,
+			last_modified  string not null default '',
+			etag           string not null default '',
+			last_error     string not null default ''
+		);
+
+		insert into feed_states (feed_id, last_refreshed, last_modified, etag, last_error)
+		select
+			f.id,
+			coalesce(h.last_refreshed, 0),
+			coalesce(h.last_modified, ''),
+			coalesce(h.etag, ''),
+			coalesce(e.error, '')
+		from feeds f
+		left join http_states h on f.id = h.feed_id
+		left join feed_errors e on f.id = e.feed_id
+		where h.feed_id is not null or e.feed_id is not null;
+
+		drop table http_states;
+		drop table feed_errors;
+	`
+	_, err := tx.Exec(sql)
 	return err
 }
