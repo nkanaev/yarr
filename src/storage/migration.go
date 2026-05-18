@@ -350,20 +350,27 @@ func m12_remove_feed_sizes(tx *sql.Tx) error {
 func m13_consolidate_feed_states(tx *sql.Tx) error {
 	sql := `
 		create table feed_states (
-			feed_id        references feeds(id) on delete cascade unique,
-			last_refreshed datetime not null default 0,
-			last_modified  string not null default '',
-			etag           string not null default '',
-			last_error     string not null default ''
+			feed_id          references feeds(id) on delete cascade unique
+			, last_refreshed datetime not null default 0
+			, last_error     string not null default ''
+
+			, http_lmod      string not null default ''
+			, http_etag      string not null default ''
 		);
 
-		insert into feed_states (feed_id, last_refreshed, last_modified, etag, last_error)
+		insert into feed_states (
+			feed_id
+			, last_refreshed
+			, last_error
+			, http_lmod
+			, http_etag
+		)
 		select
 			f.id,
 			coalesce(h.last_refreshed, 0),
+			coalesce(e.error, '')
 			coalesce(h.last_modified, ''),
 			coalesce(h.etag, ''),
-			coalesce(e.error, '')
 		from feeds f
 		left join http_states h on f.id = h.feed_id
 		left join feed_errors e on f.id = e.feed_id

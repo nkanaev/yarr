@@ -39,7 +39,7 @@ func TestUpdateFeedState_Full(t *testing.T) {
 	if !state.LastRefreshed.Equal(now) {
 		t.Errorf("expected %v, got %v", now, state.LastRefreshed)
 	}
-	if state.LastError == nil || *state.LastError != errMsg {
+	if state.LastError != errMsg {
 		t.Errorf("expected %s, got %v", errMsg, state.LastError)
 	}
 	if state.HTTPLastModified != lmod {
@@ -70,7 +70,7 @@ func TestUpdateFeedState_Partial(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if state.LastError == nil || *state.LastError != newErr {
+	if state.LastError != newErr {
 		t.Errorf("expected %s, got %v", newErr, state.LastError)
 	}
 	if state.HTTPEtag != etag {
@@ -98,8 +98,8 @@ func TestUpdateFeedState_ClearError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if state.LastError == nil || *state.LastError != "" {
-		t.Errorf("expected empty string error, got %v", state.LastError)
+	if state.LastError != "" {
+		t.Errorf("expected empty error string, got %v", state.LastError)
 	}
 }
 
@@ -111,9 +111,8 @@ func TestListFeedStates(t *testing.T) {
 	f2 := s.CreateFeed(CreateFeedParams{Title: "F2", FeedLink: "L2"})
 
 	errMsg := "fail"
-	etag := "e"
 	s.UpdateFeedState(f1.Id, UpdateFeedStateParams{LastError: &errMsg})
-	s.UpdateFeedState(f2.Id, UpdateFeedStateParams{HTTPEtag: &etag})
+	s.UpdateFeedState(f2.Id, UpdateFeedStateParams{HTTPEtag: ptr("e")})
 
 	states, err := s.ListFeedStates()
 	if err != nil {
@@ -123,4 +122,8 @@ func TestListFeedStates(t *testing.T) {
 	if len(states) != 2 {
 		t.Errorf("expected 2 states, got %d", len(states))
 	}
+}
+
+func ptr[T any](v T) *T {
+	return &v
 }

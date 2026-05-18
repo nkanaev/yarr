@@ -30,7 +30,7 @@ func (s *Storage) CreateFeed(params CreateFeedParams) *Feed {
 		title = params.FeedLink
 	}
 	row := s.db.QueryRow(`
-		insert into feeds (title, description, link, feed_link, folder_id) 
+		insert into feeds (title, description, link, feed_link, folder_id)
 		values (:title, :description, :link, :feed_link, :folder_id)
 		on conflict (feed_link) do update set folder_id = :folder_id
         returning id`,
@@ -184,43 +184,4 @@ func (s *Storage) GetFeed(id int64) *Feed {
 		return nil
 	}
 	return &f
-}
-
-func (s *Storage) ResetFeedErrors() {
-	if _, err := s.db.Exec(`delete from feed_errors`); err != nil {
-		log.Print(err)
-	}
-}
-
-func (s *Storage) SetFeedError(feedID int64, lastError error) {
-	_, err := s.db.Exec(`
-		insert into feed_errors (feed_id, error)
-		values (:feed_id, :error)
-		on conflict (feed_id) do update set error = excluded.error`,
-		sql.Named("feed_id", feedID),
-		sql.Named("error", lastError.Error()),
-	)
-	if err != nil {
-		log.Print(err)
-	}
-}
-
-func (s *Storage) GetFeedErrors() map[int64]string {
-	errors := make(map[int64]string)
-
-	rows, err := s.db.Query(`select feed_id, error from feed_errors`)
-	if err != nil {
-		log.Print(err)
-		return errors
-	}
-
-	for rows.Next() {
-		var id int64
-		var error string
-		if err = rows.Scan(&id, &error); err != nil {
-			log.Print(err)
-		}
-		errors[id] = error
-	}
-	return errors
 }

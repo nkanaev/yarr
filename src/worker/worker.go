@@ -108,7 +108,7 @@ func (w *Worker) RefreshFeeds() {
 }
 
 func (w *Worker) refresher(feeds []storage.Feed) {
-	w.db.ResetFeedErrors()
+	// w.db.ResetFeedErrors()
 
 	srcqueue := make(chan storage.Feed, len(feeds))
 	dstqueue := make(chan []storage.Item)
@@ -136,9 +136,13 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 
 func (w *Worker) worker(srcqueue <-chan storage.Feed, dstqueue chan<- []storage.Item) {
 	for feed := range srcqueue {
+		empty := ""
+		w.db.UpdateFeedState(feed.Id, storage.UpdateFeedStateParams{LastError: &empty})
+
 		items, err := listItems(feed, w.db)
 		if err != nil {
-			w.db.SetFeedError(feed.Id, err)
+			errMsg := err.Error()
+			w.db.UpdateFeedState(feed.Id, storage.UpdateFeedStateParams{LastError: &errMsg})
 		}
 		dstqueue <- items
 	}

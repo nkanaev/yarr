@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/nkanaev/yarr/src/content/scraper"
 	"github.com/nkanaev/yarr/src/parser"
@@ -162,9 +163,9 @@ func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
 func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	lmod := ""
 	etag := ""
-	if state := db.GetHTTPState(f.Id); state != nil {
-		lmod = state.LastModified
-		etag = state.Etag
+	if state, _ := db.GetFeedState(f.Id); state != nil {
+		lmod = state.HTTPLastModified
+		etag = state.HTTPEtag
 	}
 
 	res, err := client.getConditional(f.FeedLink, lmod, etag)
@@ -190,8 +191,13 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 
 	lmod = res.Header.Get("Last-Modified")
 	etag = res.Header.Get("Etag")
+	now := time.Now().UTC()
 	if lmod != "" || etag != "" {
-		db.SetHTTPState(f.Id, lmod, etag)
+		db.UpdateFeedState(f.Id, storage.UpdateFeedStateParams{
+			HTTPLastModified: &lmod,
+			HTTPEtag:         &etag,
+			LastRefreshed:    &now,
+		})
 	}
 	return ConvertItems(feed.Items, f), nil
 }

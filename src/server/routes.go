@@ -162,7 +162,15 @@ func (s *Server) handleFeedRefresh(c *router.Context) {
 }
 
 func (s *Server) handleFeedErrors(c *router.Context) {
-	errors := s.db.GetFeedErrors()
+	errors := make(map[int64]string)
+	states, err := s.db.ListFeedStates()
+	if err == nil {
+		for _, state := range states {
+			if state.LastError != "" {
+				errors[state.FeedID] = state.LastError
+			}
+		}
+	}
 	c.JSON(http.StatusOK, errors)
 }
 
