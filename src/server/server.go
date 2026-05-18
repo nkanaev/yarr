@@ -48,7 +48,7 @@ func (h *Server) GetAddr() string {
 }
 
 func (s *Server) Start() {
-	refreshRate := s.db.GetSettingsValueInt64("refresh_rate")
+	refreshRate := s.db.GetSettings().RefreshRate
 	s.worker.FindFavicons()
 	s.worker.StartFeedCleaner()
 	s.worker.SetRefreshRate(refreshRate)

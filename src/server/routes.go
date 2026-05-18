@@ -65,7 +65,7 @@ func (s *Server) handler() http.Handler {
 
 func (s *Server) handleIndex(c *router.Context) {
 	c.HTML(http.StatusOK, assets.Template("index.html"), map[string]any{
-		"settings":      s.db.GetSettings(),
+		"settings":      s.db.GetSettings().Map(),
 		"authenticated": s.Username != "" && s.Password != "",
 	})
 }
@@ -423,14 +423,14 @@ func (s *Server) handleSettings(c *router.Context) {
 	if c.Req.Method == "GET" {
 		c.JSON(http.StatusOK, s.db.GetSettings())
 	} else if c.Req.Method == "PUT" {
-		settings := make(map[string]any)
-		if err := json.NewDecoder(c.Req.Body).Decode(&settings); err != nil {
+		var params storage.UpdateSettingsParams
+		if err := json.NewDecoder(c.Req.Body).Decode(&params); err != nil {
 			c.Out.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if s.db.UpdateSettings(settings) {
-			if _, ok := settings["refresh_rate"]; ok {
-				s.worker.SetRefreshRate(s.db.GetSettingsValueInt64("refresh_rate"))
+		if s.db.UpdateSettings(params) {
+			if params.RefreshRate != nil {
+				s.worker.SetRefreshRate(s.db.GetSettings().RefreshRate)
 			}
 			c.Out.WriteHeader(http.StatusOK)
 		} else {

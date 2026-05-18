@@ -6,92 +6,166 @@ import (
 	"log"
 )
 
-func settingsDefaults() map[string]any {
+type Settings struct {
+	Filter          string `json:"filter"`
+	Feed            string `json:"feed"`
+	FeedListWidth   int    `json:"feed_list_width"`
+	ItemListWidth   int    `json:"item_list_width"`
+	SortNewestFirst bool   `json:"sort_newest_first"`
+	ThemeName       string `json:"theme_name"`
+	ThemeFont       string `json:"theme_font"`
+	ThemeSize       int    `json:"theme_size"`
+	RefreshRate     int64  `json:"refresh_rate"`
+	Language        string `json:"language"`
+}
+
+func (s Settings) Map() map[string]any {
 	return map[string]any{
-		"filter":            "",
-		"feed":              "",
-		"feed_list_width":   300,
-		"item_list_width":   300,
-		"sort_newest_first": true,
-		"theme_name":        "light",
-		"theme_font":        "",
-		"theme_size":        1,
-		"refresh_rate":      0,
-		"language": "en",
+		"filter":            s.Filter,
+		"feed":              s.Feed,
+		"feed_list_width":   s.FeedListWidth,
+		"item_list_width":   s.ItemListWidth,
+		"sort_newest_first": s.SortNewestFirst,
+		"theme_name":        s.ThemeName,
+		"theme_font":        s.ThemeFont,
+		"theme_size":        s.ThemeSize,
+		"refresh_rate":      s.RefreshRate,
+		"language":          s.Language,
 	}
 }
 
-func (s *Storage) GetSettingsValue(key string) any {
-	row := s.db.QueryRow(`select val from settings where key=:key`, sql.Named("key", key))
-	if row == nil {
-		return settingsDefaults()[key]
+func settingsDefaults() Settings {
+	return Settings{
+		Filter:          "",
+		Feed:            "",
+		FeedListWidth:   300,
+		ItemListWidth:   300,
+		SortNewestFirst: true,
+		ThemeName:       "light",
+		ThemeFont:       "",
+		ThemeSize:       1,
+		RefreshRate:     0,
+		Language:        "en",
 	}
-	var val []byte
-	row.Scan(&val)
-	if len(val) == 0 {
-		return nil
-	}
-	var valDecoded any
-	if err := json.Unmarshal([]byte(val), &valDecoded); err != nil {
-		log.Print(err)
-		return nil
-	}
-	return valDecoded
 }
 
-func (s *Storage) GetSettingsValueInt64(key string) int64 {
-	val := s.GetSettingsValue(key)
-	if val != nil {
-		if fval, ok := val.(float64); ok {
-			return int64(fval)
-		}
-	}
-	return 0
-}
-
-func (s *Storage) GetSettings() map[string]any {
+func (s *Storage) GetSettings() Settings {
 	result := settingsDefaults()
 	rows, err := s.db.Query(`select key, val from settings;`)
 	if err != nil {
 		log.Print(err)
 		return result
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		var key string
 		var val []byte
-		var valDecoded any
-
 		rows.Scan(&key, &val)
-		if err = json.Unmarshal([]byte(val), &valDecoded); err != nil {
-			log.Print(err)
-			continue
+
+		switch key {
+		case "filter":
+			json.Unmarshal(val, &result.Filter)
+		case "feed":
+			json.Unmarshal(val, &result.Feed)
+		case "feed_list_width":
+			json.Unmarshal(val, &result.FeedListWidth)
+		case "item_list_width":
+			json.Unmarshal(val, &result.ItemListWidth)
+		case "sort_newest_first":
+			json.Unmarshal(val, &result.SortNewestFirst)
+		case "theme_name":
+			json.Unmarshal(val, &result.ThemeName)
+		case "theme_font":
+			json.Unmarshal(val, &result.ThemeFont)
+		case "theme_size":
+			json.Unmarshal(val, &result.ThemeSize)
+		case "refresh_rate":
+			json.Unmarshal(val, &result.RefreshRate)
+		case "language":
+			json.Unmarshal(val, &result.Language)
 		}
-		result[key] = valDecoded
 	}
 	return result
 }
 
-func (s *Storage) UpdateSettings(kv map[string]any) bool {
-	defaults := settingsDefaults()
-	for key, val := range kv {
-		if defaults[key] == nil {
-			continue
-		}
+type UpdateSettingsParams struct {
+	Filter          *string `json:"filter"`
+	Feed            *string `json:"feed"`
+	FeedListWidth   *int    `json:"feed_list_width"`
+	ItemListWidth   *int    `json:"item_list_width"`
+	SortNewestFirst *bool   `json:"sort_newest_first"`
+	ThemeName       *string `json:"theme_name"`
+	ThemeFont       *string `json:"theme_font"`
+	ThemeSize       *int    `json:"theme_size"`
+	RefreshRate     *int64  `json:"refresh_rate"`
+	Language        *string `json:"language"`
+}
+
+func (s *Storage) UpdateSettings(params UpdateSettingsParams) bool {
+	tx, err := s.db.Begin()
+	if err != nil {
+		log.Print(err)
+		return false
+	}
+	defer tx.Rollback()
+
+	update := func(key string, val any) error {
 		valEncoded, err := json.Marshal(val)
 		if err != nil {
-			log.Print(err)
-			return false
+			return err
 		}
-		_, err = s.db.Exec(`
+		_, err = tx.Exec(`
 			insert into settings (key, val) values (:key, :val)
 			on conflict (key) do update set val=:val`,
 			sql.Named("key", key),
 			sql.Named("val", valEncoded),
 		)
+		return err
+	}
+
+	var errs []error
+	if params.Filter != nil {
+		errs = append(errs, update("filter", *params.Filter))
+	}
+	if params.Feed != nil {
+		errs = append(errs, update("feed", *params.Feed))
+	}
+	if params.FeedListWidth != nil {
+		errs = append(errs, update("feed_list_width", *params.FeedListWidth))
+	}
+	if params.ItemListWidth != nil {
+		errs = append(errs, update("item_list_width", *params.ItemListWidth))
+	}
+	if params.SortNewestFirst != nil {
+		errs = append(errs, update("sort_newest_first", *params.SortNewestFirst))
+	}
+	if params.ThemeName != nil {
+		errs = append(errs, update("theme_name", *params.ThemeName))
+	}
+	if params.ThemeFont != nil {
+		errs = append(errs, update("theme_font", *params.ThemeFont))
+	}
+	if params.ThemeSize != nil {
+		errs = append(errs, update("theme_size", *params.ThemeSize))
+	}
+	if params.RefreshRate != nil {
+		errs = append(errs, update("refresh_rate", *params.RefreshRate))
+	}
+	if params.Language != nil {
+		errs = append(errs, update("language", *params.Language))
+	}
+
+	for _, err := range errs {
 		if err != nil {
 			log.Print(err)
 			return false
 		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Print(err)
+		return false
 	}
 	return true
 }
