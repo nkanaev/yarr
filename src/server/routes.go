@@ -471,7 +471,6 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 			}
 		}
 
-		s.worker.FindFavicons()
 		s.worker.RefreshFeeds()
 
 		c.Out.WriteHeader(http.StatusOK)

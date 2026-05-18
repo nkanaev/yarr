@@ -136,36 +136,6 @@ func (s *Storage) ListFeeds() []Feed {
 	return result
 }
 
-func (s *Storage) ListFeedsMissingIcons() []Feed {
-	result := make([]Feed, 0)
-	rows, err := s.db.Query(`
-		select id, folder_id, title, description, link, feed_link
-		from feeds
-		where icon is null
-	`)
-	if err != nil {
-		log.Print(err)
-		return result
-	}
-	for rows.Next() {
-		var f Feed
-		err = rows.Scan(
-			&f.Id,
-			&f.FolderId,
-			&f.Title,
-			&f.Description,
-			&f.Link,
-			&f.FeedLink,
-		)
-		if err != nil {
-			log.Print(err)
-			return result
-		}
-		result = append(result, f)
-	}
-	return result
-}
-
 func (s *Storage) GetFeed(id int64) *Feed {
 	var f Feed
 	err := s.db.QueryRow(`

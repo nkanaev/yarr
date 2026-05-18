@@ -39,14 +39,6 @@ func (w *Worker) StartFeedCleaner() {
 	}()
 }
 
-func (w *Worker) FindFavicons() {
-	go func() {
-		for _, feed := range w.db.ListFeedsMissingIcons() {
-			w.FindFeedFavicon(feed)
-		}
-	}()
-}
-
 func (w *Worker) FindFeedFavicon(feed storage.Feed) {
 	icon, err := findFavicon(feed.Link, feed.FeedLink)
 	if err != nil {
@@ -143,6 +135,9 @@ func (w *Worker) worker(srcqueue <-chan storage.Feed, dstqueue chan<- []storage.
 		if err != nil {
 			errMsg := err.Error()
 			w.db.UpdateFeedState(feed.Id, storage.UpdateFeedStateParams{LastError: &errMsg})
+		}
+		if len(items) > 0 && !feed.HasIcon {
+			w.FindFeedFavicon(feed)
 		}
 		dstqueue <- items
 	}
