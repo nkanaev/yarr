@@ -366,11 +366,11 @@ func m13_consolidate_feed_states(tx *sql.Tx) error {
 			, http_etag
 		)
 		select
-			f.id,
-			coalesce(h.last_refreshed, 0),
-			coalesce(e.error, '')
-			coalesce(h.last_modified, ''),
-			coalesce(h.etag, ''),
+			f.id
+			, coalesce(h.last_refreshed, 0)
+			, coalesce(e.error, '')
+			, coalesce(h.last_modified, '')
+			, coalesce(h.etag, '')
 		from feeds f
 		left join http_states h on f.id = h.feed_id
 		left join feed_errors e on f.id = e.feed_id

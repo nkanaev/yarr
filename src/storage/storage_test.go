@@ -9,9 +9,11 @@ import (
 
 func testDB() *Storage {
 	log.SetOutput(io.Discard)
-	db, _ := New(":memory:")
+	db, err := New(":memory:")
+	if err != nil {
+		panic(err)
+	}
 	log.SetOutput(os.Stderr)
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	return db
 }
 

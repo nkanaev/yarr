@@ -102,7 +102,7 @@ func (s *Storage) UpdateFeedState(feedID int64, params UpdateFeedStateParams) (b
 		)
 		on conflict (feed_id) do update set
 			last_refreshed = coalesce(:last_refreshed, last_refreshed),
-			last_error     = coalesce(:last_error, last_modified),
+			last_error     = coalesce(:last_error, last_error),
 			http_lmod      = coalesce(:http_lmod, http_lmod),
 			http_etag      = coalesce(:http_etag, http_etag)
 	`,
