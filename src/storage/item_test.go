@@ -212,7 +212,6 @@ func TestListItems(t *testing.T) {
 	}
 
 	// filter by search
-	db.SyncSearch()
 	search1 := "title111"
 	have = getItemGuids(db.ListItems(ItemFilter{Search: &search1}, 4, true, false))
 	want = []string{"item111"}
@@ -431,4 +430,86 @@ func TestCreateItemsLastArrived(t *testing.T) {
 			t.Errorf("expected last_arrived to be updated. old: %v, new: %v", lastArrived1, lastArrived2)
 		}
 	})
+}
+
+func TestSearch(t *testing.T) {
+	db := testDB()
+	defer db.Close()
+	feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+
+	db.CreateItems([]Item{
+		{
+			GUID:    "i1",
+			FeedId:  feed.Id,
+			Title:   "Hello World",
+			Content: "This is a <b>test</b> of the <i>emergency</i> broadcast system.",
+		},
+		{
+			GUID:    "i2",
+			FeedId:  feed.Id,
+			Title:   "FTS5 Unicode",
+			Content: "Unicode support with characters like: Привет, 世界, 🚀",
+		},
+		{
+			GUID:    "i3",
+			FeedId:  feed.Id,
+			Title:   "Hidden Tag",
+			Content: `<div class="secret-class">Don't find me by my class name</div>`,
+		},
+	})
+
+	// 1. Basic search
+	s1 := "emergency"
+	have := getItemGuids(db.ListItems(ItemFilter{Search: &s1}, 10, true, false))
+	if !reflect.DeepEqual(have, []string{"i1"}) {
+		t.Errorf("basic search failed: expected [i1], got %v", have)
+	}
+
+	// 2. HTML stripping: Should find text, but NOT the tags
+	s2 := "test"
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &s2}, 10, true, false))
+	if !reflect.DeepEqual(have, []string{"i1"}) {
+		t.Errorf("html text search failed: expected [i1], got %v", have)
+	}
+
+	s3 := "secret-class"
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &s3}, 10, true, false))
+	if len(have) > 0 {
+		t.Errorf("html tag search should have failed but found: %v", have)
+	}
+
+	// 3. Multi-word (AND)
+	s4 := "broadcast system"
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &s4}, 10, true, false))
+	if !reflect.DeepEqual(have, []string{"i1"}) {
+		t.Errorf("multi-word search failed: expected [i1], got %v", have)
+	}
+
+	// 4. Unicode
+	s5 := "Привет"
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &s5}, 10, true, false))
+	if !reflect.DeepEqual(have, []string{"i2"}) {
+		t.Errorf("unicode search failed: expected [i2], got %v", have)
+	}
+
+	s6 := "世界"
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &s6}, 10, true, false))
+	if !reflect.DeepEqual(have, []string{"i2"}) {
+		t.Errorf("unicode search (CJK) failed: expected [i2], got %v", have)
+	}
+
+	// 5. Trigger: Update
+	db.db.Exec("update items set title = 'Updated Title' where guid = 'i1'")
+	s7 := "Updated"
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &s7}, 10, true, false))
+	if !reflect.DeepEqual(have, []string{"i1"}) {
+		t.Errorf("update trigger failed: expected [i1], got %v", have)
+	}
+
+	// 6. Trigger: Delete
+	db.db.Exec("delete from items where guid = 'i1'")
+	have = getItemGuids(db.ListItems(ItemFilter{Search: &s7}, 10, true, false))
+	if len(have) > 0 {
+		t.Errorf("delete trigger failed: found deleted item: %v", have)
+	}
 }

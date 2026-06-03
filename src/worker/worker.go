@@ -118,7 +118,6 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 			w.db.CreateItems(items)
 		}
 		atomic.AddInt32(w.pending, -1)
-		w.db.SyncSearch()
 	}
 	close(srcqueue)
 	close(dstqueue)

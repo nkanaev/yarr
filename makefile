@@ -1,7 +1,7 @@
 VERSION=2.6
 GITHASH=$(shell git rev-parse --short=8 HEAD)
 
-GO_TAGS    = sqlite_foreign_keys sqlite_json
+GO_TAGS    = sqlite_foreign_keys sqlite_json sqlite_fts5
 GO_LDFLAGS = -s -w -X 'main.Version=$(VERSION)' -X 'main.GitHash=$(GITHASH)'
 
 GO_FLAGS         = -tags "$(GO_TAGS)"     -ldflags="$(GO_LDFLAGS)"

@@ -21,6 +21,7 @@ var migrations = []func(*sql.Tx) error{
 	m11_add_item_last_arrived,
 	m12_remove_feed_sizes,
 	m13_consolidate_feed_states,
+	m14_upgrade_fts5,
 }
 
 var maxVersion = int64(len(migrations))
@@ -378,6 +379,43 @@ func m13_consolidate_feed_states(tx *sql.Tx) error {
 
 		drop table http_states;
 		drop table feed_errors;
+	`
+	_, err := tx.Exec(sql)
+	return err
+}
+
+func m14_upgrade_fts5(tx *sql.Tx) error {
+	sql := `
+		-- 1. Drop old FTS4 table and trigger
+		drop table if exists search;
+		drop trigger if exists del_item_search;
+
+		-- 2. Remove search_rowid from items
+		drop index if exists idx_item_search_rowid;
+		alter table items drop column search_rowid;
+
+		-- 3. Create FTS5 virtual table
+		create virtual table search using fts5(
+			title, content,
+			content='items',
+			content_rowid='id',
+			tokenize='unicode61'
+		);
+
+		-- 4. Create triggers for automatic FTS sync
+		create trigger items_ai after insert on items begin
+		  insert into search(rowid, title, content) values (new.id, new.title, strip_html(new.content));
+		end;
+		create trigger items_ad after delete on items begin
+		  insert into search(search, rowid, title, content) values('delete', old.id, old.title, strip_html(old.content));
+		end;
+		create trigger items_au after update on items begin
+		  insert into search(search, rowid, title, content) values('delete', old.id, old.title, strip_html(old.content));
+		  insert into search(rowid, title, content) values (new.id, new.title, strip_html(new.content));
+		end;
+
+		-- 5. Populate FTS5 table with existing data
+		insert into search(rowid, title, content) select id, title, strip_html(content) from items;
 	`
 	_, err := tx.Exec(sql)
 	return err
