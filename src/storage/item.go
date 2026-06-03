@@ -416,5 +416,9 @@ func (s *Storage) DeleteOldItems() {
 	numDeleted, err := result.RowsAffected()
 	if err == nil && numDeleted > 0 {
 		log.Printf("Deleted %d old items", numDeleted)
+
+		if _, err := s.db.Exec("vacuum"); err != nil {
+			log.Print(err)
+		}
 	}
 }
