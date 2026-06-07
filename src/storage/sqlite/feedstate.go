@@ -13,7 +13,7 @@ type FeedState struct {
 	HTTPEtag         string
 }
 
-func (s *Storage) ListFeedStates() ([]FeedState, error) {
+func (s *SQLiteStorage) ListFeedStates() ([]FeedState, error) {
 	rows, err := s.db.Query(`
 		select
 			feed_id
@@ -46,7 +46,7 @@ func (s *Storage) ListFeedStates() ([]FeedState, error) {
 	return states, nil
 }
 
-func (s *Storage) GetFeedState(feedID int64) (*FeedState, error) {
+func (s *SQLiteStorage) GetFeedState(feedID int64) (*FeedState, error) {
 	var state FeedState
 	err := s.db.QueryRow(`
 		select
@@ -79,7 +79,7 @@ type UpdateFeedStateParams struct {
 	HTTPEtag         *string
 }
 
-func (s *Storage) UpdateFeedState(feedID int64, params UpdateFeedStateParams) (bool, error) {
+func (s *SQLiteStorage) UpdateFeedState(feedID int64, params UpdateFeedStateParams) (bool, error) {
 	lastError := params.LastError
 	if lastError != nil && *lastError == "" {
 		lastError = nil

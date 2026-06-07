@@ -116,7 +116,7 @@ func (list ItemList) Swap(i, j int) {
 	list[i], list[j] = list[j], list[i]
 }
 
-func (s *Storage) CreateItems(items []Item) bool {
+func (s *SQLiteStorage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
 		log.Print(err)
@@ -241,7 +241,7 @@ func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []any) {
 	return predicate, args
 }
 
-func (s *Storage) CountItems() int {
+func (s *SQLiteStorage) CountItems() int {
 	var count int
 	err := s.db.QueryRow(`select count(*) from items`).Scan(&count)
 	if err != nil {
@@ -251,7 +251,7 @@ func (s *Storage) CountItems() int {
 	return count
 }
 
-func (s *Storage) ListItems(
+func (s *SQLiteStorage) ListItems(
 	filter ItemFilter,
 	limit int,
 	newestFirst bool,
@@ -305,7 +305,7 @@ func (s *Storage) ListItems(
 	return result
 }
 
-func (s *Storage) GetItem(id int64) *Item {
+func (s *SQLiteStorage) GetItem(id int64) *Item {
 	i := &Item{}
 	err := s.db.QueryRow(`
 		select
@@ -324,7 +324,7 @@ func (s *Storage) GetItem(id int64) *Item {
 	return i
 }
 
-func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
+func (s *SQLiteStorage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
 	_, err := s.db.Exec(`update items set status = :status where id = :id`,
 		sql.Named("status", status),
 		sql.Named("id", item_id),
@@ -332,7 +332,7 @@ func (s *Storage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
 	return err == nil
 }
 
-func (s *Storage) MarkItemsRead(filter MarkFilter) bool {
+func (s *SQLiteStorage) MarkItemsRead(filter MarkFilter) bool {
 	predicate, args := listQueryPredicate(ItemFilter{
 		FolderID: filter.FolderID,
 		FeedID:   filter.FeedID,
@@ -355,7 +355,7 @@ type FeedStat struct {
 	StarredCount int64 `json:"starred"`
 }
 
-func (s *Storage) FeedStats() []FeedStat {
+func (s *SQLiteStorage) FeedStats() []FeedStat {
 	result := make([]FeedStat, 0)
 	rows, err := s.db.Query(fmt.Sprintf(`
 		select
@@ -388,7 +388,7 @@ var (
 //   - Never delete starred entries.
 //   - Keep at least 50 latest items for each feed.
 //   - Delete entries older than 90 days relative to the latest arrived item in the same feed.
-func (s *Storage) DeleteOldItems() {
+func (s *SQLiteStorage) DeleteOldItems() {
 	result, err := s.db.Exec(`
 		delete from items
 		where id in (

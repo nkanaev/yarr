@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func testDB() *Storage {
+func testDB() *SQLiteStorage {
 	log.SetOutput(io.Discard)
 	db, err := New(":memory:")
 	if err != nil {

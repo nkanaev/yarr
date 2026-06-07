@@ -11,7 +11,7 @@ type Folder struct {
 	IsExpanded bool   `json:"is_expanded"`
 }
 
-func (s *Storage) CreateFolder(title string) *Folder {
+func (s *SQLiteStorage) CreateFolder(title string) *Folder {
 	expanded := true
 	row := s.db.QueryRow(`
 		insert into folders (title, is_expanded) values (:title, :is_expanded)
@@ -30,7 +30,7 @@ func (s *Storage) CreateFolder(title string) *Folder {
 	return &Folder{Id: id, Title: title, IsExpanded: expanded}
 }
 
-func (s *Storage) DeleteFolder(folderId int64) bool {
+func (s *SQLiteStorage) DeleteFolder(folderId int64) bool {
 	_, err := s.db.Exec(`delete from folders where id = :id`, sql.Named("id", folderId))
 	if err != nil {
 		log.Print(err)
@@ -43,7 +43,7 @@ type UpdateFolderParams struct {
 	IsExpanded *bool
 }
 
-func (s *Storage) UpdateFolder(folderId int64, params UpdateFolderParams) (bool, error) {
+func (s *SQLiteStorage) UpdateFolder(folderId int64, params UpdateFolderParams) (bool, error) {
 	_, err := s.db.Exec(`
 		update folders set
 			title       = coalesce(:title, title),
@@ -61,7 +61,7 @@ func (s *Storage) UpdateFolder(folderId int64, params UpdateFolderParams) (bool,
 	return true, nil
 }
 
-func (s *Storage) ListFolders() []Folder {
+func (s *SQLiteStorage) ListFolders() []Folder {
 	result := make([]Folder, 0)
 	rows, err := s.db.Query(`
 		select id, title, is_expanded

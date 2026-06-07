@@ -35,7 +35,7 @@ type testItemScope struct {
 	folder1, folder2 *Folder
 }
 
-func testItemsSetup(db *Storage) testItemScope {
+func testItemsSetup(db *SQLiteStorage) testItemScope {
 	folder1 := db.CreateFolder("folder1")
 	folder2 := db.CreateFolder("folder2")
 
@@ -115,7 +115,7 @@ func testItemsSetup(db *Storage) testItemScope {
 	}
 }
 
-func getItem(db *Storage, guid string) *Item {
+func getItem(db *SQLiteStorage, guid string) *Item {
 	i := &Item{}
 	err := db.db.QueryRow(`
 		select

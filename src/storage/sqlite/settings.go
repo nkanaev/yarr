@@ -49,7 +49,7 @@ func settingsDefaults() Settings {
 	}
 }
 
-func (s *Storage) GetSettings() Settings {
+func (s *SQLiteStorage) GetSettings() Settings {
 	result := settingsDefaults()
 	rows, err := s.db.Query(`select key, val from settings;`)
 	if err != nil {
@@ -102,7 +102,7 @@ type UpdateSettingsParams struct {
 	Language        *string `json:"language"`
 }
 
-func (s *Storage) UpdateSettings(params UpdateSettingsParams) bool {
+func (s *SQLiteStorage) UpdateSettings(params UpdateSettingsParams) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
 		log.Print(err)

@@ -24,7 +24,7 @@ type CreateFeedParams struct {
 	FolderID    *int64
 }
 
-func (s *Storage) CreateFeed(params CreateFeedParams) *Feed {
+func (s *SQLiteStorage) CreateFeed(params CreateFeedParams) *Feed {
 	title := params.Title
 	if title == "" {
 		title = params.FeedLink
@@ -57,7 +57,7 @@ func (s *Storage) CreateFeed(params CreateFeedParams) *Feed {
 	}
 }
 
-func (s *Storage) DeleteFeed(feedId int64) bool {
+func (s *SQLiteStorage) DeleteFeed(feedId int64) bool {
 	result, err := s.db.Exec(`delete from feeds where id = :id`, sql.Named("id", feedId))
 	if err != nil {
 		log.Print(err)
@@ -80,7 +80,7 @@ type UpdateFeedParams struct {
 	Icon     Nullable[[]byte]
 }
 
-func (s *Storage) UpdateFeed(feedId int64, params UpdateFeedParams) (bool, error) {
+func (s *SQLiteStorage) UpdateFeed(feedId int64, params UpdateFeedParams) (bool, error) {
 	_, err := s.db.Exec(`
 		update feeds set
 			title     = coalesce(:title, title),
@@ -104,7 +104,7 @@ func (s *Storage) UpdateFeed(feedId int64, params UpdateFeedParams) (bool, error
 	return true, nil
 }
 
-func (s *Storage) ListFeeds() []Feed {
+func (s *SQLiteStorage) ListFeeds() []Feed {
 	result := make([]Feed, 0)
 	rows, err := s.db.Query(`
 		select id, folder_id, title, description, link, feed_link,
@@ -136,7 +136,7 @@ func (s *Storage) ListFeeds() []Feed {
 	return result
 }
 
-func (s *Storage) GetFeed(id int64) *Feed {
+func (s *SQLiteStorage) GetFeed(id int64) *Feed {
 	var f Feed
 	err := s.db.QueryRow(`
 		select
