@@ -1,6 +1,6 @@
 package storage
 
-type IStorage interface {
+type Storage interface {
 	Close() error
 	CountItems() int
 	CreateFeed(params CreateFeedParams) *Feed
@@ -25,3 +25,4 @@ type IStorage interface {
 	UpdateItemStatus(item_id int64, status ItemStatus) bool
 	UpdateSettings(params UpdateSettingsParams) bool
 }
+
