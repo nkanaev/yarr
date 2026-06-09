@@ -108,6 +108,12 @@ type UpdateFolderParams struct {
 	IsExpanded *bool
 }
 
+type FeedStat struct {
+	FeedId       int64 `json:"feed_id"`
+	UnreadCount  int64 `json:"unread"`
+	StarredCount int64 `json:"starred"`
+}
+
 
 type Settings struct {
 	Filter          string `json:"filter"`

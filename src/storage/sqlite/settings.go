@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
-func settingsDefaults() Settings {
-	return Settings{
+func settingsDefaults() model.Settings {
+	return model.Settings{
 		Filter:          "",
 		Feed:            "",
 		FeedListWidth:   300,
@@ -21,7 +23,7 @@ func settingsDefaults() Settings {
 	}
 }
 
-func (s *SQLiteStorage) GetSettings() Settings {
+func (s *SQLiteStorage) GetSettings() model.Settings {
 	result := settingsDefaults()
 	rows, err := s.db.Query(`select key, val from settings;`)
 	if err != nil {
@@ -61,7 +63,7 @@ func (s *SQLiteStorage) GetSettings() Settings {
 	return result
 }
 
-func (s *SQLiteStorage) UpdateSettings(params UpdateSettingsParams) bool {
+func (s *SQLiteStorage) UpdateSettings(params model.UpdateSettingsParams) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
 		log.Print(err)

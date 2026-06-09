@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
 func TestSettingsDefaults(t *testing.T) {
@@ -22,7 +24,7 @@ func TestUpdateSettings(t *testing.T) {
 	s := testDB()
 	defer s.Close()
 
-	params := UpdateSettingsParams{
+	params := model.UpdateSettingsParams{
 		ThemeName:     ptr("night"),
 		FeedListWidth: ptr(400),
 		RefreshRate:   ptr(int64(15)),
@@ -49,7 +51,7 @@ func TestGetSettings(t *testing.T) {
 	s := testDB()
 	defer s.Close()
 
-	s.UpdateSettings(UpdateSettingsParams{Language: ptr("fr")})
+	s.UpdateSettings(model.UpdateSettingsParams{Language: ptr("fr")})
 
 	settings := s.GetSettings()
 	if settings.Language != "fr" {
@@ -64,8 +66,8 @@ func TestSettingsExhaustive(t *testing.T) {
 	s := testDB()
 	defer s.Close()
 
-	settingsType := reflect.TypeOf(Settings{})
-	paramsType := reflect.TypeOf(UpdateSettingsParams{})
+	settingsType := reflect.TypeOf(model.Settings{})
+	paramsType := reflect.TypeOf(model.UpdateSettingsParams{})
 	
 	settings := s.GetSettings()
 	m := settings.Map()
@@ -125,7 +127,7 @@ func TestSettingsExhaustive(t *testing.T) {
 			}
 		}
 		
-		if ok := s.UpdateSettings(paramsValue.Interface().(UpdateSettingsParams)); !ok {
+		if ok := s.UpdateSettings(paramsValue.Interface().(model.UpdateSettingsParams)); !ok {
 			t.Errorf("UpdateSettings failed for %q", jsonKey)
 		}
 		

@@ -8,6 +8,8 @@ import (
 	"testing"
 	"testing/synctest"
 	"time"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
 /*
@@ -30,22 +32,22 @@ import (
 */
 
 type testItemScope struct {
-	feed11, feed12   *Feed
-	feed21, feed01   *Feed
-	folder1, folder2 *Folder
+	feed11, feed12   *model.Feed
+	feed21, feed01   *model.Feed
+	folder1, folder2 *model.Folder
 }
 
 func testItemsSetup(db *SQLiteStorage) testItemScope {
 	folder1 := db.CreateFolder("folder1")
 	folder2 := db.CreateFolder("folder2")
 
-	feed11 := db.CreateFeed(CreateFeedParams{Title: "feed11", FeedLink: "http://test.com/feed11.xml", FolderID: &folder1.Id})
-	feed12 := db.CreateFeed(CreateFeedParams{Title: "feed12", FeedLink: "http://test.com/feed12.xml", FolderID: &folder1.Id})
-	feed21 := db.CreateFeed(CreateFeedParams{Title: "feed21", FeedLink: "http://test.com/feed21.xml", FolderID: &folder2.Id})
-	feed01 := db.CreateFeed(CreateFeedParams{Title: "feed01", FeedLink: "http://test.com/feed01.xml"})
+	feed11 := db.CreateFeed(model.CreateFeedParams{Title: "feed11", FeedLink: "http://test.com/feed11.xml", FolderID: &folder1.Id})
+	feed12 := db.CreateFeed(model.CreateFeedParams{Title: "feed12", FeedLink: "http://test.com/feed12.xml", FolderID: &folder1.Id})
+	feed21 := db.CreateFeed(model.CreateFeedParams{Title: "feed21", FeedLink: "http://test.com/feed21.xml", FolderID: &folder2.Id})
+	feed01 := db.CreateFeed(model.CreateFeedParams{Title: "feed01", FeedLink: "http://test.com/feed01.xml"})
 
 	now := time.Now()
-	db.CreateItems([]Item{
+	db.CreateItems([]model.Item{
 		// feed11
 		{GUID: "item111", FeedId: feed11.Id, Title: "title111", Date: now.Add(time.Hour * 24 * 1)},
 		{
@@ -98,11 +100,11 @@ func testItemsSetup(db *SQLiteStorage) testItemScope {
 	})
 	db.db.Exec(
 		`update items set status = :status where guid in ("item112", "item122", "item211", "item012")`,
-		sql.Named("status", READ),
+		sql.Named("status", model.READ),
 	)
 	db.db.Exec(
 		`update items set status = :status where guid in ("item113", "item212", "item013")`,
-		sql.Named("status", STARRED),
+		sql.Named("status", model.STARRED),
 	)
 
 	return testItemScope{
@@ -115,8 +117,8 @@ func testItemsSetup(db *SQLiteStorage) testItemScope {
 	}
 }
 
-func getItem(db *SQLiteStorage, guid string) *Item {
-	i := &Item{}
+func getItem(db *SQLiteStorage, guid string) *model.Item {
+	i := &model.Item{}
 	err := db.db.QueryRow(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
@@ -125,7 +127,7 @@ func getItem(db *SQLiteStorage, guid string) *Item {
 		where i.guid = :guid
 	`, sql.Named("guid", guid)).Scan(
 		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
-		&i.Date, &i.Status, &i.MediaLinks,
+		&i.Date, &i.Status, (*MediaLinks)(&i.MediaLinks),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -133,7 +135,7 @@ func getItem(db *SQLiteStorage, guid string) *Item {
 	return i
 }
 
-func getItemGuids(items []Item) []string {
+func getItemGuids(items []model.Item) []string {
 	guids := make([]string, 0)
 	for _, item := range items {
 		guids = append(guids, item.GUID)
@@ -147,7 +149,7 @@ func TestListItems(t *testing.T) {
 
 	// filter by folder_id
 
-	have := getItemGuids(db.ListItems(ItemFilter{FolderID: &scope.folder1.Id}, 10, false, false))
+	have := getItemGuids(db.ListItems(model.ItemFilter{FolderID: &scope.folder1.Id}, 10, false, false))
 	want := []string{"item111", "item112", "item113", "item121", "item122"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -155,7 +157,7 @@ func TestListItems(t *testing.T) {
 		t.Fail()
 	}
 
-	have = getItemGuids(db.ListItems(ItemFilter{FolderID: &scope.folder2.Id}, 10, false, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{FolderID: &scope.folder2.Id}, 10, false, false))
 	want = []string{"item211", "item212"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -165,7 +167,7 @@ func TestListItems(t *testing.T) {
 
 	// filter by feed_id
 
-	have = getItemGuids(db.ListItems(ItemFilter{FeedID: &scope.feed11.Id}, 10, false, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{FeedID: &scope.feed11.Id}, 10, false, false))
 	want = []string{"item111", "item112", "item113"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -173,7 +175,7 @@ func TestListItems(t *testing.T) {
 		t.Fail()
 	}
 
-	have = getItemGuids(db.ListItems(ItemFilter{FeedID: &scope.feed01.Id}, 10, false, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{FeedID: &scope.feed01.Id}, 10, false, false))
 	want = []string{"item011", "item012", "item013"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -183,8 +185,8 @@ func TestListItems(t *testing.T) {
 
 	// filter by status
 
-	var starred ItemStatus = STARRED
-	have = getItemGuids(db.ListItems(ItemFilter{Status: &starred}, 10, false, false))
+	var starred model.ItemStatus = model.STARRED
+	have = getItemGuids(db.ListItems(model.ItemFilter{Status: &starred}, 10, false, false))
 	want = []string{"item113", "item212", "item013"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -192,8 +194,8 @@ func TestListItems(t *testing.T) {
 		t.Fail()
 	}
 
-	var unread ItemStatus = UNREAD
-	have = getItemGuids(db.ListItems(ItemFilter{Status: &unread}, 10, false, false))
+	var unread model.ItemStatus = model.UNREAD
+	have = getItemGuids(db.ListItems(model.ItemFilter{Status: &unread}, 10, false, false))
 	want = []string{"item111", "item121", "item011"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -203,7 +205,7 @@ func TestListItems(t *testing.T) {
 
 	// limit
 
-	have = getItemGuids(db.ListItems(ItemFilter{}, 2, false, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{}, 2, false, false))
 	want = []string{"item111", "item112"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -213,7 +215,7 @@ func TestListItems(t *testing.T) {
 
 	// filter by search
 	search1 := "title111"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &search1}, 4, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &search1}, 4, true, false))
 	want = []string{"item111"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -222,7 +224,7 @@ func TestListItems(t *testing.T) {
 	}
 
 	// sort by date
-	have = getItemGuids(db.ListItems(ItemFilter{}, 4, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{}, 4, true, false))
 	want = []string{"item013", "item012", "item011", "item212"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -239,7 +241,7 @@ func TestListItemsPaginated(t *testing.T) {
 	item121 := getItem(db, "item121")
 
 	// all, newest first
-	have := getItemGuids(db.ListItems(ItemFilter{After: &item012.Id}, 3, true, false))
+	have := getItemGuids(db.ListItems(model.ItemFilter{After: &item012.Id}, 3, true, false))
 	want := []string{"item011", "item212", "item211"}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -248,9 +250,9 @@ func TestListItemsPaginated(t *testing.T) {
 	}
 
 	// unread, newest first
-	unread := UNREAD
+	unread := model.UNREAD
 	have = getItemGuids(
-		db.ListItems(ItemFilter{After: &item012.Id, Status: &unread}, 3, true, false),
+		db.ListItems(model.ItemFilter{After: &item012.Id, Status: &unread}, 3, true, false),
 	)
 	want = []string{"item011", "item121", "item111"}
 	if !reflect.DeepEqual(have, want) {
@@ -260,9 +262,9 @@ func TestListItemsPaginated(t *testing.T) {
 	}
 
 	// starred, oldest first
-	starred := STARRED
+	starred := model.STARRED
 	have = getItemGuids(
-		db.ListItems(ItemFilter{After: &item121.Id, Status: &starred}, 3, false, false),
+		db.ListItems(model.ItemFilter{After: &item121.Id, Status: &starred}, 3, false, false),
 	)
 	want = []string{"item212", "item013"}
 	if !reflect.DeepEqual(have, want) {
@@ -274,12 +276,12 @@ func TestListItemsPaginated(t *testing.T) {
 
 func TestMarkItemsRead(t *testing.T) {
 	// NOTE: starred items must not be marked as read
-	var read ItemStatus = READ
+	var read model.ItemStatus = model.READ
 
 	db1 := testDB()
 	testItemsSetup(db1)
-	db1.MarkItemsRead(MarkFilter{})
-	have := getItemGuids(db1.ListItems(ItemFilter{Status: &read}, 10, false, false))
+	db1.MarkItemsRead(model.MarkFilter{})
+	have := getItemGuids(db1.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
 	want := []string{
 		"item111", "item112", "item121", "item122",
 		"item211", "item011", "item012",
@@ -292,8 +294,8 @@ func TestMarkItemsRead(t *testing.T) {
 
 	db2 := testDB()
 	scope2 := testItemsSetup(db2)
-	db2.MarkItemsRead(MarkFilter{FolderID: &scope2.folder1.Id})
-	have = getItemGuids(db2.ListItems(ItemFilter{Status: &read}, 10, false, false))
+	db2.MarkItemsRead(model.MarkFilter{FolderID: &scope2.folder1.Id})
+	have = getItemGuids(db2.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
 	want = []string{
 		"item111", "item112", "item121", "item122",
 		"item211", "item012",
@@ -306,8 +308,8 @@ func TestMarkItemsRead(t *testing.T) {
 
 	db3 := testDB()
 	scope3 := testItemsSetup(db3)
-	db3.MarkItemsRead(MarkFilter{FeedID: &scope3.feed11.Id})
-	have = getItemGuids(db3.ListItems(ItemFilter{Status: &read}, 10, false, false))
+	db3.MarkItemsRead(model.MarkFilter{FeedID: &scope3.feed11.Id})
+	have = getItemGuids(db3.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
 	want = []string{
 		"item111", "item112", "item122",
 		"item211", "item012",
@@ -321,14 +323,14 @@ func TestMarkItemsRead(t *testing.T) {
 
 func TestDeleteOldItems(t *testing.T) {
 	now := time.Now().UTC()
-	starred := STARRED
+	starred := model.STARRED
 
 	t.Run("keeps at least 50 items", func(t *testing.T) {
 		db := testDB()
-		feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
-		items := make([]Item, 100)
+		feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+		items := make([]model.Item, 100)
 		for i := range 100 {
-			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Hour * 24)}
+			items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Hour * 24)}
 		}
 		db.CreateItems(items)
 
@@ -346,10 +348,10 @@ func TestDeleteOldItems(t *testing.T) {
 
 	t.Run("keeps all less than 90 days old", func(t *testing.T) {
 		db := testDB()
-		feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
-		items := make([]Item, 100)
+		feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+		items := make([]model.Item, 100)
 		for i := 0; i < 100; i++ {
-			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
+			items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
 		}
 		db.CreateItems(items)
 
@@ -368,10 +370,10 @@ func TestDeleteOldItems(t *testing.T) {
 
 	t.Run("keeps starred", func(t *testing.T) {
 		db := testDB()
-		feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
-		items := make([]Item, 100)
+		feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+		items := make([]model.Item, 100)
 		for i := 0; i < 100; i++ {
-			items[i] = Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
+			items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
 		}
 		db.CreateItems(items)
 
@@ -397,9 +399,9 @@ func TestCreateItemsLastArrived(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		db := testDB()
 		defer db.db.Close()
-		feed := db.CreateFeed(CreateFeedParams{Title: "test feed", FeedLink: "http://example.com/feed"})
+		feed := db.CreateFeed(model.CreateFeedParams{Title: "test feed", FeedLink: "http://example.com/feed"})
 
-		item := Item{
+		item := model.Item{
 			GUID:   "item1",
 			FeedId: feed.Id,
 			Title:  "Title 1",
@@ -407,7 +409,7 @@ func TestCreateItemsLastArrived(t *testing.T) {
 		}
 
 		// 1. Initial creation
-		db.CreateItems([]Item{item})
+		db.CreateItems([]model.Item{item})
 
 		var lastArrived1 time.Time
 		err := db.db.QueryRow("select last_arrived from items where guid = ?", item.GUID).Scan(&lastArrived1)
@@ -418,7 +420,7 @@ func TestCreateItemsLastArrived(t *testing.T) {
 		time.Sleep(time.Second * 10)
 
 		// 2. Update on conflict
-		db.CreateItems([]Item{item})
+		db.CreateItems([]model.Item{item})
 
 		var lastArrived2 time.Time
 		err = db.db.QueryRow("select last_arrived from items where guid = ?", item.GUID).Scan(&lastArrived2)
@@ -435,9 +437,9 @@ func TestCreateItemsLastArrived(t *testing.T) {
 func TestSearch(t *testing.T) {
 	db := testDB()
 	defer db.Close()
-	feed := db.CreateFeed(CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+	feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 
-	db.CreateItems([]Item{
+	db.CreateItems([]model.Item{
 		{
 			GUID:    "i1",
 			FeedId:  feed.Id,
@@ -460,40 +462,40 @@ func TestSearch(t *testing.T) {
 
 	// 1. Basic search
 	s1 := "emergency"
-	have := getItemGuids(db.ListItems(ItemFilter{Search: &s1}, 10, true, false))
+	have := getItemGuids(db.ListItems(model.ItemFilter{Search: &s1}, 10, true, false))
 	if !reflect.DeepEqual(have, []string{"i1"}) {
 		t.Errorf("basic search failed: expected [i1], got %v", have)
 	}
 
 	// 2. HTML stripping: Should find text, but NOT the tags
 	s2 := "test"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &s2}, 10, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s2}, 10, true, false))
 	if !reflect.DeepEqual(have, []string{"i1"}) {
 		t.Errorf("html text search failed: expected [i1], got %v", have)
 	}
 
 	s3 := "secret-class"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &s3}, 10, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s3}, 10, true, false))
 	if len(have) > 0 {
 		t.Errorf("html tag search should have failed but found: %v", have)
 	}
 
 	// 3. Multi-word (AND)
 	s4 := "broadcast system"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &s4}, 10, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s4}, 10, true, false))
 	if !reflect.DeepEqual(have, []string{"i1"}) {
 		t.Errorf("multi-word search failed: expected [i1], got %v", have)
 	}
 
 	// 4. Unicode
 	s5 := "Привет"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &s5}, 10, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s5}, 10, true, false))
 	if !reflect.DeepEqual(have, []string{"i2"}) {
 		t.Errorf("unicode search failed: expected [i2], got %v", have)
 	}
 
 	s6 := "世界"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &s6}, 10, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s6}, 10, true, false))
 	if !reflect.DeepEqual(have, []string{"i2"}) {
 		t.Errorf("unicode search (CJK) failed: expected [i2], got %v", have)
 	}
@@ -501,14 +503,14 @@ func TestSearch(t *testing.T) {
 	// 5. Trigger: Update
 	db.db.Exec("update items set title = 'Updated Title' where guid = 'i1'")
 	s7 := "Updated"
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &s7}, 10, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s7}, 10, true, false))
 	if !reflect.DeepEqual(have, []string{"i1"}) {
 		t.Errorf("update trigger failed: expected [i1], got %v", have)
 	}
 
 	// 6. Trigger: Delete
 	db.db.Exec("delete from items where guid = 'i1'")
-	have = getItemGuids(db.ListItems(ItemFilter{Search: &s7}, 10, true, false))
+	have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s7}, 10, true, false))
 	if len(have) > 0 {
 		t.Errorf("delete trigger failed: found deleted item: %v", have)
 	}

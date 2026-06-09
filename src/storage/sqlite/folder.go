@@ -3,9 +3,11 @@ package sqlite
 import (
 	"database/sql"
 	"log"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
-func (s *SQLiteStorage) CreateFolder(title string) *Folder {
+func (s *SQLiteStorage) CreateFolder(title string) *model.Folder {
 	expanded := true
 	row := s.db.QueryRow(`
 		insert into folders (title, is_expanded) values (:title, :is_expanded)
@@ -21,7 +23,7 @@ func (s *SQLiteStorage) CreateFolder(title string) *Folder {
 		log.Print(err)
 		return nil
 	}
-	return &Folder{Id: id, Title: title, IsExpanded: expanded}
+	return &model.Folder{Id: id, Title: title, IsExpanded: expanded}
 }
 
 func (s *SQLiteStorage) DeleteFolder(folderId int64) bool {
@@ -32,7 +34,7 @@ func (s *SQLiteStorage) DeleteFolder(folderId int64) bool {
 	return err == nil
 }
 
-func (s *SQLiteStorage) UpdateFolder(folderId int64, params UpdateFolderParams) (bool, error) {
+func (s *SQLiteStorage) UpdateFolder(folderId int64, params model.UpdateFolderParams) (bool, error) {
 	_, err := s.db.Exec(`
 		update folders set
 			title       = coalesce(:title, title),
@@ -50,8 +52,8 @@ func (s *SQLiteStorage) UpdateFolder(folderId int64, params UpdateFolderParams) 
 	return true, nil
 }
 
-func (s *SQLiteStorage) ListFolders() []Folder {
-	result := make([]Folder, 0)
+func (s *SQLiteStorage) ListFolders() []model.Folder {
+	result := make([]model.Folder, 0)
 	rows, err := s.db.Query(`
 		select id, title, is_expanded
 		from folders
@@ -62,7 +64,7 @@ func (s *SQLiteStorage) ListFolders() []Folder {
 		return result
 	}
 	for rows.Next() {
-		var f Folder
+		var f model.Folder
 		err = rows.Scan(&f.Id, &f.Title, &f.IsExpanded)
 		if err != nil {
 			log.Print(err)

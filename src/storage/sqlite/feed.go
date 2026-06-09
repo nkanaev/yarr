@@ -30,7 +30,7 @@ func (s *SQLiteStorage) CreateFeed(params model.CreateFeedParams) *model.Feed {
 		log.Print(err)
 		return nil
 	}
-	return &Feed{
+	return &model.Feed{
 		Id:          id,
 		Title:       title,
 		Description: params.Description,
@@ -56,7 +56,7 @@ func (s *SQLiteStorage) DeleteFeed(feedId int64) bool {
 	return nrows == 1
 }
 
-func (s *SQLiteStorage) UpdateFeed(feedId int64, params UpdateFeedParams) (bool, error) {
+func (s *SQLiteStorage) UpdateFeed(feedId int64, params model.UpdateFeedParams) (bool, error) {
 	_, err := s.db.Exec(`
 		update feeds set
 			title     = coalesce(:title, title),
@@ -112,8 +112,8 @@ func (s *SQLiteStorage) ListFeeds() []model.Feed {
 	return result
 }
 
-func (s *SQLiteStorage) GetFeed(id int64) *Feed {
-	var f Feed
+func (s *SQLiteStorage) GetFeed(id int64) *model.Feed {
+	var f model.Feed
 	err := s.db.QueryRow(`
 		select
 			id, folder_id, title, link, feed_link,

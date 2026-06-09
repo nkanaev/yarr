@@ -14,7 +14,8 @@ import (
 	"github.com/nkanaev/yarr/src/storage/model"
 )
 
-// TODO: serialize/deserialize
+type MediaLinks model.MediaLinks
+
 func (m *MediaLinks) Scan(src any) error {
 	switch data := src.(type) {
 	case []byte:
@@ -30,7 +31,7 @@ func (m MediaLinks) Value() (driver.Value, error) {
 	return json.Marshal(m)
 }
 
-func (s *SQLiteStorage) CreateItems(items []Item) bool {
+func (s *SQLiteStorage) CreateItems(items []model.Item) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
 		log.Print(err)
@@ -65,7 +66,7 @@ func (s *SQLiteStorage) CreateItems(items []Item) bool {
 			sql.Named("link", item.Link),
 			sql.Named("date", item.Date),
 			sql.Named("content", item.Content),
-			sql.Named("media_links", item.MediaLinks),
+			sql.Named("media_links", MediaLinks(item.MediaLinks)),
 			sql.Named("date_arrived", now),
 			sql.Named("last_arrived", now),
 			sql.Named("status", model.UNREAD),
@@ -86,7 +87,7 @@ func (s *SQLiteStorage) CreateItems(items []Item) bool {
 	return true
 }
 
-func listQueryPredicate(filter ItemFilter, newestFirst bool) (string, []any) {
+func listQueryPredicate(filter model.ItemFilter, newestFirst bool) (string, []any) {
 	cond := make([]string, 0)
 	args := make([]any, 0)
 	if filter.FolderID != nil {
@@ -169,13 +170,13 @@ func (s *SQLiteStorage) CountItems() int {
 }
 
 func (s *SQLiteStorage) ListItems(
-	filter ItemFilter,
+	filter model.ItemFilter,
 	limit int,
 	newestFirst bool,
 	withContent bool,
-) []Item {
+) []model.Item {
 	predicate, args := listQueryPredicate(filter, newestFirst)
-	result := make([]Item, 0)
+	result := make([]model.Item, 0)
 
 	order := "date desc, id desc"
 	if !newestFirst {
@@ -207,11 +208,11 @@ func (s *SQLiteStorage) ListItems(
 		return result
 	}
 	for rows.Next() {
-		var x Item
+		var x model.Item
 		err = rows.Scan(
 			&x.Id, &x.GUID, &x.FeedId,
 			&x.Title, &x.Link, &x.Date,
-			&x.Status, &x.MediaLinks, &x.Content,
+			&x.Status, (*MediaLinks)(&x.MediaLinks), &x.Content,
 		)
 		if err != nil {
 			log.Print(err)
@@ -222,8 +223,8 @@ func (s *SQLiteStorage) ListItems(
 	return result
 }
 
-func (s *SQLiteStorage) GetItem(id int64) *Item {
-	i := &Item{}
+func (s *SQLiteStorage) GetItem(id int64) *model.Item {
+	i := &model.Item{}
 	err := s.db.QueryRow(`
 		select
 			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
@@ -232,7 +233,7 @@ func (s *SQLiteStorage) GetItem(id int64) *Item {
 		where i.id = :id
 	`, sql.Named("id", id)).Scan(
 		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
-		&i.Date, &i.Status, &i.MediaLinks,
+		&i.Date, &i.Status, (*MediaLinks)(&i.MediaLinks),
 	)
 	if err != nil {
 		log.Print(err)
@@ -241,7 +242,7 @@ func (s *SQLiteStorage) GetItem(id int64) *Item {
 	return i
 }
 
-func (s *SQLiteStorage) UpdateItemStatus(item_id int64, status ItemStatus) bool {
+func (s *SQLiteStorage) UpdateItemStatus(item_id int64, status model.ItemStatus) bool {
 	_, err := s.db.Exec(`update items set status = :status where id = :id`,
 		sql.Named("status", status),
 		sql.Named("id", item_id),
@@ -249,8 +250,8 @@ func (s *SQLiteStorage) UpdateItemStatus(item_id int64, status ItemStatus) bool 
 	return err == nil
 }
 
-func (s *SQLiteStorage) MarkItemsRead(filter MarkFilter) bool {
-	predicate, args := listQueryPredicate(ItemFilter{
+func (s *SQLiteStorage) MarkItemsRead(filter model.MarkFilter) bool {
+	predicate, args := listQueryPredicate(model.ItemFilter{
 		FolderID: filter.FolderID,
 		FeedID:   filter.FeedID,
 		Before:   filter.Before,
@@ -258,7 +259,7 @@ func (s *SQLiteStorage) MarkItemsRead(filter MarkFilter) bool {
 	query := fmt.Sprintf(`
 		update items as i set status = %d
 		where %s and i.status != %d
-		`, READ, predicate, STARRED)
+		`, model.READ, predicate, model.STARRED)
 	_, err := s.db.Exec(query, args...)
 	if err != nil {
 		log.Print(err)
@@ -266,14 +267,8 @@ func (s *SQLiteStorage) MarkItemsRead(filter MarkFilter) bool {
 	return err == nil
 }
 
-type FeedStat struct {
-	FeedId       int64 `json:"feed_id"`
-	UnreadCount  int64 `json:"unread"`
-	StarredCount int64 `json:"starred"`
-}
-
-func (s *SQLiteStorage) FeedStats() []FeedStat {
-	result := make([]FeedStat, 0)
+func (s *SQLiteStorage) FeedStats() []model.FeedStat {
+	result := make([]model.FeedStat, 0)
 	rows, err := s.db.Query(fmt.Sprintf(`
 		select
 			feed_id,
@@ -281,13 +276,13 @@ func (s *SQLiteStorage) FeedStats() []FeedStat {
 			sum(case status when %d then 1 else 0 end)
 		from items
 		group by feed_id
-	`, UNREAD, STARRED))
+	`, model.UNREAD, model.STARRED))
 	if err != nil {
 		log.Print(err)
 		return result
 	}
 	for rows.Next() {
-		stat := FeedStat{}
+		stat := model.FeedStat{}
 		rows.Scan(&stat.FeedId, &stat.UnreadCount, &stat.StarredCount)
 		result = append(result, stat)
 	}
@@ -322,7 +317,7 @@ func (s *SQLiteStorage) DeleteOldItems() {
 			where rn > :keep_size
 			  and last_arrived < datetime(max_la, :keep_days_limit)
 		)`,
-		sql.Named("starred_status", STARRED),
+		sql.Named("starred_status", model.STARRED),
 		sql.Named("keep_size", itemsKeepSize),
 		sql.Named("keep_days_limit", fmt.Sprintf("-%d days", itemsKeepDays)),
 	)

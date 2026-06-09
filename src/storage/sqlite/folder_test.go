@@ -2,6 +2,8 @@ package sqlite
 
 import (
 	"testing"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
 func TestUpdateFolder(t *testing.T) {
@@ -13,7 +15,7 @@ func TestUpdateFolder(t *testing.T) {
 
 	t.Run("rename only", func(t *testing.T) {
 		newTitle := "new title"
-		ok, err := db.UpdateFolder(folder.Id, UpdateFolderParams{
+		ok, err := db.UpdateFolder(folder.Id, model.UpdateFolderParams{
 			Title: &newTitle,
 		})
 		if !ok || err != nil {
@@ -31,7 +33,7 @@ func TestUpdateFolder(t *testing.T) {
 
 	t.Run("toggle expanded only", func(t *testing.T) {
 		isExpanded := false
-		ok, err := db.UpdateFolder(folder.Id, UpdateFolderParams{
+		ok, err := db.UpdateFolder(folder.Id, model.UpdateFolderParams{
 			IsExpanded: &isExpanded,
 		})
 		if !ok || err != nil {
@@ -50,7 +52,7 @@ func TestUpdateFolder(t *testing.T) {
 	t.Run("update both", func(t *testing.T) {
 		bothTitle := "both"
 		isExpanded := true
-		ok, err := db.UpdateFolder(folder.Id, UpdateFolderParams{
+		ok, err := db.UpdateFolder(folder.Id, model.UpdateFolderParams{
 			Title:      &bothTitle,
 			IsExpanded: &isExpanded,
 		})
@@ -65,7 +67,7 @@ func TestUpdateFolder(t *testing.T) {
 	})
 
 	t.Run("update none", func(t *testing.T) {
-		ok, err := db.UpdateFolder(folder.Id, UpdateFolderParams{})
+		ok, err := db.UpdateFolder(folder.Id, model.UpdateFolderParams{})
 		if !ok || err != nil {
 			t.Fatalf("UpdateFolder failed: %v", err)
 		}

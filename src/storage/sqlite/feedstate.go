@@ -2,10 +2,11 @@ package sqlite
 
 import (
 	"database/sql"
-	"time"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
-func (s *SQLiteStorage) ListFeedStates() ([]FeedState, error) {
+func (s *SQLiteStorage) ListFeedStates() ([]model.FeedState, error) {
 	rows, err := s.db.Query(`
 		select
 			feed_id
@@ -20,9 +21,9 @@ func (s *SQLiteStorage) ListFeedStates() ([]FeedState, error) {
 	}
 	defer rows.Close()
 
-	states := make([]FeedState, 0)
+	states := make([]model.FeedState, 0)
 	for rows.Next() {
-		var state FeedState
+		var state model.FeedState
 		err := rows.Scan(
 			&state.FeedID,
 			&state.LastRefreshed,
@@ -38,8 +39,8 @@ func (s *SQLiteStorage) ListFeedStates() ([]FeedState, error) {
 	return states, nil
 }
 
-func (s *SQLiteStorage) GetFeedState(feedID int64) (*FeedState, error) {
-	var state FeedState
+func (s *SQLiteStorage) GetFeedState(feedID int64) (*model.FeedState, error) {
+	var state model.FeedState
 	err := s.db.QueryRow(`
 		select
 			feed_id
@@ -64,7 +65,7 @@ func (s *SQLiteStorage) GetFeedState(feedID int64) (*FeedState, error) {
 	return &state, nil
 }
 
-func (s *SQLiteStorage) UpdateFeedState(feedID int64, params UpdateFeedStateParams) (bool, error) {
+func (s *SQLiteStorage) UpdateFeedState(feedID int64, params model.UpdateFeedStateParams) (bool, error) {
 	lastError := params.LastError
 	if lastError != nil && *lastError == "" {
 		lastError = nil
