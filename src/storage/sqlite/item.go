@@ -1,57 +1,20 @@
 package sqlite
 
 import (
+	"cmp"
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"log"
-	"sort"
+	"slices"
 	"strings"
 	"time"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
-type ItemStatus int
-
-const (
-	UNREAD  ItemStatus = 0
-	READ    ItemStatus = 1
-	STARRED ItemStatus = 2
-)
-
-var StatusRepresentations = map[ItemStatus]string{
-	UNREAD:  "unread",
-	READ:    "read",
-	STARRED: "starred",
-}
-
-var StatusValues = map[string]ItemStatus{
-	"unread":  UNREAD,
-	"read":    READ,
-	"starred": STARRED,
-}
-
-func (s ItemStatus) MarshalJSON() ([]byte, error) {
-	return json.Marshal(StatusRepresentations[s])
-}
-
-func (s *ItemStatus) UnmarshalJSON(b []byte) error {
-	var str string
-	if err := json.Unmarshal(b, &str); err != nil {
-		return err
-	}
-	*s = StatusValues[str]
-	return nil
-}
-
-type MediaLink struct {
-	URL         string `json:"url"`
-	Type        string `json:"type"`
-	Description string `json:"description,omitempty"`
-}
-
-type MediaLinks []MediaLink
-
+// TODO: serialize/deserialize
 func (m *MediaLinks) Scan(src any) error {
 	switch data := src.(type) {
 	case []byte:
@@ -67,55 +30,6 @@ func (m MediaLinks) Value() (driver.Value, error) {
 	return json.Marshal(m)
 }
 
-type Item struct {
-	Id         int64      `json:"id"`
-	GUID       string     `json:"guid"`
-	FeedId     int64      `json:"feed_id"`
-	Title      string     `json:"title"`
-	Link       string     `json:"link"`
-	Content    string     `json:"content,omitempty"`
-	Date       time.Time  `json:"date"`
-	Status     ItemStatus `json:"status"`
-	MediaLinks MediaLinks `json:"media_links"`
-}
-
-type ItemFilter struct {
-	FolderID *int64
-	FeedID   *int64
-	Status   *ItemStatus
-	Search   *string
-	After    *int64
-	IDs      *[]int64
-	SinceID  *int64
-	MaxID    *int64
-	Before   *time.Time
-}
-
-type MarkFilter struct {
-	FolderID *int64
-	FeedID   *int64
-
-	Before *time.Time
-}
-
-type ItemList []Item
-
-func (list ItemList) Len() int {
-	return len(list)
-}
-
-func (list ItemList) SortKey(i int) string {
-	return list[i].Date.Format(time.RFC3339) + "::" + list[i].GUID
-}
-
-func (list ItemList) Less(i, j int) bool {
-	return list.SortKey(i) < list.SortKey(j)
-}
-
-func (list ItemList) Swap(i, j int) {
-	list[i], list[j] = list[j], list[i]
-}
-
 func (s *SQLiteStorage) CreateItems(items []Item) bool {
 	tx, err := s.db.Begin()
 	if err != nil {
@@ -125,10 +39,13 @@ func (s *SQLiteStorage) CreateItems(items []Item) bool {
 
 	now := time.Now().UTC()
 
-	itemsSorted := ItemList(items)
-	sort.Sort(itemsSorted)
+	slices.SortStableFunc(items, func(a, b model.Item) int {
+		sa := a.Date.Format(time.RFC3339) + "::" + a.GUID
+		sb := b.Date.Format(time.RFC3339) + "::" + b.GUID
+		return cmp.Compare(sa, sb)
+	})
 
-	for _, item := range itemsSorted {
+	for _, item := range items {
 		_, err = tx.Exec(`
 			insert into items (
 				guid, feed_id, title, link, date,
@@ -151,7 +68,7 @@ func (s *SQLiteStorage) CreateItems(items []Item) bool {
 			sql.Named("media_links", item.MediaLinks),
 			sql.Named("date_arrived", now),
 			sql.Named("last_arrived", now),
-			sql.Named("status", UNREAD),
+			sql.Named("status", model.UNREAD),
 		)
 		if err != nil {
 			log.Print(err)

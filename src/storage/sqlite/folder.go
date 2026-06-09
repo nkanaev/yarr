@@ -5,12 +5,6 @@ import (
 	"log"
 )
 
-type Folder struct {
-	Id         int64  `json:"id"`
-	Title      string `json:"title"`
-	IsExpanded bool   `json:"is_expanded"`
-}
-
 func (s *SQLiteStorage) CreateFolder(title string) *Folder {
 	expanded := true
 	row := s.db.QueryRow(`
@@ -36,11 +30,6 @@ func (s *SQLiteStorage) DeleteFolder(folderId int64) bool {
 		log.Print(err)
 	}
 	return err == nil
-}
-
-type UpdateFolderParams struct {
-	Title      *string
-	IsExpanded *bool
 }
 
 func (s *SQLiteStorage) UpdateFolder(folderId int64, params UpdateFolderParams) (bool, error) {

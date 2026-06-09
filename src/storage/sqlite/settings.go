@@ -6,34 +6,6 @@ import (
 	"log"
 )
 
-type Settings struct {
-	Filter          string `json:"filter"`
-	Feed            string `json:"feed"`
-	FeedListWidth   int    `json:"feed_list_width"`
-	ItemListWidth   int    `json:"item_list_width"`
-	SortNewestFirst bool   `json:"sort_newest_first"`
-	ThemeName       string `json:"theme_name"`
-	ThemeFont       string `json:"theme_font"`
-	ThemeSize       int    `json:"theme_size"`
-	RefreshRate     int64  `json:"refresh_rate"`
-	Language        string `json:"language"`
-}
-
-func (s Settings) Map() map[string]any {
-	return map[string]any{
-		"filter":            s.Filter,
-		"feed":              s.Feed,
-		"feed_list_width":   s.FeedListWidth,
-		"item_list_width":   s.ItemListWidth,
-		"sort_newest_first": s.SortNewestFirst,
-		"theme_name":        s.ThemeName,
-		"theme_font":        s.ThemeFont,
-		"theme_size":        s.ThemeSize,
-		"refresh_rate":      s.RefreshRate,
-		"language":          s.Language,
-	}
-}
-
 func settingsDefaults() Settings {
 	return Settings{
 		Filter:          "",
@@ -87,19 +59,6 @@ func (s *SQLiteStorage) GetSettings() Settings {
 		}
 	}
 	return result
-}
-
-type UpdateSettingsParams struct {
-	Filter          *string `json:"filter"`
-	Feed            *string `json:"feed"`
-	FeedListWidth   *int    `json:"feed_list_width"`
-	ItemListWidth   *int    `json:"item_list_width"`
-	SortNewestFirst *bool   `json:"sort_newest_first"`
-	ThemeName       *string `json:"theme_name"`
-	ThemeFont       *string `json:"theme_font"`
-	ThemeSize       *int    `json:"theme_size"`
-	RefreshRate     *int64  `json:"refresh_rate"`
-	Language        *string `json:"language"`
 }
 
 func (s *SQLiteStorage) UpdateSettings(params UpdateSettingsParams) bool {

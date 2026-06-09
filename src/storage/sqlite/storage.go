@@ -21,15 +21,6 @@ type SQLiteStorage struct {
 	db *sql.DB
 }
 
-type Nullable[T any] struct {
-	Set   bool
-	Value *T
-}
-
-func SetNullable[T any](v *T) Nullable[T] {
-	return Nullable[T]{Set: true, Value: v}
-}
-
 func New(path string) (*SQLiteStorage, error) {
 	if pos := strings.IndexRune(path, '?'); pos == -1 {
 		params := "_journal=WAL&_sync=NORMAL&_busy_timeout=5000&cache=shared"

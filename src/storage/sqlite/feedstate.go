@@ -5,14 +5,6 @@ import (
 	"time"
 )
 
-type FeedState struct {
-	FeedID           int64
-	LastRefreshed    time.Time
-	LastError        string
-	HTTPLastModified string
-	HTTPEtag         string
-}
-
 func (s *SQLiteStorage) ListFeedStates() ([]FeedState, error) {
 	rows, err := s.db.Query(`
 		select
@@ -70,13 +62,6 @@ func (s *SQLiteStorage) GetFeedState(feedID int64) (*FeedState, error) {
 		return nil, err
 	}
 	return &state, nil
-}
-
-type UpdateFeedStateParams struct {
-	LastRefreshed    *time.Time
-	LastError        *string
-	HTTPLastModified *string
-	HTTPEtag         *string
 }
 
 func (s *SQLiteStorage) UpdateFeedState(feedID int64, params UpdateFeedStateParams) (bool, error) {

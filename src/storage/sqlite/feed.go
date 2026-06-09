@@ -3,28 +3,11 @@ package sqlite
 import (
 	"database/sql"
 	"log"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
-type Feed struct {
-	Id          int64   `json:"id"`
-	FolderId    *int64  `json:"folder_id"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Link        string  `json:"link"`
-	FeedLink    string  `json:"feed_link"`
-	Icon        *[]byte `json:"icon,omitempty"`
-	HasIcon     bool    `json:"has_icon"`
-}
-
-type CreateFeedParams struct {
-	Title       string
-	Description string
-	Link        string
-	FeedLink    string
-	FolderID    *int64
-}
-
-func (s *SQLiteStorage) CreateFeed(params CreateFeedParams) *Feed {
+func (s *SQLiteStorage) CreateFeed(params model.CreateFeedParams) *model.Feed {
 	title := params.Title
 	if title == "" {
 		title = params.FeedLink
@@ -73,13 +56,6 @@ func (s *SQLiteStorage) DeleteFeed(feedId int64) bool {
 	return nrows == 1
 }
 
-type UpdateFeedParams struct {
-	Title    *string
-	FeedLink *string
-	FolderID Nullable[int64]
-	Icon     Nullable[[]byte]
-}
-
 func (s *SQLiteStorage) UpdateFeed(feedId int64, params UpdateFeedParams) (bool, error) {
 	_, err := s.db.Exec(`
 		update feeds set
@@ -104,8 +80,8 @@ func (s *SQLiteStorage) UpdateFeed(feedId int64, params UpdateFeedParams) (bool,
 	return true, nil
 }
 
-func (s *SQLiteStorage) ListFeeds() []Feed {
-	result := make([]Feed, 0)
+func (s *SQLiteStorage) ListFeeds() []model.Feed {
+	result := make([]model.Feed, 0)
 	rows, err := s.db.Query(`
 		select id, folder_id, title, description, link, feed_link,
 		       ifnull(length(icon), 0) > 0 as has_icon
@@ -117,7 +93,7 @@ func (s *SQLiteStorage) ListFeeds() []Feed {
 		return result
 	}
 	for rows.Next() {
-		var f Feed
+		var f model.Feed
 		err = rows.Scan(
 			&f.Id,
 			&f.FolderId,

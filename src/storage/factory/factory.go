@@ -1,22 +1,27 @@
-package storage
+package factory
+
+import (
+	"github.com/nkanaev/yarr/src/storage/model"
+)
 
 type Storage interface {
 	Close() error
+	Migrate() error
 	CountItems() int
-	CreateFeed(params CreateFeedParams) *Feed
+	CreateFeed(params model.CreateFeedParams) *model.Feed
 	CreateFolder(title string) *Folder
 	CreateItems(items []Item) bool
 	DeleteFeed(feedId int64) bool
 	DeleteFolder(folderId int64) bool
 	DeleteOldItems()
 	FeedStats() []FeedStat
-	GetFeed(id int64) *Feed
+	GetFeed(id int64) *model.Feed
 	GetFeedState(feedID int64) (*FeedState, error)
 	GetItem(id int64) *Item
 	GetSettings() Settings
 	ListFeedStates() ([]FeedState, error)
-	ListFeeds() []Feed
-	ListFolders() []Folder
+	ListFeeds() []model.Feed
+	ListFolders() []model.Folder
 	ListItems(filter ItemFilter, limit int, newestFirst bool, withContent bool) []Item
 	MarkItemsRead(filter MarkFilter) bool
 	UpdateFeed(feedId int64, params UpdateFeedParams) (bool, error)
@@ -25,4 +30,3 @@ type Storage interface {
 	UpdateItemStatus(item_id int64, status ItemStatus) bool
 	UpdateSettings(params UpdateSettingsParams) bool
 }
-
