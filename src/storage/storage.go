@@ -1,12 +1,12 @@
-package factory
+package storage
 
 import (
 	"github.com/nkanaev/yarr/src/storage/model"
+	"github.com/nkanaev/yarr/src/storage/sqlite"
 )
 
 type Storage interface {
 	Close() error
-	Migrate() error
 	CountItems() int
 	CreateFeed(params model.CreateFeedParams) *model.Feed
 	CreateFolder(title string) *model.Folder
@@ -29,4 +29,8 @@ type Storage interface {
 	UpdateFolder(folderId int64, params model.UpdateFolderParams) (bool, error)
 	UpdateItemStatus(item_id int64, status model.ItemStatus) bool
 	UpdateSettings(params model.UpdateSettingsParams) bool
+}
+
+func New(path string) (Storage, error) {
+	return sqlite.New(path)
 }

@@ -7,19 +7,20 @@ import (
 	"time"
 
 	"github.com/nkanaev/yarr/src/storage"
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
 const NUM_WORKERS = 4
 
 type Worker struct {
-	db      *storage.Storage
+	db      storage.Storage
 	pending *int32
 	refresh *time.Ticker
 	reflock sync.Mutex
 	stopper chan bool
 }
 
-func NewWorker(db *storage.Storage) *Worker {
+func NewWorker(db storage.Storage) *Worker {
 	pending := int32(0)
 	return &Worker{db: db, pending: &pending}
 }
@@ -39,13 +40,13 @@ func (w *Worker) StartFeedCleaner() {
 	}()
 }
 
-func (w *Worker) FindFeedFavicon(feed storage.Feed) {
+func (w *Worker) FindFeedFavicon(feed model.Feed) {
 	icon, err := findFavicon(feed.Link, feed.FeedLink)
 	if err != nil {
 		log.Printf("Failed to find favicon for %s (%s): %s", feed.FeedLink, feed.Link, err)
 	}
 	if icon != nil {
-		w.db.UpdateFeed(feed.Id, storage.UpdateFeedParams{Icon: storage.SetNullable(icon)})
+		w.db.UpdateFeed(feed.Id, model.UpdateFeedParams{Icon: model.SetNullable(icon)})
 	}
 }
 
@@ -99,11 +100,11 @@ func (w *Worker) RefreshFeeds() {
 	go w.refresher(feeds)
 }
 
-func (w *Worker) refresher(feeds []storage.Feed) {
+func (w *Worker) refresher(feeds []model.Feed) {
 	// w.db.ResetFeedErrors()
 
-	srcqueue := make(chan storage.Feed, len(feeds))
-	dstqueue := make(chan []storage.Item)
+	srcqueue := make(chan model.Feed, len(feeds))
+	dstqueue := make(chan []model.Item)
 
 	for range NUM_WORKERS {
 		go w.worker(srcqueue, dstqueue)
@@ -125,15 +126,15 @@ func (w *Worker) refresher(feeds []storage.Feed) {
 	log.Printf("Finished refreshing %d feeds", len(feeds))
 }
 
-func (w *Worker) worker(srcqueue <-chan storage.Feed, dstqueue chan<- []storage.Item) {
+func (w *Worker) worker(srcqueue <-chan model.Feed, dstqueue chan<- []model.Item) {
 	for feed := range srcqueue {
 		empty := ""
-		w.db.UpdateFeedState(feed.Id, storage.UpdateFeedStateParams{LastError: &empty})
+		w.db.UpdateFeedState(feed.Id, model.UpdateFeedStateParams{LastError: &empty})
 
 		items, err := listItems(feed, w.db)
 		if err != nil {
 			errMsg := err.Error()
-			w.db.UpdateFeedState(feed.Id, storage.UpdateFeedStateParams{LastError: &errMsg})
+			w.db.UpdateFeedState(feed.Id, model.UpdateFeedStateParams{LastError: &errMsg})
 		}
 		if len(items) > 0 && !feed.HasIcon {
 			w.FindFeedFavicon(feed)

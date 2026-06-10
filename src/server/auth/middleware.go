@@ -14,7 +14,7 @@ type Middleware struct {
 	Password string
 	BasePath string
 	Public   []string
-	DB       *storage.Storage
+	DB       storage.Storage
 }
 
 func (m *Middleware) Handler(c *router.Context) {

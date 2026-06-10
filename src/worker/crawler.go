@@ -14,6 +14,7 @@ import (
 	"github.com/nkanaev/yarr/src/content/scraper"
 	"github.com/nkanaev/yarr/src/parser"
 	"github.com/nkanaev/yarr/src/storage"
+	"github.com/nkanaev/yarr/src/storage/model"
 	"golang.org/x/net/html/charset"
 )
 
@@ -139,28 +140,28 @@ func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
 	return &emptyIcon, nil
 }
 
-func ConvertItems(items []parser.Item, feed storage.Feed) []storage.Item {
-	result := make([]storage.Item, len(items))
+func ConvertItems(items []parser.Item, feed model.Feed) []model.Item {
+	result := make([]model.Item, len(items))
 	for i, item := range items {
-		mediaLinks := make(storage.MediaLinks, 0)
+		mediaLinks := make(model.MediaLinks, 0)
 		for _, link := range item.MediaLinks {
-			mediaLinks = append(mediaLinks, storage.MediaLink(link))
+			mediaLinks = append(mediaLinks, model.MediaLink(link))
 		}
-		result[i] = storage.Item{
+		result[i] = model.Item{
 			GUID:       item.GUID,
 			FeedId:     feed.Id,
 			Title:      item.Title,
 			Link:       item.URL,
 			Content:    item.Content,
 			Date:       item.Date,
-			Status:     storage.UNREAD,
+			Status:     model.UNREAD,
 			MediaLinks: mediaLinks,
 		}
 	}
 	return result
 }
 
-func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
+func listItems(f model.Feed, db storage.Storage) ([]model.Item, error) {
 	lmod := ""
 	etag := ""
 	if state, _ := db.GetFeedState(f.Id); state != nil {
@@ -193,7 +194,7 @@ func listItems(f storage.Feed, db *storage.Storage) ([]storage.Item, error) {
 	etag = res.Header.Get("Etag")
 	now := time.Now().UTC()
 	if lmod != "" || etag != "" {
-		db.UpdateFeedState(f.Id, storage.UpdateFeedStateParams{
+		db.UpdateFeedState(f.Id, model.UpdateFeedStateParams{
 			HTTPLastModified: &lmod,
 			HTTPEtag:         &etag,
 			LastRefreshed:    &now,

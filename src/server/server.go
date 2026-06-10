@@ -14,7 +14,7 @@ import (
 
 type Server struct {
 	Addr        string
-	db          *storage.Storage
+	db          storage.Storage
 	worker      *worker.Worker
 	cache       map[string]any
 	cache_mutex *sync.Mutex
@@ -29,7 +29,7 @@ type Server struct {
 	KeyFile  string
 }
 
-func NewServer(db *storage.Storage, addr string) *Server {
+func NewServer(db storage.Storage, addr string) *Server {
 	return &Server{
 		db:          db,
 		Addr:        addr,
