@@ -23,6 +23,19 @@ func firstNonEmpty(vals ...string) string {
 
 var linkRe = regexp.MustCompile(`(https?:\/\/\S+)`)
 
+// RSS 2.0 elements live in no namespace, but some feeds (e.g. those declaring
+// the legacy Userland namespace `http://backend.userland.com/rss2`) put every
+// element in a default namespace. That prevents the namespaced struct tags in
+// ParseRSS from matching, so items come back blank. Strip the default namespace
+// declaration from the root <rss> element so its children fall back to the
+// decoder's DefaultSpace. Only a default `xmlns=` is matched (not
+// `xmlns:prefix=`), leaving extension namespaces intact.
+var rssDefaultNamespaceRe = regexp.MustCompile(`(<rss\b[^>]*?)\s+xmlns="[^"]*"`)
+
+func stripRSSDefaultNamespace(body []byte) []byte {
+	return rssDefaultNamespaceRe.ReplaceAll(body, []byte("$1"))
+}
+
 func plain2html(text string) string {
 	text = linkRe.ReplaceAllString(text, `<a href="$1">$1</a>`)
 	text = strings.ReplaceAll(text, "\n", "<br>")

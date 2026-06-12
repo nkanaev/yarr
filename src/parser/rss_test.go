@@ -327,3 +327,39 @@ func TestRSSMultipleMedia(t *testing.T) {
 		t.Fatal("invalid rss")
 	}
 }
+
+// Feeds that declare a default namespace on the root <rss> element (e.g. the
+// legacy Userland namespace) must still parse — see sud.ua/rss/rss_news_uk.xml.
+func TestRSSDefaultNamespace(t *testing.T) {
+	have, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<rss xmlns="http://backend.userland.com/rss2" version="2.0" xmlns:yandex="https://sud.ua/">
+			<channel>
+				<title>Example</title>
+				<link>https://example.com/</link>
+				<item>
+					<title>Title 1</title>
+					<link>https://example.com/news/1</link>
+					<description>Description 1</description>
+				</item>
+			</channel>
+		</rss>
+	`))
+	want := &Feed{
+		Title:   "Example",
+		SiteURL: "https://example.com/",
+		Items: []Item{
+			{
+				GUID:    "https://example.com/news/1",
+				URL:     "https://example.com/news/1",
+				Title:   "Title 1",
+				Content: "Description 1",
+			},
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Logf("want: %#v", want)
+		t.Logf("have: %#v", have)
+		t.Fatal("default-namespaced rss not parsed")
+	}
+}
