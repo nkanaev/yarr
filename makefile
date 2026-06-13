@@ -75,8 +75,10 @@ windows_amd64_gui: src/platform/versioninfo.rc
 windows_arm64_gui: src/platform/versioninfo.rc
 	GOOS=windows GOARCH=arm64 go build $(GO_FLAGS_GUI_WIN) -o out/$@/yarr.exe ./cmd/yarr
 
+YARR_DB ?= local.db
+
 serve:
-	go run $(GO_FLAGS_DEBUG) ./cmd/yarr -db local.db
+	go run $(GO_FLAGS_DEBUG) ./cmd/yarr -db "$(YARR_DB)"
 
 test:
 	go test $(GO_FLAGS) ./...
@@ -87,4 +89,4 @@ test:
 	darwin_arm64 darwin_arm64_gui \
 	windows_amd64 windows_amd64_gui \
 	windows_arm64 windows_arm64_gui \
-	serve test
+	serve serve_postgres test
