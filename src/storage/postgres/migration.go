@@ -95,32 +95,13 @@ func m01_initial(tx *sql.Tx) error {
 			date_arrived timestamptz,
 			last_arrived timestamptz,
 			status       integer,
-			media_links  jsonb
+			media_links  jsonb,
+			search       tsvector
 		);
 		create index if not exists idx_item_feed_id on items(feed_id);
 		create index if not exists idx_item__date_id_status on items(date, id, status);
 		create unique index if not exists idx_item_guid on items(feed_id, guid);
-
-		alter table items add column if not exists search tsvector;
 		create index if not exists idx_item_search on items using gin(search);
-
-		create or replace function items_search_update() returns trigger as $$
-		begin
-			new.search := to_tsvector('english',
-				coalesce(new.title, '') || ' ' ||
-				coalesce(regexp_replace(new.content, '<[^>]+>', '', 'g'), '')
-			);
-			return new;
-		end;
-		$$ language plpgsql;
-
-		create trigger if not exists trg_items_search_insert
-			before insert on items
-			for each row execute function items_search_update();
-
-		create trigger if not exists trg_items_search_update
-			before update of title, content on items
-			for each row execute function items_search_update();
 
 		create table if not exists settings (
 			key text primary key,

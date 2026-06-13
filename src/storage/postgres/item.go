@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"github.com/nkanaev/yarr/src/storage/model"
 )
 
@@ -46,16 +47,19 @@ func (s *PostgresStorage) CreateItems(items []model.Item) bool {
 	})
 
 	for _, item := range items {
+		searchText := item.Title + " " + htmlutil.ExtractText(item.Content)
 		_, err = tx.Exec(`
 			insert into items (
 				guid, feed_id, title, link, date,
 				content, media_links,
-				date_arrived, last_arrived, status
+				date_arrived, last_arrived, status,
+				search
 			)
 			values (
 				$1, $2, $3, $4, $5,
 				$6, $7,
-				$8, $9, $10
+				$8, $9, $10,
+				to_tsvector('simple', $11)
 			)
 			on conflict (feed_id, guid) do update set
 				last_arrived = excluded.last_arrived`,
@@ -69,6 +73,7 @@ func (s *PostgresStorage) CreateItems(items []model.Item) bool {
 			now,
 			now,
 			model.UNREAD,
+			searchText,
 		)
 		if err != nil {
 			log.Print(err)
