@@ -1,7 +1,10 @@
 package storage
 
 import (
+	"strings"
+
 	"github.com/nkanaev/yarr/src/storage/model"
+	"github.com/nkanaev/yarr/src/storage/postgres"
 	"github.com/nkanaev/yarr/src/storage/sqlite"
 )
 
@@ -32,5 +35,8 @@ type Storage interface {
 }
 
 func New(path string) (Storage, error) {
+	if strings.HasPrefix(path, "postgres://") || strings.HasPrefix(path, "postgresql://") {
+		return postgres.New(path)
+	}
 	return sqlite.New(path)
 }
