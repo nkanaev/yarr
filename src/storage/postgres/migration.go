@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -15,7 +16,7 @@ func migrate(db *sql.DB) error {
 	if _, err := db.Exec(
 		`create table if not exists schema_version (version bigint primary key)`,
 	); err != nil {
-		return err
+		return fmt.Errorf("create schema_version table: %w", err)
 	}
 
 	var version int64
@@ -23,7 +24,7 @@ func migrate(db *sql.DB) error {
 		`select coalesce(max(version), 0) from schema_version`,
 	).Scan(&version)
 	if err != nil {
-		return err
+		return fmt.Errorf("read schema version: %w", err)
 	}
 
 	if version >= maxVersion {
@@ -37,12 +38,12 @@ func migrate(db *sql.DB) error {
 
 		tx, err := db.Begin()
 		if err != nil {
-			return err
+			return fmt.Errorf("migration %d begin tx: %w", v, err)
 		}
 
 		if err := migrations[v-1](tx); err != nil {
 			tx.Rollback()
-			return err
+			return fmt.Errorf("migration %d: %w", v, err)
 		}
 
 		if _, err := tx.Exec(
@@ -50,11 +51,11 @@ func migrate(db *sql.DB) error {
 			 on conflict do nothing`, v,
 		); err != nil {
 			tx.Rollback()
-			return err
+			return fmt.Errorf("migration %d record version: %w", v, err)
 		}
 
 		if err := tx.Commit(); err != nil {
-			return err
+			return fmt.Errorf("migration %d commit: %w", v, err)
 		}
 
 		log.Printf("[migration:%d] done", v)
