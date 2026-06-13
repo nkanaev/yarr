@@ -13,7 +13,7 @@ var maxVersion = int64(len(migrations))
 
 func migrate(db *sql.DB) error {
 	if _, err := db.Exec(
-		`create table if not exists schema_version (version bigint primary key)`
+		`create table if not exists schema_version (version bigint primary key)`,
 	); err != nil {
 		return err
 	}
