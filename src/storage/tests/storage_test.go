@@ -1,9 +1,6 @@
 package tests
 
 import (
-	"io"
-	"log"
-	"os"
 	"testing"
 
 	"github.com/nkanaev/yarr/src/storage"

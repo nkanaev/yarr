@@ -38,7 +38,7 @@ type testItemScope struct {
 	folder1, folder2 *model.Folder
 }
 
-func testItemsSetup(db *SQLiteStorage) testItemScope {
+func testItemsSetup(db storage.Storage) testItemScope {
 	folder1 := db.CreateFolder("folder1")
 	folder2 := db.CreateFolder("folder2")
 
@@ -50,26 +50,39 @@ func testItemsSetup(db *SQLiteStorage) testItemScope {
 	now := time.Now()
 	db.CreateItems([]model.Item{
 		// feed11
-		{GUID: "item111", FeedId: feed11.Id, Title: "title111", Date: now.Add(time.Hour * 24 * 1)},
+		{
+			GUID: "item111",
+			FeedId: feed11.Id,
+			Title: "title111",
+			Date: now.Add(time.Hour * 24 * 1),
+		},
 		{
 			GUID:   "item112",
 			FeedId: feed11.Id,
 			Title:  "title112",
 			Date:   now.Add(time.Hour * 24 * 2),
+			Status: model.READ,
 		}, // read
 		{
 			GUID:   "item113",
 			FeedId: feed11.Id,
 			Title:  "title113",
 			Date:   now.Add(time.Hour * 24 * 3),
+			Status: model.STARRED,
 		}, // starred
 		// feed12
-		{GUID: "item121", FeedId: feed12.Id, Title: "title121", Date: now.Add(time.Hour * 24 * 4)},
+		{
+			GUID: "item121",
+			FeedId: feed12.Id,
+			Title: "title121",
+			Date: now.Add(time.Hour * 24 * 4),
+		},
 		{
 			GUID:   "item122",
 			FeedId: feed12.Id,
 			Title:  "title122",
 			Date:   now.Add(time.Hour * 24 * 5),
+			Status: model.READ,
 		}, // read
 		// feed21
 		{
@@ -77,36 +90,37 @@ func testItemsSetup(db *SQLiteStorage) testItemScope {
 			FeedId: feed21.Id,
 			Title:  "title211",
 			Date:   now.Add(time.Hour * 24 * 6),
+			Status: model.READ,
 		}, // read
 		{
 			GUID:   "item212",
 			FeedId: feed21.Id,
 			Title:  "title212",
 			Date:   now.Add(time.Hour * 24 * 7),
+			Status: model.STARRED,
 		}, // starred
 		// feed01
-		{GUID: "item011", FeedId: feed01.Id, Title: "title011", Date: now.Add(time.Hour * 24 * 8)},
+		{
+			GUID: "item011",
+			FeedId: feed01.Id,
+			Title: "title011",
+			Date: now.Add(time.Hour * 24 * 8),
+		},
 		{
 			GUID:   "item012",
 			FeedId: feed01.Id,
 			Title:  "title012",
 			Date:   now.Add(time.Hour * 24 * 9),
+			Status: model.READ,
 		}, // read
 		{
 			GUID:   "item013",
 			FeedId: feed01.Id,
 			Title:  "title013",
 			Date:   now.Add(time.Hour * 24 * 10),
+			Status: model.STARRED,
 		}, // starred
 	})
-	db.db.Exec(
-		`update items set status = :status where guid in ("item112", "item122", "item211", "item012")`,
-		sql.Named("status", model.READ),
-	)
-	db.db.Exec(
-		`update items set status = :status where guid in ("item113", "item212", "item013")`,
-		sql.Named("status", model.STARRED),
-	)
 
 	return testItemScope{
 		feed11:  feed11,
@@ -118,7 +132,7 @@ func testItemsSetup(db *SQLiteStorage) testItemScope {
 	}
 }
 
-func getItem(db *SQLiteStorage, guid string) *model.Item {
+func getItem(db storage.Storage, guid string) *model.Item {
 	i := &model.Item{}
 	err := db.db.QueryRow(`
 		select
@@ -299,8 +313,8 @@ func TestMarkItemsRead(t *testing.T) {
 	dbtest(t, func(t *testing.T, db2 storage.Storage) {
 		scope2 := testItemsSetup(db2)
 		db2.MarkItemsRead(model.MarkFilter{FolderID: &scope2.folder1.Id})
-		have = getItemGuids(db2.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
-		want = []string{
+		have := getItemGuids(db2.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
+		want := []string{
 			"item111", "item112", "item121", "item122",
 			"item211", "item012",
 		}
@@ -331,7 +345,6 @@ func TestDeleteOldItems(t *testing.T) {
 	now := time.Now().UTC()
 	starred := model.STARRED
 	dbtest(t, func(t *testing.T, db storage.Storage) {
-
 		t.Run("keeps at least 50 items", func(t *testing.T) {
 			feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 			items := make([]model.Item, 100)
