@@ -10,8 +10,8 @@ import (
 )
 
 func dbtest(t *testing.T, testcase func(t *testing.T, db storage.Storage)) {
-	testurls := map[string]string {
-		"sqlite": ":memory:",
+	testurls := map[string]string{
+		"sqlite":   ":memory:",
 		"postgres": "postgres://postgres:postgres@localhost:5432/yarr_test",
 	}
 	for testname, url := range testurls {
