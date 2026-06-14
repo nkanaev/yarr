@@ -1,28 +1,26 @@
-package sqlite
+package tests
 
 import (
 	"io"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/nkanaev/yarr/src/storage"
 )
 
-func testDB() *SQLiteStorage {
-	log.SetOutput(io.Discard)
-	db, err := New(":memory:")
-	if err != nil {
-		panic(err)
+func dbtest(t *testing.T, testcase func(t *testing.T, db storage.Storage)) {
+	testurls := map[string]string {
+		"sqlite": ":memory:",
+		"postgres": "postgres://postgres:postgres@localhost:5432/yarr_test",
 	}
-	log.SetOutput(os.Stderr)
-	return db
-}
-
-func TestStorage(t *testing.T) {
-	db, err := New(":memory:")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if db == nil {
-		t.Fatal("no db")
+	for testname, url := range testurls {
+		db, err := storage.New(url)
+		if err != nil {
+			t.Fatalf("failed to init storage for %s: %v", url, err)
+		}
+		t.Run(testname, func(t *testing.T) {
+			testcase(t, db)
+		})
 	}
 }
