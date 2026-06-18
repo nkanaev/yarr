@@ -156,6 +156,21 @@ func (s Settings) Map() map[string]any {
 	}
 }
 
+func SettingsDefault() Settings {
+	return Settings{
+		Filter:          "",
+		Feed:            "",
+		FeedListWidth:   300,
+		ItemListWidth:   300,
+		SortNewestFirst: true,
+		ThemeName:       "light",
+		ThemeFont:       "",
+		ThemeSize:       1,
+		RefreshRate:     0,
+		Language:        "en",
+	}
+}
+
 type FeedState struct {
 	FeedID           int64
 	LastRefreshed    time.Time

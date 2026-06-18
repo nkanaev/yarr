@@ -12,7 +12,7 @@ import (
 func TestSettingsDefaults(t *testing.T) {
 	dbtest(t, func(t *testing.T, s storage.Storage) {
 		settings := s.GetSettings()
-		defaults := settingsDefaults()
+		defaults := model.SettingsDefault()
 
 		if !reflect.DeepEqual(settings, defaults) {
 			t.Errorf("expected defaults %+v, got %+v", defaults, settings)
@@ -49,7 +49,6 @@ func TestUpdateSettings(t *testing.T) {
 
 func TestGetSettings(t *testing.T) {
 	dbtest(t, func(t *testing.T, s storage.Storage) {
-
 		s.UpdateSettings(model.UpdateSettingsParams{Language: ptr("fr")})
 
 		settings := s.GetSettings()

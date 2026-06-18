@@ -8,23 +8,8 @@ import (
 	"github.com/nkanaev/yarr/src/storage/model"
 )
 
-func settingsDefaults() model.Settings {
-	return model.Settings{
-		Filter:          "",
-		Feed:            "",
-		FeedListWidth:   300,
-		ItemListWidth:   300,
-		SortNewestFirst: true,
-		ThemeName:       "light",
-		ThemeFont:       "",
-		ThemeSize:       1,
-		RefreshRate:     0,
-		Language:        "en",
-	}
-}
-
 func (s *SQLiteStorage) GetSettings() model.Settings {
-	result := settingsDefaults()
+	result := model.SettingsDefault()
 	rows, err := s.db.Query(`select key, val from settings;`)
 	if err != nil {
 		log.Print(err)
