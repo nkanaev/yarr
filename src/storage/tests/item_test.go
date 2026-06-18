@@ -338,8 +338,8 @@ func TestMarkItemsRead(t *testing.T) {
 
 func TestDeleteOldItems(t *testing.T) {
 	t.Run("keeps at least 50 items", func(t *testing.T) {
-		synctest.Test(t, func(t *testing.T) {
-			dbtest(t, func(t *testing.T, db storage.Storage) {
+		dbtest(t, func(t *testing.T, db storage.Storage) {
+			synctest.Test(t, func(t *testing.T) {
 				feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 				now := time.Now()
 				items := make([]model.Item, 100)
@@ -362,8 +362,8 @@ func TestDeleteOldItems(t *testing.T) {
 	})
 
 	t.Run("keeps all less than 90 days old", func(t *testing.T) {
-		synctest.Test(t, func(t *testing.T) {
-			dbtest(t, func(t *testing.T, db storage.Storage) {
+		dbtest(t, func(t *testing.T, db storage.Storage) {
+			synctest.Test(t, func(t *testing.T) {
 				feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 				now := time.Now()
 				items := make([]model.Item, 100)
@@ -387,8 +387,8 @@ func TestDeleteOldItems(t *testing.T) {
 	})
 
 	t.Run("keeps starred", func(t *testing.T) {
-		synctest.Test(t, func(t *testing.T) {
-			dbtest(t, func(t *testing.T, db storage.Storage) {
+		dbtest(t, func(t *testing.T, db storage.Storage) {
+			synctest.Test(t, func(t *testing.T) {
 				feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 				now := time.Now()
 				items := make([]model.Item, 100)
