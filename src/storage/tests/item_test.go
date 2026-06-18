@@ -147,24 +147,6 @@ func testItemsSetup(db storage.Storage) testItemScope {
 	}
 }
 
-func getItem(db storage.Storage, guid string) *model.Item {
-	i := &model.Item{}
-	err := db.db.QueryRow(`
-		select
-			i.id, i.guid, i.feed_id, i.title, i.link, i.content,
-			i.date, i.status, i.media_links
-		from items i
-		where i.guid = :guid
-	`, sql.Named("guid", guid)).Scan(
-		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
-		&i.Date, &i.Status, (*model.MediaLinks)(&i.MediaLinks),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return i
-}
-
 func getItemGuids(items []model.Item) []string {
 	guids := make([]string, 0)
 	for _, item := range items {
