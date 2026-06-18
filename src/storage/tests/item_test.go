@@ -2,8 +2,11 @@ package tests
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"maps"
 	"reflect"
+	"slices"
 	"strconv"
 	"testing"
 	"testing/synctest"
@@ -36,6 +39,15 @@ type testItemScope struct {
 	feed11, feed12   *model.Feed
 	feed21, feed01   *model.Feed
 	folder1, folder2 *model.Folder
+	items map[string]model.Item
+}
+
+func MustGet[K comparable, V any](m map[K]V, key K) V {
+    value, ok := m[key]
+    if !ok {
+        panic(fmt.Sprintf("key %v not found in map", key))
+    }
+    return value
 }
 
 func testItemsSetup(db storage.Storage) testItemScope {
@@ -48,22 +60,22 @@ func testItemsSetup(db storage.Storage) testItemScope {
 	feed01 := db.CreateFeed(model.CreateFeedParams{Title: "feed01", FeedLink: "http://test.com/feed01.xml"})
 
 	now := time.Now()
-	db.CreateItems([]model.Item{
+	items := map[string]model.Item{
 		// feed11
-		{
+		"item111": {
 			GUID: "item111",
 			FeedId: feed11.Id,
 			Title: "title111",
 			Date: now.Add(time.Hour * 24 * 1),
 		},
-		{
+		"item112": {
 			GUID:   "item112",
 			FeedId: feed11.Id,
 			Title:  "title112",
 			Date:   now.Add(time.Hour * 24 * 2),
 			Status: model.READ,
 		}, // read
-		{
+		"item113": {
 			GUID:   "item113",
 			FeedId: feed11.Id,
 			Title:  "title113",
@@ -71,13 +83,13 @@ func testItemsSetup(db storage.Storage) testItemScope {
 			Status: model.STARRED,
 		}, // starred
 		// feed12
-		{
+		"item121": {
 			GUID: "item121",
 			FeedId: feed12.Id,
 			Title: "title121",
 			Date: now.Add(time.Hour * 24 * 4),
 		},
-		{
+		"item122": {
 			GUID:   "item122",
 			FeedId: feed12.Id,
 			Title:  "title122",
@@ -85,14 +97,14 @@ func testItemsSetup(db storage.Storage) testItemScope {
 			Status: model.READ,
 		}, // read
 		// feed21
-		{
+		"item211": {
 			GUID:   "item211",
 			FeedId: feed21.Id,
 			Title:  "title211",
 			Date:   now.Add(time.Hour * 24 * 6),
 			Status: model.READ,
 		}, // read
-		{
+		"item212": {
 			GUID:   "item212",
 			FeedId: feed21.Id,
 			Title:  "title212",
@@ -100,27 +112,29 @@ func testItemsSetup(db storage.Storage) testItemScope {
 			Status: model.STARRED,
 		}, // starred
 		// feed01
-		{
+		"item011": {
 			GUID: "item011",
 			FeedId: feed01.Id,
 			Title: "title011",
 			Date: now.Add(time.Hour * 24 * 8),
 		},
-		{
+		"item012": {
 			GUID:   "item012",
 			FeedId: feed01.Id,
 			Title:  "title012",
 			Date:   now.Add(time.Hour * 24 * 9),
 			Status: model.READ,
 		}, // read
-		{
+		"item013": {
 			GUID:   "item013",
 			FeedId: feed01.Id,
 			Title:  "title013",
 			Date:   now.Add(time.Hour * 24 * 10),
 			Status: model.STARRED,
 		}, // starred
-	})
+	}
+
+	db.CreateItems(slices.Collect(maps.Values(items)))
 
 	return testItemScope{
 		feed11:  feed11,
@@ -129,6 +143,7 @@ func testItemsSetup(db storage.Storage) testItemScope {
 		feed01:  feed01,
 		folder1: folder1,
 		folder2: folder2,
+		items: items,
 	}
 }
 
@@ -142,7 +157,7 @@ func getItem(db storage.Storage, guid string) *model.Item {
 		where i.guid = :guid
 	`, sql.Named("guid", guid)).Scan(
 		&i.Id, &i.GUID, &i.FeedId, &i.Title, &i.Link, &i.Content,
-		&i.Date, &i.Status, (*MediaLinks)(&i.MediaLinks),
+		&i.Date, &i.Status, (*model.MediaLinks)(&i.MediaLinks),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -251,10 +266,10 @@ func TestListItems(t *testing.T) {
 
 func TestListItemsPaginated(t *testing.T) {
 	dbtest(t, func(t *testing.T, db storage.Storage) {
-		testItemsSetup(db)
+		scope := testItemsSetup(db)
 
-		item012 := getItem(db, "item012")
-		item121 := getItem(db, "item121")
+		item012 := MustGet(scope.items, "item012")
+		item121 := MustGet(scope.items, "item121")
 
 		// all, newest first
 		have := getItemGuids(db.ListItems(model.ItemFilter{After: &item012.Id}, 3, true, false))
@@ -328,8 +343,8 @@ func TestMarkItemsRead(t *testing.T) {
 	dbtest(t, func(t *testing.T, db3 storage.Storage) {
 		scope3 := testItemsSetup(db3)
 		db3.MarkItemsRead(model.MarkFilter{FeedID: &scope3.feed11.Id})
-		have = getItemGuids(db3.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
-		want = []string{
+		have := getItemGuids(db3.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
+		want := []string{
 			"item111", "item112", "item122",
 			"item211", "item012",
 		}
@@ -414,8 +429,6 @@ func TestDeleteOldItems(t *testing.T) {
 func TestCreateItemsLastArrived(t *testing.T) {
 	dbtest(t, func(t *testing.T, db storage.Storage) {
 		synctest.Test(t, func(t *testing.T) {
-			db := testDB()
-			defer db.db.Close()
 			feed := db.CreateFeed(model.CreateFeedParams{Title: "test feed", FeedLink: "http://example.com/feed"})
 
 			item := model.Item{
