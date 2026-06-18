@@ -490,6 +490,11 @@ func TestSearch(t *testing.T) {
 			},
 		})
 
+		itemsByGUID := make(map[string]model.Item)
+		for _, item := range db.ListItems(model.ItemFilter{}, 1000, false, false) {
+			itemsByGUID[item.GUID] = item
+		}
+
 		// 1. Basic search
 		s1 := "emergency"
 		have := getItemGuids(db.ListItems(model.ItemFilter{Search: &s1}, 10, true, false))
@@ -531,7 +536,7 @@ func TestSearch(t *testing.T) {
 		}
 
 		// 5. Trigger: Update
-		db.db.Exec("update items set title = 'Updated Title' where guid = 'i1'")
+		db.UpdateItem(MustGet(itemsByGUID, "i1").Id, model.UpdateItemParams{Title: ptr("Updated Title")})
 		s7 := "Updated"
 		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s7}, 10, true, false))
 		if !reflect.DeepEqual(have, []string{"i1"}) {
@@ -539,7 +544,8 @@ func TestSearch(t *testing.T) {
 		}
 
 		// 6. Trigger: Delete
-		db.db.Exec("delete from items where guid = 'i1'")
+		// db.db.Exec("delete from items where guid = 'i1'")
+		db.DeleteItem(MustGet(itemsByGUID, "i1").Id)
 		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s7}, 10, true, false))
 		if len(have) > 0 {
 			t.Errorf("delete trigger failed: found deleted item: %v", have)

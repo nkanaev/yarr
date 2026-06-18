@@ -250,6 +250,45 @@ func (s *PostgresStorage) GetItem(id int64) *model.Item {
 	return i
 }
 
+func (s *PostgresStorage) UpdateItem(id int64, params model.UpdateItemParams) bool {
+	sets := make([]string, 0)
+	args := make([]any, 0)
+	n := 0
+
+	if params.Title != nil {
+		n++
+		sets = append(sets, fmt.Sprintf("title = $%d", n))
+		args = append(args, *params.Title)
+		n++
+		sets = append(sets, fmt.Sprintf("search = to_tsvector('simple', $%d || ' ' || coalesce((select i2.content from items i2 where i2.id = $%d), ''))", n-1, n))
+		args = append(args, id)
+	}
+	if params.Status != nil {
+		n++
+		sets = append(sets, fmt.Sprintf("status = $%d", n))
+		args = append(args, *params.Status)
+	}
+	if params.LastArrived != nil {
+		n++
+		sets = append(sets, fmt.Sprintf("last_arrived = $%d", n))
+		args = append(args, *params.LastArrived)
+	}
+	if len(sets) == 0 {
+		return true
+	}
+
+	n++
+	args = append(args, id)
+	query := fmt.Sprintf("update items set %s where id = $%d", strings.Join(sets, ", "), n)
+	_, err := s.db.Exec(query, args...)
+	return err == nil
+}
+
+func (s *PostgresStorage) DeleteItem(id int64) bool {
+	_, err := s.db.Exec(`delete from items where id = $1`, id)
+	return err == nil
+}
+
 func (s *PostgresStorage) UpdateItemStatus(item_id int64, status model.ItemStatus) bool {
 	_, err := s.db.Exec(`update items set status = $2 where id = $1`,
 		item_id,

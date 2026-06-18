@@ -90,6 +90,12 @@ type ItemFilter struct {
 	Before   *time.Time
 }
 
+type UpdateItemParams struct {
+	Title       *string
+	Status      *ItemStatus
+	LastArrived *time.Time
+}
+
 type MarkFilter struct {
 	FolderID *int64
 	FeedID   *int64
