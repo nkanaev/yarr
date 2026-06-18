@@ -72,7 +72,7 @@ func (s *PostgresStorage) CreateItems(items []model.Item) bool {
 			MediaLinks(item.MediaLinks),
 			now,
 			now,
-			model.UNREAD,
+			item.Status,
 			searchText,
 		)
 		if err != nil {

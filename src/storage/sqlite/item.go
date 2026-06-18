@@ -69,7 +69,7 @@ func (s *SQLiteStorage) CreateItems(items []model.Item) bool {
 			sql.Named("media_links", MediaLinks(item.MediaLinks)),
 			sql.Named("date_arrived", now),
 			sql.Named("last_arrived", now),
-			sql.Named("status", model.UNREAD),
+			sql.Named("status", item.Status),
 		)
 		if err != nil {
 			log.Print(err)

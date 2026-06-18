@@ -246,10 +246,15 @@ func TestListItems(t *testing.T) {
 
 func TestListItemsPaginated(t *testing.T) {
 	dbtest(t, func(t *testing.T, db storage.Storage) {
-		scope := testItemsSetup(db)
+		testItemsSetup(db)
 
-		item012 := MustGet(scope.items, "item012")
-		item121 := MustGet(scope.items, "item121")
+		itemsByGUID := make(map[string]model.Item)
+		for _, item := range db.ListItems(model.ItemFilter{}, 1000, false, false) {
+			itemsByGUID[item.GUID] = item
+		}
+
+		item012 := MustGet(itemsByGUID, "item012")
+		item121 := MustGet(itemsByGUID, "item121")
 
 		// all, newest first
 		have := getItemGuids(db.ListItems(model.ItemFilter{After: &item012.Id}, 3, true, false))
