@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"database/sql"
 	"fmt"
 	"maps"
 	"reflect"
@@ -338,73 +337,90 @@ func TestMarkItemsRead(t *testing.T) {
 }
 
 func TestDeleteOldItems(t *testing.T) {
-	now := time.Now().UTC()
-	starred := model.STARRED
-	dbtest(t, func(t *testing.T, db storage.Storage) {
-		t.Run("keeps at least 50 items", func(t *testing.T) {
-			feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
-			items := make([]model.Item, 100)
-			for i := range 100 {
-				items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Hour * 24)}
-			}
-			db.CreateItems(items)
+	t.Run("keeps at least 50 items", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			dbtest(t, func(t *testing.T, db storage.Storage) {
+				feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+				now := time.Now()
+				items := make([]model.Item, 100)
+				for i := range 100 {
+					items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Hour * 24)}
+				}
+				db.CreateItems(items)
 
-			// // Set 1 recent (latest), 100 old (100 days ago)
-			db.db.Exec(`update items set last_arrived = :la where guid = "99"`, sql.Named("la", now))
-			db.db.Exec(`update items set last_arrived = :la where guid != "99"`, sql.Named("la", now.Add(-time.Hour*24*100)))
+				// // Set 1 recent (latest), 99 old (100 days ago)
+				time.Sleep(100 * 24 * time.Hour)
+				db.CreateItems([]model.Item{items[99]})
 
-			db.DeleteOldItems()
-			var have int
-			db.db.QueryRow("select count(*) from items where feed_id = ?", feed.Id).Scan(&have)
-			if have != 50 {
-				t.Errorf("expected 50 items, have %d", have)
-			}
-		})
-
-		t.Run("keeps all less than 90 days old", func(t *testing.T) {
-			feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
-			items := make([]model.Item, 100)
-			for i := 0; i < 100; i++ {
-				items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
-			}
-			db.CreateItems(items)
-
-			// Latest item at "now"
-			// All others at 80 days ago (keep)
-			db.db.Exec(`update items set last_arrived = :la where guid = "99"`, sql.Named("la", now))
-			db.db.Exec(`update items set last_arrived = :la where guid != "99"`, sql.Named("la", now.Add(-time.Hour*24*80)))
-
-			db.DeleteOldItems()
-			var have int
-			db.db.QueryRow("select count(*) from items where feed_id = ?", feed.Id).Scan(&have)
-			if have != 100 {
-				t.Errorf("expected 100 items, have %d", have)
-			}
-		})
-
-		t.Run("keeps starred", func(t *testing.T) {
-			feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
-			items := make([]model.Item, 100)
-			for i := 0; i < 100; i++ {
-				items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
-			}
-			db.CreateItems(items)
-
-			// Set all to 100 days ago, except one recent
-			db.db.Exec(`update items set last_arrived = :la`, sql.Named("la", now.Add(-time.Hour*24*100)))
-			db.db.Exec(`update items set last_arrived = :la where guid = "99"`, sql.Named("la", now))
-			// Star 10 old items that would otherwise be deleted (rn > 50 and old)
-			db.db.Exec(`update items set status = :s where cast(guid as integer) < 10`, sql.Named("s", starred))
-
-			db.DeleteOldItems()
-			var have int
-			db.db.QueryRow("select count(*) from items where feed_id = ?", feed.Id).Scan(&have)
-			// 50 (limit) + 10 (starred) = 60 items should remain.
-			if have != 60 {
-				t.Errorf("expected 60 items, have %d", have)
-			}
+				db.DeleteOldItems()
+				remaining := db.ListItems(model.ItemFilter{FeedID: &feed.Id}, 1000, false, false)
+				if len(remaining) != 50 {
+					t.Errorf("expected 50 items, have %d", len(remaining))
+				}
+			})
 		})
 	})
+
+	t.Run("keeps all less than 90 days old", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			dbtest(t, func(t *testing.T, db storage.Storage) {
+				feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+				now := time.Now()
+				items := make([]model.Item, 100)
+				for i := 0; i < 100; i++ {
+					items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now}
+				}
+				db.CreateItems(items)
+
+				// Latest item at "now"
+				// All others at 80 days ago (keep)
+				time.Sleep(80 * 24 * time.Hour)
+				db.CreateItems([]model.Item{items[99]})
+
+				db.DeleteOldItems()
+				remaining := db.ListItems(model.ItemFilter{FeedID: &feed.Id}, 1000, false, false)
+				if len(remaining) != 100 {
+					t.Errorf("expected 100 items, have %d", len(remaining))
+				}
+			})
+		})
+	})
+
+	t.Run("keeps starred", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			dbtest(t, func(t *testing.T, db storage.Storage) {
+				feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
+				now := time.Now()
+				items := make([]model.Item, 100)
+				for i := 0; i < 100; i++ {
+					items[i] = model.Item{GUID: strconv.Itoa(i), FeedId: feed.Id, Date: now.Add(time.Duration(i) * time.Second)}
+				}
+				db.CreateItems(items)
+
+				// Set all to 100 days ago, except one recent
+				time.Sleep(100 * 24 * time.Hour)
+				db.CreateItems([]model.Item{items[99]})
+
+				// Star 10 old items that would otherwise be deleted (rn > 50 and old)
+				allItems := db.ListItems(model.ItemFilter{FeedID: &feed.Id}, 100, false, false)
+				for _, item := range allItems {
+					guid, _ := strconv.Atoi(item.GUID)
+					if guid < 10 {
+						db.UpdateItemStatus(item.Id, model.STARRED)
+					}
+				}
+
+				db.DeleteOldItems()
+
+				// 50 (limit) + 10 (starred) = 60 items should remain.
+				remaining := db.ListItems(model.ItemFilter{FeedID: &feed.Id}, 1000, false, false)
+				if len(remaining) != 60 {
+					t.Errorf("expected 60 items, have %d", len(remaining))
+				}
+			})
+		})
+	})
+	// })
 }
 
 func TestSearch(t *testing.T) {
