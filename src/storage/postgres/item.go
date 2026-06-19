@@ -157,7 +157,7 @@ func listQueryPredicate(filter model.ItemFilter, newestFirst bool) (string, []an
 		args = append(args, filter.Before)
 	}
 
-	predicate := "1"
+	predicate := "true"
 	if len(cond) > 0 {
 		predicate = strings.Join(cond, " and ")
 	}

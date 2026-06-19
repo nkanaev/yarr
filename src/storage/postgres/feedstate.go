@@ -87,10 +87,10 @@ func (s *PostgresStorage) UpdateFeedState(feedID int64, params model.UpdateFeedS
 			, coalesce($5, '')
 		)
 		on conflict (feed_id) do update set
-			last_refreshed = coalesce($2, last_refreshed),
-			last_error     = coalesce($3, last_error),
-			http_lmod      = coalesce($4, http_lmod),
-			http_etag      = coalesce($5, http_etag)
+			last_refreshed = coalesce($2, feed_states.last_refreshed),
+			last_error     = coalesce($3, feed_states.last_error),
+			http_lmod      = coalesce($4, feed_states.http_lmod),
+			http_etag      = coalesce($5, feed_states.http_etag)
 	`,
 		feedID,
 		params.LastRefreshed,
