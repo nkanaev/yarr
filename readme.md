@@ -7,6 +7,8 @@ The app is a single binary with an embedded database (SQLite).
 
 ![screenshot](etc/promo.png)
 
+Subscribe: [releases](https://github.com/nkanaev/yarr/releases.atom) / [devlog](https://hachyderm.io/@nkanaev.rss) ([Mastodon](https://hachyderm.io/@nkanaev))
+
 ## usage
 
 The latest prebuilt binaries for Linux/MacOS/Windows are available
