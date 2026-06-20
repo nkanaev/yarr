@@ -121,7 +121,7 @@ func listQueryPredicate(filter model.ItemFilter, newestFirst bool) (string, []an
 		}
 
 		cond = append(cond, fmt.Sprintf(
-			"i.search @@ to_tsquery('english', $%d)", next(),
+			"i.search @@ to_tsquery('simple', $%d)", next(),
 		))
 		args = append(args, strings.Join(terms, " & "))
 	}
