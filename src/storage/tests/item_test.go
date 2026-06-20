@@ -428,6 +428,59 @@ func TestDeleteOldItems(t *testing.T) {
 	// })
 }
 
+func TestDeleteItem(t *testing.T) {
+	dbtest(t, func(t *testing.T, db storage.Storage) {
+		feed := db.CreateFeed(model.CreateFeedParams{FeedLink: "http://test.com/feed.xml"})
+		db.CreateItems([]model.Item{{GUID: "i1", FeedId: feed.Id, Title: "item"}})
+
+		items := db.ListItems(model.ItemFilter{}, 10, false, false)
+		if len(items) != 1 {
+			t.Fatal("expected 1 item")
+		}
+
+		// delete non-existent returns true (err == nil)
+		if !db.DeleteItem(99999) {
+			t.Error("expected true when deleting non-existent item")
+		}
+
+		// delete existing
+		if !db.DeleteItem(items[0].Id) {
+			t.Fatal("delete failed")
+		}
+
+		items = db.ListItems(model.ItemFilter{}, 10, false, false)
+		if len(items) != 0 {
+			t.Errorf("expected 0 items, got %d", len(items))
+		}
+	})
+}
+
+func TestCountItems(t *testing.T) {
+	dbtest(t, func(t *testing.T, db storage.Storage) {
+		if count := db.CountItems(); count != 0 {
+			t.Errorf("expected 0, got %d", count)
+		}
+
+		feed := db.CreateFeed(model.CreateFeedParams{FeedLink: "http://test.com/feed.xml"})
+		db.CreateItems([]model.Item{
+			{GUID: "i1", FeedId: feed.Id},
+			{GUID: "i2", FeedId: feed.Id},
+			{GUID: "i3", FeedId: feed.Id},
+		})
+
+		if count := db.CountItems(); count != 3 {
+			t.Errorf("expected 3, got %d", count)
+		}
+
+		items := db.ListItems(model.ItemFilter{}, 10, false, false)
+		db.DeleteItem(items[0].Id)
+
+		if count := db.CountItems(); count != 2 {
+			t.Errorf("expected 2, got %d", count)
+		}
+	})
+}
+
 func TestSearch(t *testing.T) {
 	dbtest(t, func(t *testing.T, db storage.Storage) {
 		feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
