@@ -102,6 +102,7 @@ func TestAtomXHTMLTitle(t *testing.T) {
 	have := feed.Items[0].Title
 	want := "say what?"
 	if !reflect.DeepEqual(want, have) {
+		t.Log(feed)
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)
 		t.FailNow()

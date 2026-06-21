@@ -327,3 +327,68 @@ func TestRSSMultipleMedia(t *testing.T) {
 		t.Fatal("invalid rss")
 	}
 }
+
+// When both RSS <link> and Atom <atom:link> elements are present in an item,
+// the RSS link must not be lost. The <link> tag is namespace-qualified as
+// `rss link` to disambiguate — see commit ee2a825, found in:
+// https://rss.nytimes.com/services/xml/rss/nyt/Arts.xml
+func TestRSSItemLinkWithAtomLinkPresent(t *testing.T) {
+	have, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+			<channel>
+				<title>Example</title>
+				<item>
+					<title>Article</title>
+					<link>http://example.com/article/1</link>
+					<atom:link href="http://example.com/article/1/atom" rel="alternate" type="text/html"/>
+				</item>
+			</channel>
+		</rss>
+	`))
+	want := &Feed{
+		Title: "Example",
+		Items: []Item{
+			{
+				GUID:  "http://example.com/article/1",
+				URL:   "http://example.com/article/1",
+				Title: "Article",
+			},
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Fatalf("RSS link lost when atom:link is present\nwant: %#v\nhave: %#v", want, have)
+	}
+}
+
+// Feeds that declare a default namespace on the root <rss> element (e.g. the
+// legacy Userland namespace) must still parse — see sud.ua/rss/rss_news_uk.xml.
+func TestRSSDefaultNamespace(t *testing.T) {
+	have, _ := Parse(strings.NewReader(`
+		<?xml version="1.0" encoding="utf-8"?>
+		<rss xmlns="http://backend.userland.com/rss2" version="2.0">
+			<channel>
+				<title>Feed</title>
+				<item>
+					<title>Title 1</title>
+					<link>https://example.com/news/1</link>
+				</item>
+			</channel>
+		</rss>
+	`))
+	want := &Feed{
+		Title:   "Feed",
+		Items: []Item{
+			{
+				GUID:    "https://example.com/news/1",
+				URL:     "https://example.com/news/1",
+				Title:   "Title 1",
+			},
+		},
+	}
+	if !reflect.DeepEqual(want, have) {
+		t.Fatalf("default-namespaced rss not parsed \nwant: %#v\nhave: %#v", want, have)
+		// t.Logf("have: %#v", have)
+		// t.Fatal("default-namespaced rss not parsed")
+	}
+}
