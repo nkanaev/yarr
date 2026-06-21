@@ -80,7 +80,7 @@ func TestAtomHTMLTitle(t *testing.T) {
 	feed, _ := Parse(strings.NewReader(`
 		<?xml version="1.0" encoding="utf-8"?>
 		<feed xmlns="http://www.w3.org/2005/Atom">
-			<entry><title type="html">say &lt;code&gt;what&lt;/code&gt;?</entry>
+			<entry><title type="html">say &lt;code&gt;what&lt;/code&gt;?</title></entry>
 		</feed>
 	`))
 	have := feed.Items[0].Title
@@ -96,7 +96,7 @@ func TestAtomXHTMLTitle(t *testing.T) {
 	feed, _ := Parse(strings.NewReader(`
 		<?xml version="1.0" encoding="utf-8"?>
 		<feed xmlns="http://www.w3.org/2005/Atom">
-			<entry><title type="xhtml">say &lt;code&gt;what&lt;/code&gt;?</entry>
+			<entry><title type="xhtml">say &lt;code&gt;what&lt;/code&gt;?</title></entry>
 		</feed>
 	`))
 	have := feed.Items[0].Title
