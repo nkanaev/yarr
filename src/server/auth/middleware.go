@@ -46,13 +46,14 @@ func (m *Middleware) Handler(c *router.Context) {
 		} else {
 			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]any{
 				"username": username,
-				"error":    "Invalid username/password",
+				"hasError": true,
 				"settings": m.DB.GetSettings().Map(),
 			})
 			return
 		}
 	}
 	c.HTML(http.StatusOK, assets.Template("login.html"), map[string]any{
+		"hasError": false,
 		"settings": m.DB.GetSettings().Map(),
 	})
 }

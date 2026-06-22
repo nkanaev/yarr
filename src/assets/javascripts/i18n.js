@@ -340,6 +340,11 @@
       "zh": "登录",
       "ru": "Вход"
     },
+    "login_error": {
+      "en": "Invalid username or password",
+      "zh": "用户名或密码错误",
+      "ru": "Неверное имя пользователя или пароль"
+    },
     "username": {
       "en": "Username",
       "zh": "用户名",
