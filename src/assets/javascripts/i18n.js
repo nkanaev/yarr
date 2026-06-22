@@ -2,346 +2,691 @@
   const translations = {
     "unread": {
       "en": "Unread",
+      "de": "Ungelesene",
+      "fr": "Non lus",
+      "es": "No leídos",
+      "ja": "未読",
+      "pt": "Não lidos",
       "zh": "未读",
       "ru": "Непрочитанные"
     },
     "starred": {
       "en": "Starred",
+      "de": "Markierte",
+      "fr": "Favoris",
+      "es": "Destacados",
+      "ja": "スター付き",
+      "pt": "Favoritos",
       "zh": "星标",
       "ru": "Избранные"
     },
     "all": {
       "en": "All",
+      "de": "Alle",
+      "fr": "Tout",
+      "es": "Todo",
+      "ja": "すべて",
+      "pt": "Tudo",
       "zh": "全部",
       "ru": "Все"
     },
     "settings": {
       "en": "Settings",
+      "de": "Einstellungen",
+      "fr": "Paramètres",
+      "es": "Ajustes",
+      "ja": "設定",
+      "pt": "Configurações",
       "zh": "设置",
       "ru": "Настройки"
     },
     "new_feed": {
       "en": "New Feed",
+      "de": "Neuer Feed",
+      "fr": "Nouveau flux",
+      "es": "Nueva fuente",
+      "ja": "新規フィード",
+      "pt": "Novo feed",
       "zh": "新建订阅",
       "ru": "Новая лента"
     },
     "refresh_feeds": {
       "en": "Refresh Feeds",
+      "de": "Feeds aktualisieren",
+      "fr": "Actualiser les flux",
+      "es": "Actualizar fuentes",
+      "ja": "フィードを更新",
+      "pt": "Atualizar feeds",
       "zh": "刷新订阅",
       "ru": "Обновить ленты"
     },
     "theme": {
       "en": "Theme",
+      "de": "Design",
+      "fr": "Thème",
+      "es": "Tema",
+      "ja": "テーマ",
+      "pt": "Tema",
       "zh": "主题",
       "ru": "Тема"
     },
     "auto_refresh": {
       "en": "Auto Refresh",
+      "de": "Automatisch aktualisieren",
+      "fr": "Actualisation automatique",
+      "es": "Actualización automática",
+      "ja": "自動更新",
+      "pt": "Atualização automática",
       "zh": "自动刷新",
       "ru": "Автообновление"
     },
     "show_first": {
       "en": "Show first",
+      "de": "Zuerst anzeigen",
+      "fr": "Afficher d'abord",
+      "es": "Mostrar primero",
+      "ja": "表示順",
+      "pt": "Mostrar primeiro",
       "zh": "优先显示",
       "ru": "Сначала"
     },
     "new": {
       "en": "New",
+      "de": "Neue",
+      "fr": "Récents",
+      "es": "Nuevos",
+      "ja": "新しい順",
+      "pt": "Novos",
       "zh": "最新",
       "ru": "Новые"
     },
     "old": {
       "en": "Old",
+      "de": "Alte",
+      "fr": "Anciens",
+      "es": "Antiguos",
+      "ja": "古い順",
+      "pt": "Antigos",
       "zh": "最旧",
       "ru": "Старые"
     },
     "subscriptions": {
       "en": "Subscriptions",
+      "de": "Abonnements",
+      "fr": "Abonnements",
+      "es": "Suscripciones",
+      "ja": "購読管理",
+      "pt": "Assinaturas",
       "zh": "订阅管理",
       "ru": "Подписки"
     },
     "import": {
       "en": "Import",
+      "de": "Importieren",
+      "fr": "Importer",
+      "es": "Importar",
+      "ja": "インポート",
+      "pt": "Importar",
       "zh": "导入",
       "ru": "Импорт"
     },
     "export": {
       "en": "Export",
+      "de": "Exportieren",
+      "fr": "Exporter",
+      "es": "Exportar",
+      "ja": "エクスポート",
+      "pt": "Exportar",
       "zh": "导出",
       "ru": "Экспорт"
     },
     "shortcuts": {
       "en": "Shortcuts",
+      "de": "Tastenkürzel",
+      "fr": "Raccourcis",
+      "es": "Atajos",
+      "ja": "ショートカット",
+      "pt": "Atalhos",
       "zh": "快捷键",
       "ru": "Горячие клавиши"
     },
     "log_out": {
       "en": "Log out",
+      "de": "Abmelden",
+      "fr": "Déconnexion",
+      "es": "Cerrar sesión",
+      "ja": "ログアウト",
+      "pt": "Sair",
       "zh": "登出",
       "ru": "Выйти"
     },
     "all_unread": {
       "en": "All Unread",
+      "de": "Alle ungelesenen",
+      "fr": "Tous les non lus",
+      "es": "Todos los no leídos",
+      "ja": "すべての未読",
+      "pt": "Todos os não lidos",
       "zh": "全部未读",
       "ru": "Все непрочитанные"
     },
     "all_starred": {
       "en": "All Starred",
+      "de": "Alle markierten",
+      "fr": "Tous les favoris",
+      "es": "Todos los destacados",
+      "ja": "すべてのスター付き",
+      "pt": "Todos os favoritos",
       "zh": "全部星标",
       "ru": "Все избранные"
     },
     "all_feeds": {
       "en": "All Feeds",
+      "de": "Alle Feeds",
+      "fr": "Tous les flux",
+      "es": "Todas las fuentes",
+      "ja": "すべてのフィード",
+      "pt": "Todos os feeds",
       "zh": "全部订阅",
       "ru": "Все ленты"
     },
     "refreshing_progress": {
       "en": "Refreshing ({ $count } left)",
+      "de": "Aktualisiere ({ $count } übrig)",
+      "fr": "Actualisation ({ $count } restantes)",
+      "es": "Actualizando ({ $count } restantes)",
+      "ja": "更新中（残り{ $count }）",
+      "pt": "Atualizando ({ $count } restantes)",
       "zh": "正在刷新（剩余{ $count }）",
       "ru": "Обновление: осталось { $count }"
     },
     "show_feeds": {
       "en": "Show Feeds",
+      "de": "Feeds anzeigen",
+      "fr": "Afficher les flux",
+      "es": "Mostrar fuentes",
+      "ja": "フィードを表示",
+      "pt": "Mostrar feeds",
       "zh": "显示订阅",
       "ru": "Показать ленты"
     },
     "mark_all_read": {
       "en": "Mark All Read",
+      "de": "Alle als gelesen markieren",
+      "fr": "Tout marquer comme lu",
+      "es": "Marcar todo como leído",
+      "ja": "すべて既読にする",
+      "pt": "Marcar todos como lidos",
       "zh": "全部标记为已读",
       "ru": "Отметить все как прочитанные"
     },
     "feed_settings": {
       "en": "Feed Settings",
+      "de": "Feed-Einstellungen",
+      "fr": "Paramètres du flux",
+      "es": "Ajustes de fuente",
+      "ja": "フィード設定",
+      "pt": "Configurações do feed",
       "zh": "订阅设置",
       "ru": "Настройки ленты"
     },
     "folder_settings": {
       "en": "Folder Settings",
+      "de": "Ordner-Einstellungen",
+      "fr": "Paramètres du dossier",
+      "es": "Ajustes de carpeta",
+      "ja": "フォルダ設定",
+      "pt": "Configurações da pasta",
       "zh": "文件夹设置",
       "ru": "Настройки папки"
     },
     "website": {
       "en": "Website",
+      "de": "Webseite",
+      "fr": "Site web",
+      "es": "Sitio web",
+      "ja": "ウェブサイト",
+      "pt": "Site",
       "zh": "网站",
       "ru": "Сайт"
     },
     "feed_link": {
       "en": "Feed Link",
+      "de": "Feed-Link",
+      "fr": "Lien du flux",
+      "es": "Enlace de la fuente",
+      "ja": "フィードリンク",
+      "pt": "Link do feed",
       "zh": "订阅链接",
       "ru": "Ссылка на ленту"
     },
     "rename": {
       "en": "Rename",
+      "de": "Umbenennen",
+      "fr": "Renommer",
+      "es": "Renombrar",
+      "ja": "名前変更",
+      "pt": "Renomear",
       "zh": "重命名",
       "ru": "Переименовать"
     },
     "change_link": {
       "en": "Change Link",
+      "de": "Link ändern",
+      "fr": "Changer le lien",
+      "es": "Cambiar enlace",
+      "ja": "リンク変更",
+      "pt": "Alterar link",
       "zh": "修改链接",
       "ru": "Изменить ссылку"
     },
     "move_to": {
       "en": "Move to...",
+      "de": "Verschieben nach...",
+      "fr": "Déplacer vers...",
+      "es": "Mover a...",
+      "ja": "移動...",
+      "pt": "Mover para...",
       "zh": "移动到...",
       "ru": "Переместить в..."
     },
     "new_folder": {
       "en": "new folder",
+      "de": "neuer Ordner",
+      "fr": "nouveau dossier",
+      "es": "nueva carpeta",
+      "ja": "新規フォルダ",
+      "pt": "nova pasta",
       "zh": "新建文件夹",
       "ru": "новая папка"
     },
     "delete": {
       "en": "Delete",
+      "de": "Löschen",
+      "fr": "Supprimer",
+      "es": "Eliminar",
+      "ja": "削除",
+      "pt": "Excluir",
       "zh": "删除",
       "ru": "Удалить"
     },
     "mark_starred": {
       "en": "Mark Starred",
+      "de": "Als markiert kennzeichnen",
+      "fr": "Marquer comme favori",
+      "es": "Marcar como destacado",
+      "ja": "スターを付ける",
+      "pt": "Marcar como favorito",
       "zh": "标记星标",
       "ru": "Пометить избранным"
     },
     "mark_unread": {
       "en": "Mark Unread",
+      "de": "Als ungelesen kennzeichnen",
+      "fr": "Marquer comme non lu",
+      "es": "Marcar como no leído",
+      "ja": "未読にする",
+      "pt": "Marcar como não lido",
       "zh": "标记未读",
       "ru": "Пометить непрочитанным"
     },
     "appearance": {
       "en": "Appearance",
+      "de": "Darstellung",
+      "fr": "Apparence",
+      "es": "Apariencia",
+      "ja": "表示設定",
+      "pt": "Aparência",
       "zh": "外观",
       "ru": "Внешний вид"
     },
     "read_here": {
       "en": "Read Here",
+      "de": "Hier lesen",
+      "fr": "Lire ici",
+      "es": "Leer aquí",
+      "ja": "ここで読む",
+      "pt": "Ler aqui",
       "zh": "在此阅读",
       "ru": "Читать здесь"
     },
     "open_link": {
       "en": "Open Link",
+      "de": "Link öffnen",
+      "fr": "Ouvrir le lien",
+      "es": "Abrir enlace",
+      "ja": "リンクを開く",
+      "pt": "Abrir link",
       "zh": "打开链接",
       "ru": "Открыть ссылку"
     },
     "previous_article": {
       "en": "Previous Article",
+      "de": "Vorheriger Artikel",
+      "fr": "Article précédent",
+      "es": "Artículo anterior",
+      "ja": "前の記事",
+      "pt": "Artigo anterior",
       "zh": "上一篇",
       "ru": "Предыдущая статья"
     },
     "next_article": {
       "en": "Next Article",
+      "de": "Nächster Artikel",
+      "fr": "Article suivant",
+      "es": "Artículo siguiente",
+      "ja": "次の記事",
+      "pt": "Próximo artigo",
       "zh": "下一篇",
       "ru": "Следующая статья"
     },
     "close_article": {
       "en": "Close Article",
+      "de": "Artikel schließen",
+      "fr": "Fermer l'article",
+      "es": "Cerrar artículo",
+      "ja": "記事を閉じる",
+      "pt": "Fechar artigo",
       "zh": "关闭文章",
       "ru": "Закрыть статью"
     },
     "untitled": {
       "en": "untitled",
+      "de": "unbenannt",
+      "fr": "sans titre",
+      "es": "sin título",
+      "ja": "無題",
+      "pt": "sem título",
       "zh": "无标题",
       "ru": "без названия"
     },
     "sans_serif": {
       "en": "sans-serif",
+      "de": "serifenlos",
+      "fr": "sans empattement",
+      "es": "sans-serif",
+      "ja": "ゴシック体",
+      "pt": "sem serifa",
       "zh": "无衬线",
       "ru": "sans-serif"
     },
     "serif": {
       "en": "serif",
+      "de": "Serife",
+      "fr": "empattement",
+      "es": "serifa",
+      "ja": "明朝体",
+      "pt": "com serifa",
       "zh": "衬线",
       "ru": "serif"
     },
     "monospace": {
       "en": "monospace",
+      "de": "monospace",
+      "fr": "monospace",
+      "es": "monoespacio",
+      "ja": "等幅",
+      "pt": "monoespaçada",
       "zh": "等宽",
       "ru": "monospace"
     },
     "url": {
       "en": "URL",
+      "de": "URL",
+      "fr": "URL",
+      "es": "URL",
+      "ja": "URL",
+      "pt": "URL",
       "zh": "网址",
       "ru": "URL"
     },
     "folder": {
       "en": "Folder",
+      "de": "Ordner",
+      "fr": "Dossier",
+      "es": "Carpeta",
+      "ja": "フォルダ",
+      "pt": "Pasta",
       "zh": "文件夹",
       "ru": "Папка"
     },
     "add": {
       "en": "Add",
+      "de": "Hinzufügen",
+      "fr": "Ajouter",
+      "es": "Añadir",
+      "ja": "追加",
+      "pt": "Adicionar",
       "zh": "添加",
       "ru": "Добавить"
     },
     "keyboard_shortcuts": {
       "en": "Keyboard Shortcuts",
+      "de": "Tastenkürzel",
+      "fr": "Raccourcis clavier",
+      "es": "Atajos de teclado",
+      "ja": "キーボードショートカット",
+      "pt": "Atalhos do teclado",
       "zh": "键盘快捷键",
       "ru": "Горячие клавиши"
     },
     "multiple_feeds_found": {
       "en": "Multiple feeds found. Choose one below:",
+      "de": "Mehrere Feeds gefunden. Bitte wählen Sie einen aus:",
+      "fr": "Plusieurs flux trouvés. Choisissez-en un ci-dessous :",
+      "es": "Múltiples fuentes encontradas. Elija una:",
+      "ja": "複数のフィードが見つかりました。以下から選択してください：",
+      "pt": "Múltiplos feeds encontrados. Escolha um abaixo:",
       "zh": "找到多个订阅源，请选择一个：",
       "ru": "Найдено несколько лент. Выберите одну:"
     },
     "cancel": {
       "en": "cancel",
+      "de": "abbrechen",
+      "fr": "annuler",
+      "es": "cancelar",
+      "ja": "キャンセル",
+      "pt": "cancelar",
       "zh": "取消",
       "ru": "отмена"
     },
     "kb_show_filters": {
       "en": "show unread / starred / all feeds",
+      "de": "ungelesene / markierte / alle Feeds anzeigen",
+      "fr": "afficher les flux non lus / favoris / tous",
+      "es": "mostrar fuentes no leídas / destacadas / todas",
+      "ja": "未読/スター付き/すべてのフィードを表示",
+      "pt": "mostrar feeds não lidos / favoritos / todos",
       "zh": "显示未读/星标/全部订阅",
       "ru": "показать непрочитанные / избранные / все ленты"
     },
     "kb_focus_search": {
       "en": "focus the search bar",
+      "de": "Suchleiste fokussieren",
+      "fr": "focus sur la barre de recherche",
+      "es": "enfocar la barra de búsqueda",
+      "ja": "検索バーにフォーカス",
+      "pt": "focar na barra de pesquisa",
       "zh": "聚焦搜索栏",
       "ru": "фокус на строку поиска"
     },
     "kb_next_prev_article": {
       "en": "next / prev article",
+      "de": "nächster / vorheriger Artikel",
+      "fr": "article suivant / précédent",
+      "es": "artículo siguiente / anterior",
+      "ja": "次の/前の記事",
+      "pt": "próximo / artigo anterior",
       "zh": "下一篇/上一篇文章",
       "ru": "следующая / предыдущая статья"
     },
     "kb_next_prev_feed": {
       "en": "next / prev feed",
+      "de": "nächster / vorheriger Feed",
+      "fr": "flux suivant / précédent",
+      "es": "fuente siguiente / anterior",
+      "ja": "次の/前のフィード",
+      "pt": "próximo / feed anterior",
       "zh": "下一个/上一个订阅",
       "ru": "следующая / предыдущая лента"
     },
     "kb_close_article": {
       "en": "close article",
+      "de": "Artikel schließen",
+      "fr": "fermer l'article",
+      "es": "cerrar artículo",
+      "ja": "記事を閉じる",
+      "pt": "fechar artigo",
       "zh": "关闭文章",
       "ru": "закрыть статью"
     },
     "kb_mark_all_read": {
       "en": "mark all read",
+      "de": "alle als gelesen markieren",
+      "fr": "tout marquer comme lu",
+      "es": "marcar todo como leído",
+      "ja": "すべて既読にする",
+      "pt": "marcar todos como lidos",
       "zh": "全部标记为已读",
       "ru": "отметить все как прочитанные"
     },
     "kb_mark_read": {
       "en": "mark read / unread",
+      "de": "als gelesen / ungelesen markieren",
+      "fr": "marquer comme lu / non lu",
+      "es": "marcar como leído / no leído",
+      "ja": "既読/未読を切り替え",
+      "pt": "marcar como lido / não lido",
       "zh": "标记已读/未读",
       "ru": "отметить как прочитанное / непрочитанное"
     },
     "kb_mark_starred": {
       "en": "mark starred / unstarred",
+      "de": "als markiert / nicht markiert kennzeichnen",
+      "fr": "marquer comme favori / non favori",
+      "es": "marcar como destacado / no destacado",
+      "ja": "スターを付ける/外す",
+      "pt": "marcar como favorito / não favorito",
       "zh": "标记星标/取消星标",
       "ru": "пометить избранным / убрать из избранного"
     },
     "kb_open_link": {
       "en": "open link",
+      "de": "Link öffnen",
+      "fr": "ouvrir le lien",
+      "es": "abrir enlace",
+      "ja": "リンクを開く",
+      "pt": "abrir link",
       "zh": "打开链接",
       "ru": "открыть ссылку"
     },
     "kb_read_here": {
       "en": "read here",
+      "de": "hier lesen",
+      "fr": "lire ici",
+      "es": "leer aquí",
+      "ja": "ここで読む",
+      "pt": "ler aqui",
       "zh": "在此阅读",
       "ru": "читать здесь"
     },
     "kb_scroll_content": {
       "en": "scroll content forward / backward",
+      "de": "Inhalt vorwärts / rückwärts scrollen",
+      "fr": "faire défiler le contenu avant / arrière",
+      "es": "desplazar contenido hacia adelante / atrás",
+      "ja": "コンテンツを前/後にスクロール",
+      "pt": "rolar conteúdo para frente / trás",
       "zh": "向前/向后滚动内容",
       "ru": "прокрутка вперед / назад"
     },
     "prompt_folder_name": {
       "en": "Enter folder name:",
+      "de": "Ordnernamen eingeben:",
+      "fr": "Entrez le nom du dossier :",
+      "es": "Introduzca el nombre de la carpeta:",
+      "ja": "フォルダ名を入力してください：",
+      "pt": "Digite o nome da pasta:",
       "zh": "请输入文件夹名称：",
       "ru": "Введите имя папки:"
     },
     "prompt_new_title": {
       "en": "Enter new title",
+      "de": "Neuen Titel eingeben",
+      "fr": "Entrez un nouveau titre",
+      "es": "Introduzca un nuevo título",
+      "ja": "新しいタイトルを入力してください",
+      "pt": "Digite o novo título",
       "zh": "请输入新标题",
       "ru": "Введите новый заголовок"
     },
     "prompt_feed_link": {
       "en": "Enter feed link",
+      "de": "Feed-Link eingeben",
+      "fr": "Entrez le lien du flux",
+      "es": "Introduzca el enlace de la fuente",
+      "ja": "フィードリンクを入力してください",
+      "pt": "Digite o link do feed",
       "zh": "请输入订阅链接",
       "ru": "Введите ссылку на ленту"
     },
     "confirm_delete": {
       "en": "Are you sure you want to delete { $name }?",
+      "de": "Möchten Sie { $name } wirklich löschen?",
+      "fr": "Voulez-vous vraiment supprimer { $name } ?",
+      "es": "¿Está seguro de que quiere eliminar { $name }?",
+      "ja": "{ $name }を削除してもよろしいですか？",
+      "pt": "Tem certeza que deseja excluir { $name }?",
       "zh": "确定要删除{ $name }？",
       "ru": "Вы уверены, что хотите удалить { $name }?"
     },
     "alert_no_feeds": {
       "en": "No feeds found at the given url.",
+      "de": "Keine Feeds unter der angegebenen URL gefunden.",
+      "fr": "Aucun flux trouvé à cette URL.",
+      "es": "No se encontraron fuentes en la URL proporcionada.",
+      "ja": "指定されたURLにフィードが見つかりませんでした。",
+      "pt": "Nenhum feed encontrado no URL fornecido.",
       "zh": "在指定的网址未找到订阅源。",
       "ru": "Лент по данному адресу не найдено."
     },
     "login": {
       "en": "Login",
+      "de": "Anmelden",
+      "fr": "Connexion",
+      "es": "Iniciar sesión",
+      "ja": "ログイン",
+      "pt": "Entrar",
       "zh": "登录",
       "ru": "Вход"
     },
     "login_error": {
       "en": "Invalid username or password",
+      "de": "Ungültiger Benutzername oder Passwort",
+      "fr": "Nom d'utilisateur ou mot de passe invalide",
+      "es": "Nombre de usuario o contraseña inválidos",
+      "ja": "ユーザー名またはパスワードが無効です",
+      "pt": "Nome de usuário ou senha inválidos",
       "zh": "用户名或密码错误",
       "ru": "Неверное имя пользователя или пароль"
     },
     "username": {
       "en": "Username",
+      "de": "Benutzername",
+      "fr": "Nom d'utilisateur",
+      "es": "Nombre de usuario",
+      "ja": "ユーザー名",
+      "pt": "Nome de usuário",
       "zh": "用户名",
       "ru": "Имя пользователя"
     },
     "password": {
       "en": "Password",
+      "de": "Passwort",
+      "fr": "Mot de passe",
+      "es": "Contraseña",
+      "ja": "パスワード",
+      "pt": "Senha",
       "zh": "密码",
       "ru": "Пароль"
     },

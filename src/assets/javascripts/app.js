@@ -276,8 +276,13 @@ var vm = new Vue({
       'language': s.language,
       'languages': [
         {code: 'en', name: 'English' },
-        {code: 'zh', name: '简体中文'},
+        {code: 'de', name: 'Deutsch'},
+        {code: 'es', name: 'Español'},
+        {code: 'fr', name: 'Français'},
+        {code: 'ja', name: '日本語'},
+        {code: 'pt', name: 'Português'},
         {code: 'ru', name: 'Русский'},
+        {code: 'zh', name: '简体中文'},
       ]
     }
   },
