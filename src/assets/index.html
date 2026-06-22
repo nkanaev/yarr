@@ -126,17 +126,19 @@
                         {{ $t('shortcuts') }}
                     </button>
                     <div class="dropdown-divider"></div>
-                    <header class="dropdown-header" role="heading" aria-level="2">ᚨ / 𐎠 / 𑖀</header>
-                    <div class="d-flex">
-                        <button
-                            v-for="lang in languages"
-                            class="dropdown-item text-center"
-                            :aria-label="lang.name"
-                            :title="lang.name"
-                            :class="{active: language==lang.code}"
-                            @click.stop="changeLanguage(lang.code)">
-                                {{ lang.code }}
-                        </button>
+                    <header class="dropdown-header" role="heading" aria-level="2">A / あ / 文</header>
+                    <div class="container">
+                        <div class="row">
+                            <button
+                                v-for="lang in languages"
+                                class="dropdown-item text-center col-3 px-0"
+                                :aria-label="lang.name"
+                                :title="lang.name"
+                                :class="{active: language==lang.code}"
+                                @click.stop="changeLanguage(lang.code)">
+                                    {{ lang.code }}
+                            </button>
+                        </div>
                     </div>
                     <div class="dropdown-divider" v-if="authenticated"></div>
                     <button class="dropdown-item" v-if="authenticated" @click="logout()">
