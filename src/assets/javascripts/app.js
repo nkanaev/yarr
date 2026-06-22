@@ -590,7 +590,7 @@ var vm = new Vue({
       }
     },
     deleteFolder: function(folder) {
-      if (confirm(this.$t('confirm_delete_folder', {name: folder.title}))) {
+      if (confirm(this.$t('confirm_delete', {name: folder.title}))) {
         api.folders.delete(folder.id).then(function() {
           vm.feedSelected = null
           vm.refreshStats()
@@ -615,7 +615,7 @@ var vm = new Vue({
       }
     },
     deleteFeed: function(feed) {
-      if (confirm(this.$t('confirm_delete_feed', {name: feed.title}))) {
+      if (confirm(this.$t('confirm_delete', {name: feed.title}))) {
         api.feeds.delete(feed.id).then(function() {
           vm.feedSelected = null
           vm.refreshStats()

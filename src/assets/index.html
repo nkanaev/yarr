@@ -193,7 +193,7 @@
             </div>
             <div class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0" v-if="loading.feeds">
                 <span class="icon loading mx-2"></span>
-                <span class="text-truncate cursor-default noselect">{{ $t('refreshing') }} ({{ loading.feeds }} {{ $t('left') }})</span>
+                <span class="text-truncate cursor-default noselect">{{ $t('refreshing_progress', {count: loading.feeds}) }}</span>
             </div>
         </div>
         <!-- item list -->

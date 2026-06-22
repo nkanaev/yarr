@@ -95,15 +95,10 @@
       "zh": "全部订阅",
       "ru": "Все ленты"
     },
-    "refreshing": {
-      "en": "Refreshing",
-      "zh": "正在刷新",
-      "ru": "Обновление"
-    },
-    "left": {
-      "en": "left",
-      "zh": "剩余",
-      "ru": "осталось"
+    "refreshing_progress": {
+      "en": "Refreshing ({ $count } left)",
+      "zh": "正在刷新（剩余{ $count }）",
+      "ru": "Обновление: осталось { $count }"
     },
     "show_feeds": {
       "en": "Show Feeds",
@@ -320,12 +315,7 @@
       "zh": "请输入订阅链接",
       "ru": "Введите ссылку на ленту"
     },
-    "confirm_delete_folder": {
-      "en": "Are you sure you want to delete { $name }?",
-      "zh": "确定要删除{ $name }？",
-      "ru": "Вы уверены, что хотите удалить { $name }?"
-    },
-    "confirm_delete_feed": {
+    "confirm_delete": {
       "en": "Are you sure you want to delete { $name }?",
       "zh": "确定要删除{ $name }？",
       "ru": "Вы уверены, что хотите удалить { $name }?"
