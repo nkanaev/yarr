@@ -321,14 +321,14 @@
       "ru": "Введите ссылку на ленту"
     },
     "confirm_delete_folder": {
-      "en": "Are you sure you want to delete",
-      "zh": "确定要删除",
-      "ru": "Вы уверены, что хотите удалить"
+      "en": "Are you sure you want to delete { $name }?",
+      "zh": "确定要删除{ $name }？",
+      "ru": "Вы уверены, что хотите удалить { $name }?"
     },
     "confirm_delete_feed": {
-      "en": "Are you sure you want to delete",
-      "zh": "确定要删除",
-      "ru": "Вы уверены, что хотите удалить"
+      "en": "Are you sure you want to delete { $name }?",
+      "zh": "确定要删除{ $name }？",
+      "ru": "Вы уверены, что хотите удалить { $name }?"
     },
     "alert_no_feeds": {
       "en": "No feeds found at the given url.",
@@ -351,22 +351,26 @@
       "ru": "Пароль"
     },
   };
-  class i18n {
-    constructor() {
-      this.lang = 'en'
-    }
-    setLang(lang) {
-      this.lang = lang
-    }
-    $t(code) {
-      return translations[code][this.lang]
-    }
+  function ftlFrom(lang) {
+    return Object.entries(translations)
+      .map(([key, langs]) => `${key} = ${langs[lang]}`)
+      .join('\n')
   }
   exports.i18n = {
-    install(Vue, opts) {
-      const x = new i18n();
-      Vue.prototype.$t = x.$t
-      Vue.prototype.$setLang = x.setLang
+    install(Vue) {
+      let bundle = null
+      Vue.prototype.$setLang = function (lang) {
+        const ftl = ftlFrom(lang)
+        const resource = new FluentBundle.FluentResource(ftl)
+        bundle = new FluentBundle.FluentBundle(lang)
+        bundle.addResource(resource)
+      }
+      Vue.prototype.$t = function (code, args) {
+        if (!bundle) return
+        const msg = bundle.getMessage(code)
+        if (!msg || !msg.value) return
+        return bundle.formatPattern(msg.value, args)
+      }
     }
   }
 })(window)
