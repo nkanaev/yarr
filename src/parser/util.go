@@ -42,6 +42,59 @@ func xmlDecoder(r io.Reader) *xml.Decoder {
 	return decoder
 }
 
+// XML token reader that strips the default namespace.
+// It's primary purpose is to support namespaced legacy UserLand RSS feeds.
+// NOTE: token readers cannot populate ",innerxml"-tagged struct fields,
+// see https://github.com/golang/go/issues/39645
+type rssTokenReader struct {
+	Decoder   *xml.Decoder
+	defaultNS string
+}
+
+func (r *rssTokenReader) Token() (xml.Token, error) {
+	tok, err := r.Decoder.Token()
+	if err != nil {
+		return nil, err
+	}
+
+	switch t := tok.(type) {
+	case xml.StartElement:
+		// extract default namespace: <rss xmlns="<defaultNS>">
+		if t.Name.Local == "rss" {
+			for _, attr := range t.Attr {
+				if attr.Name.Space == "" && attr.Name.Local == "xmlns" && attr.Value != "" {
+					r.defaultNS = attr.Value
+					break
+				}
+			}
+		}
+
+		if r.defaultNS != "" {
+			// Rewrite element namespace
+			if t.Name.Space == r.defaultNS {
+				t.Name.Space = r.Decoder.DefaultSpace
+			}
+			// Rewrite attribute namespaces
+			attrs := t.Attr[:0]
+			for _, a := range t.Attr {
+				if a.Name.Space == r.defaultNS {
+					a.Name.Space = r.Decoder.DefaultSpace
+				}
+				attrs = append(attrs, a)
+			}
+			t.Attr = attrs
+		}
+		return t, nil
+	case xml.EndElement:
+		if r.defaultNS != "" && t.Name.Space == r.defaultNS {
+			t.Name.Space = r.Decoder.DefaultSpace
+		}
+		return t, nil
+	default:
+		return tok, nil
+	}
+}
+
 type safexmlreader struct {
 	reader *bufio.Reader
 	buffer *bytes.Buffer

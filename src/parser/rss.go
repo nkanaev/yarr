@@ -48,12 +48,6 @@ type rssLink struct {
 	Rel     string `xml:"rel,attr"`
 }
 
-type rssTitle struct {
-	XMLName xml.Name
-	Data    string `xml:",chardata"`
-	Inner   string `xml:",innerxml"`
-}
-
 type rssEnclosure struct {
 	URL    string `xml:"url,attr"`
 	Type   string `xml:"type,attr"`
@@ -63,9 +57,10 @@ type rssEnclosure struct {
 func ParseRSS(r io.Reader) (*Feed, error) {
 	srcfeed := rssFeed{}
 
-	decoder := xmlDecoder(r)
-	decoder.DefaultSpace = "rss"
-	if err := decoder.Decode(&srcfeed); err != nil {
+	rawDecoder := xmlDecoder(r)
+	rawDecoder.DefaultSpace = "rss"
+	rssDecoder := xml.NewTokenDecoder(&rssTokenReader{Decoder: rawDecoder})
+	if err := rssDecoder.Decode(&srcfeed); err != nil {
 		return nil, err
 	}
 
