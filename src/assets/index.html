@@ -67,6 +67,7 @@
                     <div class="row text-center m-0">
                         <button class="btn btn-link col-4 px-0 rounded-0"
                                 :class="'theme-'+t"
+                                :title="t"
                                 :aria-label="t"
                                 :aria-pressed="theme.name == t"
                                 @click.stop="theme.name = t"
@@ -126,13 +127,17 @@
                     </button>
                     <div class="dropdown-divider"></div>
                     <header class="dropdown-header" role="heading" aria-level="2">ᚨ / 𐎠 / 𑖀</header>
-                    <button
-                        v-for="lang in languages"
-                        class="dropdown-item"
-                        :class="{active: language==lang.code}"
-                        @click.stop="changeLanguage(lang.code)">
-                            {{ lang.name }}
-                    </button>
+                    <div class="d-flex">
+                        <button
+                            v-for="lang in languages"
+                            class="dropdown-item text-center"
+                            :aria-label="lang.name"
+                            :title="lang.name"
+                            :class="{active: language==lang.code}"
+                            @click.stop="changeLanguage(lang.code)">
+                                {{ lang.code }}
+                        </button>
+                    </div>
                     <div class="dropdown-divider" v-if="authenticated"></div>
                     <button class="dropdown-item" v-if="authenticated" @click="logout()">
                         <span class="icon mr-1">{% inline "log-out.svg" %}</span>

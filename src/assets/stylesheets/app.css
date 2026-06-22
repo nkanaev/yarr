@@ -4,9 +4,6 @@
 
 html {
   font-size: 15px !important;
-}
-
-body {
   overscroll-behavior: none;
 }
 
