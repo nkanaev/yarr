@@ -6,14 +6,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      YARR_POSTGRES_TEST_IMAGE: postgres:17-alpine
+
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v6
       with:
-        go-version: '^1.18'
+        go-version-file: 'go.mod'
 
     - name: Run tests
       run: make test
