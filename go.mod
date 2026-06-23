@@ -1,8 +1,6 @@
 module github.com/nkanaev/yarr
 
-go 1.23.0
-
-toolchain go1.23.5
+go 1.25.0
 
 require (
 	fyne.io/systray v1.12.0

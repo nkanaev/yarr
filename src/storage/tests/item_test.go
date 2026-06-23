@@ -291,14 +291,12 @@ func TestListItemsPaginated(t *testing.T) {
 	})
 }
 
-func TestMarkItemsRead(t *testing.T) {
-	// NOTE: starred items must not be marked as read
+func TestMarkAllItemsRead(t *testing.T) {
 	var read model.ItemStatus = model.READ
-
-	dbtest(t, func(t *testing.T, db1 storage.Storage) {
-		testItemsSetup(db1)
-		db1.MarkItemsRead(model.MarkFilter{})
-		have := getItemGuids(db1.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
+	dbtest(t, func(t *testing.T, db storage.Storage) {
+		testItemsSetup(db)
+		db.MarkItemsRead(model.MarkFilter{})
+		have := getItemGuids(db.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
 		want := []string{
 			"item111", "item112", "item121", "item122",
 			"item211", "item011", "item012",
@@ -309,11 +307,14 @@ func TestMarkItemsRead(t *testing.T) {
 			t.Fail()
 		}
 	})
+}
 
-	dbtest(t, func(t *testing.T, db2 storage.Storage) {
-		scope2 := testItemsSetup(db2)
-		db2.MarkItemsRead(model.MarkFilter{FolderID: &scope2.folder1.Id})
-		have := getItemGuids(db2.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
+func TestMarkItemsReadByFolder(t *testing.T) {
+	var read model.ItemStatus = model.READ
+	dbtest(t, func(t *testing.T, db storage.Storage) {
+		scope := testItemsSetup(db)
+		db.MarkItemsRead(model.MarkFilter{FolderID: &scope.folder1.Id})
+		have := getItemGuids(db.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
 		want := []string{
 			"item111", "item112", "item121", "item122",
 			"item211", "item012",
@@ -324,11 +325,14 @@ func TestMarkItemsRead(t *testing.T) {
 			t.Fail()
 		}
 	})
+}
 
-	dbtest(t, func(t *testing.T, db3 storage.Storage) {
-		scope3 := testItemsSetup(db3)
-		db3.MarkItemsRead(model.MarkFilter{FeedID: &scope3.feed11.Id})
-		have := getItemGuids(db3.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
+func TestMarkItemsReadByFeed(t *testing.T) {
+	var read model.ItemStatus = model.READ
+	dbtest(t, func(t *testing.T, db storage.Storage) {
+		scope := testItemsSetup(db)
+		db.MarkItemsRead(model.MarkFilter{FeedID: &scope.feed11.Id})
+		have := getItemGuids(db.ListItems(model.ItemFilter{Status: &read}, 10, false, false))
 		want := []string{
 			"item111", "item112", "item122",
 			"item211", "item012",
