@@ -51,8 +51,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Replace dots with commas for version_comma
-version_comma="${version//./,}"
+# Strip leading 'v' and replace dots with commas for version_comma
+version_num="${version#v}"
+version_comma="${version_num//./,}"
 
 # Use a here document for the template with ENDFILE delimiter
 cat <<ENDFILE > "$outfile"
