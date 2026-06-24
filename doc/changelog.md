@@ -1,10 +1,14 @@
 # upcoming
 
+- (new) initial PostgreSQL support
+- (new) i18n: English, Chinese, French, German, Japanese, Portuguese, Russian, Spanish
 - (fix) articles not resetting immediately after feed/filter selection (thank to @scratchmex for the report)
 - (fix) crash on empty article list with article is selected (thanks to @rksvc)
 - (fix) invalid article title in RSS feeds with media containing titles (thanks to @bwwu-git for the report)
 - (fix) missing image enclosures in certain RSS feeds (thanks to @palinek for the report)
 - (fix) parsing namespaced legacy RSS feeds (thanks to @f100024)
+- (fix) marking feeds read in Fever API (thanks to @weskoop)
+- (etc) systray improvements for macOS
 
 # v2.6 (2025-11-24)
 
