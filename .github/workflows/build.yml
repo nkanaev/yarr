@@ -9,7 +9,7 @@ on:
 jobs:
   build_macos:
     name: Build for MacOS
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -44,7 +44,7 @@ jobs:
 
   build_windows:
     name: Build for Windows
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -67,7 +67,7 @@ jobs:
         out: out/windows_arm64_gui/yarr.exe
 
   build_multi_cli:
-    name: Build for Windows/MacOS/Linux CLI
+    name: Build for Windows/Linux (CLI)
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
