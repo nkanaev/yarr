@@ -73,7 +73,7 @@ func main() {
 	flag.Parse()
 
 	if ver {
-		fmt.Printf("v%s (%s)\n", Version, GitHash)
+		fmt.Printf("%s (%s)\n", Version, GitHash)
 		return
 	}
 
