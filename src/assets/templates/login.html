@@ -23,32 +23,17 @@
         }
     </style>
 </head>
-<body class="theme-{% .settings.theme_name %}">
-    <div id="app" v-cloak>
-        <form action="" method="post">
-            <img src="./static/graphicarts/anchor.svg" alt="">
-            <div class="text-danger text-center my-3" v-if="hasError">{{ $t('login_error') }}</div>
-            <div class="form-group">
-                <label for="username">{{ $t('username') }}</label>
-                <input name="username" class="form-control" id="username" autocomplete="off"
-                       value="{% if .username %}{% .username %}{% end %}" required autofocus>
-            </div>
-            <div class="form-group">
-                <label for="password">{{ $t('password') }}</label>
-                <input name="password" class="form-control" id="password" type="password" required>
-            </div>
-            <button class="btn btn-block btn-default" type="submit">{{ $t('login') }}</button>
-        </form>
-    </div>
+<body class="theme-{{ .settings.theme_name }}">
+    <div id="app" v-cloak></div>
     <script src="./static/javascripts/vue.min.js"></script>
     <script src="./static/javascripts/fluent.js"></script>
     <script src="./static/javascripts/i18n.js"></script>
     <script>
         Vue.use(i18n)
         new Vue({
-            data: { hasError: {% .hasError %} },
+            data: { hasError: {{ .hasError }} },
             created: function () {
-                this.$setLang('{% .settings.language %}')
+                this.$setLang('{{ .settings.language }}')
             }
         }).$mount('#app')
     </script>
