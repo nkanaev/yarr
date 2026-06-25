@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>yarr!</title>
-    <link rel="stylesheet" href="./static/stylesheets/bootstrap.min.css">
-    <link rel="stylesheet" href="./static/stylesheets/app.css">
+    <link rel="stylesheet" href="./static/bundle.css">
     <link rel="icon" href="./static/graphicarts/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png">
     <link rel="manifest" href="./manifest.json" />
@@ -18,13 +17,6 @@
 </head>
 <body class="theme-{{ .settings.theme_name }}">
     <div id="app" v-cloak></div>
-    <!-- external -->
-    <script src="./static/javascripts/vue.min.js"></script>
-    <script src="./static/javascripts/fluent.js"></script>
-    <!-- internal -->
-    <script src="./static/javascripts/i18n.js"></script>
-    <script src="./static/javascripts/api.js"></script>
-    <script src="./static/javascripts/app.js"></script>
-    <script src="./static/javascripts/key.js"></script>
+    <script src="./static/bundle.js"></script>
 </body>
 </html>
