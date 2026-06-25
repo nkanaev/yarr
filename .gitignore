@@ -7,3 +7,4 @@
 *.syso
 versioninfo.rc
 .DS_Store
+node_modules/
