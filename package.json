@@ -1,5 +1,10 @@
 {
   "devDependencies": {
     "esbuild": "0.28.1"
+  },
+  "dependencies": {
+    "@fluent/bundle": "^0.19.1",
+    "bootstrap": "^4.6.2",
+    "vue": "^2.7.16"
   }
 }
