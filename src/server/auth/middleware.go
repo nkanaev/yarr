@@ -44,7 +44,7 @@ func (m *Middleware) Handler(c *router.Context) {
 			c.Redirect(rootUrl)
 			return
 		} else {
-			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]any{
+			c.HTML(http.StatusOK, assets.Templates().Lookup("login.html"), map[string]any{
 				"username": username,
 				"hasError": true,
 				"settings": m.DB.GetSettings().Map(),
@@ -52,7 +52,7 @@ func (m *Middleware) Handler(c *router.Context) {
 			return
 		}
 	}
-	c.HTML(http.StatusOK, assets.Template("login.html"), map[string]any{
+	c.HTML(http.StatusOK, assets.Templates().Lookup("login.html"), map[string]any{
 		"hasError": false,
 		"settings": m.DB.GetSettings().Map(),
 	})

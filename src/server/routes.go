@@ -64,7 +64,7 @@ func (s *Server) handler() http.Handler {
 }
 
 func (s *Server) handleIndex(c *router.Context) {
-	c.HTML(http.StatusOK, assets.Template("index.html"), map[string]any{
+	c.HTML(http.StatusOK, assets.Templates().Lookup("index.html"), map[string]any{
 		"settings":      s.db.GetSettings().Map(),
 		"authenticated": s.Username != "" && s.Password != "",
 	})
@@ -77,7 +77,7 @@ func (s *Server) handleStatic(c *router.Context) {
 		c.Out.WriteHeader(http.StatusNotFound)
 		return
 	}
-	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.FS))).
+	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.StaticFS()))).
 		ServeHTTP(c.Out, c.Req)
 }
 
