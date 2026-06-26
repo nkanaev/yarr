@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/content/htmlutil"
@@ -480,8 +481,9 @@ func (s *Server) handleOPMLImport(c *router.Context) {
 
 func (s *Server) handleOPMLExport(c *router.Context) {
 	if c.Req.Method == "GET" {
+		filename := fmt.Sprintf("subscriptions_%s.opml", time.Now().Format("2006-01-02_15-04-05"))
 		c.Out.Header().Set("Content-Type", "application/xml; charset=utf-8")
-		c.Out.Header().Set("Content-Disposition", `attachment; filename="subscriptions.opml"`)
+		c.Out.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
 
 		doc := opml.Folder{}
 
