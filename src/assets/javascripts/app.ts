@@ -2,6 +2,7 @@ import Vue from 'vue/dist/vue.esm.js'
 import i18n from './i18n'
 import api from './api'
 import template from './templates/index.html' with {type: 'text'}
+import icons from './icons'
 
 var app = window.app
 
@@ -205,6 +206,14 @@ Vue.component('relative-time', {
   destroyed: function() {
     clearInterval(this.interval)
   },
+})
+
+Vue.component('v-icon', {
+  props: ['name'],
+  template: '<span class="icon" v-html="content"></span>',
+  computed: {
+    content: function () { return icons[this.name] || '' }
+  }
 })
 
 Vue.use(i18n)

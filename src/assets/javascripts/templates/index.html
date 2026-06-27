@@ -3,42 +3,42 @@
     <div id="col-feed-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
         <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
         <div class="p-2 toolbar d-flex align-items-center">
-            <div class="icon mx-2">{% inline "anchor.svg" %}</div>
+            <v-icon class="mx-2" name="anchor" />
             <div class="flex-grow-1"></div>
             <button class="toolbar-item ml-1"
                     :class="{active: filterSelected == 'unread'}"
                     :aria-pressed="filterSelected == 'unread'"
                     :title="$t('unread')"
                     @click="filterSelected = 'unread'">
-                <span class="icon">{% inline "circle-full.svg" %}</span>
+                <v-icon name="circle-full" />
             </button>
             <button class="toolbar-item mx-1"
                     :class="{active: filterSelected == 'starred'}"
                     :aria-pressed="filterSelected == 'starred'"
                     :title="$t('starred')"
                     @click="filterSelected = 'starred'">
-                <span class="icon">{% inline "star-full.svg" %}</span>
+                <v-icon name="star-full" />
             </button>
             <button class="toolbar-item mr-1"
                     :class="{active: filterSelected == ''}"
                     :aria-pressed="filterSelected == ''"
                     :title="$t('all')"
                     @click="filterSelected = ''">
-                <span class="icon">{% inline "assorted.svg" %}</span>
+                <v-icon name="assorted" />
             </button>
             <div class="flex-grow-1"></div>
             <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" :title="$t('settings')">
                 <template v-slot:button>
-                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    <v-icon name="more-horizontal" />
                 </template>
 
                 <button class="dropdown-item" @click="showSettings('create')">
-                    <span class="icon mr-1">{% inline "plus.svg" %}</span>
+                    <v-icon class="mr-1" name="plus" />
                     {{ $t('new_feed') }}
                 </button>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item" @click="fetchAllFeeds()">
-                    <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
+                    <v-icon class="mr-1" name="rotate-cw" />
                     {{ $t('refresh_feeds') }}
                 </button>
 
@@ -53,7 +53,7 @@
                             :aria-pressed="theme.name == t"
                             @click.stop="theme.name = t"
                             v-for="t in ['light', 'sepia', 'night']">
-                        <span class="icon" v-if="theme.name == t">{% inline "check.svg" %}</span>
+                        <v-icon v-if="theme.name == t" name="check" />
                     </button>
                 </div>
 
@@ -64,16 +64,12 @@
                     <button class="dropdown-item col-4 px-0"
                             @click.stop="changeRefreshRate(-1)"
                             :disabled="!refreshRate">
-                        <span class="icon">
-                            {% inline "chevron-down.svg" %}
-                        </span>
+                        <v-icon name="chevron-down" />
                     </button>
                     <div class="col-4 d-flex align-items-center justify-content-center">{{ refreshRateTitle }}</div>
                     <button class="dropdown-item col-4 px-0"
                             @click.stop="changeRefreshRate(1)" :disabled="refreshRate === refreshRateOptions.at(-1).value">
-                        <span class="icon">
-                            {% inline "chevron-up.svg" %}
-                        </span>
+                        <v-icon name="chevron-up" />
                     </button>
                 </div>
 
@@ -93,17 +89,17 @@
                             name="opml"
                             style="opacity: 0; width: 1px; height: 0; position: absolute; z-index: -1;">
                     <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" @click.stop="">
-                        <span class="icon mr-1">{% inline "download.svg" %}</span>
+                        <v-icon class="mr-1" name="download" />
                         {{ $t('import') }}
                     </label>
                 </form>
                 <a class="dropdown-item" href="./opml/export">
-                    <span class="icon mr-1">{% inline "upload.svg" %}</span>
+                    <v-icon class="mr-1" name="upload" />
                     {{ $t('export') }}
                 </a>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item" @click="showSettings('shortcuts')">
-                    <span class="icon mr-1">{% inline "help-circle.svg" %}</span>
+                    <v-icon class="mr-1" name="help-circle" />
                     {{ $t('shortcuts') }}
                 </button>
                 <div class="dropdown-divider"></div>
@@ -123,7 +119,7 @@
                 </div>
                 <div class="dropdown-divider" v-if="authenticated"></div>
                 <button class="dropdown-item" v-if="authenticated" @click="logout()">
-                    <span class="icon mr-1">{% inline "log-out.svg" %}</span>
+                    <v-icon class="mr-1" name="log-out" />
                     {{ $t('log_out') }}
                 </button>
             </dropdown>
@@ -132,7 +128,7 @@
             <label class="selectgroup">
                 <input type="radio" name="feed" value="" v-model="feedSelected">
                 <div class="selectgroup-label d-flex align-items-center w-100">
-                    <span class="icon mr-2">{% inline "layers.svg" %}</span>
+                    <v-icon class="mr-2" name="layers" />
                     <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">{{ $t('all_unread') }}</span>
                     <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">{{ $t('all_starred') }}</span>
                     <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">{{ $t('all_feeds') }}</span>
@@ -145,11 +141,10 @@
                         v-if="folder.id">
                     <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
                     <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
-                        <span class="icon mr-2"
+                        <v-icon class="mr-2"
                                 :class="{expanded: folder.is_expanded}"
-                                @click.prevent="toggleFolderExpanded(folder)">
-                            {% inline "chevron-right.svg" %}
-                        </span>
+                                @click.prevent="toggleFolderExpanded(folder)"
+                                name="chevron-right" />
                         <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
                         <span class="counter text-right">{{ filteredFolderStats[folder.id] || '' }}</span>
                     </div>
@@ -160,15 +155,14 @@
                             v-for="feed in folder.feeds">
                         <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                         <div class="selectgroup-label d-flex align-items-center w-100">
-                            <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
+                            <v-icon class="mr-2" name="rss" v-if="!feed.has_icon" />
                             <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
                             <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                             <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
-                            <span class="icon flex-shrink-0 mx-2"
+                            <v-icon class="flex-shrink-0 mx-2"
                                     :title="feed_errors[feed.id]"
-                                    v-if="!filterSelected && feed_errors[feed.id]">
-                                {% inline "alert-circle.svg" %}
-                            </span>
+                                    v-if="!filterSelected && feed_errors[feed.id]"
+                                    name="alert-circle" />
                         </div>
                     </label>
                 </div>
@@ -186,10 +180,10 @@
             <button class="toolbar-item mr-2 d-block d-md-none"
                     @click="feedSelected = null"
                     :title="$t('show_feeds')">
-                <span class="icon">{% inline "chevron-left.svg" %}</span>
+                <v-icon name="chevron-left" />
             </button>
             <div class="input-icon flex-grow-1">
-                <span class="icon">{% inline "search.svg" %}</span>
+                <v-icon name="search" />
                 <!-- id used by keybindings -->
                 <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" @keydown.enter="$event.target.blur()">
             </div>
@@ -197,12 +191,12 @@
                     @click="markItemsRead()"
                     v-if="filterSelected == 'unread'"
                     :title="$t('mark_all_read')">
-                <span class="icon">{% inline "check.svg" %}</span>
+                <v-icon name="check" />
             </button>
 
 
             <button class="btn btn-link toolbar-item px-2 ml-2" v-if="!current.type" disabled>
-                <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                <v-icon name="more-horizontal" />
             </button>
             <dropdown class="settings-dropdown"
                         toggle-class="btn btn-link toolbar-item px-2 ml-2"
@@ -210,24 +204,24 @@
                         :title="$t('feed_settings')"
                         v-if="current.type == 'feed'">
                 <template v-slot:button>
-                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    <v-icon name="more-horizontal" />
                 </template>
                 <header class="dropdown-header" role="heading" aria-level="2">{{ current.feed.title }}</header>
                 <a class="dropdown-item" :href="current.feed.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.link">
-                    <span class="icon mr-1">{% inline "globe.svg" %}</span>
+                    <v-icon class="mr-1" name="globe" />
                     {{ $t('website') }}
                 </a>
                 <a class="dropdown-item" :href="current.feed.feed_link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.feed_link">
-                    <span class="icon mr-1">{% inline "rss.svg" %}</span>
+                    <v-icon class="mr-1" name="rss" />
                     {{ $t('feed_link') }}
                 </a>
                 <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
                 <button class="dropdown-item" @click="renameFeed(current.feed)">
-                    <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                    <v-icon class="mr-1" name="edit" />
                     {{ $t('rename') }}
                 </button>
                 <button class="dropdown-item" @click="updateFeedLink(current.feed)" v-if="current.feed.feed_link">
-                    <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                    <v-icon class="mr-1" name="edit" />
                     {{ $t('change_link') }}
                 </button>
                 <div class="dropdown-divider"></div>
@@ -236,20 +230,20 @@
                     v-if="folder.id != current.feed.folder_id"
                     v-for="folder in folders"
                     @click="moveFeed(current.feed, folder)">
-                    <span class="icon mr-1">{% inline "folder.svg" %}</span>
+                    <v-icon class="mr-1" name="folder" />
                     {{ folder.title }}
                 </button>
                 <button class="dropdown-item text-muted" @click="moveFeed(current.feed, null)" v-if="current.feed.folder_id">
-                    <span class="icon mr-1">{% inline "folder-minus.svg" %}</span>
+                    <v-icon class="mr-1" name="folder-minus" />
                     ──
                 </button>
                 <button class="dropdown-item text-muted" @click="moveFeedToNewFolder(current.feed)">
-                    <span class="icon mr-1">{% inline "folder-plus.svg" %}</span>
+                    <v-icon class="mr-1" name="folder-plus" />
                     {{ $t('new_folder') }}
                 </button>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item text-danger" @click.prevent="deleteFeed(current.feed)">
-                    <span class="icon mr-1">{% inline "trash.svg" %}</span>
+                    <v-icon class="mr-1" name="trash" />
                     {{ $t('delete') }}
                 </button>
             </dropdown>
@@ -259,16 +253,16 @@
                         drop="right"
                         v-if="current.type == 'folder'">
                 <template v-slot:button>
-                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    <v-icon name="more-horizontal" />
                 </template>
                 <header class="dropdown-header" role="heading" aria-level="2">{{ current.folder.title }}</header>
                 <button class="dropdown-item" @click="renameFolder(current.folder)">
-                    <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                    <v-icon class="mr-1" name="edit" />
                     {{ $t('rename') }}
                 </button>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">
-                    <span class="icon mr-1">{% inline "trash.svg" %}</span>
+                    <v-icon class="mr-1" name="trash" />
                     {{ $t('delete') }}
                 </button>
             </dropdown>
@@ -280,8 +274,8 @@
                 <div class="selectgroup-label d-flex flex-column">
                     <div style="line-height: 100%; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
                         <transition name="indicator">
-                            <span class="icon icon-small mr-1" v-if="item.status=='unread'">{% inline "circle-full.svg" %}</span>
-                            <span class="icon icon-small mr-1" v-if="item.status=='starred'">{% inline "star-full.svg" %}</span>
+                            <v-icon class="icon-small mr-1" name="circle-full" v-if="item.status=='unread'" />
+                            <v-icon class="icon-small mr-1" name="star-full" v-if="item.status=='starred'" />
                         </transition>
                         <small class="flex-fill text-truncate mr-1">
                             {{ (feedsById[item.feed_id] || {}).title }}
@@ -303,18 +297,18 @@
             <button class="toolbar-item"
                     @click="toggleItemStarred(itemSelectedDetails)"
                     :title="$t('mark_starred')">
-                <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
-                <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
+                <v-icon name="star-full" v-if="itemSelectedDetails.status=='starred'" />
+                <v-icon name="star" v-else-if="itemSelectedDetails.status!='starred'" />
             </button>
             <button class="toolbar-item"
                     :title="$t('mark_unread')"
                     @click="toggleItemRead(itemSelectedDetails)">
-                <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
-                <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
+                <v-icon name="circle-full" v-if="itemSelectedDetails.status=='unread'" />
+                <v-icon name="circle" v-if="itemSelectedDetails.status!='unread'" />
             </button>
             <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" :title="$t('appearance')">
                 <template v-slot:button>
-                    <span class="icon">{% inline "sliders.svg" %}</span>
+                    <v-icon name="sliders" />
                 </template>
 
                 <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">{{ $t('sans_serif') }}</button>
@@ -330,20 +324,20 @@
                     :class="{active: itemSelectedReadability}"
                     @click="toggleReadability()"
                     :title="$t('read_here')">
-                <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
+                <v-icon :class="{'icon-loading': loading.readability}" name="book-open" />
             </button>
             <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" :title="$t('open_link')">
-                <span class="icon">{% inline "external-link.svg" %}</span>
+                <v-icon name="external-link" />
             </a>
             <div class="flex-grow-1"></div>
             <button class="toolbar-item" @click="navigateToItem(-1)" :title="$t('previous_article')" :disabled="!items.length || itemSelected == items[0].id">
-                <span class="icon">{% inline "chevron-left.svg" %}</span>
+                <v-icon name="chevron-left" />
             </button>
             <button class="toolbar-item" @click="navigateToItem(+1)" :title="$t('next_article')" :disabled="!items.length || itemSelected == items[items.length - 1].id">
-                <span class="icon">{% inline "chevron-right.svg" %}</span>
+                <v-icon name="chevron-right" />
             </button>
             <button class="toolbar-item" @click="itemSelected=null" :title="$t('close_article')">
-                <span class="icon">{% inline "x.svg" %}</span>
+                <v-icon name="x" />
             </button>
         </div>
         <div v-if="itemSelectedDetails"
@@ -378,7 +372,7 @@
     </div>
     <modal :open="!!settings" @hide="settings = ''">
         <button class="btn btn-link outline-none float-right p-2 mr-n2 mt-n2" style="line-height: 1" @click="settings = ''">
-            <span class="icon">{% inline "x.svg" %}</span>
+            <v-icon name="x" />
         </button>
         <div v-if="settings=='create'">
             <p class="cursor-default"><b>{{ $t('new_feed') }}</b></p>

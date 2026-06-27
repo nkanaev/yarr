@@ -10951,42 +10951,42 @@
     <div id="col-feed-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
         <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
         <div class="p-2 toolbar d-flex align-items-center">
-            <div class="icon mx-2">{% inline "anchor.svg" %}</div>
+            <v-icon class="mx-2" name="anchor" />
             <div class="flex-grow-1"></div>
             <button class="toolbar-item ml-1"
                     :class="{active: filterSelected == 'unread'}"
                     :aria-pressed="filterSelected == 'unread'"
                     :title="$t('unread')"
                     @click="filterSelected = 'unread'">
-                <span class="icon">{% inline "circle-full.svg" %}</span>
+                <v-icon name="circle-full" />
             </button>
             <button class="toolbar-item mx-1"
                     :class="{active: filterSelected == 'starred'}"
                     :aria-pressed="filterSelected == 'starred'"
                     :title="$t('starred')"
                     @click="filterSelected = 'starred'">
-                <span class="icon">{% inline "star-full.svg" %}</span>
+                <v-icon name="star-full" />
             </button>
             <button class="toolbar-item mr-1"
                     :class="{active: filterSelected == ''}"
                     :aria-pressed="filterSelected == ''"
                     :title="$t('all')"
                     @click="filterSelected = ''">
-                <span class="icon">{% inline "assorted.svg" %}</span>
+                <v-icon name="assorted" />
             </button>
             <div class="flex-grow-1"></div>
             <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" :title="$t('settings')">
                 <template v-slot:button>
-                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    <v-icon name="more-horizontal" />
                 </template>
 
                 <button class="dropdown-item" @click="showSettings('create')">
-                    <span class="icon mr-1">{% inline "plus.svg" %}</span>
+                    <v-icon class="mr-1" name="plus" />
                     {{ $t('new_feed') }}
                 </button>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item" @click="fetchAllFeeds()">
-                    <span class="icon mr-1">{% inline "rotate-cw.svg" %}</span>
+                    <v-icon class="mr-1" name="rotate-cw" />
                     {{ $t('refresh_feeds') }}
                 </button>
 
@@ -11001,7 +11001,7 @@
                             :aria-pressed="theme.name == t"
                             @click.stop="theme.name = t"
                             v-for="t in ['light', 'sepia', 'night']">
-                        <span class="icon" v-if="theme.name == t">{% inline "check.svg" %}</span>
+                        <v-icon v-if="theme.name == t" name="check" />
                     </button>
                 </div>
 
@@ -11012,16 +11012,12 @@
                     <button class="dropdown-item col-4 px-0"
                             @click.stop="changeRefreshRate(-1)"
                             :disabled="!refreshRate">
-                        <span class="icon">
-                            {% inline "chevron-down.svg" %}
-                        </span>
+                        <v-icon name="chevron-down" />
                     </button>
                     <div class="col-4 d-flex align-items-center justify-content-center">{{ refreshRateTitle }}</div>
                     <button class="dropdown-item col-4 px-0"
                             @click.stop="changeRefreshRate(1)" :disabled="refreshRate === refreshRateOptions.at(-1).value">
-                        <span class="icon">
-                            {% inline "chevron-up.svg" %}
-                        </span>
+                        <v-icon name="chevron-up" />
                     </button>
                 </div>
 
@@ -11041,17 +11037,17 @@
                             name="opml"
                             style="opacity: 0; width: 1px; height: 0; position: absolute; z-index: -1;">
                     <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" @click.stop="">
-                        <span class="icon mr-1">{% inline "download.svg" %}</span>
+                        <v-icon class="mr-1" name="download" />
                         {{ $t('import') }}
                     </label>
                 </form>
                 <a class="dropdown-item" href="./opml/export">
-                    <span class="icon mr-1">{% inline "upload.svg" %}</span>
+                    <v-icon class="mr-1" name="upload" />
                     {{ $t('export') }}
                 </a>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item" @click="showSettings('shortcuts')">
-                    <span class="icon mr-1">{% inline "help-circle.svg" %}</span>
+                    <v-icon class="mr-1" name="help-circle" />
                     {{ $t('shortcuts') }}
                 </button>
                 <div class="dropdown-divider"></div>
@@ -11071,7 +11067,7 @@
                 </div>
                 <div class="dropdown-divider" v-if="authenticated"></div>
                 <button class="dropdown-item" v-if="authenticated" @click="logout()">
-                    <span class="icon mr-1">{% inline "log-out.svg" %}</span>
+                    <v-icon class="mr-1" name="log-out" />
                     {{ $t('log_out') }}
                 </button>
             </dropdown>
@@ -11080,7 +11076,7 @@
             <label class="selectgroup">
                 <input type="radio" name="feed" value="" v-model="feedSelected">
                 <div class="selectgroup-label d-flex align-items-center w-100">
-                    <span class="icon mr-2">{% inline "layers.svg" %}</span>
+                    <v-icon class="mr-2" name="layers" />
                     <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">{{ $t('all_unread') }}</span>
                     <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">{{ $t('all_starred') }}</span>
                     <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">{{ $t('all_feeds') }}</span>
@@ -11093,11 +11089,10 @@
                         v-if="folder.id">
                     <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
                     <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
-                        <span class="icon mr-2"
+                        <v-icon class="mr-2"
                                 :class="{expanded: folder.is_expanded}"
-                                @click.prevent="toggleFolderExpanded(folder)">
-                            {% inline "chevron-right.svg" %}
-                        </span>
+                                @click.prevent="toggleFolderExpanded(folder)"
+                                name="chevron-right" />
                         <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
                         <span class="counter text-right">{{ filteredFolderStats[folder.id] || '' }}</span>
                     </div>
@@ -11108,15 +11103,14 @@
                             v-for="feed in folder.feeds">
                         <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
                         <div class="selectgroup-label d-flex align-items-center w-100">
-                            <span class="icon mr-2" v-if="!feed.has_icon">{% inline "rss.svg" %}</span>
+                            <v-icon class="mr-2" name="rss" v-if="!feed.has_icon" />
                             <span class="icon mr-2" v-else><img :src="'./api/feeds/'+feed.id+'/icon'" alt="" loading="lazy"></span>
                             <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
                             <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
-                            <span class="icon flex-shrink-0 mx-2"
+                            <v-icon class="flex-shrink-0 mx-2"
                                     :title="feed_errors[feed.id]"
-                                    v-if="!filterSelected && feed_errors[feed.id]">
-                                {% inline "alert-circle.svg" %}
-                            </span>
+                                    v-if="!filterSelected && feed_errors[feed.id]"
+                                    name="alert-circle" />
                         </div>
                     </label>
                 </div>
@@ -11134,10 +11128,10 @@
             <button class="toolbar-item mr-2 d-block d-md-none"
                     @click="feedSelected = null"
                     :title="$t('show_feeds')">
-                <span class="icon">{% inline "chevron-left.svg" %}</span>
+                <v-icon name="chevron-left" />
             </button>
             <div class="input-icon flex-grow-1">
-                <span class="icon">{% inline "search.svg" %}</span>
+                <v-icon name="search" />
                 <!-- id used by keybindings -->
                 <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" @keydown.enter="$event.target.blur()">
             </div>
@@ -11145,12 +11139,12 @@
                     @click="markItemsRead()"
                     v-if="filterSelected == 'unread'"
                     :title="$t('mark_all_read')">
-                <span class="icon">{% inline "check.svg" %}</span>
+                <v-icon name="check" />
             </button>
 
 
             <button class="btn btn-link toolbar-item px-2 ml-2" v-if="!current.type" disabled>
-                <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                <v-icon name="more-horizontal" />
             </button>
             <dropdown class="settings-dropdown"
                         toggle-class="btn btn-link toolbar-item px-2 ml-2"
@@ -11158,24 +11152,24 @@
                         :title="$t('feed_settings')"
                         v-if="current.type == 'feed'">
                 <template v-slot:button>
-                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    <v-icon name="more-horizontal" />
                 </template>
                 <header class="dropdown-header" role="heading" aria-level="2">{{ current.feed.title }}</header>
                 <a class="dropdown-item" :href="current.feed.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.link">
-                    <span class="icon mr-1">{% inline "globe.svg" %}</span>
+                    <v-icon class="mr-1" name="globe" />
                     {{ $t('website') }}
                 </a>
                 <a class="dropdown-item" :href="current.feed.feed_link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" v-if="current.feed.feed_link">
-                    <span class="icon mr-1">{% inline "rss.svg" %}</span>
+                    <v-icon class="mr-1" name="rss" />
                     {{ $t('feed_link') }}
                 </a>
                 <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
                 <button class="dropdown-item" @click="renameFeed(current.feed)">
-                    <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                    <v-icon class="mr-1" name="edit" />
                     {{ $t('rename') }}
                 </button>
                 <button class="dropdown-item" @click="updateFeedLink(current.feed)" v-if="current.feed.feed_link">
-                    <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                    <v-icon class="mr-1" name="edit" />
                     {{ $t('change_link') }}
                 </button>
                 <div class="dropdown-divider"></div>
@@ -11184,20 +11178,20 @@
                     v-if="folder.id != current.feed.folder_id"
                     v-for="folder in folders"
                     @click="moveFeed(current.feed, folder)">
-                    <span class="icon mr-1">{% inline "folder.svg" %}</span>
+                    <v-icon class="mr-1" name="folder" />
                     {{ folder.title }}
                 </button>
                 <button class="dropdown-item text-muted" @click="moveFeed(current.feed, null)" v-if="current.feed.folder_id">
-                    <span class="icon mr-1">{% inline "folder-minus.svg" %}</span>
+                    <v-icon class="mr-1" name="folder-minus" />
                     \u2500\u2500
                 </button>
                 <button class="dropdown-item text-muted" @click="moveFeedToNewFolder(current.feed)">
-                    <span class="icon mr-1">{% inline "folder-plus.svg" %}</span>
+                    <v-icon class="mr-1" name="folder-plus" />
                     {{ $t('new_folder') }}
                 </button>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item text-danger" @click.prevent="deleteFeed(current.feed)">
-                    <span class="icon mr-1">{% inline "trash.svg" %}</span>
+                    <v-icon class="mr-1" name="trash" />
                     {{ $t('delete') }}
                 </button>
             </dropdown>
@@ -11207,16 +11201,16 @@
                         drop="right"
                         v-if="current.type == 'folder'">
                 <template v-slot:button>
-                    <span class="icon">{% inline "more-horizontal.svg" %}</span>
+                    <v-icon name="more-horizontal" />
                 </template>
                 <header class="dropdown-header" role="heading" aria-level="2">{{ current.folder.title }}</header>
                 <button class="dropdown-item" @click="renameFolder(current.folder)">
-                    <span class="icon mr-1">{% inline "edit.svg" %}</span>
+                    <v-icon class="mr-1" name="edit" />
                     {{ $t('rename') }}
                 </button>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">
-                    <span class="icon mr-1">{% inline "trash.svg" %}</span>
+                    <v-icon class="mr-1" name="trash" />
                     {{ $t('delete') }}
                 </button>
             </dropdown>
@@ -11228,8 +11222,8 @@
                 <div class="selectgroup-label d-flex flex-column">
                     <div style="line-height: 100%; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
                         <transition name="indicator">
-                            <span class="icon icon-small mr-1" v-if="item.status=='unread'">{% inline "circle-full.svg" %}</span>
-                            <span class="icon icon-small mr-1" v-if="item.status=='starred'">{% inline "star-full.svg" %}</span>
+                            <v-icon class="icon-small mr-1" name="circle-full" v-if="item.status=='unread'" />
+                            <v-icon class="icon-small mr-1" name="star-full" v-if="item.status=='starred'" />
                         </transition>
                         <small class="flex-fill text-truncate mr-1">
                             {{ (feedsById[item.feed_id] || {}).title }}
@@ -11251,18 +11245,18 @@
             <button class="toolbar-item"
                     @click="toggleItemStarred(itemSelectedDetails)"
                     :title="$t('mark_starred')">
-                <span class="icon" v-if="itemSelectedDetails.status=='starred'" >{% inline "star-full.svg" %}</span>
-                <span class="icon" v-else-if="itemSelectedDetails.status!='starred'" >{% inline "star.svg" %}</span>
+                <v-icon name="star-full" v-if="itemSelectedDetails.status=='starred'" />
+                <v-icon name="star" v-else-if="itemSelectedDetails.status!='starred'" />
             </button>
             <button class="toolbar-item"
                     :title="$t('mark_unread')"
                     @click="toggleItemRead(itemSelectedDetails)">
-                <span class="icon" v-if="itemSelectedDetails.status=='unread'">{% inline "circle-full.svg" %}</span>
-                <span class="icon" v-if="itemSelectedDetails.status!='unread'">{% inline "circle.svg" %}</span>
+                <v-icon name="circle-full" v-if="itemSelectedDetails.status=='unread'" />
+                <v-icon name="circle" v-if="itemSelectedDetails.status!='unread'" />
             </button>
             <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" :title="$t('appearance')">
                 <template v-slot:button>
-                    <span class="icon">{% inline "sliders.svg" %}</span>
+                    <v-icon name="sliders" />
                 </template>
 
                 <button class="dropdown-item" :class="{active: !theme.font}" @click.stop="theme.font = ''">{{ $t('sans_serif') }}</button>
@@ -11278,20 +11272,20 @@
                     :class="{active: itemSelectedReadability}"
                     @click="toggleReadability()"
                     :title="$t('read_here')">
-                <span class="icon" :class="{'icon-loading': loading.readability}">{% inline "book-open.svg" %}</span>
+                <v-icon :class="{'icon-loading': loading.readability}" name="book-open" />
             </button>
             <a class="toolbar-item" :href="itemSelectedDetails.link" rel="noopener noreferrer" target="_blank" referrerpolicy="no-referrer" :title="$t('open_link')">
-                <span class="icon">{% inline "external-link.svg" %}</span>
+                <v-icon name="external-link" />
             </a>
             <div class="flex-grow-1"></div>
             <button class="toolbar-item" @click="navigateToItem(-1)" :title="$t('previous_article')" :disabled="!items.length || itemSelected == items[0].id">
-                <span class="icon">{% inline "chevron-left.svg" %}</span>
+                <v-icon name="chevron-left" />
             </button>
             <button class="toolbar-item" @click="navigateToItem(+1)" :title="$t('next_article')" :disabled="!items.length || itemSelected == items[items.length - 1].id">
-                <span class="icon">{% inline "chevron-right.svg" %}</span>
+                <v-icon name="chevron-right" />
             </button>
             <button class="toolbar-item" @click="itemSelected=null" :title="$t('close_article')">
-                <span class="icon">{% inline "x.svg" %}</span>
+                <v-icon name="x" />
             </button>
         </div>
         <div v-if="itemSelectedDetails"
@@ -11326,7 +11320,7 @@
     </div>
     <modal :open="!!settings" @hide="settings = ''">
         <button class="btn btn-link outline-none float-right p-2 mr-n2 mt-n2" style="line-height: 1" @click="settings = ''">
-            <span class="icon">{% inline "x.svg" %}</span>
+            <v-icon name="x" />
         </button>
         <div v-if="settings=='create'">
             <p class="cursor-default"><b>{{ $t('new_feed') }}</b></p>
@@ -11383,6 +11377,138 @@
     </modal>
 </div>
 `;
+
+  // src/assets/graphicarts/anchor.svg
+  var anchor_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-anchor"><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="22" x2="12" y2="8"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>';
+
+  // src/assets/graphicarts/alert-circle.svg
+  var alert_circle_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+
+  // src/assets/graphicarts/assorted.svg
+  var assorted_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="4" y1="6" x2="14" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="8" y2="18"></line></svg>\n';
+
+  // src/assets/graphicarts/book-open.svg
+  var book_open_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>';
+
+  // src/assets/graphicarts/check.svg
+  var check_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+  // src/assets/graphicarts/chevron-down.svg
+  var chevron_down_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
+  // src/assets/graphicarts/chevron-left.svg
+  var chevron_left_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+
+  // src/assets/graphicarts/chevron-right.svg
+  var chevron_right_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+
+  // src/assets/graphicarts/chevron-up.svg
+  var chevron_up_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+
+  // src/assets/graphicarts/circle.svg
+  var circle_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle"><circle cx="12" cy="12" r="10"></circle></svg>';
+
+  // src/assets/graphicarts/circle-full.svg
+  var circle_full_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle"><circle cx="12" cy="12" r="10"></circle></svg>\n';
+
+  // src/assets/graphicarts/download.svg
+  var download_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+
+  // src/assets/graphicarts/edit.svg
+  var edit_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
+
+  // src/assets/graphicarts/external-link.svg
+  var external_link_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>';
+
+  // src/assets/graphicarts/folder.svg
+  var folder_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>';
+
+  // src/assets/graphicarts/folder-minus.svg
+  var folder_minus_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder-minus"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="9" y1="14" x2="15" y2="14"></line></svg>';
+
+  // src/assets/graphicarts/folder-plus.svg
+  var folder_plus_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder-plus"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>';
+
+  // src/assets/graphicarts/globe.svg
+  var globe_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>';
+
+  // src/assets/graphicarts/help-circle.svg
+  var help_circle_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+
+  // src/assets/graphicarts/layers.svg
+  var layers_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>';
+
+  // src/assets/graphicarts/log-out.svg
+  var log_out_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
+
+  // src/assets/graphicarts/more-horizontal.svg
+  var more_horizontal_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>';
+
+  // src/assets/graphicarts/plus.svg
+  var plus_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+
+  // src/assets/graphicarts/rotate-cw.svg
+  var rotate_cw_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>';
+
+  // src/assets/graphicarts/rss.svg
+  var rss_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>';
+
+  // src/assets/graphicarts/search.svg
+  var search_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>';
+
+  // src/assets/graphicarts/sliders.svg
+  var sliders_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sliders"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>';
+
+  // src/assets/graphicarts/star.svg
+  var star_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+
+  // src/assets/graphicarts/star-full.svg
+  var star_full_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>\n';
+
+  // src/assets/graphicarts/trash.svg
+  var trash_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+
+  // src/assets/graphicarts/upload.svg
+  var upload_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>';
+
+  // src/assets/graphicarts/x.svg
+  var x_default = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+
+  // src/assets/javascripts/icons.ts
+  var icons_default = {
+    anchor: anchor_default,
+    "alert-circle": alert_circle_default,
+    assorted: assorted_default,
+    "book-open": book_open_default,
+    check: check_default,
+    "chevron-down": chevron_down_default,
+    "chevron-left": chevron_left_default,
+    "chevron-right": chevron_right_default,
+    "chevron-up": chevron_up_default,
+    circle: circle_default,
+    "circle-full": circle_full_default,
+    download: download_default,
+    edit: edit_default,
+    "external-link": external_link_default,
+    folder: folder_default,
+    "folder-minus": folder_minus_default,
+    "folder-plus": folder_plus_default,
+    globe: globe_default,
+    "help-circle": help_circle_default,
+    layers: layers_default,
+    "log-out": log_out_default,
+    "more-horizontal": more_horizontal_default,
+    plus: plus_default,
+    "rotate-cw": rotate_cw_default,
+    rss: rss_default,
+    search: search_default,
+    sliders: sliders_default,
+    star: star_default,
+    "star-full": star_full_default,
+    trash: trash_default,
+    upload: upload_default,
+    x: x_default
+  };
 
   // src/assets/javascripts/app.ts
   var app = window.app;
@@ -11568,6 +11694,15 @@
     },
     destroyed: function() {
       clearInterval(this.interval);
+    }
+  });
+  Vue.component("v-icon", {
+    props: ["name"],
+    template: '<span class="icon" v-html="content"></span>',
+    computed: {
+      content: function() {
+        return icons_default[this.name] || "";
+      }
     }
   });
   Vue.use(i18n_default);
