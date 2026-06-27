@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "build:js": "esbuild src/assets/javascripts/main.ts --bundle --outfile=src/assets/bundle.js",
+    "build:css": "esbuild src/assets/stylesheets/app.css --bundle --outfile=src/assets/bundle.css",
+    "build": "npm run build:js && npm run build:css"
+  },
   "devDependencies": {
     "esbuild": "0.28.1"
   },

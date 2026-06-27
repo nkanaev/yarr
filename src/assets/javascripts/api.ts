@@ -1,6 +1,4 @@
-"use strict";
 
-(function() {
   var xfetch = function(resource, init) {
     init = init || {}
     if (['post', 'put', 'delete'].indexOf(init.method) !== -1) {
@@ -29,7 +27,7 @@
     }).join('&')
   }
 
-  window.api = {
+export default {
     feeds: {
       list: function() {
         return api('get', './api/feeds').then(json)
@@ -108,4 +106,3 @@
       return api('get', './page?url=' + encodeURIComponent(url)).then(json)
     }
   }
-})()

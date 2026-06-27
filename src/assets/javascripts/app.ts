@@ -1,4 +1,8 @@
-'use strict';
+import Vue from 'vue/dist/vue.esm.js'
+import i18n from './i18n'
+import api from './api'
+
+var app = window.app
 
 var TITLE = document.title
 
@@ -857,4 +861,4 @@ var vm = new Vue({
   }
 })
 
-vm.$mount('#app')
+export { vm }

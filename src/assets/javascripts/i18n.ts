@@ -1,4 +1,5 @@
-(function (exports) {
+import { FluentResource, FluentBundle } from '@fluent/bundle'
+
   const translations = {
     "unread": {
       "en": "Unread",
@@ -691,26 +692,25 @@
       "ru": "Пароль"
     },
   };
-  function ftlFrom(lang) {
+function ftlFrom(lang) {
     return Object.entries(translations)
-      .map(([key, langs]) => `${key} = ${langs[lang]}`)
-      .join('\n')
-  }
-  exports.i18n = {
-    install(Vue) {
-      let bundle = null
-      Vue.prototype.$setLang = function (lang) {
-        const ftl = ftlFrom(lang)
-        const resource = new FluentBundle.FluentResource(ftl)
-        bundle = new FluentBundle.FluentBundle(lang)
-        bundle.addResource(resource)
-      }
-      Vue.prototype.$t = function (code, args) {
-        if (!bundle) return
-        const msg = bundle.getMessage(code)
-        if (!msg || !msg.value) return
-        return bundle.formatPattern(msg.value, args)
-      }
+    .map(([key, langs]) => `${key} = ${langs[lang]}`)
+    .join('\n')
+}
+export default {
+  install(Vue) {
+    let bundle = null
+    Vue.prototype.$setLang = function (lang) {
+      const ftl = ftlFrom(lang)
+      const resource = new FluentResource(ftl)
+      bundle = new FluentBundle(lang)
+      bundle.addResource(resource)
+    }
+    Vue.prototype.$t = function (code, args) {
+      if (!bundle) return
+      const msg = bundle.getMessage(code)
+      if (!msg || !msg.value) return
+      return bundle.formatPattern(msg.value, args)
     }
   }
-})(window)
+}
