@@ -22,6 +22,7 @@ var migrations = []func(*sql.Tx) error{
 	m12_remove_feed_sizes,
 	m13_consolidate_feed_states,
 	m14_upgrade_fts5,
+	m15_update_item_update_trigger,
 }
 
 var maxVersion = int64(len(migrations))
@@ -418,5 +419,16 @@ func m14_upgrade_fts5(tx *sql.Tx) error {
 		insert into search(rowid, title, content) select id, title, strip_html(content) from items;
 	`
 	_, err := tx.Exec(sql)
+	return err
+}
+
+func m15_update_item_update_trigger(tx *sql.Tx) error {
+	_, err := tx.Exec(`
+		drop trigger if exists items_au;
+		create trigger items_au after update of title, content on items begin
+		  insert into search(search, rowid, title, content) values('delete', old.id, old.title, strip_html(old.content));
+		  insert into search(rowid, title, content) values (new.id, new.title, strip_html(new.content));
+		end;
+	`)
 	return err
 }

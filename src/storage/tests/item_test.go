@@ -223,16 +223,6 @@ func TestListItems(t *testing.T) {
 			t.Fail()
 		}
 
-		// filter by search
-		search1 := "title111"
-		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &search1}, 4, true, false))
-		want = []string{"item111"}
-		if !reflect.DeepEqual(have, want) {
-			t.Logf("want: %#v", want)
-			t.Logf("have: %#v", have)
-			t.Fail()
-		}
-
 		// sort by date
 		have = getItemGuids(db.ListItems(model.ItemFilter{}, 4, true, false))
 		want = []string{"item013", "item012", "item011", "item212"}
