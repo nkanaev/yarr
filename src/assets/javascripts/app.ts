@@ -79,7 +79,7 @@ Vue.component('drag', {
 })
 
 Vue.component('dropdown', {
-  props: ['class', 'toggle-class', 'ref', 'drop', 'title'],
+  props: ['toggle-class', 'drop', 'title'],
   data: function() {
     return {open: false}
   },
