@@ -1,6 +1,7 @@
 import Vue from 'vue/dist/vue.esm.js'
 import i18n from './i18n'
 import api from './api'
+import template from './templates/index.html' with {type: 'text'}
 
 var app = window.app
 
@@ -209,6 +210,7 @@ Vue.component('relative-time', {
 Vue.use(i18n)
 
 var vm = new Vue({
+  template: template,
   created: function() {
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
