@@ -3,8 +3,10 @@ import i18n from './i18n'
 import api from './api'
 import template from './templates/index.html' with {type: 'text'}
 import icons from './icons'
+import { setupKeybindings } from './key'
 
 var app = window.app
+var vm
 
 var TITLE = document.title
 
@@ -216,11 +218,10 @@ Vue.component('v-icon', {
   }
 })
 
-Vue.use(i18n)
-
-var vm = new Vue({
+export default {
   template: template,
   created: function() {
+    vm = this
     this.refreshStats()
       .then(this.refreshFeeds.bind(this))
       .then(this.refreshItems.bind(this, false))
@@ -230,6 +231,9 @@ var vm = new Vue({
     })
     this.updateMetaTheme(app.settings.theme_name)
     this.$setLang(app.settings.language)
+  },
+  mounted: function() {
+    setupKeybindings(this)
   },
   data: function() {
     var s = app.settings
@@ -870,6 +874,4 @@ var vm = new Vue({
       api.settings.update({language: lang})
     }
   }
-})
-
-export { vm }
+}

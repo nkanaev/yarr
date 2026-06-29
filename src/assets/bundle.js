@@ -1,131 +1,4 @@
 (() => {
-  // src/assets/javascripts/key.ts
-  function setupKeybindings(vm2) {
-    var helperFunctions = {
-      scrollContent: function(direction) {
-        var padding = 40;
-        var scroll = document.querySelector(".content");
-        if (!scroll) return;
-        var height = scroll.getBoundingClientRect().height;
-        var newpos = scroll.scrollTop + (height - padding) * direction;
-        if (typeof scroll.scrollTo == "function") {
-          scroll.scrollTo({ top: newpos, left: 0, behavior: "smooth" });
-        } else {
-          scroll.scrollTop = newpos;
-        }
-      }
-    };
-    var shortcutFunctions = {
-      openItemLink: function() {
-        if (vm2.itemSelectedDetails && vm2.itemSelectedDetails.link) {
-          window.open(vm2.itemSelectedDetails.link, "_blank", "noopener,noreferrer");
-        }
-      },
-      toggleReadability: function() {
-        vm2.toggleReadability();
-      },
-      toggleItemRead: function() {
-        if (vm2.itemSelected != null) {
-          vm2.toggleItemRead(vm2.itemSelectedDetails);
-        }
-      },
-      markAllRead: function() {
-        if (vm2.filterSelected == "unread") {
-          vm2.markItemsRead();
-        }
-      },
-      toggleItemStarred: function() {
-        if (vm2.itemSelected != null) {
-          vm2.toggleItemStarred(vm2.itemSelectedDetails);
-        }
-      },
-      focusSearch: function() {
-        document.getElementById("searchbar").focus();
-      },
-      nextItem() {
-        vm2.navigateToItem(1);
-      },
-      previousItem() {
-        vm2.navigateToItem(-1);
-      },
-      nextFeed() {
-        vm2.navigateToFeed(1);
-      },
-      previousFeed() {
-        vm2.navigateToFeed(-1);
-      },
-      scrollForward: function() {
-        helperFunctions.scrollContent(1);
-      },
-      scrollBackward: function() {
-        helperFunctions.scrollContent(-1);
-      },
-      closeItem: function() {
-        vm2.itemSelected = null;
-      },
-      showAll() {
-        vm2.filterSelected = "";
-      },
-      showUnread() {
-        vm2.filterSelected = "unread";
-      },
-      showStarred() {
-        vm2.filterSelected = "starred";
-      }
-    };
-    var keybindings = {
-      "o": shortcutFunctions.openItemLink,
-      "i": shortcutFunctions.toggleReadability,
-      "r": shortcutFunctions.toggleItemRead,
-      "R": shortcutFunctions.markAllRead,
-      "s": shortcutFunctions.toggleItemStarred,
-      "/": shortcutFunctions.focusSearch,
-      "j": shortcutFunctions.nextItem,
-      "k": shortcutFunctions.previousItem,
-      "l": shortcutFunctions.nextFeed,
-      "h": shortcutFunctions.previousFeed,
-      "f": shortcutFunctions.scrollForward,
-      "b": shortcutFunctions.scrollBackward,
-      "q": shortcutFunctions.closeItem,
-      "1": shortcutFunctions.showUnread,
-      "2": shortcutFunctions.showStarred,
-      "3": shortcutFunctions.showAll
-    };
-    var codebindings = {
-      "KeyO": shortcutFunctions.openItemLink,
-      "KeyI": shortcutFunctions.toggleReadability,
-      //"r": shortcutFunctions.toggleItemRead,
-      //"KeyR": shortcutFunctions.markAllRead,
-      "KeyS": shortcutFunctions.toggleItemStarred,
-      "Slash": shortcutFunctions.focusSearch,
-      "KeyJ": shortcutFunctions.nextItem,
-      "KeyK": shortcutFunctions.previousItem,
-      "KeyL": shortcutFunctions.nextFeed,
-      "KeyH": shortcutFunctions.previousFeed,
-      "KeyF": shortcutFunctions.scrollForward,
-      "KeyB": shortcutFunctions.scrollBackward,
-      "KeyQ": shortcutFunctions.closeItem,
-      "Digit1": shortcutFunctions.showUnread,
-      "Digit2": shortcutFunctions.showStarred,
-      "Digit3": shortcutFunctions.showAll
-    };
-    function isTextBox(element) {
-      var tagName2 = element.tagName.toLowerCase();
-      var inputBlocklist = ["button", "checkbox", "color", "file", "hidden", "image", "radio", "range", "reset", "search", "submit"];
-      return tagName2 === "textarea" || tagName2 === "input" && inputBlocklist.indexOf(element.getAttribute("type").toLowerCase()) == -1;
-    }
-    document.addEventListener("keydown", function(event) {
-      if (isTextBox(event.target) || event.metaKey || event.ctrlKey || event.altKey) {
-        return;
-      }
-      var keybindFunction = keybindings[event.key] || codebindings[event.code];
-      if (keybindFunction) {
-        event.preventDefault();
-        keybindFunction();
-      }
-    });
-  }
-
   // node_modules/vue/dist/vue.esm.js
   var emptyObject = Object.freeze({});
   var isArray = Array.isArray;
@@ -524,14 +397,14 @@
     })();
   }
   var currentInstance = null;
-  function setCurrentInstance(vm2) {
-    if (vm2 === void 0) {
-      vm2 = null;
+  function setCurrentInstance(vm3) {
+    if (vm3 === void 0) {
+      vm3 = null;
     }
-    if (!vm2)
+    if (!vm3)
       currentInstance && currentInstance._scope.off();
-    currentInstance = vm2;
-    vm2 && vm2._scope.on();
+    currentInstance = vm3;
+    vm3 && vm3._scope.on();
   }
   var VNode = (
     /** @class */
@@ -661,13 +534,13 @@
         return target2[key];
       }
     };
-    initProxy = function initProxy2(vm2) {
+    initProxy = function initProxy2(vm3) {
       if (hasProxy_1) {
-        var options = vm2.$options;
+        var options = vm3.$options;
         var handlers = options.render && options.render._withStripped ? getHandler_1 : hasHandler_1;
-        vm2._renderProxy = new Proxy(vm2, handlers);
+        vm3._renderProxy = new Proxy(vm3, handlers);
       } else {
-        vm2._renderProxy = vm2;
+        vm3._renderProxy = vm3;
       }
     };
   }
@@ -1128,32 +1001,32 @@
       passive
     };
   });
-  function createFnInvoker(fns, vm2) {
+  function createFnInvoker(fns, vm3) {
     function invoker() {
       var fns2 = invoker.fns;
       if (isArray(fns2)) {
         var cloned = fns2.slice();
         for (var i = 0; i < cloned.length; i++) {
-          invokeWithErrorHandling(cloned[i], null, arguments, vm2, "v-on handler");
+          invokeWithErrorHandling(cloned[i], null, arguments, vm3, "v-on handler");
         }
       } else {
-        return invokeWithErrorHandling(fns2, null, arguments, vm2, "v-on handler");
+        return invokeWithErrorHandling(fns2, null, arguments, vm3, "v-on handler");
       }
     }
     invoker.fns = fns;
     return invoker;
   }
-  function updateListeners(on2, oldOn, add2, remove2, createOnceHandler2, vm2) {
+  function updateListeners(on2, oldOn, add2, remove2, createOnceHandler2, vm3) {
     var name, cur, old, event;
     for (name in on2) {
       cur = on2[name];
       old = oldOn[name];
       event = normalizeEvent(name);
       if (isUndef(cur)) {
-        warn$2('Invalid handler for event "'.concat(event.name, '": got ') + String(cur), vm2);
+        warn$2('Invalid handler for event "'.concat(event.name, '": got ') + String(cur), vm3);
       } else if (isUndef(old)) {
         if (isUndef(cur.fns)) {
-          cur = on2[name] = createFnInvoker(cur, vm2);
+          cur = on2[name] = createFnInvoker(cur, vm3);
         }
         if (isTrue(event.once)) {
           cur = on2[name] = createOnceHandler2(event.name, cur, event.capture);
@@ -1659,10 +1532,10 @@
     def(res, "$hasNormal", hasNormalSlots);
     return res;
   }
-  function normalizeScopedSlot(vm2, normalSlots, key, fn) {
+  function normalizeScopedSlot(vm3, normalSlots, key, fn) {
     var normalized = function() {
       var cur = currentInstance;
-      setCurrentInstance(vm2);
+      setCurrentInstance(vm3);
       var res = arguments.length ? fn.apply(null, arguments) : fn({});
       res = res && typeof res === "object" && !isArray(res) ? [res] : normalizeChildren(res);
       var vnode = res && res[0];
@@ -1683,14 +1556,14 @@
       return slots[key];
     };
   }
-  function initSetup(vm2) {
-    var options = vm2.$options;
+  function initSetup(vm3) {
+    var options = vm3.$options;
     var setup = options.setup;
     if (setup) {
-      var ctx = vm2._setupContext = createSetupContext(vm2);
-      setCurrentInstance(vm2);
+      var ctx = vm3._setupContext = createSetupContext(vm3);
+      setCurrentInstance(vm3);
       pushTarget();
-      var setupResult = invokeWithErrorHandling(setup, null, [vm2._props || shallowReactive({}), ctx], vm2, "setup");
+      var setupResult = invokeWithErrorHandling(setup, null, [vm3._props || shallowReactive({}), ctx], vm3, "setup");
       popTarget();
       setCurrentInstance();
       if (isFunction(setupResult)) {
@@ -1699,17 +1572,17 @@
         if (setupResult instanceof VNode) {
           warn$2("setup() should not return VNodes directly - return a render function instead.");
         }
-        vm2._setupState = setupResult;
+        vm3._setupState = setupResult;
         if (!setupResult.__sfc) {
           for (var key in setupResult) {
             if (!isReserved(key)) {
-              proxyWithRefUnwrap(vm2, setupResult, key);
+              proxyWithRefUnwrap(vm3, setupResult, key);
             } else if (true) {
               warn$2("Avoid using variables that start with _ or $ in setup().");
             }
           }
         } else {
-          var proxy2 = vm2._setupProxy = {};
+          var proxy2 = vm3._setupProxy = {};
           for (var key in setupResult) {
             if (key !== "__sfc") {
               proxyWithRefUnwrap(proxy2, setupResult, key);
@@ -1721,38 +1594,38 @@
       }
     }
   }
-  function createSetupContext(vm2) {
+  function createSetupContext(vm3) {
     var exposeCalled = false;
     return {
       get attrs() {
-        if (!vm2._attrsProxy) {
-          var proxy2 = vm2._attrsProxy = {};
+        if (!vm3._attrsProxy) {
+          var proxy2 = vm3._attrsProxy = {};
           def(proxy2, "_v_attr_proxy", true);
-          syncSetupProxy(proxy2, vm2.$attrs, emptyObject, vm2, "$attrs");
+          syncSetupProxy(proxy2, vm3.$attrs, emptyObject, vm3, "$attrs");
         }
-        return vm2._attrsProxy;
+        return vm3._attrsProxy;
       },
       get listeners() {
-        if (!vm2._listenersProxy) {
-          var proxy2 = vm2._listenersProxy = {};
-          syncSetupProxy(proxy2, vm2.$listeners, emptyObject, vm2, "$listeners");
+        if (!vm3._listenersProxy) {
+          var proxy2 = vm3._listenersProxy = {};
+          syncSetupProxy(proxy2, vm3.$listeners, emptyObject, vm3, "$listeners");
         }
-        return vm2._listenersProxy;
+        return vm3._listenersProxy;
       },
       get slots() {
-        return initSlotsProxy(vm2);
+        return initSlotsProxy(vm3);
       },
-      emit: bind$1(vm2.$emit, vm2),
+      emit: bind$1(vm3.$emit, vm3),
       expose: function(exposed) {
         if (true) {
           if (exposeCalled) {
-            warn$2("expose() should be called only once per setup().", vm2);
+            warn$2("expose() should be called only once per setup().", vm3);
           }
           exposeCalled = true;
         }
         if (exposed) {
           Object.keys(exposed).forEach(function(key) {
-            return proxyWithRefUnwrap(vm2, exposed, key);
+            return proxyWithRefUnwrap(vm3, exposed, key);
           });
         }
       }
@@ -1785,11 +1658,11 @@
       }
     });
   }
-  function initSlotsProxy(vm2) {
-    if (!vm2._slotsProxy) {
-      syncSetupSlots(vm2._slotsProxy = {}, vm2.$scopedSlots);
+  function initSlotsProxy(vm3) {
+    if (!vm3._slotsProxy) {
+      syncSetupSlots(vm3._slotsProxy = {}, vm3.$scopedSlots);
     }
-    return vm2._slotsProxy;
+    return vm3._slotsProxy;
   }
   function syncSetupSlots(to, from) {
     for (var key in from) {
@@ -1801,31 +1674,31 @@
       }
     }
   }
-  function initRender(vm2) {
-    vm2._vnode = null;
-    vm2._staticTrees = null;
-    var options = vm2.$options;
-    var parentVnode = vm2.$vnode = options._parentVnode;
+  function initRender(vm3) {
+    vm3._vnode = null;
+    vm3._staticTrees = null;
+    var options = vm3.$options;
+    var parentVnode = vm3.$vnode = options._parentVnode;
     var renderContext = parentVnode && parentVnode.context;
-    vm2.$slots = resolveSlots(options._renderChildren, renderContext);
-    vm2.$scopedSlots = parentVnode ? normalizeScopedSlots(vm2.$parent, parentVnode.data.scopedSlots, vm2.$slots) : emptyObject;
-    vm2._c = function(a, b, c, d) {
-      return createElement$1(vm2, a, b, c, d, false);
+    vm3.$slots = resolveSlots(options._renderChildren, renderContext);
+    vm3.$scopedSlots = parentVnode ? normalizeScopedSlots(vm3.$parent, parentVnode.data.scopedSlots, vm3.$slots) : emptyObject;
+    vm3._c = function(a, b, c, d) {
+      return createElement$1(vm3, a, b, c, d, false);
     };
-    vm2.$createElement = function(a, b, c, d) {
-      return createElement$1(vm2, a, b, c, d, true);
+    vm3.$createElement = function(a, b, c, d) {
+      return createElement$1(vm3, a, b, c, d, true);
     };
     var parentData = parentVnode && parentVnode.data;
     if (true) {
-      defineReactive(vm2, "$attrs", parentData && parentData.attrs || emptyObject, function() {
-        !isUpdatingChildComponent && warn$2("$attrs is readonly.", vm2);
+      defineReactive(vm3, "$attrs", parentData && parentData.attrs || emptyObject, function() {
+        !isUpdatingChildComponent && warn$2("$attrs is readonly.", vm3);
       }, true);
-      defineReactive(vm2, "$listeners", options._parentListeners || emptyObject, function() {
-        !isUpdatingChildComponent && warn$2("$listeners is readonly.", vm2);
+      defineReactive(vm3, "$listeners", options._parentListeners || emptyObject, function() {
+        !isUpdatingChildComponent && warn$2("$listeners is readonly.", vm3);
       }, true);
     } else {
-      defineReactive(vm2, "$attrs", parentData && parentData.attrs || emptyObject, null, true);
-      defineReactive(vm2, "$listeners", options._parentListeners || emptyObject, null, true);
+      defineReactive(vm3, "$attrs", parentData && parentData.attrs || emptyObject, null, true);
+      defineReactive(vm3, "$listeners", options._parentListeners || emptyObject, null, true);
     }
   }
   var currentRenderingInstance = null;
@@ -1835,33 +1708,33 @@
       return nextTick(fn, this);
     };
     Vue2.prototype._render = function() {
-      var vm2 = this;
-      var _a2 = vm2.$options, render = _a2.render, _parentVnode = _a2._parentVnode;
-      if (_parentVnode && vm2._isMounted) {
-        vm2.$scopedSlots = normalizeScopedSlots(vm2.$parent, _parentVnode.data.scopedSlots, vm2.$slots, vm2.$scopedSlots);
-        if (vm2._slotsProxy) {
-          syncSetupSlots(vm2._slotsProxy, vm2.$scopedSlots);
+      var vm3 = this;
+      var _a2 = vm3.$options, render = _a2.render, _parentVnode = _a2._parentVnode;
+      if (_parentVnode && vm3._isMounted) {
+        vm3.$scopedSlots = normalizeScopedSlots(vm3.$parent, _parentVnode.data.scopedSlots, vm3.$slots, vm3.$scopedSlots);
+        if (vm3._slotsProxy) {
+          syncSetupSlots(vm3._slotsProxy, vm3.$scopedSlots);
         }
       }
-      vm2.$vnode = _parentVnode;
+      vm3.$vnode = _parentVnode;
       var prevInst = currentInstance;
       var prevRenderInst = currentRenderingInstance;
       var vnode;
       try {
-        setCurrentInstance(vm2);
-        currentRenderingInstance = vm2;
-        vnode = render.call(vm2._renderProxy, vm2.$createElement);
+        setCurrentInstance(vm3);
+        currentRenderingInstance = vm3;
+        vnode = render.call(vm3._renderProxy, vm3.$createElement);
       } catch (e) {
-        handleError(e, vm2, "render");
-        if (vm2.$options.renderError) {
+        handleError(e, vm3, "render");
+        if (vm3.$options.renderError) {
           try {
-            vnode = vm2.$options.renderError.call(vm2._renderProxy, vm2.$createElement, e);
+            vnode = vm3.$options.renderError.call(vm3._renderProxy, vm3.$createElement, e);
           } catch (e2) {
-            handleError(e2, vm2, "renderError");
-            vnode = vm2._vnode;
+            handleError(e2, vm3, "renderError");
+            vnode = vm3._vnode;
           }
         } else {
-          vnode = vm2._vnode;
+          vnode = vm3._vnode;
         }
       } finally {
         currentRenderingInstance = prevRenderInst;
@@ -1872,7 +1745,7 @@
       }
       if (!(vnode instanceof VNode)) {
         if (isArray(vnode)) {
-          warn$2("Multiple root nodes returned from render function. Render function should return a single root node.", vm2);
+          warn$2("Multiple root nodes returned from render function. Render function should return a single root node.", vm3);
         }
         vnode = createEmptyVNode();
       }
@@ -1994,12 +1867,12 @@
       }
     }
   }
-  function initEvents(vm2) {
-    vm2._events = /* @__PURE__ */ Object.create(null);
-    vm2._hasHookEvent = false;
-    var listeners = vm2.$options._parentListeners;
+  function initEvents(vm3) {
+    vm3._events = /* @__PURE__ */ Object.create(null);
+    vm3._hasHookEvent = false;
+    var listeners = vm3.$options._parentListeners;
     if (listeners) {
-      updateComponentListeners(vm2, listeners);
+      updateComponentListeners(vm3, listeners);
     }
   }
   var target$1;
@@ -2018,56 +1891,56 @@
       }
     };
   }
-  function updateComponentListeners(vm2, listeners, oldListeners) {
-    target$1 = vm2;
-    updateListeners(listeners, oldListeners || {}, add$1, remove$1, createOnceHandler$1, vm2);
+  function updateComponentListeners(vm3, listeners, oldListeners) {
+    target$1 = vm3;
+    updateListeners(listeners, oldListeners || {}, add$1, remove$1, createOnceHandler$1, vm3);
     target$1 = void 0;
   }
   function eventsMixin(Vue2) {
     var hookRE = /^hook:/;
     Vue2.prototype.$on = function(event, fn) {
-      var vm2 = this;
+      var vm3 = this;
       if (isArray(event)) {
         for (var i = 0, l = event.length; i < l; i++) {
-          vm2.$on(event[i], fn);
+          vm3.$on(event[i], fn);
         }
       } else {
-        (vm2._events[event] || (vm2._events[event] = [])).push(fn);
+        (vm3._events[event] || (vm3._events[event] = [])).push(fn);
         if (hookRE.test(event)) {
-          vm2._hasHookEvent = true;
+          vm3._hasHookEvent = true;
         }
       }
-      return vm2;
+      return vm3;
     };
     Vue2.prototype.$once = function(event, fn) {
-      var vm2 = this;
+      var vm3 = this;
       function on2() {
-        vm2.$off(event, on2);
-        fn.apply(vm2, arguments);
+        vm3.$off(event, on2);
+        fn.apply(vm3, arguments);
       }
       on2.fn = fn;
-      vm2.$on(event, on2);
-      return vm2;
+      vm3.$on(event, on2);
+      return vm3;
     };
     Vue2.prototype.$off = function(event, fn) {
-      var vm2 = this;
+      var vm3 = this;
       if (!arguments.length) {
-        vm2._events = /* @__PURE__ */ Object.create(null);
-        return vm2;
+        vm3._events = /* @__PURE__ */ Object.create(null);
+        return vm3;
       }
       if (isArray(event)) {
         for (var i_1 = 0, l = event.length; i_1 < l; i_1++) {
-          vm2.$off(event[i_1], fn);
+          vm3.$off(event[i_1], fn);
         }
-        return vm2;
+        return vm3;
       }
-      var cbs = vm2._events[event];
+      var cbs = vm3._events[event];
       if (!cbs) {
-        return vm2;
+        return vm3;
       }
       if (!fn) {
-        vm2._events[event] = null;
-        return vm2;
+        vm3._events[event] = null;
+        return vm3;
       }
       var cb;
       var i = cbs.length;
@@ -2078,26 +1951,26 @@
           break;
         }
       }
-      return vm2;
+      return vm3;
     };
     Vue2.prototype.$emit = function(event) {
-      var vm2 = this;
+      var vm3 = this;
       if (true) {
         var lowerCaseEvent = event.toLowerCase();
-        if (lowerCaseEvent !== event && vm2._events[lowerCaseEvent]) {
-          tip('Event "'.concat(lowerCaseEvent, '" is emitted in component ') + "".concat(formatComponentName(vm2), ' but the handler is registered for "').concat(event, '". ') + "Note that HTML attributes are case-insensitive and you cannot use v-on to listen to camelCase events when using in-DOM templates. " + 'You should probably use "'.concat(hyphenate(event), '" instead of "').concat(event, '".'));
+        if (lowerCaseEvent !== event && vm3._events[lowerCaseEvent]) {
+          tip('Event "'.concat(lowerCaseEvent, '" is emitted in component ') + "".concat(formatComponentName(vm3), ' but the handler is registered for "').concat(event, '". ') + "Note that HTML attributes are case-insensitive and you cannot use v-on to listen to camelCase events when using in-DOM templates. " + 'You should probably use "'.concat(hyphenate(event), '" instead of "').concat(event, '".'));
         }
       }
-      var cbs = vm2._events[event];
+      var cbs = vm3._events[event];
       if (cbs) {
         cbs = cbs.length > 1 ? toArray(cbs) : cbs;
         var args = toArray(arguments, 1);
         var info = 'event handler for "'.concat(event, '"');
         for (var i = 0, l = cbs.length; i < l; i++) {
-          invokeWithErrorHandling(cbs[i], vm2, args, vm2, info);
+          invokeWithErrorHandling(cbs[i], vm3, args, vm3, info);
         }
       }
-      return vm2;
+      return vm3;
     };
   }
   var activeEffectScope;
@@ -2177,149 +2050,149 @@
   }
   var activeInstance = null;
   var isUpdatingChildComponent = false;
-  function setActiveInstance(vm2) {
+  function setActiveInstance(vm3) {
     var prevActiveInstance = activeInstance;
-    activeInstance = vm2;
+    activeInstance = vm3;
     return function() {
       activeInstance = prevActiveInstance;
     };
   }
-  function initLifecycle(vm2) {
-    var options = vm2.$options;
+  function initLifecycle(vm3) {
+    var options = vm3.$options;
     var parent = options.parent;
     if (parent && !options.abstract) {
       while (parent.$options.abstract && parent.$parent) {
         parent = parent.$parent;
       }
-      parent.$children.push(vm2);
+      parent.$children.push(vm3);
     }
-    vm2.$parent = parent;
-    vm2.$root = parent ? parent.$root : vm2;
-    vm2.$children = [];
-    vm2.$refs = {};
-    vm2._provided = parent ? parent._provided : /* @__PURE__ */ Object.create(null);
-    vm2._watcher = null;
-    vm2._inactive = null;
-    vm2._directInactive = false;
-    vm2._isMounted = false;
-    vm2._isDestroyed = false;
-    vm2._isBeingDestroyed = false;
+    vm3.$parent = parent;
+    vm3.$root = parent ? parent.$root : vm3;
+    vm3.$children = [];
+    vm3.$refs = {};
+    vm3._provided = parent ? parent._provided : /* @__PURE__ */ Object.create(null);
+    vm3._watcher = null;
+    vm3._inactive = null;
+    vm3._directInactive = false;
+    vm3._isMounted = false;
+    vm3._isDestroyed = false;
+    vm3._isBeingDestroyed = false;
   }
   function lifecycleMixin(Vue2) {
     Vue2.prototype._update = function(vnode, hydrating) {
-      var vm2 = this;
-      var prevEl = vm2.$el;
-      var prevVnode = vm2._vnode;
-      var restoreActiveInstance = setActiveInstance(vm2);
-      vm2._vnode = vnode;
+      var vm3 = this;
+      var prevEl = vm3.$el;
+      var prevVnode = vm3._vnode;
+      var restoreActiveInstance = setActiveInstance(vm3);
+      vm3._vnode = vnode;
       if (!prevVnode) {
-        vm2.$el = vm2.__patch__(
-          vm2.$el,
+        vm3.$el = vm3.__patch__(
+          vm3.$el,
           vnode,
           hydrating,
           false
           /* removeOnly */
         );
       } else {
-        vm2.$el = vm2.__patch__(prevVnode, vnode);
+        vm3.$el = vm3.__patch__(prevVnode, vnode);
       }
       restoreActiveInstance();
       if (prevEl) {
         prevEl.__vue__ = null;
       }
-      if (vm2.$el) {
-        vm2.$el.__vue__ = vm2;
+      if (vm3.$el) {
+        vm3.$el.__vue__ = vm3;
       }
-      var wrapper = vm2;
+      var wrapper = vm3;
       while (wrapper && wrapper.$vnode && wrapper.$parent && wrapper.$vnode === wrapper.$parent._vnode) {
         wrapper.$parent.$el = wrapper.$el;
         wrapper = wrapper.$parent;
       }
     };
     Vue2.prototype.$forceUpdate = function() {
-      var vm2 = this;
-      if (vm2._watcher) {
-        vm2._watcher.update();
+      var vm3 = this;
+      if (vm3._watcher) {
+        vm3._watcher.update();
       }
     };
     Vue2.prototype.$destroy = function() {
-      var vm2 = this;
-      if (vm2._isBeingDestroyed) {
+      var vm3 = this;
+      if (vm3._isBeingDestroyed) {
         return;
       }
-      callHook$1(vm2, "beforeDestroy");
-      vm2._isBeingDestroyed = true;
-      var parent = vm2.$parent;
-      if (parent && !parent._isBeingDestroyed && !vm2.$options.abstract) {
-        remove$2(parent.$children, vm2);
+      callHook$1(vm3, "beforeDestroy");
+      vm3._isBeingDestroyed = true;
+      var parent = vm3.$parent;
+      if (parent && !parent._isBeingDestroyed && !vm3.$options.abstract) {
+        remove$2(parent.$children, vm3);
       }
-      vm2._scope.stop();
-      if (vm2._data.__ob__) {
-        vm2._data.__ob__.vmCount--;
+      vm3._scope.stop();
+      if (vm3._data.__ob__) {
+        vm3._data.__ob__.vmCount--;
       }
-      vm2._isDestroyed = true;
-      vm2.__patch__(vm2._vnode, null);
-      callHook$1(vm2, "destroyed");
-      vm2.$off();
-      if (vm2.$el) {
-        vm2.$el.__vue__ = null;
+      vm3._isDestroyed = true;
+      vm3.__patch__(vm3._vnode, null);
+      callHook$1(vm3, "destroyed");
+      vm3.$off();
+      if (vm3.$el) {
+        vm3.$el.__vue__ = null;
       }
-      if (vm2.$vnode) {
-        vm2.$vnode.parent = null;
+      if (vm3.$vnode) {
+        vm3.$vnode.parent = null;
       }
     };
   }
-  function mountComponent(vm2, el, hydrating) {
-    vm2.$el = el;
-    if (!vm2.$options.render) {
-      vm2.$options.render = createEmptyVNode;
+  function mountComponent(vm3, el, hydrating) {
+    vm3.$el = el;
+    if (!vm3.$options.render) {
+      vm3.$options.render = createEmptyVNode;
       if (true) {
-        if (vm2.$options.template && vm2.$options.template.charAt(0) !== "#" || vm2.$options.el || el) {
-          warn$2("You are using the runtime-only build of Vue where the template compiler is not available. Either pre-compile the templates into render functions, or use the compiler-included build.", vm2);
+        if (vm3.$options.template && vm3.$options.template.charAt(0) !== "#" || vm3.$options.el || el) {
+          warn$2("You are using the runtime-only build of Vue where the template compiler is not available. Either pre-compile the templates into render functions, or use the compiler-included build.", vm3);
         } else {
-          warn$2("Failed to mount component: template or render function not defined.", vm2);
+          warn$2("Failed to mount component: template or render function not defined.", vm3);
         }
       }
     }
-    callHook$1(vm2, "beforeMount");
+    callHook$1(vm3, "beforeMount");
     var updateComponent;
     if (config.performance && mark) {
       updateComponent = function() {
-        var name = vm2._name;
-        var id = vm2._uid;
+        var name = vm3._name;
+        var id = vm3._uid;
         var startTag = "vue-perf-start:".concat(id);
         var endTag2 = "vue-perf-end:".concat(id);
         mark(startTag);
-        var vnode = vm2._render();
+        var vnode = vm3._render();
         mark(endTag2);
         measure("vue ".concat(name, " render"), startTag, endTag2);
         mark(startTag);
-        vm2._update(vnode, hydrating);
+        vm3._update(vnode, hydrating);
         mark(endTag2);
         measure("vue ".concat(name, " patch"), startTag, endTag2);
       };
     } else {
       updateComponent = function() {
-        vm2._update(vm2._render(), hydrating);
+        vm3._update(vm3._render(), hydrating);
       };
     }
     var watcherOptions = {
       before: function() {
-        if (vm2._isMounted && !vm2._isDestroyed) {
-          callHook$1(vm2, "beforeUpdate");
+        if (vm3._isMounted && !vm3._isDestroyed) {
+          callHook$1(vm3, "beforeUpdate");
         }
       }
     };
     if (true) {
       watcherOptions.onTrack = function(e) {
-        return callHook$1(vm2, "renderTracked", [e]);
+        return callHook$1(vm3, "renderTracked", [e]);
       };
       watcherOptions.onTrigger = function(e) {
-        return callHook$1(vm2, "renderTriggered", [e]);
+        return callHook$1(vm3, "renderTriggered", [e]);
       };
     }
     new Watcher(
-      vm2,
+      vm3,
       updateComponent,
       noop,
       watcherOptions,
@@ -2327,125 +2200,125 @@
       /* isRenderWatcher */
     );
     hydrating = false;
-    var preWatchers = vm2._preWatchers;
+    var preWatchers = vm3._preWatchers;
     if (preWatchers) {
       for (var i = 0; i < preWatchers.length; i++) {
         preWatchers[i].run();
       }
     }
-    if (vm2.$vnode == null) {
-      vm2._isMounted = true;
-      callHook$1(vm2, "mounted");
+    if (vm3.$vnode == null) {
+      vm3._isMounted = true;
+      callHook$1(vm3, "mounted");
     }
-    return vm2;
+    return vm3;
   }
-  function updateChildComponent(vm2, propsData, listeners, parentVnode, renderChildren) {
+  function updateChildComponent(vm3, propsData, listeners, parentVnode, renderChildren) {
     if (true) {
       isUpdatingChildComponent = true;
     }
     var newScopedSlots = parentVnode.data.scopedSlots;
-    var oldScopedSlots = vm2.$scopedSlots;
-    var hasDynamicScopedSlot = !!(newScopedSlots && !newScopedSlots.$stable || oldScopedSlots !== emptyObject && !oldScopedSlots.$stable || newScopedSlots && vm2.$scopedSlots.$key !== newScopedSlots.$key || !newScopedSlots && vm2.$scopedSlots.$key);
+    var oldScopedSlots = vm3.$scopedSlots;
+    var hasDynamicScopedSlot = !!(newScopedSlots && !newScopedSlots.$stable || oldScopedSlots !== emptyObject && !oldScopedSlots.$stable || newScopedSlots && vm3.$scopedSlots.$key !== newScopedSlots.$key || !newScopedSlots && vm3.$scopedSlots.$key);
     var needsForceUpdate = !!(renderChildren || // has new static slots
-    vm2.$options._renderChildren || // has old static slots
+    vm3.$options._renderChildren || // has old static slots
     hasDynamicScopedSlot);
-    var prevVNode = vm2.$vnode;
-    vm2.$options._parentVnode = parentVnode;
-    vm2.$vnode = parentVnode;
-    if (vm2._vnode) {
-      vm2._vnode.parent = parentVnode;
+    var prevVNode = vm3.$vnode;
+    vm3.$options._parentVnode = parentVnode;
+    vm3.$vnode = parentVnode;
+    if (vm3._vnode) {
+      vm3._vnode.parent = parentVnode;
     }
-    vm2.$options._renderChildren = renderChildren;
+    vm3.$options._renderChildren = renderChildren;
     var attrs2 = parentVnode.data.attrs || emptyObject;
-    if (vm2._attrsProxy) {
-      if (syncSetupProxy(vm2._attrsProxy, attrs2, prevVNode.data && prevVNode.data.attrs || emptyObject, vm2, "$attrs")) {
+    if (vm3._attrsProxy) {
+      if (syncSetupProxy(vm3._attrsProxy, attrs2, prevVNode.data && prevVNode.data.attrs || emptyObject, vm3, "$attrs")) {
         needsForceUpdate = true;
       }
     }
-    vm2.$attrs = attrs2;
+    vm3.$attrs = attrs2;
     listeners = listeners || emptyObject;
-    var prevListeners = vm2.$options._parentListeners;
-    if (vm2._listenersProxy) {
-      syncSetupProxy(vm2._listenersProxy, listeners, prevListeners || emptyObject, vm2, "$listeners");
+    var prevListeners = vm3.$options._parentListeners;
+    if (vm3._listenersProxy) {
+      syncSetupProxy(vm3._listenersProxy, listeners, prevListeners || emptyObject, vm3, "$listeners");
     }
-    vm2.$listeners = vm2.$options._parentListeners = listeners;
-    updateComponentListeners(vm2, listeners, prevListeners);
-    if (propsData && vm2.$options.props) {
+    vm3.$listeners = vm3.$options._parentListeners = listeners;
+    updateComponentListeners(vm3, listeners, prevListeners);
+    if (propsData && vm3.$options.props) {
       toggleObserving(false);
-      var props2 = vm2._props;
-      var propKeys = vm2.$options._propKeys || [];
+      var props2 = vm3._props;
+      var propKeys = vm3.$options._propKeys || [];
       for (var i = 0; i < propKeys.length; i++) {
         var key = propKeys[i];
-        var propOptions = vm2.$options.props;
-        props2[key] = validateProp(key, propOptions, propsData, vm2);
+        var propOptions = vm3.$options.props;
+        props2[key] = validateProp(key, propOptions, propsData, vm3);
       }
       toggleObserving(true);
-      vm2.$options.propsData = propsData;
+      vm3.$options.propsData = propsData;
     }
     if (needsForceUpdate) {
-      vm2.$slots = resolveSlots(renderChildren, parentVnode.context);
-      vm2.$forceUpdate();
+      vm3.$slots = resolveSlots(renderChildren, parentVnode.context);
+      vm3.$forceUpdate();
     }
     if (true) {
       isUpdatingChildComponent = false;
     }
   }
-  function isInInactiveTree(vm2) {
-    while (vm2 && (vm2 = vm2.$parent)) {
-      if (vm2._inactive)
+  function isInInactiveTree(vm3) {
+    while (vm3 && (vm3 = vm3.$parent)) {
+      if (vm3._inactive)
         return true;
     }
     return false;
   }
-  function activateChildComponent(vm2, direct) {
+  function activateChildComponent(vm3, direct) {
     if (direct) {
-      vm2._directInactive = false;
-      if (isInInactiveTree(vm2)) {
+      vm3._directInactive = false;
+      if (isInInactiveTree(vm3)) {
         return;
       }
-    } else if (vm2._directInactive) {
+    } else if (vm3._directInactive) {
       return;
     }
-    if (vm2._inactive || vm2._inactive === null) {
-      vm2._inactive = false;
-      for (var i = 0; i < vm2.$children.length; i++) {
-        activateChildComponent(vm2.$children[i]);
+    if (vm3._inactive || vm3._inactive === null) {
+      vm3._inactive = false;
+      for (var i = 0; i < vm3.$children.length; i++) {
+        activateChildComponent(vm3.$children[i]);
       }
-      callHook$1(vm2, "activated");
+      callHook$1(vm3, "activated");
     }
   }
-  function deactivateChildComponent(vm2, direct) {
+  function deactivateChildComponent(vm3, direct) {
     if (direct) {
-      vm2._directInactive = true;
-      if (isInInactiveTree(vm2)) {
+      vm3._directInactive = true;
+      if (isInInactiveTree(vm3)) {
         return;
       }
     }
-    if (!vm2._inactive) {
-      vm2._inactive = true;
-      for (var i = 0; i < vm2.$children.length; i++) {
-        deactivateChildComponent(vm2.$children[i]);
+    if (!vm3._inactive) {
+      vm3._inactive = true;
+      for (var i = 0; i < vm3.$children.length; i++) {
+        deactivateChildComponent(vm3.$children[i]);
       }
-      callHook$1(vm2, "deactivated");
+      callHook$1(vm3, "deactivated");
     }
   }
-  function callHook$1(vm2, hook, args, setContext) {
+  function callHook$1(vm3, hook, args, setContext) {
     if (setContext === void 0) {
       setContext = true;
     }
     pushTarget();
     var prevInst = currentInstance;
     var prevScope = getCurrentScope();
-    setContext && setCurrentInstance(vm2);
-    var handlers = vm2.$options[hook];
+    setContext && setCurrentInstance(vm3);
+    var handlers = vm3.$options[hook];
     var info = "".concat(hook, " hook");
     if (handlers) {
       for (var i = 0, j = handlers.length; i < j; i++) {
-        invokeWithErrorHandling(handlers[i], vm2, args || null, vm2, info);
+        invokeWithErrorHandling(handlers[i], vm3, args || null, vm3, info);
       }
     }
-    if (vm2._hasHookEvent) {
-      vm2.$emit("hook:" + hook);
+    if (vm3._hasHookEvent) {
+      vm3.$emit("hook:" + hook);
     }
     if (setContext) {
       setCurrentInstance(prevInst);
@@ -2524,15 +2397,15 @@
     var i = queue2.length;
     while (i--) {
       var watcher = queue2[i];
-      var vm2 = watcher.vm;
-      if (vm2 && vm2._watcher === watcher && vm2._isMounted && !vm2._isDestroyed) {
-        callHook$1(vm2, "updated");
+      var vm3 = watcher.vm;
+      if (vm3 && vm3._watcher === watcher && vm3._isMounted && !vm3._isDestroyed) {
+        callHook$1(vm3, "updated");
       }
     }
   }
-  function queueActivatedComponent(vm2) {
-    vm2._inactive = false;
-    activatedChildren.push(vm2);
+  function queueActivatedComponent(vm3) {
+    vm3._inactive = false;
+    activatedChildren.push(vm3);
   }
   function callActivatedHooks(queue2) {
     for (var i = 0; i < queue2.length; i++) {
@@ -2575,26 +2448,26 @@
   var WATCHER_CB = "".concat(WATCHER, " callback");
   var WATCHER_GETTER = "".concat(WATCHER, " getter");
   var WATCHER_CLEANUP = "".concat(WATCHER, " cleanup");
-  function resolveProvided(vm2) {
-    var existing = vm2._provided;
-    var parentProvides = vm2.$parent && vm2.$parent._provided;
+  function resolveProvided(vm3) {
+    var existing = vm3._provided;
+    var parentProvides = vm3.$parent && vm3.$parent._provided;
     if (parentProvides === existing) {
-      return vm2._provided = Object.create(parentProvides);
+      return vm3._provided = Object.create(parentProvides);
     } else {
       return existing;
     }
   }
-  function handleError(err, vm2, info) {
+  function handleError(err, vm3, info) {
     pushTarget();
     try {
-      if (vm2) {
-        var cur = vm2;
+      if (vm3) {
+        var cur = vm3;
         while (cur = cur.$parent) {
           var hooks2 = cur.$options.errorCaptured;
           if (hooks2) {
             for (var i = 0; i < hooks2.length; i++) {
               try {
-                var capture = hooks2[i].call(cur, err, vm2, info) === false;
+                var capture = hooks2[i].call(cur, err, vm3, info) === false;
                 if (capture)
                   return;
               } catch (e) {
@@ -2604,41 +2477,41 @@
           }
         }
       }
-      globalHandleError(err, vm2, info);
+      globalHandleError(err, vm3, info);
     } finally {
       popTarget();
     }
   }
-  function invokeWithErrorHandling(handler, context, args, vm2, info) {
+  function invokeWithErrorHandling(handler, context, args, vm3, info) {
     var res;
     try {
       res = args ? handler.apply(context, args) : handler.call(context);
       if (res && !res._isVue && isPromise(res) && !res._handled) {
         res.catch(function(e) {
-          return handleError(e, vm2, info + " (Promise/async)");
+          return handleError(e, vm3, info + " (Promise/async)");
         });
         res._handled = true;
       }
     } catch (e) {
-      handleError(e, vm2, info);
+      handleError(e, vm3, info);
     }
     return res;
   }
-  function globalHandleError(err, vm2, info) {
+  function globalHandleError(err, vm3, info) {
     if (config.errorHandler) {
       try {
-        return config.errorHandler.call(null, err, vm2, info);
+        return config.errorHandler.call(null, err, vm3, info);
       } catch (e) {
         if (e !== err) {
           logError(e, null, "config.errorHandler");
         }
       }
     }
-    logError(err, vm2, info);
+    logError(err, vm3, info);
   }
-  function logError(err, vm2, info) {
+  function logError(err, vm3, info) {
     if (true) {
-      warn$2("Error in ".concat(info, ': "').concat(err.toString(), '"'), vm2);
+      warn$2("Error in ".concat(info, ': "').concat(err.toString(), '"'), vm3);
     }
     if (inBrowser && typeof console !== "undefined") {
       console.error(err);
@@ -2788,15 +2661,15 @@
   var Watcher = (
     /** @class */
     (function() {
-      function Watcher2(vm2, expOrFn, cb, options, isRenderWatcher) {
+      function Watcher2(vm3, expOrFn, cb, options, isRenderWatcher) {
         recordEffectScope(
           this,
           // if the active effect scope is manually created (not a component scope),
           // prioritize it
-          activeEffectScope && !activeEffectScope._vm ? activeEffectScope : vm2 ? vm2._scope : void 0
+          activeEffectScope && !activeEffectScope._vm ? activeEffectScope : vm3 ? vm3._scope : void 0
         );
-        if ((this.vm = vm2) && isRenderWatcher) {
-          vm2._watcher = this;
+        if ((this.vm = vm3) && isRenderWatcher) {
+          vm3._watcher = this;
         }
         if (options) {
           this.deep = !!options.deep;
@@ -2827,7 +2700,7 @@
           this.getter = parsePath(expOrFn);
           if (!this.getter) {
             this.getter = noop;
-            warn$2('Failed watching path: "'.concat(expOrFn, '" ') + "Watcher only accepts simple dot-delimited paths. For full control, use a function instead.", vm2);
+            warn$2('Failed watching path: "'.concat(expOrFn, '" ') + "Watcher only accepts simple dot-delimited paths. For full control, use a function instead.", vm3);
           }
         }
         this.value = this.lazy ? void 0 : this.get();
@@ -2835,12 +2708,12 @@
       Watcher2.prototype.get = function() {
         pushTarget(this);
         var value;
-        var vm2 = this.vm;
+        var vm3 = this.vm;
         try {
-          value = this.getter.call(vm2, vm2);
+          value = this.getter.call(vm3, vm3);
         } catch (e) {
           if (this.user) {
-            handleError(e, vm2, 'getter for watcher "'.concat(this.expression, '"'));
+            handleError(e, vm3, 'getter for watcher "'.concat(this.expression, '"'));
           } else {
             throw e;
           }
@@ -2950,40 +2823,40 @@
     };
     Object.defineProperty(target2, key, sharedPropertyDefinition);
   }
-  function initState(vm2) {
-    var opts2 = vm2.$options;
+  function initState(vm3) {
+    var opts2 = vm3.$options;
     if (opts2.props)
-      initProps$1(vm2, opts2.props);
-    initSetup(vm2);
+      initProps$1(vm3, opts2.props);
+    initSetup(vm3);
     if (opts2.methods)
-      initMethods(vm2, opts2.methods);
+      initMethods(vm3, opts2.methods);
     if (opts2.data) {
-      initData(vm2);
+      initData(vm3);
     } else {
-      var ob = observe(vm2._data = {});
+      var ob = observe(vm3._data = {});
       ob && ob.vmCount++;
     }
     if (opts2.computed)
-      initComputed$1(vm2, opts2.computed);
+      initComputed$1(vm3, opts2.computed);
     if (opts2.watch && opts2.watch !== nativeWatch) {
-      initWatch(vm2, opts2.watch);
+      initWatch(vm3, opts2.watch);
     }
   }
-  function initProps$1(vm2, propsOptions) {
-    var propsData = vm2.$options.propsData || {};
-    var props2 = vm2._props = shallowReactive({});
-    var keys = vm2.$options._propKeys = [];
-    var isRoot = !vm2.$parent;
+  function initProps$1(vm3, propsOptions) {
+    var propsData = vm3.$options.propsData || {};
+    var props2 = vm3._props = shallowReactive({});
+    var keys = vm3.$options._propKeys = [];
+    var isRoot = !vm3.$parent;
     if (!isRoot) {
       toggleObserving(false);
     }
     var _loop_1 = function(key2) {
       keys.push(key2);
-      var value = validateProp(key2, propsOptions, propsData, vm2);
+      var value = validateProp(key2, propsOptions, propsData, vm3);
       if (true) {
         var hyphenatedKey = hyphenate(key2);
         if (isReservedAttribute(hyphenatedKey) || config.isReservedAttr(hyphenatedKey)) {
-          warn$2('"'.concat(hyphenatedKey, '" is a reserved attribute and cannot be used as component prop.'), vm2);
+          warn$2('"'.concat(hyphenatedKey, '" is a reserved attribute and cannot be used as component prop.'), vm3);
         }
         defineReactive(
           props2,
@@ -2991,7 +2864,7 @@
           value,
           function() {
             if (!isRoot && !isUpdatingChildComponent) {
-              warn$2("Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders. Instead, use a data or computed property based on the prop's " + 'value. Prop being mutated: "'.concat(key2, '"'), vm2);
+              warn$2("Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders. Instead, use a data or computed property based on the prop's " + 'value. Prop being mutated: "'.concat(key2, '"'), vm3);
             }
           },
           true
@@ -3007,8 +2880,8 @@
           /* shallow */
         );
       }
-      if (!(key2 in vm2)) {
-        proxy(vm2, "_props", key2);
+      if (!(key2 in vm3)) {
+        proxy(vm3, "_props", key2);
       }
     };
     for (var key in propsOptions) {
@@ -3016,66 +2889,66 @@
     }
     toggleObserving(true);
   }
-  function initData(vm2) {
-    var data = vm2.$options.data;
-    data = vm2._data = isFunction(data) ? getData(data, vm2) : data || {};
+  function initData(vm3) {
+    var data = vm3.$options.data;
+    data = vm3._data = isFunction(data) ? getData(data, vm3) : data || {};
     if (!isPlainObject(data)) {
       data = {};
-      warn$2("data functions should return an object:\nhttps://v2.vuejs.org/v2/guide/components.html#data-Must-Be-a-Function", vm2);
+      warn$2("data functions should return an object:\nhttps://v2.vuejs.org/v2/guide/components.html#data-Must-Be-a-Function", vm3);
     }
     var keys = Object.keys(data);
-    var props2 = vm2.$options.props;
-    var methods = vm2.$options.methods;
+    var props2 = vm3.$options.props;
+    var methods = vm3.$options.methods;
     var i = keys.length;
     while (i--) {
       var key = keys[i];
       if (true) {
         if (methods && hasOwn(methods, key)) {
-          warn$2('Method "'.concat(key, '" has already been defined as a data property.'), vm2);
+          warn$2('Method "'.concat(key, '" has already been defined as a data property.'), vm3);
         }
       }
       if (props2 && hasOwn(props2, key)) {
-        warn$2('The data property "'.concat(key, '" is already declared as a prop. ') + "Use prop default value instead.", vm2);
+        warn$2('The data property "'.concat(key, '" is already declared as a prop. ') + "Use prop default value instead.", vm3);
       } else if (!isReserved(key)) {
-        proxy(vm2, "_data", key);
+        proxy(vm3, "_data", key);
       }
     }
     var ob = observe(data);
     ob && ob.vmCount++;
   }
-  function getData(data, vm2) {
+  function getData(data, vm3) {
     pushTarget();
     try {
-      return data.call(vm2, vm2);
+      return data.call(vm3, vm3);
     } catch (e) {
-      handleError(e, vm2, "data()");
+      handleError(e, vm3, "data()");
       return {};
     } finally {
       popTarget();
     }
   }
   var computedWatcherOptions = { lazy: true };
-  function initComputed$1(vm2, computed) {
-    var watchers = vm2._computedWatchers = /* @__PURE__ */ Object.create(null);
+  function initComputed$1(vm3, computed) {
+    var watchers = vm3._computedWatchers = /* @__PURE__ */ Object.create(null);
     var isSSR = isServerRendering();
     for (var key in computed) {
       var userDef = computed[key];
       var getter = isFunction(userDef) ? userDef : userDef.get;
       if (getter == null) {
-        warn$2('Getter is missing for computed property "'.concat(key, '".'), vm2);
+        warn$2('Getter is missing for computed property "'.concat(key, '".'), vm3);
       }
       if (!isSSR) {
-        watchers[key] = new Watcher(vm2, getter || noop, noop, computedWatcherOptions);
+        watchers[key] = new Watcher(vm3, getter || noop, noop, computedWatcherOptions);
       }
-      if (!(key in vm2)) {
-        defineComputed(vm2, key, userDef);
+      if (!(key in vm3)) {
+        defineComputed(vm3, key, userDef);
       } else if (true) {
-        if (key in vm2.$data) {
-          warn$2('The computed property "'.concat(key, '" is already defined in data.'), vm2);
-        } else if (vm2.$options.props && key in vm2.$options.props) {
-          warn$2('The computed property "'.concat(key, '" is already defined as a prop.'), vm2);
-        } else if (vm2.$options.methods && key in vm2.$options.methods) {
-          warn$2('The computed property "'.concat(key, '" is already defined as a method.'), vm2);
+        if (key in vm3.$data) {
+          warn$2('The computed property "'.concat(key, '" is already defined in data.'), vm3);
+        } else if (vm3.$options.props && key in vm3.$options.props) {
+          warn$2('The computed property "'.concat(key, '" is already defined as a prop.'), vm3);
+        } else if (vm3.$options.methods && key in vm3.$options.methods) {
+          warn$2('The computed property "'.concat(key, '" is already defined as a method.'), vm3);
         }
       }
     }
@@ -3123,44 +2996,44 @@
       return fn.call(this, this);
     };
   }
-  function initMethods(vm2, methods) {
-    var props2 = vm2.$options.props;
+  function initMethods(vm3, methods) {
+    var props2 = vm3.$options.props;
     for (var key in methods) {
       if (true) {
         if (typeof methods[key] !== "function") {
-          warn$2('Method "'.concat(key, '" has type "').concat(typeof methods[key], '" in the component definition. ') + "Did you reference the function correctly?", vm2);
+          warn$2('Method "'.concat(key, '" has type "').concat(typeof methods[key], '" in the component definition. ') + "Did you reference the function correctly?", vm3);
         }
         if (props2 && hasOwn(props2, key)) {
-          warn$2('Method "'.concat(key, '" has already been defined as a prop.'), vm2);
+          warn$2('Method "'.concat(key, '" has already been defined as a prop.'), vm3);
         }
-        if (key in vm2 && isReserved(key)) {
+        if (key in vm3 && isReserved(key)) {
           warn$2('Method "'.concat(key, '" conflicts with an existing Vue instance method. ') + "Avoid defining component methods that start with _ or $.");
         }
       }
-      vm2[key] = typeof methods[key] !== "function" ? noop : bind$1(methods[key], vm2);
+      vm3[key] = typeof methods[key] !== "function" ? noop : bind$1(methods[key], vm3);
     }
   }
-  function initWatch(vm2, watch) {
+  function initWatch(vm3, watch) {
     for (var key in watch) {
       var handler = watch[key];
       if (isArray(handler)) {
         for (var i = 0; i < handler.length; i++) {
-          createWatcher(vm2, key, handler[i]);
+          createWatcher(vm3, key, handler[i]);
         }
       } else {
-        createWatcher(vm2, key, handler);
+        createWatcher(vm3, key, handler);
       }
     }
   }
-  function createWatcher(vm2, expOrFn, handler, options) {
+  function createWatcher(vm3, expOrFn, handler, options) {
     if (isPlainObject(handler)) {
       options = handler;
       handler = handler.handler;
     }
     if (typeof handler === "string") {
-      handler = vm2[handler];
+      handler = vm3[handler];
     }
-    return vm2.$watch(expOrFn, handler, options);
+    return vm3.$watch(expOrFn, handler, options);
   }
   function stateMixin(Vue2) {
     var dataDef = {};
@@ -3184,17 +3057,17 @@
     Vue2.prototype.$set = set;
     Vue2.prototype.$delete = del;
     Vue2.prototype.$watch = function(expOrFn, cb, options) {
-      var vm2 = this;
+      var vm3 = this;
       if (isPlainObject(cb)) {
-        return createWatcher(vm2, expOrFn, cb, options);
+        return createWatcher(vm3, expOrFn, cb, options);
       }
       options = options || {};
       options.user = true;
-      var watcher = new Watcher(vm2, expOrFn, cb, options);
+      var watcher = new Watcher(vm3, expOrFn, cb, options);
       if (options.immediate) {
         var info = 'callback for immediate watcher "'.concat(watcher.expression, '"');
         pushTarget();
-        invokeWithErrorHandling(cb, vm2, [watcher.value], vm2, info);
+        invokeWithErrorHandling(cb, vm3, [watcher.value], vm3, info);
         popTarget();
       }
       return function unwatchFn() {
@@ -3202,14 +3075,14 @@
       };
     };
   }
-  function initProvide(vm2) {
-    var provideOption = vm2.$options.provide;
+  function initProvide(vm3) {
+    var provideOption = vm3.$options.provide;
     if (provideOption) {
-      var provided = isFunction(provideOption) ? provideOption.call(vm2) : provideOption;
+      var provided = isFunction(provideOption) ? provideOption.call(vm3) : provideOption;
       if (!isObject(provided)) {
         return;
       }
-      var source = resolveProvided(vm2);
+      var source = resolveProvided(vm3);
       var keys = hasSymbol ? Reflect.ownKeys(provided) : Object.keys(provided);
       for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
@@ -3217,23 +3090,23 @@
       }
     }
   }
-  function initInjections(vm2) {
-    var result = resolveInject(vm2.$options.inject, vm2);
+  function initInjections(vm3) {
+    var result = resolveInject(vm3.$options.inject, vm3);
     if (result) {
       toggleObserving(false);
       Object.keys(result).forEach(function(key) {
         if (true) {
-          defineReactive(vm2, key, result[key], function() {
-            warn$2("Avoid mutating an injected value directly since the changes will be overwritten whenever the provided component re-renders. " + 'injection being mutated: "'.concat(key, '"'), vm2);
+          defineReactive(vm3, key, result[key], function() {
+            warn$2("Avoid mutating an injected value directly since the changes will be overwritten whenever the provided component re-renders. " + 'injection being mutated: "'.concat(key, '"'), vm3);
           });
         } else {
-          defineReactive(vm2, key, result[key]);
+          defineReactive(vm3, key, result[key]);
         }
       });
       toggleObserving(true);
     }
   }
-  function resolveInject(inject, vm2) {
+  function resolveInject(inject, vm3) {
     if (inject) {
       var result = /* @__PURE__ */ Object.create(null);
       var keys = hasSymbol ? Reflect.ownKeys(inject) : Object.keys(inject);
@@ -3242,13 +3115,13 @@
         if (key === "__ob__")
           continue;
         var provideKey = inject[key].from;
-        if (provideKey in vm2._provided) {
-          result[key] = vm2._provided[provideKey];
+        if (provideKey in vm3._provided) {
+          result[key] = vm3._provided[provideKey];
         } else if ("default" in inject[key]) {
           var provideDefault = inject[key].default;
-          result[key] = isFunction(provideDefault) ? provideDefault.call(vm2) : provideDefault;
+          result[key] = isFunction(provideDefault) ? provideDefault.call(vm3) : provideDefault;
         } else if (true) {
-          warn$2('Injection "'.concat(key, '" not found'), vm2);
+          warn$2('Injection "'.concat(key, '" not found'), vm3);
         }
       }
       return result;
@@ -3257,59 +3130,59 @@
   var uid = 0;
   function initMixin$1(Vue2) {
     Vue2.prototype._init = function(options) {
-      var vm2 = this;
-      vm2._uid = uid++;
+      var vm3 = this;
+      vm3._uid = uid++;
       var startTag, endTag2;
       if (config.performance && mark) {
-        startTag = "vue-perf-start:".concat(vm2._uid);
-        endTag2 = "vue-perf-end:".concat(vm2._uid);
+        startTag = "vue-perf-start:".concat(vm3._uid);
+        endTag2 = "vue-perf-end:".concat(vm3._uid);
         mark(startTag);
       }
-      vm2._isVue = true;
-      vm2.__v_skip = true;
-      vm2._scope = new EffectScope(
+      vm3._isVue = true;
+      vm3.__v_skip = true;
+      vm3._scope = new EffectScope(
         true
         /* detached */
       );
-      vm2._scope.parent = void 0;
-      vm2._scope._vm = true;
+      vm3._scope.parent = void 0;
+      vm3._scope._vm = true;
       if (options && options._isComponent) {
-        initInternalComponent(vm2, options);
+        initInternalComponent(vm3, options);
       } else {
-        vm2.$options = mergeOptions(resolveConstructorOptions(vm2.constructor), options || {}, vm2);
+        vm3.$options = mergeOptions(resolveConstructorOptions(vm3.constructor), options || {}, vm3);
       }
       if (true) {
-        initProxy(vm2);
+        initProxy(vm3);
       } else {
-        vm2._renderProxy = vm2;
+        vm3._renderProxy = vm3;
       }
-      vm2._self = vm2;
-      initLifecycle(vm2);
-      initEvents(vm2);
-      initRender(vm2);
+      vm3._self = vm3;
+      initLifecycle(vm3);
+      initEvents(vm3);
+      initRender(vm3);
       callHook$1(
-        vm2,
+        vm3,
         "beforeCreate",
         void 0,
         false
         /* setContext */
       );
-      initInjections(vm2);
-      initState(vm2);
-      initProvide(vm2);
-      callHook$1(vm2, "created");
+      initInjections(vm3);
+      initState(vm3);
+      initProvide(vm3);
+      callHook$1(vm3, "created");
       if (config.performance && mark) {
-        vm2._name = formatComponentName(vm2, false);
+        vm3._name = formatComponentName(vm3, false);
         mark(endTag2);
-        measure("vue ".concat(vm2._name, " init"), startTag, endTag2);
+        measure("vue ".concat(vm3._name, " init"), startTag, endTag2);
       }
-      if (vm2.$options.el) {
-        vm2.$mount(vm2.$options.el);
+      if (vm3.$options.el) {
+        vm3.$mount(vm3.$options.el);
       }
     };
   }
-  function initInternalComponent(vm2, options) {
-    var opts2 = vm2.$options = Object.create(vm2.constructor.options);
+  function initInternalComponent(vm3, options) {
+    var opts2 = vm3.$options = Object.create(vm3.constructor.options);
     var parentVnode = options._parentVnode;
     opts2.parent = options.parent;
     opts2._parentVnode = parentVnode;
@@ -3628,27 +3501,27 @@
         return c.toUpperCase();
       }).replace(/[-_]/g, "");
     };
-    warn$2 = function(msg, vm2) {
-      if (vm2 === void 0) {
-        vm2 = currentInstance;
+    warn$2 = function(msg, vm3) {
+      if (vm3 === void 0) {
+        vm3 = currentInstance;
       }
-      var trace = vm2 ? generateComponentTrace(vm2) : "";
+      var trace = vm3 ? generateComponentTrace(vm3) : "";
       if (config.warnHandler) {
-        config.warnHandler.call(null, msg, vm2, trace);
+        config.warnHandler.call(null, msg, vm3, trace);
       } else if (hasConsole_1 && !config.silent) {
         console.error("[Vue warn]: ".concat(msg).concat(trace));
       }
     };
-    tip = function(msg, vm2) {
+    tip = function(msg, vm3) {
       if (hasConsole_1 && !config.silent) {
-        console.warn("[Vue tip]: ".concat(msg) + (vm2 ? generateComponentTrace(vm2) : ""));
+        console.warn("[Vue tip]: ".concat(msg) + (vm3 ? generateComponentTrace(vm3) : ""));
       }
     };
-    formatComponentName = function(vm2, includeFile) {
-      if (vm2.$root === vm2) {
+    formatComponentName = function(vm3, includeFile) {
+      if (vm3.$root === vm3) {
         return "<Root>";
       }
-      var options = isFunction(vm2) && vm2.cid != null ? vm2.options : vm2._isVue ? vm2.$options || vm2.constructor.options : vm2;
+      var options = isFunction(vm3) && vm3.cid != null ? vm3.options : vm3._isVue ? vm3.$options || vm3.constructor.options : vm3;
       var name = getComponentName(options);
       var file = options.__file;
       if (!name && file) {
@@ -3668,30 +3541,30 @@
       }
       return res;
     };
-    generateComponentTrace = function(vm2) {
-      if (vm2._isVue && vm2.$parent) {
+    generateComponentTrace = function(vm3) {
+      if (vm3._isVue && vm3.$parent) {
         var tree = [];
         var currentRecursiveSequence = 0;
-        while (vm2) {
+        while (vm3) {
           if (tree.length > 0) {
             var last = tree[tree.length - 1];
-            if (last.constructor === vm2.constructor) {
+            if (last.constructor === vm3.constructor) {
               currentRecursiveSequence++;
-              vm2 = vm2.$parent;
+              vm3 = vm3.$parent;
               continue;
             } else if (currentRecursiveSequence > 0) {
               tree[tree.length - 1] = [last, currentRecursiveSequence];
               currentRecursiveSequence = 0;
             }
           }
-          tree.push(vm2);
-          vm2 = vm2.$parent;
+          tree.push(vm3);
+          vm3 = vm3.$parent;
         }
-        return "\n\nfound in\n\n" + tree.map(function(vm3, i) {
-          return "".concat(i === 0 ? "---> " : repeat_1(" ", 5 + i * 2)).concat(isArray(vm3) ? "".concat(formatComponentName(vm3[0]), "... (").concat(vm3[1], " recursive calls)") : formatComponentName(vm3));
+        return "\n\nfound in\n\n" + tree.map(function(vm4, i) {
+          return "".concat(i === 0 ? "---> " : repeat_1(" ", 5 + i * 2)).concat(isArray(vm4) ? "".concat(formatComponentName(vm4[0]), "... (").concat(vm4[1], " recursive calls)") : formatComponentName(vm4));
         }).join("\n");
       } else {
-        return "\n\n(found in ".concat(formatComponentName(vm2), ")");
+        return "\n\n(found in ".concat(formatComponentName(vm3), ")");
       }
     };
   }
@@ -3701,8 +3574,8 @@
   var repeat_1;
   var strats = config.optionMergeStrategies;
   if (true) {
-    strats.el = strats.propsData = function(parent, child, vm2, key) {
-      if (!vm2) {
+    strats.el = strats.propsData = function(parent, child, vm3, key) {
+      if (!vm3) {
         warn$2('option "'.concat(key, '" can only be used during instance ') + "creation with the `new` keyword.");
       }
       return defaultStrat(parent, child);
@@ -3730,8 +3603,8 @@
     }
     return to;
   }
-  function mergeDataOrFn(parentVal, childVal, vm2) {
-    if (!vm2) {
+  function mergeDataOrFn(parentVal, childVal, vm3) {
+    if (!vm3) {
       if (!childVal) {
         return parentVal;
       }
@@ -3743,8 +3616,8 @@
       };
     } else {
       return function mergedInstanceDataFn() {
-        var instanceData = isFunction(childVal) ? childVal.call(vm2, vm2) : childVal;
-        var defaultData = isFunction(parentVal) ? parentVal.call(vm2, vm2) : parentVal;
+        var instanceData = isFunction(childVal) ? childVal.call(vm3, vm3) : childVal;
+        var defaultData = isFunction(parentVal) ? parentVal.call(vm3, vm3) : parentVal;
         if (instanceData) {
           return mergeData(instanceData, defaultData);
         } else {
@@ -3753,15 +3626,15 @@
       };
     }
   }
-  strats.data = function(parentVal, childVal, vm2) {
-    if (!vm2) {
+  strats.data = function(parentVal, childVal, vm3) {
+    if (!vm3) {
       if (childVal && typeof childVal !== "function") {
-        warn$2('The "data" option should be a function that returns a per-instance value in component definitions.', vm2);
+        warn$2('The "data" option should be a function that returns a per-instance value in component definitions.', vm3);
         return parentVal;
       }
       return mergeDataOrFn(parentVal, childVal);
     }
-    return mergeDataOrFn(parentVal, childVal, vm2);
+    return mergeDataOrFn(parentVal, childVal, vm3);
   };
   function mergeLifecycleHook(parentVal, childVal) {
     var res = childVal ? parentVal ? parentVal.concat(childVal) : isArray(childVal) ? childVal : [childVal] : parentVal;
@@ -3779,10 +3652,10 @@
   LIFECYCLE_HOOKS.forEach(function(hook) {
     strats[hook] = mergeLifecycleHook;
   });
-  function mergeAssets(parentVal, childVal, vm2, key) {
+  function mergeAssets(parentVal, childVal, vm3, key) {
     var res = Object.create(parentVal || null);
     if (childVal) {
-      assertObjectType(key, childVal, vm2);
+      assertObjectType(key, childVal, vm3);
       return extend(res, childVal);
     } else {
       return res;
@@ -3791,7 +3664,7 @@
   ASSET_TYPES.forEach(function(type) {
     strats[type + "s"] = mergeAssets;
   });
-  strats.watch = function(parentVal, childVal, vm2, key) {
+  strats.watch = function(parentVal, childVal, vm3, key) {
     if (parentVal === nativeWatch)
       parentVal = void 0;
     if (childVal === nativeWatch)
@@ -3799,7 +3672,7 @@
     if (!childVal)
       return Object.create(parentVal || null);
     if (true) {
-      assertObjectType(key, childVal, vm2);
+      assertObjectType(key, childVal, vm3);
     }
     if (!parentVal)
       return childVal;
@@ -3815,9 +3688,9 @@
     }
     return ret;
   };
-  strats.props = strats.methods = strats.inject = strats.computed = function(parentVal, childVal, vm2, key) {
+  strats.props = strats.methods = strats.inject = strats.computed = function(parentVal, childVal, vm3, key) {
     if (childVal && true) {
-      assertObjectType(key, childVal, vm2);
+      assertObjectType(key, childVal, vm3);
     }
     if (!parentVal)
       return childVal;
@@ -3860,7 +3733,7 @@
       warn$2("Do not use built-in or reserved HTML elements as component id: " + name);
     }
   }
-  function normalizeProps(options, vm2) {
+  function normalizeProps(options, vm3) {
     var props2 = options.props;
     if (!props2)
       return;
@@ -3884,11 +3757,11 @@
         res[name] = isPlainObject(val) ? val : { type: val };
       }
     } else if (true) {
-      warn$2('Invalid value for option "props": expected an Array or an Object, ' + "but got ".concat(toRawType(props2), "."), vm2);
+      warn$2('Invalid value for option "props": expected an Array or an Object, ' + "but got ".concat(toRawType(props2), "."), vm3);
     }
     options.props = res;
   }
-  function normalizeInject(options, vm2) {
+  function normalizeInject(options, vm3) {
     var inject = options.inject;
     if (!inject)
       return;
@@ -3903,7 +3776,7 @@
         normalized[key] = isPlainObject(val) ? extend({ from: key }, val) : { from: val };
       }
     } else if (true) {
-      warn$2('Invalid value for option "inject": expected an Array or an Object, ' + "but got ".concat(toRawType(inject), "."), vm2);
+      warn$2('Invalid value for option "inject": expected an Array or an Object, ' + "but got ".concat(toRawType(inject), "."), vm3);
     }
   }
   function normalizeDirectives$1(options) {
@@ -3917,28 +3790,28 @@
       }
     }
   }
-  function assertObjectType(name, value, vm2) {
+  function assertObjectType(name, value, vm3) {
     if (!isPlainObject(value)) {
-      warn$2('Invalid value for option "'.concat(name, '": expected an Object, ') + "but got ".concat(toRawType(value), "."), vm2);
+      warn$2('Invalid value for option "'.concat(name, '": expected an Object, ') + "but got ".concat(toRawType(value), "."), vm3);
     }
   }
-  function mergeOptions(parent, child, vm2) {
+  function mergeOptions(parent, child, vm3) {
     if (true) {
       checkComponents(child);
     }
     if (isFunction(child)) {
       child = child.options;
     }
-    normalizeProps(child, vm2);
-    normalizeInject(child, vm2);
+    normalizeProps(child, vm3);
+    normalizeInject(child, vm3);
     normalizeDirectives$1(child);
     if (!child._base) {
       if (child.extends) {
-        parent = mergeOptions(parent, child.extends, vm2);
+        parent = mergeOptions(parent, child.extends, vm3);
       }
       if (child.mixins) {
         for (var i = 0, l = child.mixins.length; i < l; i++) {
-          parent = mergeOptions(parent, child.mixins[i], vm2);
+          parent = mergeOptions(parent, child.mixins[i], vm3);
         }
       }
     }
@@ -3954,7 +3827,7 @@
     }
     function mergeField(key2) {
       var strat = strats[key2] || defaultStrat;
-      options[key2] = strat(parent[key2], child[key2], vm2, key2);
+      options[key2] = strat(parent[key2], child[key2], vm3, key2);
     }
     return options;
   }
@@ -3977,7 +3850,7 @@
     }
     return res;
   }
-  function validateProp(key, propOptions, propsData, vm2) {
+  function validateProp(key, propOptions, propsData, vm3) {
     var prop = propOptions[key];
     var absent = !hasOwn(propsData, key);
     var value = propsData[key];
@@ -3993,33 +3866,33 @@
       }
     }
     if (value === void 0) {
-      value = getPropDefaultValue(vm2, prop, key);
+      value = getPropDefaultValue(vm3, prop, key);
       var prevShouldObserve = shouldObserve;
       toggleObserving(true);
       observe(value);
       toggleObserving(prevShouldObserve);
     }
     if (true) {
-      assertProp(prop, key, value, vm2, absent);
+      assertProp(prop, key, value, vm3, absent);
     }
     return value;
   }
-  function getPropDefaultValue(vm2, prop, key) {
+  function getPropDefaultValue(vm3, prop, key) {
     if (!hasOwn(prop, "default")) {
       return void 0;
     }
     var def2 = prop.default;
     if (isObject(def2)) {
-      warn$2('Invalid default value for prop "' + key + '": Props with type Object/Array must use a factory function to return the default value.', vm2);
+      warn$2('Invalid default value for prop "' + key + '": Props with type Object/Array must use a factory function to return the default value.', vm3);
     }
-    if (vm2 && vm2.$options.propsData && vm2.$options.propsData[key] === void 0 && vm2._props[key] !== void 0) {
-      return vm2._props[key];
+    if (vm3 && vm3.$options.propsData && vm3.$options.propsData[key] === void 0 && vm3._props[key] !== void 0) {
+      return vm3._props[key];
     }
-    return isFunction(def2) && getType(prop.type) !== "Function" ? def2.call(vm2) : def2;
+    return isFunction(def2) && getType(prop.type) !== "Function" ? def2.call(vm3) : def2;
   }
-  function assertProp(prop, name, value, vm2, absent) {
+  function assertProp(prop, name, value, vm3, absent) {
     if (prop.required && absent) {
-      warn$2('Missing required prop: "' + name + '"', vm2);
+      warn$2('Missing required prop: "' + name + '"', vm3);
       return;
     }
     if (value == null && !prop.required) {
@@ -4033,7 +3906,7 @@
         type = [type];
       }
       for (var i = 0; i < type.length && !valid; i++) {
-        var assertedType = assertType(value, type[i], vm2);
+        var assertedType = assertType(value, type[i], vm3);
         expectedTypes.push(assertedType.expectedType || "");
         valid = assertedType.valid;
       }
@@ -4042,18 +3915,18 @@
       return t;
     });
     if (!valid && haveExpectedTypes) {
-      warn$2(getInvalidTypeMessage(name, value, expectedTypes), vm2);
+      warn$2(getInvalidTypeMessage(name, value, expectedTypes), vm3);
       return;
     }
     var validator = prop.validator;
     if (validator) {
       if (!validator(value)) {
-        warn$2('Invalid prop: custom validator check failed for prop "' + name + '".', vm2);
+        warn$2('Invalid prop: custom validator check failed for prop "' + name + '".', vm3);
       }
     }
   }
   var simpleCheckRE = /^(String|Number|Boolean|Function|Symbol|BigInt)$/;
-  function assertType(value, type, vm2) {
+  function assertType(value, type, vm3) {
     var valid;
     var expectedType = getType(type);
     if (simpleCheckRE.test(expectedType)) {
@@ -4070,7 +3943,7 @@
       try {
         valid = value instanceof type;
       } catch (e) {
-        warn$2('Invalid prop type: "' + String(type) + '" is not a constructor', vm2);
+        warn$2('Invalid prop type: "' + String(type) + '" is not a constructor', vm3);
         valid = false;
       }
     }
@@ -4638,18 +4511,18 @@
     var ref2 = vnode.data.ref;
     if (!isDef(ref2))
       return;
-    var vm2 = vnode.context;
+    var vm3 = vnode.context;
     var refValue = vnode.componentInstance || vnode.elm;
     var value = isRemoval ? null : refValue;
     var $refsValue = isRemoval ? void 0 : refValue;
     if (isFunction(ref2)) {
-      invokeWithErrorHandling(ref2, vm2, [value], vm2, "template ref function");
+      invokeWithErrorHandling(ref2, vm3, [value], vm3, "template ref function");
       return;
     }
     var isFor = vnode.data.refInFor;
     var _isString = typeof ref2 === "string" || typeof ref2 === "number";
     var _isRef = isRef(ref2);
-    var refs = vm2.$refs;
+    var refs = vm3.$refs;
     if (_isString || _isRef) {
       if (isFor) {
         var existing = _isString ? refs[ref2] : ref2.value;
@@ -4659,7 +4532,7 @@
           if (!isArray(existing)) {
             if (_isString) {
               refs[ref2] = [refValue];
-              setSetupRef(vm2, ref2, refs[ref2]);
+              setSetupRef(vm3, ref2, refs[ref2]);
             } else {
               ref2.value = [refValue];
             }
@@ -4672,7 +4545,7 @@
           return;
         }
         refs[ref2] = $refsValue;
-        setSetupRef(vm2, ref2, value);
+        setSetupRef(vm3, ref2, value);
       } else if (_isRef) {
         if (isRemoval && ref2.value !== refValue) {
           return;
@@ -5337,7 +5210,7 @@
     }
   }
   var emptyModifiers = /* @__PURE__ */ Object.create(null);
-  function normalizeDirectives(dirs, vm2) {
+  function normalizeDirectives(dirs, vm3) {
     var res = /* @__PURE__ */ Object.create(null);
     if (!dirs) {
       return res;
@@ -5349,8 +5222,8 @@
         dir.modifiers = emptyModifiers;
       }
       res[getRawDirName(dir)] = dir;
-      if (vm2._setupState && vm2._setupState.__sfc) {
-        var setupDef = dir.def || resolveAsset(vm2, "_setupState", "v-" + dir.name);
+      if (vm3._setupState && vm3._setupState.__sfc) {
+        var setupDef = dir.def || resolveAsset(vm3, "_setupState", "v-" + dir.name);
         if (typeof setupDef === "function") {
           dir.def = {
             bind: setupDef,
@@ -5360,7 +5233,7 @@
           dir.def = setupDef;
         }
       }
-      dir.def = dir.def || resolveAsset(vm2.$options, "directives", dir.name, true);
+      dir.def = dir.def || resolveAsset(vm3.$options, "directives", dir.name, true);
     }
     return res;
   }
@@ -6624,19 +6497,19 @@
       }
     }
   };
-  function setSelected(el, binding, vm2) {
-    actuallySetSelected(el, binding, vm2);
+  function setSelected(el, binding, vm3) {
+    actuallySetSelected(el, binding, vm3);
     if (isIE || isEdge) {
       setTimeout(function() {
-        actuallySetSelected(el, binding, vm2);
+        actuallySetSelected(el, binding, vm3);
       }, 0);
     }
   }
-  function actuallySetSelected(el, binding, vm2) {
+  function actuallySetSelected(el, binding, vm3) {
     var value = binding.value;
     var isMultiple = el.multiple;
     if (isMultiple && !Array.isArray(value)) {
-      warn$2('<select multiple v-model="'.concat(binding.expression, '"> ') + "expects an Array value for its binding, but got ".concat(Object.prototype.toString.call(value).slice(8, -1)), vm2);
+      warn$2('<select multiple v-model="'.concat(binding.expression, '"> ') + "expects an Array value for its binding, but got ".concat(Object.prototype.toString.call(value).slice(8, -1)), vm3);
       return;
     }
     var selected, option;
@@ -8987,7 +8860,7 @@
   }
   function createCompileToFunctionFn(compile) {
     var cache2 = /* @__PURE__ */ Object.create(null);
-    return function compileToFunctions2(template, options, vm2) {
+    return function compileToFunctions2(template, options, vm3) {
       options = extend({}, options);
       var warn2 = options.warn || warn$2;
       delete options.warn;
@@ -9009,22 +8882,22 @@
         if (compiled.errors && compiled.errors.length) {
           if (options.outputSourceRange) {
             compiled.errors.forEach(function(e) {
-              warn2("Error compiling template:\n\n".concat(e.msg, "\n\n") + generateCodeFrame(template, e.start, e.end), vm2);
+              warn2("Error compiling template:\n\n".concat(e.msg, "\n\n") + generateCodeFrame(template, e.start, e.end), vm3);
             });
           } else {
             warn2("Error compiling template:\n\n".concat(template, "\n\n") + compiled.errors.map(function(e) {
               return "- ".concat(e);
-            }).join("\n") + "\n", vm2);
+            }).join("\n") + "\n", vm3);
           }
         }
         if (compiled.tips && compiled.tips.length) {
           if (options.outputSourceRange) {
             compiled.tips.forEach(function(e) {
-              return tip(e.msg, vm2);
+              return tip(e.msg, vm3);
             });
           } else {
             compiled.tips.forEach(function(msg) {
-              return tip(msg, vm2);
+              return tip(msg, vm3);
             });
           }
         }
@@ -9040,7 +8913,7 @@
           warn2("Failed to generate render function:\n\n" + fnGenErrors.map(function(_a2) {
             var err = _a2.err, code = _a2.code;
             return "".concat(err.toString(), " in\n\n").concat(code, "\n");
-          }).join("\n"), vm2);
+          }).join("\n"), vm3);
         }
       }
       return cache2[key] = res;
@@ -11510,8 +11383,136 @@
     x: x_default
   };
 
+  // src/assets/javascripts/key.ts
+  function setupKeybindings(vm3) {
+    var helperFunctions = {
+      scrollContent: function(direction) {
+        var padding = 40;
+        var scroll = document.querySelector(".content");
+        if (!scroll) return;
+        var height = scroll.getBoundingClientRect().height;
+        var newpos = scroll.scrollTop + (height - padding) * direction;
+        if (typeof scroll.scrollTo == "function") {
+          scroll.scrollTo({ top: newpos, left: 0, behavior: "smooth" });
+        } else {
+          scroll.scrollTop = newpos;
+        }
+      }
+    };
+    var shortcutFunctions = {
+      openItemLink: function() {
+        if (vm3.itemSelectedDetails && vm3.itemSelectedDetails.link) {
+          window.open(vm3.itemSelectedDetails.link, "_blank", "noopener,noreferrer");
+        }
+      },
+      toggleReadability: function() {
+        vm3.toggleReadability();
+      },
+      toggleItemRead: function() {
+        if (vm3.itemSelected != null) {
+          vm3.toggleItemRead(vm3.itemSelectedDetails);
+        }
+      },
+      markAllRead: function() {
+        if (vm3.filterSelected == "unread") {
+          vm3.markItemsRead();
+        }
+      },
+      toggleItemStarred: function() {
+        if (vm3.itemSelected != null) {
+          vm3.toggleItemStarred(vm3.itemSelectedDetails);
+        }
+      },
+      focusSearch: function() {
+        document.getElementById("searchbar").focus();
+      },
+      nextItem() {
+        vm3.navigateToItem(1);
+      },
+      previousItem() {
+        vm3.navigateToItem(-1);
+      },
+      nextFeed() {
+        vm3.navigateToFeed(1);
+      },
+      previousFeed() {
+        vm3.navigateToFeed(-1);
+      },
+      scrollForward: function() {
+        helperFunctions.scrollContent(1);
+      },
+      scrollBackward: function() {
+        helperFunctions.scrollContent(-1);
+      },
+      closeItem: function() {
+        vm3.itemSelected = null;
+      },
+      showAll() {
+        vm3.filterSelected = "";
+      },
+      showUnread() {
+        vm3.filterSelected = "unread";
+      },
+      showStarred() {
+        vm3.filterSelected = "starred";
+      }
+    };
+    var keybindings = {
+      "o": shortcutFunctions.openItemLink,
+      "i": shortcutFunctions.toggleReadability,
+      "r": shortcutFunctions.toggleItemRead,
+      "R": shortcutFunctions.markAllRead,
+      "s": shortcutFunctions.toggleItemStarred,
+      "/": shortcutFunctions.focusSearch,
+      "j": shortcutFunctions.nextItem,
+      "k": shortcutFunctions.previousItem,
+      "l": shortcutFunctions.nextFeed,
+      "h": shortcutFunctions.previousFeed,
+      "f": shortcutFunctions.scrollForward,
+      "b": shortcutFunctions.scrollBackward,
+      "q": shortcutFunctions.closeItem,
+      "1": shortcutFunctions.showUnread,
+      "2": shortcutFunctions.showStarred,
+      "3": shortcutFunctions.showAll
+    };
+    var codebindings = {
+      "KeyO": shortcutFunctions.openItemLink,
+      "KeyI": shortcutFunctions.toggleReadability,
+      //"r": shortcutFunctions.toggleItemRead,
+      //"KeyR": shortcutFunctions.markAllRead,
+      "KeyS": shortcutFunctions.toggleItemStarred,
+      "Slash": shortcutFunctions.focusSearch,
+      "KeyJ": shortcutFunctions.nextItem,
+      "KeyK": shortcutFunctions.previousItem,
+      "KeyL": shortcutFunctions.nextFeed,
+      "KeyH": shortcutFunctions.previousFeed,
+      "KeyF": shortcutFunctions.scrollForward,
+      "KeyB": shortcutFunctions.scrollBackward,
+      "KeyQ": shortcutFunctions.closeItem,
+      "Digit1": shortcutFunctions.showUnread,
+      "Digit2": shortcutFunctions.showStarred,
+      "Digit3": shortcutFunctions.showAll
+    };
+    function isTextBox(element) {
+      var tagName2 = element.tagName.toLowerCase();
+      var inputBlocklist = ["button", "checkbox", "color", "file", "hidden", "image", "radio", "range", "reset", "search", "submit"];
+      return tagName2 === "textarea" || tagName2 === "input" && inputBlocklist.indexOf(element.getAttribute("type").toLowerCase()) == -1;
+    }
+    document.addEventListener("keydown", function(event) {
+      if (isTextBox(event.target) || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+      var keybindFunction = keybindings[event.key] || codebindings[event.code];
+      if (keybindFunction) {
+        event.preventDefault();
+        keybindFunction();
+      }
+    });
+  }
+
   // src/assets/javascripts/app.ts
   var app = window.app;
+  var vm;
   var TITLE = document.title;
   function scrollto(target2, scroll) {
     var padding = 10;
@@ -11705,16 +11706,19 @@
       }
     }
   });
-  Vue.use(i18n_default);
-  var vm = new Vue({
+  var app_default = {
     template: templates_default,
     created: function() {
+      vm = this;
       this.refreshStats().then(this.refreshFeeds.bind(this)).then(this.refreshItems.bind(this, false));
       api_default.feeds.list_errors().then(function(errors) {
         vm.feed_errors = errors;
       });
       this.updateMetaTheme(app.settings.theme_name);
       this.$setLang(app.settings.language);
+    },
+    mounted: function() {
+      setupKeybindings(this);
     },
     data: function() {
       var s = app.settings;
@@ -12246,48 +12250,48 @@
       },
       // navigation helper, navigate relative to selected item
       navigateToItem: function(relativePosition) {
-        let vm2 = this;
-        if (vm2.itemSelected == null) {
-          if (vm2.items.length !== 0) vm2.itemSelected = vm2.items[0].id;
+        let vm3 = this;
+        if (vm3.itemSelected == null) {
+          if (vm3.items.length !== 0) vm3.itemSelected = vm3.items[0].id;
           return;
         }
-        var itemPosition = vm2.items.findIndex(function(x) {
-          return x.id === vm2.itemSelected;
+        var itemPosition = vm3.items.findIndex(function(x) {
+          return x.id === vm3.itemSelected;
         });
         if (itemPosition === -1) {
-          if (vm2.items.length !== 0) vm2.itemSelected = vm2.items[0].id;
+          if (vm3.items.length !== 0) vm3.itemSelected = vm3.items[0].id;
           return;
         }
         var newPosition = itemPosition + relativePosition;
-        if (newPosition < 0 || newPosition >= vm2.items.length) return;
-        vm2.itemSelected = vm2.items[newPosition].id;
-        vm2.$nextTick(function() {
+        if (newPosition < 0 || newPosition >= vm3.items.length) return;
+        vm3.itemSelected = vm3.items[newPosition].id;
+        vm3.$nextTick(function() {
           var scroll = document.querySelector("#item-list-scroll");
           var handle = scroll.querySelector("input[type=radio]:checked");
           var target2 = handle && handle.parentElement;
           if (target2 && scroll) scrollto(target2, scroll);
-          vm2.loadMoreItems();
+          vm3.loadMoreItems();
         });
       },
       // navigation helper, navigate relative to selected feed
       navigateToFeed: function(relativePosition) {
-        let vm2 = this;
-        const navigationList = this.foldersWithFeeds.filter((folder) => !folder.id || !vm2.mustHideFolder(folder)).map((folder) => {
+        let vm3 = this;
+        const navigationList = this.foldersWithFeeds.filter((folder) => !folder.id || !vm3.mustHideFolder(folder)).map((folder) => {
           if (this.mustHideFolder(folder)) return [];
           const folds = folder.id ? [`folder:${folder.id}`] : [];
-          const feeds = folder.is_expanded || !folder.id ? (folder.feeds || []).filter((f) => !vm2.mustHideFeed(f)).map((f) => `feed:${f.id}`) : [];
+          const feeds = folder.is_expanded || !folder.id ? (folder.feeds || []).filter((f) => !vm3.mustHideFeed(f)).map((f) => `feed:${f.id}`) : [];
           return folds.concat(feeds);
         }).flat();
         navigationList.unshift("");
-        var currentFeedPosition = navigationList.indexOf(vm2.feedSelected);
+        var currentFeedPosition = navigationList.indexOf(vm3.feedSelected);
         if (currentFeedPosition == -1) {
-          vm2.feedSelected = "";
+          vm3.feedSelected = "";
           return;
         }
         var newPosition = currentFeedPosition + relativePosition;
         if (newPosition < 0 || newPosition >= navigationList.length) return;
-        vm2.feedSelected = navigationList[newPosition];
-        vm2.$nextTick(function() {
+        vm3.feedSelected = navigationList[newPosition];
+        vm3.$nextTick(function() {
           var scroll = document.querySelector("#feed-list-scroll");
           var handle = scroll.querySelector("input[type=radio]:checked");
           var target2 = handle && handle.parentElement;
@@ -12312,11 +12316,57 @@
         api_default.settings.update({ language: lang });
       }
     }
-  });
+  };
+
+  // src/assets/javascripts/templates/login.html
+  var login_default = `<div class="login-page">
+    <form @submit.prevent="login">
+        <img src="./static/graphicarts/anchor.svg" alt="">
+        <div class="text-danger text-center my-3" v-if="hasError">{{ $t('login_error') }}</div>
+        <div class="form-group">
+            <label for="username">{{ $t('username') }}</label>
+            <input name="username" class="form-control" id="username" autocomplete="off" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="password">{{ $t('password') }}</label>
+            <input name="password" class="form-control" id="password" type="password" required>
+        </div>
+        <button class="btn btn-block btn-default" type="submit">{{ $t('login') }}</button>
+    </form>
+</div>
+`;
+
+  // src/assets/javascripts/login.ts
+  var login_default2 = {
+    template: login_default,
+    data: function() {
+      return { hasError: false };
+    },
+    created: function() {
+      this.$setLang(window.app.settings.language);
+    },
+    methods: {
+      login: function(event) {
+        event.preventDefault();
+        var data = new FormData(event.target);
+        fetch("./login", { method: "POST", body: data }).then(function(res) {
+          if (res.ok) {
+            document.location.assign("./");
+          } else {
+            this.hasError = true;
+          }
+        }.bind(this));
+      }
+    }
+  };
 
   // src/assets/javascripts/main.ts
-  setupKeybindings(vm);
-  vm.$mount("#app");
+  Vue.use(i18n_default);
+  var vm2 = new Vue({
+    render: function(h) {
+      return h(window.app.authenticated ? app_default : login_default2);
+    }
+  }).$mount("#app");
 })();
 /*! Bundled license information:
 
