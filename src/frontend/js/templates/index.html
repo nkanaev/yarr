@@ -141,10 +141,9 @@
                         v-if="folder.id">
                     <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
                     <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
-                        <v-icon class="mr-2"
-                                :class="{expanded: folder.is_expanded}"
-                                @click.prevent="toggleFolderExpanded(folder)"
-                                name="chevron-right" />
+                        <div @click.prevent="toggleFolderExpanded(folder)" class="m-n1 p-1">
+                            <v-icon class="mr-2" :class="{expanded: folder.is_expanded}" name="chevron-right" />
+                        </div>
                         <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
                         <span class="counter text-right">{{ filteredFolderStats[folder.id] || '' }}</span>
                     </div>
