@@ -1,7 +1,7 @@
 <div class="d-flex" :class="{'feed-selected': feedSelected !== null, 'item-selected': itemSelected !== null}">
     <!-- feed list -->
     <div id="col-feed-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: feedListWidth+'px'}">
-        <drag :width="feedListWidth" @resize="resizeFeedList"></drag>
+        <v-drag :width="feedListWidth" @resize="resizeFeedList"></v-drag>
         <div class="p-2 toolbar d-flex align-items-center">
             <v-icon class="mx-2" name="anchor" />
             <div class="flex-grow-1"></div>
@@ -27,7 +27,7 @@
                 <v-icon name="assorted" />
             </button>
             <div class="flex-grow-1"></div>
-            <dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" :title="$t('settings')">
+            <v-dropdown class="settings-dropdown" toggle-class="btn btn-link toolbar-item px-2" ref="menuDropdown" drop="right" :title="$t('settings')">
                 <template v-slot:button>
                     <v-icon name="more-horizontal" />
                 </template>
@@ -122,7 +122,7 @@
                     <v-icon class="mr-1" name="log-out" />
                     {{ $t('log_out') }}
                 </button>
-            </dropdown>
+            </v-dropdown>
         </div>
         <div id="feed-list-scroll" class="p-2 overflow-auto scroll-touch border-top flex-grow-1">
             <label class="selectgroup">
@@ -174,7 +174,7 @@
     </div>
     <!-- item list -->
     <div id="col-item-list" class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0" :style="{width: itemListWidth+'px'}">
-        <drag :width="itemListWidth" @resize="resizeItemList"></drag>
+        <v-drag :width="itemListWidth" @resize="resizeItemList"></v-drag>
         <div class="px-2 toolbar d-flex align-items-center">
             <button class="toolbar-item mr-2 d-block d-md-none"
                     @click="feedSelected = null"
@@ -197,7 +197,7 @@
             <button class="btn btn-link toolbar-item px-2 ml-2" v-if="!current.type" disabled>
                 <v-icon name="more-horizontal" />
             </button>
-            <dropdown class="settings-dropdown"
+            <v-dropdown class="settings-dropdown"
                         toggle-class="btn btn-link toolbar-item px-2 ml-2"
                         drop="right"
                         :title="$t('feed_settings')"
@@ -245,8 +245,8 @@
                     <v-icon class="mr-1" name="trash" />
                     {{ $t('delete') }}
                 </button>
-            </dropdown>
-            <dropdown class="settings-dropdown"
+            </v-dropdown>
+            <v-dropdown class="settings-dropdown"
                         toggle-class="btn btn-link toolbar-item px-2 ml-2"
                         :title="$t('folder_settings')"
                         drop="right"
@@ -264,7 +264,7 @@
                     <v-icon class="mr-1" name="trash" />
                     {{ $t('delete') }}
                 </button>
-            </dropdown>
+            </v-dropdown>
         </div>
         <div id="item-list-scroll" class="p-2 overflow-auto scroll-touch border-top flex-grow-1" v-scroll="loadMoreItems" ref="itemlist">
             <label v-for="item in items" :key="item.id"
@@ -279,7 +279,7 @@
                         <small class="flex-fill text-truncate mr-1">
                             {{ (feedsById[item.feed_id] || {}).title }}
                         </small>
-                        <small class="flex-shrink-0"><relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
+                        <small class="flex-shrink-0"><v-relative-time v-bind:title="formatDate(item.date)" :val="item.date"/></small>
                     </div>
                     <div>{{ item.title || $t('untitled') }}</div>
                 </div>
@@ -305,7 +305,7 @@
                 <v-icon name="circle-full" v-if="itemSelectedDetails.status=='unread'" />
                 <v-icon name="circle" v-if="itemSelectedDetails.status!='unread'" />
             </button>
-            <dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" :title="$t('appearance')">
+            <v-dropdown class="settings-dropdown" toggle-class="toolbar-item px-2" drop="center" :title="$t('appearance')">
                 <template v-slot:button>
                     <v-icon name="sliders" />
                 </template>
@@ -318,7 +318,7 @@
                     <button class="dropdown-item" style="font-size: 0.8rem" @click.stop="incrFont(-1)">A</button>
                     <button class="dropdown-item" style="font-size: 1.2rem" @click.stop="incrFont(1)">A</button>
                 </div>
-            </dropdown>
+            </v-dropdown>
             <button class="toolbar-item"
                     :class="{active: itemSelectedReadability}"
                     @click="toggleReadability()"
@@ -369,7 +369,7 @@
             </div>
         </div>
     </div>
-    <modal :open="!!settings" @hide="settings = ''">
+    <v-modal :open="!!settings" @hide="settings = ''">
         <button class="btn btn-link outline-none float-right p-2 mr-n2 mt-n2" style="line-height: 1" @click="settings = ''">
             <v-icon name="x" />
         </button>
@@ -425,5 +425,5 @@
                 </tr>
             </table>
         </div>
-    </modal>
+    </v-modal>
 </div>
