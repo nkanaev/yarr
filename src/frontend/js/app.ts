@@ -560,7 +560,7 @@ export default {
         vm.refreshStats()
       })
     },
-    toggleFolderExpanded: function(folder) {
+    toggleFolderExpanded: function (folder) {
       folder.is_expanded = !folder.is_expanded
       api.folders.update(folder.id, {is_expanded: folder.is_expanded})
     },

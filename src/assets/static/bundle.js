@@ -12032,6 +12032,7 @@
         });
       },
       toggleFolderExpanded: function(folder) {
+        console.log("here");
         folder.is_expanded = !folder.is_expanded;
         api_default.folders.update(folder.id, { is_expanded: folder.is_expanded });
       },
