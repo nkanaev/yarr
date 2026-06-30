@@ -8,9 +8,7 @@ import (
 	"io/fs"
 )
 
-//go:embed graphicarts
-//go:embed javascripts
-//go:embed stylesheets
+//go:embed static
 var static embed.FS
 
 //go:embed templates

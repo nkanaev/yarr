@@ -9501,7 +9501,7 @@ a.text-dark:hover {
   }
 }
 
-/* src/assets/stylesheets/app.css */
+/* src/frontend/css/app.css */
 [v-cloak] {
   display: none !important;
 }
