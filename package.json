@@ -1,8 +1,6 @@
 {
   "scripts": {
-    "build:js": "esbuild src/frontend/js/main.ts --bundle --outfile=src/assets/static/bundle.js",
-    "build:css": "esbuild src/frontend/css/app.css --bundle --outfile=src/assets/static/bundle.css",
-    "build": "npm run build:js && npm run build:css"
+    "build": "esbuild src/frontend/js/main.ts src/frontend/css/app.css --bundle --outdir=src/assets/static --entry-names=bundle"
   },
   "devDependencies": {
     "esbuild": "0.28.1"
