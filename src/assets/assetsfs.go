@@ -2,14 +2,22 @@
 
 package assets
 
-import "embed"
+import (
+	"embed"
+	"html/template"
+	"io/fs"
+)
 
-//go:embed *.html
-//go:embed graphicarts
-//go:embed javascripts
-//go:embed stylesheets
-var embedded embed.FS
+//go:embed static/*
+var static embed.FS
 
-func init() {
-	FS.embedded = &embedded
+//go:embed templates
+var templates embed.FS
+
+func Templates() *template.Template {
+    return template.Must(template.ParseFS(templates, "*.html"))
+}
+
+func StaticFS() fs.FS {
+    return static
 }

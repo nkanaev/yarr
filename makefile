@@ -32,58 +32,62 @@ src/platform/versioninfo.rc:
 
 # build targets
 
-host:
+assets:
+	npm run build
+
+host: assets
 	go build $(GO_FLAGS) -o out/yarr ./cmd/yarr
 
-darwin_amd64:
+darwin_amd64: assets
 	# cross-compilation not supported: CC="zig cc -target x86_64-macos-none"
 	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
-darwin_arm64:
+darwin_arm64: assets
 	# cross-compilation not supported: CC="zig cc -target aarch64-macos-none"
 	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
-linux_amd64:
+linux_amd64: assets
 	CC="zig cc -target x86_64-linux-musl -O2 -g0" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" GOOS=linux GOARCH=amd64 \
 	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
-linux_arm64:
+linux_arm64: assets
 	CC="zig cc -target aarch64-linux-musl -O2 -g0" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" GOOS=linux GOARCH=arm64 \
 	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
-linux_armv7:
+linux_armv7: assets
 	CC="zig cc -target arm-linux-musleabihf -O2 -g0" CGO_CFLAGS="-D_LARGEFILE64_SOURCE" GOOS=linux GOARCH=arm GOARM=7 \
 	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
-windows_amd64:
+windows_amd64: assets
 	CC="zig cc -target x86_64-windows-gnu" GOOS=windows GOARCH=amd64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
-windows_arm64:
+windows_arm64: assets
 	CC="zig cc -target aarch64-windows-gnu" GOOS=windows GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
-darwin_arm64_gui: etc/icon.icns
+darwin_arm64_gui: assets etc/icon.icns
 	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS_GUI) -o out/$@/yarr ./cmd/yarr
 	./etc/macos_package.sh $(VERSION) etc/icon.icns out/$@/yarr out/$@
 
-darwin_amd64_gui: etc/icon.icns
+darwin_amd64_gui: assets etc/icon.icns
 	GOOS=darwin GOARCH=amd64 go build $(GO_FLAGS_GUI) -o out/$@/yarr ./cmd/yarr
 	./etc/macos_package.sh $(VERSION) etc/icon.icns out/$@/yarr out/$@
 
-windows_amd64_gui: src/platform/versioninfo.rc
+windows_amd64_gui: assets src/platform/versioninfo.rc
 	GOOS=windows GOARCH=amd64 go build $(GO_FLAGS_GUI_WIN) -o out/$@/yarr.exe ./cmd/yarr
 
-windows_arm64_gui: src/platform/versioninfo.rc
+windows_arm64_gui: assets src/platform/versioninfo.rc
 	GOOS=windows GOARCH=arm64 go build $(GO_FLAGS_GUI_WIN) -o out/$@/yarr.exe ./cmd/yarr
 
 YARR_DB ?= local.db
 
-serve:
+serve: assets
 	go run $(GO_FLAGS_DEBUG) ./cmd/yarr -db "$(YARR_DB)"
 
 test:
 	go test $(GO_FLAGS) ./...
 
 .PHONY: \
+	assets \
 	host \
 	darwin_amd64 darwin_amd64_gui \
 	darwin_arm64 darwin_arm64_gui \

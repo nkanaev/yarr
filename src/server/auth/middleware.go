@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/server/router"
 	"github.com/nkanaev/yarr/src/storage"
 )
@@ -26,34 +25,7 @@ func (m *Middleware) Handler(c *router.Context) {
 	}
 	if IsAuthenticated(c.Req, m.Username, m.Password) {
 		c.Next()
-		return
-	}
-
-	rootUrl := m.BasePath + "/"
-
-	if c.Req.URL.Path != rootUrl {
+	} else {
 		c.Out.WriteHeader(http.StatusUnauthorized)
-		return
 	}
-
-	if c.Req.Method == "POST" {
-		username := c.Req.FormValue("username")
-		password := c.Req.FormValue("password")
-		if StringsEqual(username, m.Username) && StringsEqual(password, m.Password) {
-			Authenticate(c.Out, m.Username, m.Password, m.BasePath)
-			c.Redirect(rootUrl)
-			return
-		} else {
-			c.HTML(http.StatusOK, assets.Template("login.html"), map[string]any{
-				"username": username,
-				"hasError": true,
-				"settings": m.DB.GetSettings().Map(),
-			})
-			return
-		}
-	}
-	c.HTML(http.StatusOK, assets.Template("login.html"), map[string]any{
-		"hasError": false,
-		"settings": m.DB.GetSettings().Map(),
-	})
 }

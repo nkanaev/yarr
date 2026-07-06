@@ -35,7 +35,7 @@ func (s *Server) handler() http.Handler {
 			BasePath: s.BasePath,
 			Username: s.Username,
 			Password: s.Password,
-			Public:   []string{"/static", "/fever", "/manifest.json"},
+			Public:   []string{"/", "/login", "/static", "/fever", "/manifest.json"},
 			DB:       s.db,
 		}
 		r.Use(a.Handler)
@@ -58,6 +58,7 @@ func (s *Server) handler() http.Handler {
 	r.For("/opml/import", s.handleOPMLImport)
 	r.For("/opml/export", s.handleOPMLExport)
 	r.For("/page", s.handlePageCrawl)
+	r.For("/login", s.handleLogin)
 	r.For("/logout", s.handleLogout)
 	r.For("/fever/", s.handleFever)
 
@@ -65,9 +66,24 @@ func (s *Server) handler() http.Handler {
 }
 
 func (s *Server) handleIndex(c *router.Context) {
-	c.HTML(http.StatusOK, assets.Template("index.html"), map[string]any{
-		"settings":      s.db.GetSettings().Map(),
-		"authenticated": s.Username != "" && s.Password != "",
+	isAuthenticated := false
+	if s.Username == "" && s.Password == "" {
+		isAuthenticated = true
+	} else {
+		isAuthenticated = auth.IsAuthenticated(c.Req, s.Username, s.Password)
+	}
+
+	settings := s.db.GetSettings()
+	if !isAuthenticated {
+		settings = model.Settings{
+			Language: settings.Language,
+			ThemeName: settings.ThemeName,
+		}
+	}
+
+	c.HTML(http.StatusOK, assets.Templates().Lookup("index.html"), map[string]any{
+		"settings":      settings.Map(),
+		"authenticated": isAuthenticated,
 	})
 }
 
@@ -78,7 +94,7 @@ func (s *Server) handleStatic(c *router.Context) {
 		c.Out.WriteHeader(http.StatusNotFound)
 		return
 	}
-	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.FS))).
+	http.StripPrefix(s.BasePath+"/static/", http.FileServer(http.FS(assets.StaticFS()))).
 		ServeHTTP(c.Out, c.Req)
 }
 
@@ -555,6 +571,22 @@ func (s *Server) handlePageCrawl(c *router.Context) {
 	c.JSON(http.StatusOK, map[string]string{
 		"content": content,
 	})
+}
+
+func (s *Server) handleLogin(c *router.Context) {
+	if c.Req.Method == "POST" {
+		username := c.Req.FormValue("username")
+		password := c.Req.FormValue("password")
+		if auth.StringsEqual(username, s.Username) && auth.StringsEqual(password, s.Password) {
+			auth.Authenticate(c.Out, s.Username, s.Password, s.BasePath)
+			return
+		} else {
+			c.Out.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	} else {
+		c.Out.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 func (s *Server) handleLogout(c *router.Context) {

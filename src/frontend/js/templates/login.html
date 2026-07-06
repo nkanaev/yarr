@@ -1,0 +1,15 @@
+<div class="login-page">
+    <form @submit.prevent="login">
+        <img src="./static/graphicarts/anchor.svg" alt="">
+        <div class="text-danger text-center my-3" v-if="hasError">{{ $t('login_error') }}</div>
+        <div class="form-group">
+            <label for="username">{{ $t('username') }}</label>
+            <input name="username" class="form-control" id="username" autocomplete="off" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="password">{{ $t('password') }}</label>
+            <input name="password" class="form-control" id="password" type="password" required>
+        </div>
+        <button class="btn btn-block btn-default" type="submit">{{ $t('login') }}</button>
+    </form>
+</div>

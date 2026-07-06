@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>yarr!</title>
+    <link rel="stylesheet" href="./static/bundle.css">
+    <link rel="icon" href="./static/graphicarts/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="./static/graphicarts/favicon.png" type="image/png">
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script>
+        window.app = window.app || {}
+        window.app.settings = {{ .settings }};
+        window.app.authenticated = {{ .authenticated }};
+    </script>
+</head>
+<body class="theme-{{ .settings.theme_name }}">
+    <div id="app" v-cloak></div>
+    <script src="./static/bundle.js"></script>
+</body>
+</html>

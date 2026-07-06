@@ -1,3 +1,5 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
 [v-cloak] {
   display: none !important;
 }
@@ -608,4 +610,16 @@ a,
   .toolbar-search {
     padding: .5rem;
   }
+}
+
+.login-page {
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.login-page img {
+  width: 4rem;
+  height: 4rem;
+  display: block;
+  margin: 3rem auto;
 }
