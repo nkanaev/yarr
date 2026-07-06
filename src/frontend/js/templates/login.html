@@ -1,6 +1,6 @@
 <div class="login-page">
     <form @submit.prevent="login">
-        <img src="./static/graphicarts/anchor.svg" alt="">
+        <div class="logo" v-html="logo"></div>
         <div class="text-danger text-center my-3" v-if="hasError">{{ $t('login_error') }}</div>
         <div class="form-group">
             <label for="username">{{ $t('username') }}</label>

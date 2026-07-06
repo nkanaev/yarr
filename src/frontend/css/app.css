@@ -617,7 +617,7 @@ a,
   margin: 0 auto;
   padding: 1rem;
 }
-.login-page img {
+.login-page .logo svg {
   width: 4rem;
   height: 4rem;
   display: block;

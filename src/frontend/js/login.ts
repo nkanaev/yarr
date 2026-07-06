@@ -1,9 +1,13 @@
 import template from './templates/login.html' with {type: 'text'}
+import icons from './icons'
 
 export default {
   template: template,
   data: function () {
-    return { hasError: false }
+    return {
+      logo: icons.anchor,
+      hasError: false,
+    }
   },
   created: function () {
     this.$setLang(window.app.settings.language)
