@@ -90,6 +90,7 @@ export default {
       },
       'refreshRate': s.refresh_rate,
       'authenticated': app.authenticated,
+      'requiresAuth': app.requiresAuth,
       'feed_errors': {},
 
       'refreshRateOptions': [

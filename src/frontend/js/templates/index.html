@@ -117,8 +117,8 @@
                         </button>
                     </div>
                 </div>
-                <div class="dropdown-divider" v-if="authenticated"></div>
-                <button class="dropdown-item" v-if="authenticated" @click="logout()">
+                <div class="dropdown-divider" v-if="requiresAuth"></div>
+                <button class="dropdown-item" v-if="requiresAuth" @click="logout()">
                     <v-icon class="mr-1" name="log-out" />
                     {{ $t('log_out') }}
                 </button>

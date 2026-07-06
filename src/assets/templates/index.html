@@ -13,6 +13,7 @@
         window.app = window.app || {}
         window.app.settings = {{ .settings }};
         window.app.authenticated = {{ .authenticated }};
+        window.app.requiresAuth = {{ .requiresAuth }};
     </script>
 </head>
 <body class="theme-{{ .settings.theme_name }}">

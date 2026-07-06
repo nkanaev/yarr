@@ -67,16 +67,18 @@ func (s *Server) handler() http.Handler {
 
 func (s *Server) handleIndex(c *router.Context) {
 	isAuthenticated := false
+	requiresAuth := false
 	if s.Username == "" && s.Password == "" {
 		isAuthenticated = true
 	} else {
+		requiresAuth = true
 		isAuthenticated = auth.IsAuthenticated(c.Req, s.Username, s.Password)
 	}
 
 	settings := s.db.GetSettings()
 	if !isAuthenticated {
 		settings = model.Settings{
-			Language: settings.Language,
+			Language:  settings.Language,
 			ThemeName: settings.ThemeName,
 		}
 	}
@@ -84,6 +86,7 @@ func (s *Server) handleIndex(c *router.Context) {
 	c.HTML(http.StatusOK, assets.Templates().Lookup("index.html"), map[string]any{
 		"settings":      settings.Map(),
 		"authenticated": isAuthenticated,
+		"requiresAuth":  requiresAuth,
 	})
 }
 
