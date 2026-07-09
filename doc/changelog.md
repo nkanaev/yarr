@@ -1,5 +1,9 @@
 # upcoming
 
+- (etc) do not auto-refresh feeds on startup
+
+# v2.7 (2026-06-24)
+
 - (new) initial PostgreSQL support
 - (new) i18n: English, Chinese, French, German, Japanese, Portuguese, Russian, Spanish
 - (fix) articles not resetting immediately after feed/filter selection (thank to @scratchmex for the report)

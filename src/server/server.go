@@ -51,9 +51,6 @@ func (s *Server) Start() {
 	refreshRate := s.db.GetSettings().RefreshRate
 	s.worker.StartFeedCleaner()
 	s.worker.SetRefreshRate(refreshRate)
-	if refreshRate > 0 {
-		s.worker.RefreshFeeds()
-	}
 
 	var ln net.Listener
 	var err error
