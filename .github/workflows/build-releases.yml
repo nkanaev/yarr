@@ -1,10 +1,5 @@
-name: Build
-
-on:
-  push:
-    tags:
-      - v*
-  workflow_dispatch:
+name: Build Releases
+on: workflow_call
 
 jobs:
   build_macos:

@@ -1,0 +1,20 @@
+name: CI
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  build-docker:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/build-docker.yml
+    secrets: inherit
+
+  build-releases:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/build-releases.yml
+    secrets: inherit
