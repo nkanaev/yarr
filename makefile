@@ -83,7 +83,7 @@ YARR_DB ?= local.db
 serve: assets
 	go run $(GO_FLAGS_DEBUG) ./cmd/yarr -db "$(YARR_DB)"
 
-test:
+test: assets
 	go test $(GO_FLAGS) ./...
 
 .PHONY: \
