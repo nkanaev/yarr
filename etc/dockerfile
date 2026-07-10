@@ -1,5 +1,5 @@
 FROM golang:alpine3.21 AS build
-RUN apk add build-base git
+RUN apk add build-base git nodejs npm
 WORKDIR /src
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build \

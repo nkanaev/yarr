@@ -7,7 +7,8 @@ RUN apt install -y \
         gcc-aarch64-linux-gnu \
         binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg \
         gcc-arm-linux-gnueabihf \
-        binutils-arm-linux-gnueabihf binutils-arm-linux-gnueabihf-dbg
+        binutils-arm-linux-gnueabihf binutils-arm-linux-gnueabihf-dbg \
+        nodejs npm
 RUN env DEBIAN_FRONTEND=noninteractive \
     apt install -y qemu-user qemu-user-static
 

@@ -12,6 +12,10 @@ jobs:
       uses: actions/setup-go@v6
       with:
         go-version-file: 'go.mod'
+    - name: Setup Node
+      uses: actions/setup-node@v6
+    - name: Install dependencies
+      run: npm ci
     - name: Build arm64 gui
       uses: ./.github/actions/prepare
       with:
@@ -47,6 +51,10 @@ jobs:
       uses: actions/setup-go@v6
       with:
         go-version-file: 'go.mod'
+    - name: Setup Node
+      uses: actions/setup-node@v6
+    - name: Install dependencies
+      run: npm ci
     - name: Build amd64 gui
       uses: ./.github/actions/prepare
       with:
@@ -71,6 +79,10 @@ jobs:
       uses: actions/setup-go@v6
       with:
         go-version-file: 'go.mod'
+    - name: Setup Node
+      uses: actions/setup-node@v6
+    - name: Install dependencies
+      run: npm ci
     - name: Setup Zig
       uses: mlugg/setup-zig@v1
       with:
