@@ -22,6 +22,8 @@ ENV PATH=$PATH:/usr/local/go/bin
 WORKDIR /root/src
 RUN mkdir /root/out
 COPY . .
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 # Build ARM64
 RUN env \
