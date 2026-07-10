@@ -43,6 +43,7 @@ func init() {
 			Timeout: 10 * time.Second,
 		}).DialContext,
 		DisableKeepAlives:   true,
+		ForceAttemptHTTP2: true,
 		TLSHandshakeTimeout: time.Second * 10,
 	}
 	httpClient := &http.Client{
