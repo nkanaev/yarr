@@ -44,7 +44,6 @@ const (
 	STARRED ItemStatus = 2
 )
 
-
 var StatusRepresentations = map[ItemStatus]string{
 	UNREAD:  "unread",
 	READ:    "read",
@@ -119,7 +118,6 @@ type FeedStat struct {
 	UnreadCount  int64 `json:"unread"`
 	StarredCount int64 `json:"starred"`
 }
-
 
 type Settings struct {
 	Filter          string `json:"filter"`

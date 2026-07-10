@@ -15,7 +15,7 @@ var static embed.FS
 var templates embed.FS
 
 func Templates() *template.Template {
-    return template.Must(template.ParseFS(templates, "templates/*.html"))
+	return template.Must(template.ParseFS(templates, "templates/*.html"))
 }
 
 func StaticFS() fs.FS {

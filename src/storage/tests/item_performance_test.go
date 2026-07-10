@@ -255,7 +255,7 @@ func BenchmarkMarkItemsRead_ByFolder(b *testing.B) {
 			FeedLink: fmt.Sprintf("http://f%d.xml", k),
 			FolderID: &folder.Id,
 		})
-		for i := 0; i < 1_000_000 / 5; i++ {
+		for i := 0; i < 1_000_000/5; i++ {
 			all = append(all, model.Item{
 				GUID:   fmt.Sprintf("f%d-i%d", k, i),
 				FeedId: feed.Id,

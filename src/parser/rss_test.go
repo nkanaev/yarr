@@ -377,12 +377,12 @@ func TestRSSDefaultNamespace(t *testing.T) {
 		</rss>
 	`))
 	want := &Feed{
-		Title:   "Feed",
+		Title: "Feed",
 		Items: []Item{
 			{
-				GUID:    "https://example.com/news/1",
-				URL:     "https://example.com/news/1",
-				Title:   "Title 1",
+				GUID:  "https://example.com/news/1",
+				URL:   "https://example.com/news/1",
+				Title: "Title 1",
 			},
 		},
 	}

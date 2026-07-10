@@ -37,15 +37,15 @@ type testItemScope struct {
 	feed11, feed12   *model.Feed
 	feed21, feed01   *model.Feed
 	folder1, folder2 *model.Folder
-	items map[string]model.Item
+	items            map[string]model.Item
 }
 
 func MustGet[K comparable, V any](m map[K]V, key K) V {
-    value, ok := m[key]
-    if !ok {
-        panic(fmt.Sprintf("key %v not found in map", key))
-    }
-    return value
+	value, ok := m[key]
+	if !ok {
+		panic(fmt.Sprintf("key %v not found in map", key))
+	}
+	return value
 }
 
 func testItemsSetup(db storage.Storage) testItemScope {
@@ -61,10 +61,10 @@ func testItemsSetup(db storage.Storage) testItemScope {
 	items := map[string]model.Item{
 		// feed11
 		"item111": {
-			GUID: "item111",
+			GUID:   "item111",
 			FeedId: feed11.Id,
-			Title: "title111",
-			Date: now.Add(time.Hour * 24 * 1),
+			Title:  "title111",
+			Date:   now.Add(time.Hour * 24 * 1),
 		},
 		"item112": {
 			GUID:   "item112",
@@ -82,10 +82,10 @@ func testItemsSetup(db storage.Storage) testItemScope {
 		}, // starred
 		// feed12
 		"item121": {
-			GUID: "item121",
+			GUID:   "item121",
 			FeedId: feed12.Id,
-			Title: "title121",
-			Date: now.Add(time.Hour * 24 * 4),
+			Title:  "title121",
+			Date:   now.Add(time.Hour * 24 * 4),
 		},
 		"item122": {
 			GUID:   "item122",
@@ -111,10 +111,10 @@ func testItemsSetup(db storage.Storage) testItemScope {
 		}, // starred
 		// feed01
 		"item011": {
-			GUID: "item011",
+			GUID:   "item011",
 			FeedId: feed01.Id,
-			Title: "title011",
-			Date: now.Add(time.Hour * 24 * 8),
+			Title:  "title011",
+			Date:   now.Add(time.Hour * 24 * 8),
 		},
 		"item012": {
 			GUID:   "item012",
@@ -141,7 +141,7 @@ func testItemsSetup(db storage.Storage) testItemScope {
 		feed01:  feed01,
 		folder1: folder1,
 		folder2: folder2,
-		items: items,
+		items:   items,
 	}
 }
 
