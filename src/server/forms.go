@@ -16,6 +16,7 @@ type FolderUpdateForm struct {
 }
 
 type FeedCreateForm struct {
-	Url      string `json:"url"`
-	FolderID *int64 `json:"folder_id,omitempty"`
+	Url           string `json:"url"`
+	TitleOverride string `json:"title_override,omitempty"`
+	FolderID      *int64 `json:"folder_id,omitempty"`
 }

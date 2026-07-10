@@ -1,6 +1,7 @@
 # upcoming
 
 - (fix) support for HTTP/2 (thanks to @Dean-Corso for the report)
+- (fix) displaying correct title for custom Youtube feeds
 - (etc) do not auto-refresh feeds on startup
 
 # v2.7 (2026-06-24)

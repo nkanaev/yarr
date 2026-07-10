@@ -268,8 +268,12 @@ func (s *Server) handleFeedList(c *router.Context) {
 				map[string]any{"status": "multiple", "choice": result.Sources},
 			)
 		case result.Feed != nil:
+			title := result.Feed.Title
+			if form.TitleOverride != "" {
+				title = form.TitleOverride
+			}
 			feed := s.db.CreateFeed(model.CreateFeedParams{
-				Title:    result.Feed.Title,
+				Title:    title,
 				Link:     result.Feed.SiteURL,
 				FeedLink: result.FeedLink,
 				FolderID: form.FolderID,

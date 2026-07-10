@@ -459,14 +459,16 @@ export default {
         })
       }
     },
-    createFeed: function(event) {
-      var form = event.target
+    createFeed: function($event) {
+      var form = $event.target
       var data = {
         url: form.querySelector('input[name=url]').value,
         folder_id: parseInt(form.querySelector('select[name=folder_id]').value) || null,
       }
       if (this.feedNewChoiceSelected) {
+        var choice = this.feedNewChoice.find(c => c.url === this.feedNewChoiceSelected)
         data.url = this.feedNewChoiceSelected
+        if (choice && choice.title_override) data.title_override = choice.title_override
       }
       this.loading.newfeed = true
       api.feeds.create(data).then(function(result) {

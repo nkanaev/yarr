@@ -18,15 +18,10 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-type FeedSource struct {
-	Title string `json:"title"`
-	Url   string `json:"url"`
-}
-
 type DiscoverResult struct {
 	Feed     *parser.Feed
 	FeedLink string
-	Sources  []FeedSource
+	Sources  []scraper.FeedLink
 }
 
 func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
@@ -64,18 +59,15 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 			}
 		}
 	}
-	sources := make([]FeedSource, 0)
-	for url, title := range scraper.FindFeeds(content, candidateUrl) {
-		sources = append(sources, FeedSource{Title: title, Url: url})
-	}
+	sources := scraper.FindFeeds(content, candidateUrl)
 	switch {
 	case len(sources) == 0:
 		return nil, errors.New("no feeds found at the given url")
 	case len(sources) == 1:
-		if sources[0].Url == candidateUrl {
+		if sources[0].URL == candidateUrl {
 			return nil, errors.New("recursion")
 		}
-		return DiscoverFeed(sources[0].Url)
+		return DiscoverFeed(sources[0].URL)
 	}
 
 	result.Sources = sources
