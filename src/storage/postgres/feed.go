@@ -81,8 +81,7 @@ func (s *PostgresStorage) UpdateFeed(feedId int64, params model.UpdateFeedParams
 func (s *PostgresStorage) ListFeeds() []model.Feed {
 	result := make([]model.Feed, 0)
 	rows, err := s.db.Query(`
-		select id, folder_id, title, description, link, feed_link,
-		       coalesce(length(icon), 0) > 0 as has_icon
+		select id, folder_id, title, description, link, feed_link, icon
 		from feeds
 		order by lower(title)
 	`)
@@ -101,7 +100,7 @@ func (s *PostgresStorage) ListFeeds() []model.Feed {
 			&f.Description,
 			&f.Link,
 			&f.FeedLink,
-			&f.HasIcon,
+			&f.Icon,
 		)
 		if err != nil {
 			log.Print(err)
@@ -117,11 +116,11 @@ func (s *PostgresStorage) GetFeed(id int64) *model.Feed {
 	err := s.db.QueryRow(`
 		select
 			id, folder_id, title, link, feed_link,
-			icon, coalesce(length(icon), 0) > 0 as has_icon
+			icon
 		from feeds where id = $1
 	`, id).Scan(
 		&f.Id, &f.FolderId, &f.Title, &f.Link, &f.FeedLink,
-		&f.Icon, &f.HasIcon,
+		&f.Icon,
 	)
 	if err != nil {
 		if err != sql.ErrNoRows {

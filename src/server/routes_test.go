@@ -8,12 +8,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/nkanaev/yarr/src/storage"
-	"github.com/nkanaev/yarr/src/storage/model"
 )
 
 func TestStatic(t *testing.T) {
@@ -149,42 +147,4 @@ func TestFeedCreateWithTitleOverride(t *testing.T) {
 			t.Fatalf("expected 'RSS Title', got %v", feed["title"])
 		}
 	})
-}
-
-func TestFeedIcons(t *testing.T) {
-	log.SetOutput(io.Discard)
-	db, _ := storage.New(":memory:")
-	icon := []byte("test")
-	feed := db.CreateFeed(model.CreateFeedParams{})
-	db.UpdateFeed(feed.Id, model.UpdateFeedParams{Icon: model.SetNullable(&icon)})
-	log.SetOutput(os.Stderr)
-
-	recorder := httptest.NewRecorder()
-	url := fmt.Sprintf("/api/feeds/%d/icon", feed.Id)
-	request := httptest.NewRequest("GET", url, nil)
-
-	handler := NewServer(db, "127.0.0.1:8000").handler()
-	handler.ServeHTTP(recorder, request)
-	response := recorder.Result()
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal()
-	}
-	body, _ := io.ReadAll(response.Body)
-	if !reflect.DeepEqual(body, icon) {
-		t.Fatal()
-	}
-	if response.Header.Get("Etag") == "" {
-		t.Fatal()
-	}
-
-	recorder2 := httptest.NewRecorder()
-	request2 := httptest.NewRequest("GET", url, nil)
-	request2.Header.Set("If-None-Match", response.Header.Get("Etag"))
-	handler.ServeHTTP(recorder2, request2)
-	response2 := recorder2.Result()
-
-	if response2.StatusCode != http.StatusNotModified {
-		t.Fatal("got", response2.StatusCode)
-	}
 }

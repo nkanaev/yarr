@@ -1,19 +1,61 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"time"
 )
 
 type Feed struct {
-	Id          int64   `json:"id"`
-	FolderId    *int64  `json:"folder_id"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Link        string  `json:"link"`
-	FeedLink    string  `json:"feed_link"`
-	Icon        *[]byte `json:"icon,omitempty"`
-	HasIcon     bool    `json:"has_icon"`
+	Id          int64  `json:"id"`
+	FolderId    *int64 `json:"folder_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Link        string `json:"link"`
+	FeedLink    string `json:"feed_link"`
+	Icon        *Icon  `json:"icon,omitempty"`
+}
+
+// Icon holds a feed favicon's raw bytes and serializes to a self-describing
+// data: URI (with the detected content type) when sent over JSON.
+type Icon []byte
+
+func (i Icon) DataURI() string {
+	if len(i) == 0 {
+		return ""
+	}
+	return "data:" + http.DetectContentType(i) +
+		";base64," + base64.StdEncoding.EncodeToString(i)
+}
+
+func (i Icon) MarshalJSON() ([]byte, error) {
+	if len(i) == 0 {
+		return []byte("null"), nil
+	}
+	return json.Marshal(i.DataURI())
+}
+
+func (i *Icon) Scan(src any) error {
+	if src == nil {
+		*i = nil
+		return nil
+	}
+	b, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("Icon.Scan: unsupported source type %T", src)
+	}
+	*i = b
+	return nil
+}
+
+func (i Icon) Value() (driver.Value, error) {
+	if i == nil {
+		return nil, nil
+	}
+	return []byte(i), nil
 }
 
 type CreateFeedParams struct {
@@ -194,7 +236,7 @@ type UpdateFeedParams struct {
 	Title    *string
 	FeedLink *string
 	FolderID Nullable[int64]
-	Icon     Nullable[[]byte]
+	Icon     Nullable[Icon]
 }
 
 type Nullable[T any] struct {

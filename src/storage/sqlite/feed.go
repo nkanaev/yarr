@@ -83,8 +83,7 @@ func (s *SQLiteStorage) UpdateFeed(feedId int64, params model.UpdateFeedParams) 
 func (s *SQLiteStorage) ListFeeds() []model.Feed {
 	result := make([]model.Feed, 0)
 	rows, err := s.db.Query(`
-		select id, folder_id, title, description, link, feed_link,
-		       ifnull(length(icon), 0) > 0 as has_icon
+		select id, folder_id, title, description, link, feed_link, icon
 		from feeds
 		order by title collate nocase
 	`)
@@ -101,7 +100,7 @@ func (s *SQLiteStorage) ListFeeds() []model.Feed {
 			&f.Description,
 			&f.Link,
 			&f.FeedLink,
-			&f.HasIcon,
+			&f.Icon,
 		)
 		if err != nil {
 			log.Print(err)
@@ -117,11 +116,11 @@ func (s *SQLiteStorage) GetFeed(id int64) *model.Feed {
 	err := s.db.QueryRow(`
 		select
 			id, folder_id, title, link, feed_link,
-			icon, ifnull(icon, '') != '' as has_icon
+			icon
 		from feeds where id = :id
 	`, sql.Named("id", id)).Scan(
 		&f.Id, &f.FolderId, &f.Title, &f.Link, &f.FeedLink,
-		&f.Icon, &f.HasIcon,
+		&f.Icon,
 	)
 	if err != nil {
 		if err != sql.ErrNoRows {

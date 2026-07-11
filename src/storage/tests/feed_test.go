@@ -58,7 +58,7 @@ func TestUpdateFeed(t *testing.T) {
 	dbtest(t, func(t *testing.T, db storage.Storage) {
 		feed1 := db.CreateFeed(model.CreateFeedParams{Title: "feed 1", Link: "http://example1.com", FeedLink: "http://example1.com/feed.xml"})
 		folder := db.CreateFolder("test")
-		icon := []byte("icon")
+		icon := model.Icon("icon")
 
 		title := "newtitle"
 		db.UpdateFeed(feed1.Id, model.UpdateFeedParams{
@@ -74,7 +74,7 @@ func TestUpdateFeed(t *testing.T) {
 		if feed2.FolderId == nil || *feed2.FolderId != folder.Id {
 			t.Error("invalid folder")
 		}
-		if !feed2.HasIcon || string(*feed2.Icon) != "icon" {
+		if feed2.Icon == nil || string(*feed2.Icon) != "icon" {
 			t.Error("invalid icon")
 		}
 	})

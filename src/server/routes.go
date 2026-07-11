@@ -1,14 +1,12 @@
 package server
 
 import (
-	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
@@ -50,7 +48,6 @@ func (s *Server) handler() http.Handler {
 	r.For("/api/feeds", s.handleFeedList)
 	r.For("/api/feeds/refresh", s.handleFeedRefresh)
 	r.For("/api/feeds/errors", s.handleFeedErrors)
-	r.For("/api/feeds/:id/icon", s.handleFeedIcon)
 	r.For("/api/feeds/:id", s.handleFeed)
 	r.For("/api/items", s.handleItemList)
 	r.For("/api/items/:id", s.handleItem)
@@ -192,57 +189,6 @@ func (s *Server) handleFeedErrors(c *router.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, errors)
-}
-
-type feedicon struct {
-	ctype string
-	bytes []byte
-	etag  string
-}
-
-func (s *Server) handleFeedIcon(c *router.Context) {
-	id, err := c.VarInt64("id")
-	if err != nil {
-		c.Out.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	cachekey := "icon:" + strconv.FormatInt(id, 10)
-	s.cache_mutex.Lock()
-	cachedat := s.cache[cachekey]
-	s.cache_mutex.Unlock()
-	if cachedat == nil {
-		feed := s.db.GetFeed(id)
-		if feed == nil || feed.Icon == nil {
-			c.Out.WriteHeader(http.StatusNotFound)
-			return
-		}
-
-		hash := md5.New()
-		hash.Write(*feed.Icon)
-
-		etag := fmt.Sprintf("%x", hash.Sum(nil))[:16]
-
-		cachedat = feedicon{
-			ctype: http.DetectContentType(*feed.Icon),
-			bytes: *(*feed).Icon,
-			etag:  etag,
-		}
-		s.cache_mutex.Lock()
-		s.cache[cachekey] = cachedat
-		s.cache_mutex.Unlock()
-	}
-
-	icon := cachedat.(feedicon)
-
-	if c.Req.Header.Get("If-None-Match") == icon.etag {
-		c.Out.WriteHeader(http.StatusNotModified)
-		return
-	}
-
-	c.Out.Header().Set("Content-Type", icon.ctype)
-	c.Out.Header().Set("Etag", icon.etag)
-	c.Out.Write(icon.bytes)
 }
 
 func (s *Server) handleFeedList(c *router.Context) {

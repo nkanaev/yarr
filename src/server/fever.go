@@ -2,7 +2,6 @@ package server
 
 import (
 	"crypto/md5"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -209,13 +208,8 @@ func (s *Server) feverFaviconsHandler(c *router.Context) {
 	favicons := make([]*FeverFavicon, len(feeds))
 	for i, feed := range feeds {
 		data := "data:image/gif;base64,R0lGODlhAQABAAAAACw="
-		if feed.HasIcon {
-			icon := s.db.GetFeed(feed.Id).Icon
-			data = fmt.Sprintf(
-				"data:%s;base64,%s",
-				http.DetectContentType(*icon),
-				base64.StdEncoding.EncodeToString(*icon),
-			)
+		if feed.Icon != nil {
+			data = feed.Icon.DataURI()
 		}
 		favicons[i] = &FeverFavicon{ID: feed.Id, Data: data}
 	}

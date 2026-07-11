@@ -74,7 +74,7 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 	return result, nil
 }
 
-var emptyIcon = make([]byte, 0)
+var emptyIcon = make(model.Icon, 0)
 var imageTypes = map[string]bool{
 	"image/x-icon": true,
 	"image/png":    true,
@@ -82,7 +82,7 @@ var imageTypes = map[string]bool{
 	"image/gif":    true,
 }
 
-func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
+func findFavicon(siteUrl, feedUrl string) (*model.Icon, error) {
 	urls := make([]string, 0)
 
 	favicon := func(link string) string {
@@ -126,7 +126,8 @@ func findFavicon(siteUrl, feedUrl string) (*[]byte, error) {
 
 		ctype := http.DetectContentType(content)
 		if imageTypes[ctype] {
-			return &content, nil
+			icon := model.Icon(content)
+			return &icon, nil
 		}
 	}
 	return &emptyIcon, nil

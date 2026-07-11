@@ -136,7 +136,7 @@ func (w *Worker) worker(srcqueue <-chan model.Feed, dstqueue chan<- []model.Item
 			errMsg := err.Error()
 			w.db.UpdateFeedState(feed.Id, model.UpdateFeedStateParams{LastError: &errMsg})
 		}
-		if len(items) > 0 && !feed.HasIcon {
+		if len(items) > 0 && feed.Icon == nil {
 			w.FindFeedFavicon(feed)
 		}
 		dstqueue <- items
