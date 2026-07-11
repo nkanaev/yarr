@@ -335,6 +335,9 @@ select.form-control:not([multiple]):not([size]) {
   border-radius: 3px;
   padding: .25rem .5rem;
   line-height: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .toolbar-search:hover, .toolbar-search:focus {

@@ -184,7 +184,7 @@
             <div class="input-icon flex-grow-1">
                 <v-icon name="search" />
                 <!-- id used by keybindings -->
-                <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" @keydown.enter="$event.target.blur()">
+                <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" :placeholder="$t('search_placeholder', {scope: searchScope})" @keydown.enter="$event.target.blur()">
             </div>
             <button class="toolbar-item ml-2"
                     @click="markItemsRead()"

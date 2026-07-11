@@ -191,6 +191,16 @@ import { FluentResource, FluentBundle } from '@fluent/bundle'
       "zh": "全部订阅",
       "ru": "Все ленты"
     },
+    "search_placeholder": {
+      "en": "Search: { $scope }",
+      "de": "Suche: { $scope }",
+      "fr": "Rechercher : { $scope }",
+      "es": "Buscar: { $scope }",
+      "ja": "検索: { $scope }",
+      "pt": "Pesquisar: { $scope }",
+      "zh": "搜索：{ $scope }",
+      "ru": "Поиск: { $scope }"
+    },
     "refreshing_progress": {
       "en": "Refreshing ({ $count } left)",
       "de": "Aktualisiere ({ $count } übrig)",

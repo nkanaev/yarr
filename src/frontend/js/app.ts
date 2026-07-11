@@ -153,6 +153,19 @@ export default {
 
       return {type: type, feed: feed, folder: folder}
     },
+    searchScope: function() {
+      void this.language
+      var type = (this.feedSelected || '').split(':', 2)[0]
+      if (type == 'feed')
+        return (this.feedsById[this.feedSelected.split(':', 2)[1]] || {}).title || ''
+      if (type == 'folder')
+        return (this.foldersById[this.feedSelected.split(':', 2)[1]] || {}).title || ''
+      if (this.filterSelected == 'unread')
+        return this.$t('all_unread')
+      if (this.filterSelected == 'starred')
+        return this.$t('all_starred')
+      return this.$t('all_feeds')
+    },
     itemSelectedContent: function() {
       if (!this.itemSelected) return ''
 
