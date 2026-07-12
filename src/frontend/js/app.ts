@@ -1,7 +1,7 @@
 import Vue from 'vue/dist/vue.esm.js'
 import i18n from './i18n'
 import api from './api'
-import template from './templates/index.html' with {type: 'text'}
+import template from './templates/app.html' with {type: 'text'}
 import icons from './icons'
 import { setupKeybindings } from './key'
 import { scrollto, debounce, dateRepr } from './utils'
