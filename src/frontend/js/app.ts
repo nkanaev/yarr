@@ -42,6 +42,20 @@ export default {
     })
     this.updateMetaTheme(app.settings.theme_name)
     this.$setLang(app.settings.language)
+
+    // keep the theme-color meta tag in sync when the OS color scheme changes
+    if (window.matchMedia) {
+      this._colorSchemeMql = window.matchMedia('(prefers-color-scheme: dark)')
+      this._colorSchemeHandler = function() {
+        this.updateMetaTheme(this.theme.name)
+      }.bind(this)
+      this._colorSchemeMql.addEventListener('change', this._colorSchemeHandler)
+    }
+  },
+  beforeDestroy: function() {
+    if (this._colorSchemeMql) {
+      this._colorSchemeMql.removeEventListener('change', this._colorSchemeHandler)
+    }
   },
   mounted: function() {
     setupKeybindings(this)
@@ -276,6 +290,10 @@ export default {
   },
   methods: {
     updateMetaTheme: function(theme) {
+      if (theme == 'system') {
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        theme = dark ? 'night' : 'light'
+      }
       document.querySelector("meta[name='theme-color']").content = this.themeColors[theme]
     },
     refreshStats: function(loopMode) {

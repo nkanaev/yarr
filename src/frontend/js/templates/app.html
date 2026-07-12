@@ -46,14 +46,13 @@
 
                 <header class="dropdown-header" role="heading" aria-level="2">{{ $t('theme') }}</header>
                 <div class="row text-center m-0">
-                    <button class="btn btn-link col-4 px-0 rounded-0"
+                    <button class="btn btn-link theme-swatch col-3 px-0 rounded-0"
                             :class="'theme-'+t"
                             :title="t"
                             :aria-label="t"
                             :aria-pressed="theme.name == t"
                             @click.stop="theme.name = t"
-                            v-for="t in ['light', 'sepia', 'night']">
-                        <v-icon v-if="theme.name == t" name="check" />
+                            v-for="t in ['light', 'sepia', 'night', 'system']">
                     </button>
                 </div>
 
