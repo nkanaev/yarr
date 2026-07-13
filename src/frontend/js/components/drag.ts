@@ -1,4 +1,6 @@
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   props: ['width'],
   template: '<div class="drag"></div>',
   mounted: function() {
@@ -21,4 +23,4 @@ export default {
       document.addEventListener('mouseup', onMouseUp)
     })
   },
-}
+})

@@ -1,4 +1,6 @@
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   inheritAttrs: false,
   props: ['toggle-class', 'drop', 'title'],
   data: function() {
@@ -50,4 +52,4 @@ export default {
       if (e.target.closest('.dropdown-item') != null) return this.hide()
     }
   },
-}
+})

@@ -1,4 +1,6 @@
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   props: ['open'],
   template: `
     <div class="modal custom-modal" tabindex="-1" v-if="$props.open">
@@ -25,7 +27,7 @@ export default {
     },
   },
   methods: {
-    handleClick: function(e) {
+    handleClick: function (e) {
       if (this.opening) {
         this.opening = false
         return
@@ -33,4 +35,4 @@ export default {
       if (e.target.closest('.modal-content') == null) this.$emit('hide')
     },
   },
-}
+})

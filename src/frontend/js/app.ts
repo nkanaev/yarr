@@ -11,13 +11,14 @@ import relativeTime from './components/relative-time'
 import icon from './components/icon'
 import scrollDir from './directives/scroll'
 import focusDir from './directives/focus'
+import { defineComponent } from 'vue'
 
 var app = window.app
 var vm
 
 var TITLE = document.title
 
-export default {
+export default defineComponent({
   template: template,
   components: {
     'v-drag': drag,
@@ -718,4 +719,4 @@ export default {
       api.settings.update({language: lang})
     }
   }
-}
+})

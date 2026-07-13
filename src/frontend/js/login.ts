@@ -1,7 +1,8 @@
 import template from './templates/login.html' with {type: 'text'}
 import icons from './icons'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   template: template,
   data: function () {
     return {
@@ -23,7 +24,7 @@ export default {
         } else {
           this.hasError = true
         }
-      }.bind(this))
+        }.bind(this))
     }
   }
-}
+})

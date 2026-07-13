@@ -1,6 +1,7 @@
 import { dateRepr } from '../utils'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   props: ['val'],
   data: function() {
     var d = new Date(this.val)
@@ -19,4 +20,4 @@ export default {
   unmounted: function() {
     clearInterval(this.interval)
   },
-}
+})
