@@ -1,4 +1,4 @@
-export function scrollto(target, scroll) {
+export function scrollto(target: Element, scroll: Element) {
   var padding = 10
   var targetRect = target.getBoundingClientRect()
   var scrollRect = scroll.getBoundingClientRect()
@@ -18,18 +18,21 @@ export function scrollto(target, scroll) {
   scroll.scrollTop = Math.round(newPos)
 }
 
-export function debounce(callback, wait) {
-  var timeout
-  return function() {
-    var ctx = this, args = arguments
+export function debounce<A extends unknown[]>(
+  callback: (...args: A) => void,
+  wait: number
+): (...args: A) => void {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  return function (this: unknown, ...args: A) {
+    const ctx = this
     clearTimeout(timeout)
-    timeout = setTimeout(function() {
+    timeout = setTimeout(function () {
       callback.apply(ctx, args)
     }, wait)
   }
 }
 
-export function dateRepr(d) {
+export function dateRepr(d: Date): string {
   var sec = (new Date().getTime() - d.getTime()) / 1000
   var neg = sec < 0
   var out = ''
