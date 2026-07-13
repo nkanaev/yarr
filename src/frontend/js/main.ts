@@ -1,12 +1,12 @@
-import Vue from 'vue/dist/vue.esm.js'
+import { createApp, h } from 'vue/dist/vue.esm-browser.prod.js'
 import i18n from './i18n'
 import App from './app'
 import Login from './login'
 
-Vue.use(i18n)
-
-var vm = new Vue({
-  render: function (h) {
+const application = createApp({
+  render: function () {
     return h(window.app.authenticated ? App : Login)
   }
-}).$mount('#app')
+})
+application.use(i18n)
+application.mount('#app')

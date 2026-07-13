@@ -224,13 +224,14 @@
                 </button>
                 <div class="dropdown-divider"></div>
                 <header class="dropdown-header" role="heading" aria-level="2">{{ $t('move_to') }}</header>
+                <template v-for="folder in folders">
                 <button class="dropdown-item"
                     v-if="folder.id != current.feed.folder_id"
-                    v-for="folder in folders"
                     @click="moveFeed(current.feed, folder)">
                     <v-icon class="mr-1" name="folder" />
                     {{ folder.title }}
                 </button>
+                </template>
                 <button class="dropdown-item text-muted" @click="moveFeed(current.feed, null)" v-if="current.feed.folder_id">
                     <v-icon class="mr-1" name="folder-minus" />
                     ──

@@ -1,4 +1,5 @@
 export default {
+  inheritAttrs: false,
   props: ['toggle-class', 'drop', 'title'],
   data: function() {
     return {open: false}

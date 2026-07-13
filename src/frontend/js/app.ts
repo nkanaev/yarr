@@ -1,4 +1,3 @@
-import Vue from 'vue/dist/vue.esm.js'
 import i18n from './i18n'
 import api from './api'
 import template from './templates/app.html' with {type: 'text'}
@@ -52,7 +51,7 @@ export default {
       this._colorSchemeMql.addEventListener('change', this._colorSchemeHandler)
     }
   },
-  beforeDestroy: function() {
+  beforeUnmount: function() {
     if (this._colorSchemeMql) {
       this._colorSchemeMql.removeEventListener('change', this._colorSchemeHandler)
     }

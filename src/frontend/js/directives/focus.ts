@@ -1,5 +1,5 @@
 export default {
-  inserted: function(el) {
+  mounted: function(el) {
     el.focus()
   }
 }

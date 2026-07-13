@@ -708,15 +708,15 @@ function ftlFrom(lang) {
     .join('\n')
 }
 export default {
-  install(Vue) {
+  install(app) {
     let bundle = null
-    Vue.prototype.$setLang = function (lang) {
+    app.config.globalProperties.$setLang = function (lang) {
       const ftl = ftlFrom(lang)
       const resource = new FluentResource(ftl)
       bundle = new FluentBundle(lang)
       bundle.addResource(resource)
     }
-    Vue.prototype.$t = function (code, args) {
+    app.config.globalProperties.$t = function (code, args) {
       if (!bundle) return
       const msg = bundle.getMessage(code)
       if (!msg || !msg.value) return

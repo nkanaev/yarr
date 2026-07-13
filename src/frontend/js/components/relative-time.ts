@@ -16,7 +16,7 @@ export default {
       this.formatted = dateRepr(this.date)
     }.bind(this), 600000)  // every 10 minutes
   },
-  destroyed: function() {
+  unmounted: function() {
     clearInterval(this.interval)
   },
 }
