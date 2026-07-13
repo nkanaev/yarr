@@ -1,4 +1,4 @@
-import { FluentResource, FluentBundle } from '@fluent/bundle'
+import { FluentResource, FluentBundle, FluentVariable } from '@fluent/bundle'
 
   const translations = {
     "unread": {
@@ -702,21 +702,24 @@ import { FluentResource, FluentBundle } from '@fluent/bundle'
       "ru": "Пароль"
     },
   };
-function ftlFrom(lang) {
+
+type Lang = 'en' | 'de' | 'fr' | 'es' | 'ja' | 'pt' | 'zh' | 'ru'
+
+function ftlFrom(lang: Lang) {
     return Object.entries(translations)
     .map(([key, langs]) => `${key} = ${langs[lang]}`)
     .join('\n')
 }
 export default {
-  install(app) {
-    let bundle = null
-    app.config.globalProperties.$setLang = function (lang) {
+  install(app: any) {
+    let bundle = undefined as FluentBundle | undefined
+    app.config.globalProperties.$setLang = function (lang: Lang) {
       const ftl = ftlFrom(lang)
       const resource = new FluentResource(ftl)
       bundle = new FluentBundle(lang)
       bundle.addResource(resource)
     }
-    app.config.globalProperties.$t = function (code, args) {
+    app.config.globalProperties.$t = function (code: string, args: Record<string, FluentVariable>) {
       if (!bundle) return
       const msg = bundle.getMessage(code)
       if (!msg || !msg.value) return
