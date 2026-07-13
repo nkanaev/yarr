@@ -1,4 +1,4 @@
-import { createApp, h } from 'vue/dist/vue.esm-browser.prod.js'
+import { createApp, h } from 'vue'
 import i18n from './i18n'
 import App from './app'
 import Login from './login'
