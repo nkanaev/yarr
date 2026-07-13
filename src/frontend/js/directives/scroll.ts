@@ -1,3 +1,4 @@
+import type { Directive } from 'vue'
 import { debounce } from '../utils'
 
 export default {
@@ -6,4 +7,4 @@ export default {
       binding.value(event, el)
     }, 200))
   },
-}
+  } satisfies Directive<HTMLElement, (event: Event, el: HTMLElement) => void>
