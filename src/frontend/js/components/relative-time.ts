@@ -8,14 +8,14 @@ export default defineComponent({
     return {
       'date': d,
       'formatted': dateRepr(d),
-      'interval': null,
+      'interval': undefined as number | undefined,
     }
   },
   template: '<time :datetime="val">{{ formatted }}</time>',
   mounted: function() {
-    this.interval = setInterval(function() {
+    this.interval = setInterval(() => {
       this.formatted = dateRepr(this.date)
-    }.bind(this), 600000)  // every 10 minutes
+    }, 600000)  // every 10 minutes
   },
   unmounted: function() {
     clearInterval(this.interval)

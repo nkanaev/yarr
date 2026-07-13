@@ -27,12 +27,13 @@ export default defineComponent({
     },
   },
   methods: {
-    handleClick: function (e) {
+    handleClick: function (e: Event) {
+      const target = e.target as HTMLElement
       if (this.opening) {
         this.opening = false
         return
       }
-      if (e.target.closest('.modal-content') == null) this.$emit('hide')
+      if (target.closest('.modal-content') == null) this.$emit('hide')
     },
   },
 })

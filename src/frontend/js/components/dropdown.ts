@@ -2,7 +2,20 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   inheritAttrs: false,
-  props: ['toggle-class', 'drop', 'title'],
+  props: {
+    toggleClass: {
+      type: String,
+      required: true,
+    },
+    drop: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+  },
   data: function() {
     return {open: false}
   },
@@ -21,23 +34,25 @@ export default defineComponent({
     }
   },
   methods: {
-    toggle: function(e) {
+    toggle: function() {
       this.open ? this.hide() : this.show()
     },
-    show: function(e) {
+    show: function() {
       this.open = true
-      this.$refs.menu.style.top = this.$refs.btn.offsetHeight + 'px'
+      const menu = this.$refs.menu as HTMLElement
+      const btn = this.$refs.btn as HTMLElement
+      menu.style.top = btn.offsetHeight + 'px'
       var drop = this.$props.drop
 
       if (drop === 'right') {
-        this.$refs.menu.style.left = 'auto'
-        this.$refs.menu.style.right = '0'
+        menu.style.left = 'auto'
+        menu.style.right = '0'
       } else if (drop === 'center') {
-        this.$nextTick(function() {
-          var btnWidth = this.$refs.btn.getBoundingClientRect().width
-          var menuWidth = this.$refs.menu.getBoundingClientRect().width
-          this.$refs.menu.style.left = '-' + ((menuWidth - btnWidth) / 2) + 'px'
-        }.bind(this))
+        this.$nextTick(() => {
+          const b = this.$refs.btn as HTMLElement
+          const m = this.$refs.menu as HTMLElement
+          m.style.left = '-' + ((m.getBoundingClientRect().width - b.getBoundingClientRect().width) / 2) + 'px'
+        })
       }
 
       document.addEventListener('click', this.clickHandler)
@@ -46,10 +61,11 @@ export default defineComponent({
       this.open = false
       document.removeEventListener('click', this.clickHandler)
     },
-    clickHandler: function(e) {
-      var dropdown = e.target.closest('.dropdown')
+    clickHandler: function(e: MouseEvent) {
+      const target = e.target as HTMLElement
+      var dropdown = target.closest('.dropdown')
       if (dropdown == null || dropdown != this.$el) return this.hide()
-      if (e.target.closest('.dropdown-item') != null) return this.hide()
+      if (target.closest('.dropdown-item') != null) return this.hide()
     }
   },
 })
