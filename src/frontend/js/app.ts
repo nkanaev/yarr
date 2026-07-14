@@ -16,6 +16,8 @@ import { defineComponent } from "vue";
 var app = window.app;
 var vm;
 
+type Theme = "system" | "light" | "sepia" | "night";
+
 var TITLE = document.title;
 
 export default defineComponent({
@@ -322,7 +324,7 @@ export default defineComponent({
     },
   },
   methods: {
-    updateMetaTheme(theme) {
+    updateMetaTheme(theme: Theme) {
       if (theme == "system") {
         var dark =
           window.matchMedia &&
@@ -332,7 +334,7 @@ export default defineComponent({
       document.querySelector("meta[name='theme-color']").content =
         this.themeColors[theme];
     },
-    refreshStats(loopMode) {
+    refreshStats(loopMode?: boolean) {
       return api.status().then((data) => {
         if (loopMode && !this.itemSelected) this.refreshItems();
 
@@ -422,7 +424,7 @@ export default defineComponent({
         (parseFloat(getComputedStyle(document.documentElement).fontSize) ||
           16) / 16;
 
-      var el = this.$refs.itemlist;
+      var el = this.$refs.itemlist as HTMLElement;
 
       if (!el || el.scrollHeight === 0) return false; // element is invisible (responsive design)
 
@@ -430,7 +432,7 @@ export default defineComponent({
         el.scrollHeight - el.scrollTop - el.offsetHeight < bottomSpace * scale;
       return closeToBottom;
     },
-    loadMoreItems(event, el) {
+    loadMoreItems() {
       if (!this.itemsHasMore) return;
       if (this.loading.items) return;
       if (this.itemListCloseToBottom()) return this.refreshItems(true);
@@ -454,7 +456,7 @@ export default defineComponent({
       folder.is_expanded = !folder.is_expanded;
       api.folders.update(folder.id, { is_expanded: folder.is_expanded });
     },
-    formatDate(datestr) {
+    formatDate(datestr: string) {
       var options = {
         year: "numeric",
         month: "long",
@@ -691,7 +693,7 @@ export default defineComponent({
       this.filteredTotalStats = statsTotal;
     },
     // navigation helper, navigate relative to selected item
-    navigateToItem(relativePosition) {
+    navigateToItem(relativePosition: number) {
       let vm = this;
       if (this.itemSelected == null) {
         // if no item is selected, select first
@@ -724,7 +726,7 @@ export default defineComponent({
       });
     },
     // navigation helper, navigate relative to selected feed
-    navigateToFeed(relativePosition) {
+    navigateToFeed(relativePosition: number) {
       let vm = this;
       const navigationList = this.foldersWithFeeds
         .filter((folder) => !folder.id || !this.mustHideFolder(folder))
@@ -763,7 +765,7 @@ export default defineComponent({
         if (target && scroll) scrollto(target, scroll);
       });
     },
-    changeRefreshRate(offset) {
+    changeRefreshRate(offset: number) {
       const curIdx = this.refreshRateOptions.findIndex(
         (o) => o.value === this.refreshRate,
       );
