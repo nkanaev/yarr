@@ -1,6 +1,6 @@
 export function setupKeybindings(vm) {
   var helperFunctions = {
-    scrollContent: function (direction) {
+    scrollContent(direction) {
       var padding = 40;
       var scroll = document.querySelector(".content");
       if (!scroll) return;
@@ -16,7 +16,7 @@ export function setupKeybindings(vm) {
     },
   };
   var shortcutFunctions = {
-    openItemLink: function () {
+    openItemLink() {
       if (vm.itemSelectedDetails && vm.itemSelectedDetails.link) {
         window.open(
           vm.itemSelectedDetails.link,
@@ -25,26 +25,26 @@ export function setupKeybindings(vm) {
         );
       }
     },
-    toggleReadability: function () {
+    toggleReadability() {
       vm.toggleReadability();
     },
-    toggleItemRead: function () {
+    toggleItemRead() {
       if (vm.itemSelected != null) {
         vm.toggleItemRead(vm.itemSelectedDetails);
       }
     },
-    markAllRead: function () {
+    markAllRead() {
       // same condition as 'Mark all read button'
       if (vm.filterSelected == "unread") {
         vm.markItemsRead();
       }
     },
-    toggleItemStarred: function () {
+    toggleItemStarred() {
       if (vm.itemSelected != null) {
         vm.toggleItemStarred(vm.itemSelectedDetails);
       }
     },
-    focusSearch: function () {
+    focusSearch() {
       document.getElementById("searchbar").focus();
     },
     nextItem() {
@@ -59,13 +59,13 @@ export function setupKeybindings(vm) {
     previousFeed() {
       vm.navigateToFeed(-1);
     },
-    scrollForward: function () {
+    scrollForward() {
       helperFunctions.scrollContent(+1);
     },
-    scrollBackward: function () {
+    scrollBackward() {
       helperFunctions.scrollContent(-1);
     },
-    closeItem: function () {
+    closeItem() {
       vm.itemSelected = null;
     },
     showAll() {

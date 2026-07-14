@@ -4,17 +4,17 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   template: template,
-  data: function () {
+  data() {
     return {
       logo: icons.anchor,
       hasError: false,
     };
   },
-  created: function () {
+  created() {
     this.$setLang(window.app.settings.language);
   },
   methods: {
-    login: function (event: Event) {
+    login(event: Event) {
       event.preventDefault();
       var data = new FormData(event.target);
       fetch("./login", { method: "POST", body: data }).then(

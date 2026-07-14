@@ -31,7 +31,7 @@ export default defineComponent({
     scroll: scrollDir,
     focus: focusDir,
   },
-  created: function () {
+  created() {
     vm = this;
     this.refreshStats()
       .then(() => this.refreshFeeds())
@@ -52,7 +52,7 @@ export default defineComponent({
       this._colorSchemeMql.addEventListener("change", this._colorSchemeHandler);
     }
   },
-  beforeUnmount: function () {
+  beforeUnmount() {
     if (this._colorSchemeMql) {
       this._colorSchemeMql.removeEventListener(
         "change",
@@ -60,10 +60,10 @@ export default defineComponent({
       );
     }
   },
-  mounted: function () {
+  mounted() {
     setupKeybindings(this);
   },
-  data: function () {
+  data() {
     var s = app.settings;
     return {
       filterSelected: s.filter,
@@ -135,7 +135,7 @@ export default defineComponent({
     };
   },
   computed: {
-    foldersWithFeeds: function () {
+    foldersWithFeeds() {
       var feedsByFolders = this.feeds.reduce(function (folders, feed) {
         if (!folders[feed.folder_id]) folders[feed.folder_id] = [feed];
         else folders[feed.folder_id].push(feed);
@@ -148,19 +148,19 @@ export default defineComponent({
       folders.push({ id: null, feeds: feedsByFolders[null] });
       return folders;
     },
-    feedsById: function () {
+    feedsById() {
       return this.feeds.reduce(function (acc, f) {
         acc[f.id] = f;
         return acc;
       }, {});
     },
-    foldersById: function () {
+    foldersById() {
       return this.folders.reduce(function (acc, f) {
         acc[f.id] = f;
         return acc;
       }, {});
     },
-    current: function () {
+    current() {
       var parts = (this.feedSelected || "").split(":", 2);
       var type = parts[0];
       var guid = parts[1];
@@ -173,7 +173,7 @@ export default defineComponent({
 
       return { type: type, feed: feed, folder: folder };
     },
-    searchScope: function () {
+    searchScope() {
       void this.language;
       var type = (this.feedSelected || "").split(":", 2)[0];
       if (type == "feed")
@@ -189,32 +189,32 @@ export default defineComponent({
       if (this.filterSelected == "starred") return this.$t("all_starred");
       return this.$t("all_feeds");
     },
-    itemSelectedContent: function () {
+    itemSelectedContent() {
       if (!this.itemSelected) return "";
 
       if (this.itemSelectedReadability) return this.itemSelectedReadability;
 
       return this.itemSelectedDetails.content || "";
     },
-    contentImages: function () {
+    contentImages() {
       if (!this.itemSelectedDetails) return [];
       return (this.itemSelectedDetails.media_links || []).filter(
         (l) => l.type === "image",
       );
     },
-    contentAudios: function () {
+    contentAudios() {
       if (!this.itemSelectedDetails) return [];
       return (this.itemSelectedDetails.media_links || []).filter(
         (l) => l.type === "audio",
       );
     },
-    contentVideos: function () {
+    contentVideos() {
       if (!this.itemSelectedDetails) return [];
       return (this.itemSelectedDetails.media_links || []).filter(
         (l) => l.type === "video",
       );
     },
-    refreshRateTitle: function () {
+    refreshRateTitle() {
       const entry = this.refreshRateOptions.find(
         (o) => o.value === this.refreshRate,
       );
@@ -224,7 +224,7 @@ export default defineComponent({
   watch: {
     theme: {
       deep: true,
-      handler: function (theme) {
+      handler(theme) {
         this.updateMetaTheme(theme.name);
         document.body.classList.value = "theme-" + theme.name;
         api.settings.update({
@@ -251,7 +251,7 @@ export default defineComponent({
         this.computeStats();
       }, 500),
     },
-    filterSelected: function (newVal, oldVal) {
+    filterSelected(newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
       this.itemSelected = null;
       this.items = [];
@@ -261,7 +261,7 @@ export default defineComponent({
         .then(() => this.refreshItems(false));
       this.computeStats();
     },
-    feedSelected: function (newVal, oldVal) {
+    feedSelected(newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
       this.itemSelected = null;
       this.items = [];
@@ -271,7 +271,7 @@ export default defineComponent({
         .then(() => this.refreshItems(false));
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0;
     },
-    itemSelected: function (newVal, oldVal) {
+    itemSelected(newVal, oldVal) {
       this.itemSelectedReadability = "";
       if (newVal === null) {
         this.itemSelectedDetails = null;
@@ -302,7 +302,7 @@ export default defineComponent({
     itemSearch: debounce(function (newVal) {
       this.refreshItems();
     }, 500),
-    itemSortNewestFirst: function (newVal, oldVal) {
+    itemSortNewestFirst(newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
       api.settings
         .update({ sort_newest_first: newVal })
@@ -316,13 +316,13 @@ export default defineComponent({
       if (oldVal === undefined) return; // do nothing, initial setup
       api.settings.update({ item_list_width: newVal });
     }, 1000),
-    refreshRate: function (newVal, oldVal) {
+    refreshRate(newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
       api.settings.update({ refresh_rate: newVal });
     },
   },
   methods: {
-    updateMetaTheme: function (theme) {
+    updateMetaTheme(theme) {
       if (theme == "system") {
         var dark =
           window.matchMedia &&
@@ -332,7 +332,7 @@ export default defineComponent({
       document.querySelector("meta[name='theme-color']").content =
         this.themeColors[theme];
     },
-    refreshStats: function (loopMode) {
+    refreshStats(loopMode) {
       return api.status().then((data) => {
         if (loopMode && !this.itemSelected) this.refreshItems();
 
@@ -350,7 +350,7 @@ export default defineComponent({
         });
       });
     },
-    getItemsQuery: function () {
+    getItemsQuery() {
       var query = {};
       if (this.feedSelected) {
         var parts = this.feedSelected.split(":", 2);
@@ -373,7 +373,7 @@ export default defineComponent({
       }
       return query;
     },
-    refreshFeeds: function () {
+    refreshFeeds() {
       return Promise.all([api.folders.list(), api.feeds.list()]).then(
         (values) => {
           this.folders = values[0];
@@ -381,7 +381,7 @@ export default defineComponent({
         },
       );
     },
-    refreshItems: function (loadMore = false) {
+    refreshItems(loadMore = false) {
       if (this.feedSelected === null) {
         this.items = [];
         this.itemsHasMore = false;
@@ -415,7 +415,7 @@ export default defineComponent({
         });
       });
     },
-    itemListCloseToBottom: function () {
+    itemListCloseToBottom() {
       // approx. vertical space at the bottom of the list (loading el & paddings) when 1rem = 16px
       var bottomSpace = 70;
       var scale =
@@ -430,7 +430,7 @@ export default defineComponent({
         el.scrollHeight - el.scrollTop - el.offsetHeight < bottomSpace * scale;
       return closeToBottom;
     },
-    loadMoreItems: function (event, el) {
+    loadMoreItems(event, el) {
       if (!this.itemsHasMore) return;
       if (this.loading.items) return;
       if (this.itemListCloseToBottom()) return this.refreshItems(true);
@@ -440,7 +440,7 @@ export default defineComponent({
       )
         return this.refreshItems(true);
     },
-    markItemsRead: function () {
+    markItemsRead() {
       var query = this.getItemsQuery();
       api.items.mark_read(query).then(() => {
         this.items = [];
@@ -450,11 +450,11 @@ export default defineComponent({
         this.refreshStats();
       });
     },
-    toggleFolderExpanded: function (folder) {
+    toggleFolderExpanded(folder) {
       folder.is_expanded = !folder.is_expanded;
       api.folders.update(folder.id, { is_expanded: folder.is_expanded });
     },
-    formatDate: function (datestr) {
+    formatDate(datestr) {
       var options = {
         year: "numeric",
         month: "long",
@@ -464,14 +464,14 @@ export default defineComponent({
       };
       return new Date(datestr).toLocaleDateString(undefined, options);
     },
-    moveFeed: function (feed, folder) {
+    moveFeed(feed, folder) {
       var folder_id = folder ? folder.id : null;
       api.feeds.update(feed.id, { folder_id: folder_id }).then(() => {
         feed.folder_id = folder_id;
         this.refreshStats();
       });
     },
-    moveFeedToNewFolder: function (feed) {
+    moveFeedToNewFolder(feed) {
       var title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
       api.folders.create({ title: title }).then((folder) => {
@@ -482,7 +482,7 @@ export default defineComponent({
         });
       });
     },
-    createNewFeedFolder: function () {
+    createNewFeedFolder() {
       var title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
       api.folders.create({ title: title }).then((result) => {
@@ -495,7 +495,7 @@ export default defineComponent({
         });
       });
     },
-    renameFolder: function (folder) {
+    renameFolder(folder) {
       var newTitle = prompt(this.$t("prompt_new_title"), folder.title);
       if (newTitle) {
         api.folders.update(folder.id, { title: newTitle }).then(
@@ -508,7 +508,7 @@ export default defineComponent({
         );
       }
     },
-    deleteFolder: function (folder) {
+    deleteFolder(folder) {
       if (confirm(this.$t("confirm_delete", { name: folder.title }))) {
         api.folders.delete(folder.id).then(() => {
           this.feedSelected = null;
@@ -517,7 +517,7 @@ export default defineComponent({
         });
       }
     },
-    updateFeedLink: function (feed) {
+    updateFeedLink(feed) {
       var newLink = prompt(this.$t("prompt_feed_link"), feed.feed_link);
       if (newLink) {
         api.feeds.update(feed.id, { feed_link: newLink }).then(function () {
@@ -525,7 +525,7 @@ export default defineComponent({
         });
       }
     },
-    renameFeed: function (feed) {
+    renameFeed(feed) {
       var newTitle = prompt(this.$t("prompt_new_title"), feed.title);
       if (newTitle) {
         api.feeds.update(feed.id, { title: newTitle }).then(function () {
@@ -533,7 +533,7 @@ export default defineComponent({
         });
       }
     },
-    deleteFeed: function (feed) {
+    deleteFeed(feed) {
       if (confirm(this.$t("confirm_delete", { name: feed.title }))) {
         api.feeds.delete(feed.id).then(() => {
           this.feedSelected = null;
@@ -542,7 +542,7 @@ export default defineComponent({
         });
       }
     },
-    createFeed: function ($event) {
+    createFeed($event) {
       var form = $event.target;
       var data = {
         url: form.querySelector("input[name=url]").value,
@@ -573,7 +573,7 @@ export default defineComponent({
         this.loading.newfeed = false;
       });
     },
-    toggleItemStatus: function (item, targetstatus, fallbackstatus) {
+    toggleItemStatus(item, targetstatus, fallbackstatus) {
       var oldstatus = item.status;
       var newstatus =
         item.status !== targetstatus ? targetstatus : fallbackstatus;
@@ -597,13 +597,13 @@ export default defineComponent({
         },
       );
     },
-    toggleItemStarred: function (item) {
+    toggleItemStarred(item) {
       this.toggleItemStatus(item, "starred", "read");
     },
-    toggleItemRead: function (item) {
+    toggleItemRead(item) {
       this.toggleItemStatus(item, "unread", "read");
     },
-    importOPML: function (event) {
+    importOPML(event) {
       var input = event.target;
       var form = document.querySelector("#opml-import-form");
       this.$refs.menuDropdown.hide();
@@ -613,12 +613,12 @@ export default defineComponent({
         this.refreshStats();
       });
     },
-    logout: function () {
+    logout() {
       api.logout().then(() => {
         document.location.reload();
       });
     },
-    toggleReadability: function () {
+    toggleReadability() {
       if (this.itemSelectedReadability) {
         this.itemSelectedReadability = null;
         return;
@@ -633,7 +633,7 @@ export default defineComponent({
         });
       }
     },
-    showSettings: function (settings) {
+    showSettings(settings) {
       this.settings = settings;
 
       if (settings === "create") {
@@ -641,26 +641,26 @@ export default defineComponent({
         this.feedNewChoiceSelected = "";
       }
     },
-    resizeFeedList: function (width) {
+    resizeFeedList(width) {
       this.feedListWidth = Math.min(Math.max(200, width), 700);
     },
-    resizeItemList: function (width) {
+    resizeItemList(width) {
       this.itemListWidth = Math.min(Math.max(200, width), 700);
     },
-    resetFeedChoice: function () {
+    resetFeedChoice() {
       this.feedNewChoice = [];
       this.feedNewChoiceSelected = "";
     },
-    incrFont: function (x) {
+    incrFont(x) {
       this.theme.size = +(this.theme.size + 0.1 * x).toFixed(1);
     },
-    fetchAllFeeds: function () {
+    fetchAllFeeds() {
       if (this.loading.feeds) return;
       api.feeds.refresh().then(() => {
         this.refreshStats();
       });
     },
-    computeStats: function () {
+    computeStats() {
       var filter = this.filterSelected;
       if (!filter) {
         this.filteredFeedStats = {};
@@ -691,7 +691,7 @@ export default defineComponent({
       this.filteredTotalStats = statsTotal;
     },
     // navigation helper, navigate relative to selected item
-    navigateToItem: function (relativePosition) {
+    navigateToItem(relativePosition) {
       let vm = this;
       if (this.itemSelected == null) {
         // if no item is selected, select first
@@ -724,7 +724,7 @@ export default defineComponent({
       });
     },
     // navigation helper, navigate relative to selected feed
-    navigateToFeed: function (relativePosition) {
+    navigateToFeed(relativePosition) {
       let vm = this;
       const navigationList = this.foldersWithFeeds
         .filter((folder) => !folder.id || !this.mustHideFolder(folder))
@@ -763,7 +763,7 @@ export default defineComponent({
         if (target && scroll) scrollto(target, scroll);
       });
     },
-    changeRefreshRate: function (offset) {
+    changeRefreshRate(offset) {
       const curIdx = this.refreshRateOptions.findIndex(
         (o) => o.value === this.refreshRate,
       );
@@ -771,7 +771,7 @@ export default defineComponent({
       if (curIdx >= this.refreshRateOptions.length - 1 && offset > 0) return;
       this.refreshRate = this.refreshRateOptions[curIdx + offset].value;
     },
-    mustHideFolder: function (folder) {
+    mustHideFolder(folder) {
       return (
         this.filterSelected &&
         !(
@@ -784,7 +784,7 @@ export default defineComponent({
             folder.id)
       );
     },
-    mustHideFeed: function (feed) {
+    mustHideFeed(feed) {
       return (
         this.filterSelected &&
         !(this.current.feed.id == feed.id) &&

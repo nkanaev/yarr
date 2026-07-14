@@ -16,7 +16,7 @@ export default defineComponent({
       required: true,
     },
   },
-  data: function () {
+  data() {
     return { open: false };
   },
   template: `
@@ -26,7 +26,7 @@ export default defineComponent({
     </div>
   `,
   computed: {
-    btnToggleClass: function () {
+    btnToggleClass() {
       var c = this.$props.toggleClass || "";
       c += " dropdown-toggle dropdown-toggle-no-caret";
       c += this.open ? " show" : "";
@@ -34,10 +34,10 @@ export default defineComponent({
     },
   },
   methods: {
-    toggle: function () {
+    toggle() {
       this.open ? this.hide() : this.show();
     },
-    show: function () {
+    show() {
       this.open = true;
       const menu = this.$refs.menu as HTMLElement;
       const btn = this.$refs.btn as HTMLElement;
@@ -62,11 +62,11 @@ export default defineComponent({
 
       document.addEventListener("click", this.clickHandler);
     },
-    hide: function () {
+    hide() {
       this.open = false;
       document.removeEventListener("click", this.clickHandler);
     },
-    clickHandler: function (e: MouseEvent) {
+    clickHandler(e: MouseEvent) {
       const target = e.target as HTMLElement;
       var dropdown = target.closest(".dropdown");
       if (dropdown == null || dropdown != this.$el) return this.hide();

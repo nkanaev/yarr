@@ -13,11 +13,11 @@ export default defineComponent({
       </div>
     </div>
   `,
-  data: function () {
+  data() {
     return { opening: false };
   },
   watch: {
-    open: function (newVal) {
+    open(newVal) {
       if (newVal) {
         this.opening = true;
         document.addEventListener("click", this.handleClick);
@@ -27,7 +27,7 @@ export default defineComponent({
     },
   },
   methods: {
-    handleClick: function (e: Event) {
+    handleClick(e: Event) {
       const target = e.target as HTMLElement;
       if (this.opening) {
         this.opening = false;

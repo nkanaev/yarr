@@ -3,7 +3,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   props: ["width"],
   template: '<div class="drag"></div>',
-  mounted: function () {
+  mounted() {
     var self = this;
     let startX = 0;
     let initW = 0;

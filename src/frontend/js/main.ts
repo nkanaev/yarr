@@ -4,7 +4,7 @@ import App from "./app";
 import Login from "./login";
 
 const application = createApp({
-  render: function () {
+  render() {
     return h(window.app.authenticated ? App : Login);
   },
 });

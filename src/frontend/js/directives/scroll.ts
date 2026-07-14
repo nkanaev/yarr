@@ -2,7 +2,7 @@ import type { Directive } from "vue";
 import { debounce } from "../utils";
 
 export default {
-  mounted: function (el, binding) {
+  mounted(el, binding) {
     el.addEventListener(
       "scroll",
       debounce(function (event) {

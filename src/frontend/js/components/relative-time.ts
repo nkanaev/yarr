@@ -3,7 +3,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: ["val"],
-  data: function () {
+  data() {
     var d = new Date(this.val);
     return {
       date: d,
@@ -12,12 +12,12 @@ export default defineComponent({
     };
   },
   template: '<time :datetime="val">{{ formatted }}</time>',
-  mounted: function () {
+  mounted() {
     this.interval = setInterval(() => {
       this.formatted = dateRepr(this.date);
     }, 600000); // every 10 minutes
   },
-  unmounted: function () {
+  unmounted() {
     clearInterval(this.interval);
   },
 });

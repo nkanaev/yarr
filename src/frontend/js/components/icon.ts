@@ -5,7 +5,7 @@ export default defineComponent({
   props: { name: { type: String, required: true } },
   template: '<span class="icon" v-html="content"></span>',
   computed: {
-    content: function () {
+    content() {
       return (icons as Record<string, string>)[this.name] || "";
     },
   },

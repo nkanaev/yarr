@@ -33,80 +33,80 @@ var param = function (query) {
 
 export default {
   feeds: {
-    list: function () {
+    list() {
       return api("get", "./api/feeds").then(json);
     },
-    create: function (data) {
+    create(data) {
       return api("post", "./api/feeds", data).then(json);
     },
-    update: function (id, data) {
+    update(id, data) {
       return api("put", "./api/feeds/" + id, data);
     },
-    delete: function (id) {
+    delete(id) {
       return api("delete", "./api/feeds/" + id);
     },
-    list_items: function (id) {
+    list_items(id) {
       return api("get", "./api/feeds/" + id + "/items").then(json);
     },
-    refresh: function () {
+    refresh() {
       return api("post", "./api/feeds/refresh");
     },
-    list_errors: function () {
+    list_errors() {
       return api("get", "./api/feeds/errors").then(json);
     },
   },
   folders: {
-    list: function () {
+    list() {
       return api("get", "./api/folders").then(json);
     },
-    create: function (data) {
+    create(data) {
       return api("post", "./api/folders", data).then(json);
     },
-    update: function (id, data) {
+    update(id, data) {
       return api("put", "./api/folders/" + id, data);
     },
-    delete: function (id) {
+    delete(id) {
       return api("delete", "./api/folders/" + id);
     },
-    list_items: function (id) {
+    list_items(id) {
       return api("get", "./api/folders/" + id + "/items").then(json);
     },
   },
   items: {
-    get: function (id) {
+    get(id) {
       return api("get", "./api/items/" + id).then(json);
     },
-    list: function (query) {
+    list(query) {
       return api("get", "./api/items" + param(query)).then(json);
     },
-    update: function (id, data) {
+    update(id, data) {
       return api("put", "./api/items/" + id, data);
     },
-    mark_read: function (query) {
+    mark_read(query) {
       return api("put", "./api/items" + param(query));
     },
   },
   settings: {
-    get: function () {
+    get() {
       return api("get", "./api/settings").then(json);
     },
-    update: function (data) {
+    update(data) {
       return api("put", "./api/settings", data);
     },
   },
-  status: function () {
+  status() {
     return api("get", "./api/status").then(json);
   },
-  upload_opml: function (form) {
+  upload_opml(form) {
     return xfetch("./opml/import", {
       method: "post",
       body: new FormData(form),
     });
   },
-  logout: function () {
+  logout() {
     return api("post", "./logout");
   },
-  crawl: function (url) {
+  crawl(url) {
     return api("get", "./page?url=" + encodeURIComponent(url)).then(json);
   },
 };
