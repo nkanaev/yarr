@@ -14,7 +14,6 @@ import focusDir from "./directives/focus";
 import { defineComponent } from "vue";
 
 var app = window.app;
-var vm;
 
 type Theme = "system" | "light" | "sepia" | "night";
 
@@ -34,7 +33,6 @@ export default defineComponent({
     focus: focusDir,
   },
   created() {
-    vm = this;
     this.refreshStats()
       .then(() => this.refreshFeeds())
       .then(() => this.refreshItems(false));
