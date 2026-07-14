@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -16,8 +16,8 @@ export default defineComponent({
       required: true,
     },
   },
-  data: function() {
-    return {open: false}
+  data: function () {
+    return { open: false };
   },
   template: `
     <div class="dropdown" :class="$attrs.class">
@@ -26,46 +26,51 @@ export default defineComponent({
     </div>
   `,
   computed: {
-    btnToggleClass: function() {
-      var c = this.$props.toggleClass || ''
-      c += ' dropdown-toggle dropdown-toggle-no-caret'
-      c += this.open ? ' show' : ''
-      return c.trim()
-    }
+    btnToggleClass: function () {
+      var c = this.$props.toggleClass || "";
+      c += " dropdown-toggle dropdown-toggle-no-caret";
+      c += this.open ? " show" : "";
+      return c.trim();
+    },
   },
   methods: {
-    toggle: function() {
-      this.open ? this.hide() : this.show()
+    toggle: function () {
+      this.open ? this.hide() : this.show();
     },
-    show: function() {
-      this.open = true
-      const menu = this.$refs.menu as HTMLElement
-      const btn = this.$refs.btn as HTMLElement
-      menu.style.top = btn.offsetHeight + 'px'
-      var drop = this.$props.drop
+    show: function () {
+      this.open = true;
+      const menu = this.$refs.menu as HTMLElement;
+      const btn = this.$refs.btn as HTMLElement;
+      menu.style.top = btn.offsetHeight + "px";
+      var drop = this.$props.drop;
 
-      if (drop === 'right') {
-        menu.style.left = 'auto'
-        menu.style.right = '0'
-      } else if (drop === 'center') {
+      if (drop === "right") {
+        menu.style.left = "auto";
+        menu.style.right = "0";
+      } else if (drop === "center") {
         this.$nextTick(() => {
-          const b = this.$refs.btn as HTMLElement
-          const m = this.$refs.menu as HTMLElement
-          m.style.left = '-' + ((m.getBoundingClientRect().width - b.getBoundingClientRect().width) / 2) + 'px'
-        })
+          const b = this.$refs.btn as HTMLElement;
+          const m = this.$refs.menu as HTMLElement;
+          m.style.left =
+            "-" +
+            (m.getBoundingClientRect().width -
+              b.getBoundingClientRect().width) /
+              2 +
+            "px";
+        });
       }
 
-      document.addEventListener('click', this.clickHandler)
+      document.addEventListener("click", this.clickHandler);
     },
-    hide: function() {
-      this.open = false
-      document.removeEventListener('click', this.clickHandler)
+    hide: function () {
+      this.open = false;
+      document.removeEventListener("click", this.clickHandler);
     },
-    clickHandler: function(e: MouseEvent) {
-      const target = e.target as HTMLElement
-      var dropdown = target.closest('.dropdown')
-      if (dropdown == null || dropdown != this.$el) return this.hide()
-      if (target.closest('.dropdown-item') != null) return this.hide()
-    }
+    clickHandler: function (e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      var dropdown = target.closest(".dropdown");
+      if (dropdown == null || dropdown != this.$el) return this.hide();
+      if (target.closest(".dropdown-item") != null) return this.hide();
+    },
   },
-})
+});

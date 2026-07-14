@@ -1,7 +1,7 @@
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  props: ['open'],
+  props: ["open"],
   template: `
     <div class="modal custom-modal" tabindex="-1" v-if="$props.open">
       <div class="modal-dialog">
@@ -13,27 +13,27 @@ export default defineComponent({
       </div>
     </div>
   `,
-  data: function() {
-    return {opening: false}
+  data: function () {
+    return { opening: false };
   },
   watch: {
-    'open': function(newVal) {
+    open: function (newVal) {
       if (newVal) {
-        this.opening = true
-        document.addEventListener('click', this.handleClick)
+        this.opening = true;
+        document.addEventListener("click", this.handleClick);
       } else {
-        document.removeEventListener('click', this.handleClick)
+        document.removeEventListener("click", this.handleClick);
       }
     },
   },
   methods: {
     handleClick: function (e: Event) {
-      const target = e.target as HTMLElement
+      const target = e.target as HTMLElement;
       if (this.opening) {
-        this.opening = false
-        return
+        this.opening = false;
+        return;
       }
-      if (target.closest('.modal-content') == null) this.$emit('hide')
+      if (target.closest(".modal-content") == null) this.$emit("hide");
     },
   },
-})
+});
