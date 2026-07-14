@@ -16,17 +16,15 @@ export default defineComponent({
   methods: {
     login(event: Event) {
       event.preventDefault();
-      var data = new FormData(event.target);
-      fetch("./login", { method: "POST", body: data }).then(
-        function (res) {
-          if (res.ok) {
-            // TODO:
-            document.location.assign("./");
-          } else {
-            this.hasError = true;
-          }
-        }.bind(this),
-      );
+      var data = new FormData(event.target as HTMLFormElement);
+      fetch("./login", { method: "POST", body: data }).then((res) => {
+        if (res.ok) {
+          // TODO: reload settings instead of refreshing the page
+          document.location.assign("./");
+        } else {
+          this.hasError = true;
+        }
+      });
     },
   },
 });

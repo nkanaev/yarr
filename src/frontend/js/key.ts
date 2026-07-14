@@ -1,6 +1,6 @@
 export function setupKeybindings(vm) {
   var helperFunctions = {
-    scrollContent(direction) {
+    scrollContent(direction: number) {
       var padding = 40;
       var scroll = document.querySelector(".content");
       if (!scroll) return;
@@ -118,7 +118,7 @@ export function setupKeybindings(vm) {
     Digit3: shortcutFunctions.showAll,
   };
 
-  function isTextBox(element) {
+  function isTextBox(element: Element) {
     var tagName = element.tagName.toLowerCase();
     // Input elements that aren't text
     var inputBlocklist = [
@@ -147,7 +147,7 @@ export function setupKeybindings(vm) {
     // Ignore while focused on text or
     // when using modifier keys (to not clash with browser behaviour)
     if (
-      isTextBox(event.target) ||
+      isTextBox(event.target as Element) ||
       event.metaKey ||
       event.ctrlKey ||
       event.altKey
