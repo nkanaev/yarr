@@ -34,11 +34,11 @@ export default defineComponent({
   created: function () {
     vm = this;
     this.refreshStats()
-      .then(this.refreshFeeds.bind(this))
-      .then(this.refreshItems.bind(this, false));
+      .then(() => this.refreshFeeds())
+      .then(() => this.refreshItems(false));
 
-    api.feeds.list_errors().then(function (errors) {
-      vm.feed_errors = errors;
+    api.feeds.list_errors().then((errors) => {
+      this.feed_errors = errors;
     });
     this.updateMetaTheme(app.settings.theme_name);
     this.$setLang(app.settings.language);
@@ -46,9 +46,9 @@ export default defineComponent({
     // keep the theme-color meta tag in sync when the OS color scheme changes
     if (window.matchMedia) {
       this._colorSchemeMql = window.matchMedia("(prefers-color-scheme: dark)");
-      this._colorSchemeHandler = function () {
+      this._colorSchemeHandler = () => {
         this.updateMetaTheme(this.theme.name);
-      }.bind(this);
+      };
       this._colorSchemeMql.addEventListener("change", this._colorSchemeHandler);
     }
   },
@@ -258,7 +258,7 @@ export default defineComponent({
       this.itemsHasMore = true;
       api.settings
         .update({ filter: newVal })
-        .then(this.refreshItems.bind(this, false));
+        .then(() => this.refreshItems(false));
       this.computeStats();
     },
     feedSelected: function (newVal, oldVal) {
@@ -268,7 +268,7 @@ export default defineComponent({
       this.itemsHasMore = true;
       api.settings
         .update({ feed: newVal })
-        .then(this.refreshItems.bind(this, false));
+        .then(() => this.refreshItems(false));
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0;
     },
     itemSelected: function (newVal, oldVal) {
@@ -280,23 +280,23 @@ export default defineComponent({
       if (this.$refs.content) this.$refs.content.scrollTop = 0;
 
       api.items.get(newVal).then(
-        function (item) {
+        (item) => {
           this.itemSelectedDetails = item;
           if (this.itemSelectedDetails.status == "unread") {
             api.items
               .update(this.itemSelectedDetails.id, { status: "read" })
               .then(
-                function () {
+                () => {
                   this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1;
                   var itemInList = this.items.find(function (i) {
                     return i.id == item.id;
                   });
                   if (itemInList) itemInList.status = "read";
                   this.itemSelectedDetails.status = "read";
-                }.bind(this),
+                },
               );
           }
-        }.bind(this),
+        },
       );
     },
     itemSearch: debounce(function (newVal) {
@@ -306,7 +306,7 @@ export default defineComponent({
       if (oldVal === undefined) return; // do nothing, initial setup
       api.settings
         .update({ sort_newest_first: newVal })
-        .then(vm.refreshItems.bind(this, false));
+        .then(() => this.refreshItems(false));
     },
     feedListWidth: debounce(function (newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
@@ -333,20 +333,20 @@ export default defineComponent({
         this.themeColors[theme];
     },
     refreshStats: function (loopMode) {
-      return api.status().then(function (data) {
-        if (loopMode && !vm.itemSelected) vm.refreshItems();
+      return api.status().then((data) => {
+        if (loopMode && !this.itemSelected) this.refreshItems();
 
-        vm.loading.feeds = data.running;
+        this.loading.feeds = data.running;
         if (data.running) {
-          setTimeout(vm.refreshStats.bind(vm, true), 500);
+          setTimeout(() => this.refreshStats(true), 500);
         }
-        vm.feedStats = data.stats.reduce(function (acc, stat) {
+        this.feedStats = data.stats.reduce((acc, stat) => {
           acc[stat.feed_id] = stat;
           return acc;
         }, {});
 
-        api.feeds.list_errors().then(function (errors) {
-          vm.feed_errors = errors;
+        api.feeds.list_errors().then((errors) => {
+          this.feed_errors = errors;
         });
       });
     },
@@ -375,42 +375,42 @@ export default defineComponent({
     },
     refreshFeeds: function () {
       return Promise.all([api.folders.list(), api.feeds.list()]).then(
-        function (values) {
-          vm.folders = values[0];
-          vm.feeds = values[1];
+        (values) => {
+          this.folders = values[0];
+          this.feeds = values[1];
         },
       );
     },
     refreshItems: function (loadMore = false) {
       if (this.feedSelected === null) {
-        vm.items = [];
-        vm.itemsHasMore = false;
+        this.items = [];
+        this.itemsHasMore = false;
         return;
       }
 
       var query = this.getItemsQuery();
       if (loadMore) {
-        query.after = vm.items[vm.items.length - 1].id;
+        query.after = this.items[this.items.length - 1].id;
       }
 
       this.loading.items = true;
-      return api.items.list(query).then(function (data) {
+      return api.items.list(query).then((data) => {
         if (loadMore) {
-          vm.items = vm.items.concat(data.list);
+          this.items = this.items.concat(data.list);
         } else {
-          vm.items = data.list;
+          this.items = data.list;
         }
-        vm.itemsHasMore = data.has_more;
-        vm.loading.items = false;
+        this.itemsHasMore = data.has_more;
+        this.loading.items = false;
 
         // load more if there's some space left at the bottom of the item list.
-        vm.$nextTick(function () {
+        this.$nextTick(() => {
           if (
-            vm.itemsHasMore &&
-            !vm.loading.items &&
-            vm.itemListCloseToBottom()
+            this.itemsHasMore &&
+            !this.loading.items &&
+            this.itemListCloseToBottom()
           ) {
-            vm.refreshItems(true);
+            this.refreshItems(true);
           }
         });
       });
@@ -442,12 +442,12 @@ export default defineComponent({
     },
     markItemsRead: function () {
       var query = this.getItemsQuery();
-      api.items.mark_read(query).then(function () {
-        vm.items = [];
-        vm.itemsPage = { cur: 1, num: 1 };
-        vm.itemSelected = null;
-        vm.itemsHasMore = false;
-        vm.refreshStats();
+      api.items.mark_read(query).then(() => {
+        this.items = [];
+        this.itemsPage = { cur: 1, num: 1 };
+        this.itemSelected = null;
+        this.itemsHasMore = false;
+        this.refreshStats();
       });
     },
     toggleFolderExpanded: function (folder) {
@@ -466,18 +466,18 @@ export default defineComponent({
     },
     moveFeed: function (feed, folder) {
       var folder_id = folder ? folder.id : null;
-      api.feeds.update(feed.id, { folder_id: folder_id }).then(function () {
+      api.feeds.update(feed.id, { folder_id: folder_id }).then(() => {
         feed.folder_id = folder_id;
-        vm.refreshStats();
+        this.refreshStats();
       });
     },
     moveFeedToNewFolder: function (feed) {
       var title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
-      api.folders.create({ title: title }).then(function (folder) {
-        api.feeds.update(feed.id, { folder_id: folder.id }).then(function () {
-          vm.refreshFeeds().then(function () {
-            vm.refreshStats();
+      api.folders.create({ title: title }).then((folder) => {
+        api.feeds.update(feed.id, { folder_id: folder.id }).then(() => {
+          this.refreshFeeds().then(() => {
+            this.refreshStats();
           });
         });
       });
@@ -485,11 +485,11 @@ export default defineComponent({
     createNewFeedFolder: function () {
       var title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
-      api.folders.create({ title: title }).then(function (result) {
-        vm.refreshFeeds().then(function () {
-          vm.$nextTick(function () {
-            if (vm.$refs.newFeedFolder) {
-              vm.$refs.newFeedFolder.value = result.id;
+      api.folders.create({ title: title }).then((result) => {
+        this.refreshFeeds().then(() => {
+          this.$nextTick(() => {
+            if (this.$refs.newFeedFolder) {
+              this.$refs.newFeedFolder.value = result.id;
             }
           });
         });
@@ -499,21 +499,21 @@ export default defineComponent({
       var newTitle = prompt(this.$t("prompt_new_title"), folder.title);
       if (newTitle) {
         api.folders.update(folder.id, { title: newTitle }).then(
-          function () {
+          () => {
             folder.title = newTitle;
             this.folders.sort(function (a, b) {
               return a.title.localeCompare(b.title);
             });
-          }.bind(this),
+          },
         );
       }
     },
     deleteFolder: function (folder) {
       if (confirm(this.$t("confirm_delete", { name: folder.title }))) {
-        api.folders.delete(folder.id).then(function () {
-          vm.feedSelected = null;
-          vm.refreshStats();
-          vm.refreshFeeds();
+        api.folders.delete(folder.id).then(() => {
+          this.feedSelected = null;
+          this.refreshStats();
+          this.refreshFeeds();
         });
       }
     },
@@ -535,10 +535,10 @@ export default defineComponent({
     },
     deleteFeed: function (feed) {
       if (confirm(this.$t("confirm_delete", { name: feed.title }))) {
-        api.feeds.delete(feed.id).then(function () {
-          vm.feedSelected = null;
-          vm.refreshStats();
-          vm.refreshFeeds();
+        api.feeds.delete(feed.id).then(() => {
+          this.feedSelected = null;
+          this.refreshStats();
+          this.refreshFeeds();
         });
       }
     },
@@ -558,19 +558,19 @@ export default defineComponent({
           data.title_override = choice.title_override;
       }
       this.loading.newfeed = true;
-      api.feeds.create(data).then(function (result) {
+      api.feeds.create(data).then((result) => {
         if (result.status === "success") {
-          vm.refreshFeeds();
-          vm.refreshStats();
-          vm.settings = "";
-          vm.feedSelected = "feed:" + result.feed.id;
+          this.refreshFeeds();
+          this.refreshStats();
+          this.settings = "";
+          this.feedSelected = "feed:" + result.feed.id;
         } else if (result.status === "multiple") {
-          vm.feedNewChoice = result.choice;
-          vm.feedNewChoiceSelected = result.choice[0].url;
+          this.feedNewChoice = result.choice;
+          this.feedNewChoiceSelected = result.choice[0].url;
         } else {
           alert("No feeds found at the given url.");
         }
-        vm.loading.newfeed = false;
+        this.loading.newfeed = false;
       });
     },
     toggleItemStatus: function (item, targetstatus, fallbackstatus) {
@@ -578,14 +578,14 @@ export default defineComponent({
       var newstatus =
         item.status !== targetstatus ? targetstatus : fallbackstatus;
 
-      var updateStats = function (status, incr) {
+      var updateStats = (status, incr) => {
         if (status == "unread" || status == "starred") {
           this.feedStats[item.feed_id][status] += incr;
         }
-      }.bind(this);
+      };
 
       api.items.update(item.id, { status: newstatus }).then(
-        function () {
+        () => {
           updateStats(oldstatus, -1);
           updateStats(newstatus, +1);
 
@@ -594,7 +594,7 @@ export default defineComponent({
           });
           if (itemInList) itemInList.status = newstatus;
           item.status = newstatus;
-        }.bind(this),
+        },
       );
     },
     toggleItemStarred: function (item) {
@@ -607,14 +607,14 @@ export default defineComponent({
       var input = event.target;
       var form = document.querySelector("#opml-import-form");
       this.$refs.menuDropdown.hide();
-      api.upload_opml(form).then(function () {
+      api.upload_opml(form).then(() => {
         input.value = "";
-        vm.refreshFeeds();
-        vm.refreshStats();
+        this.refreshFeeds();
+        this.refreshStats();
       });
     },
     logout: function () {
-      api.logout().then(function () {
+      api.logout().then(() => {
         document.location.reload();
       });
     },
@@ -627,9 +627,9 @@ export default defineComponent({
       if (!item) return;
       if (item.link) {
         this.loading.readability = true;
-        api.crawl(item.link).then(function (data) {
-          vm.itemSelectedReadability = data && data.content;
-          vm.loading.readability = false;
+        api.crawl(item.link).then((data) => {
+          this.itemSelectedReadability = data && data.content;
+          this.loading.readability = false;
         });
       }
     },
@@ -637,8 +637,8 @@ export default defineComponent({
       this.settings = settings;
 
       if (settings === "create") {
-        vm.feedNewChoice = [];
-        vm.feedNewChoiceSelected = "";
+        this.feedNewChoice = [];
+        this.feedNewChoiceSelected = "";
       }
     },
     resizeFeedList: function (width) {
@@ -656,8 +656,8 @@ export default defineComponent({
     },
     fetchAllFeeds: function () {
       if (this.loading.feeds) return;
-      api.feeds.refresh().then(function () {
-        vm.refreshStats();
+      api.feeds.refresh().then(() => {
+        this.refreshStats();
       });
     },
     computeStats: function () {
@@ -677,7 +677,7 @@ export default defineComponent({
         var feed = this.feeds[i];
         if (!this.feedStats[feed.id]) continue;
 
-        var n = vm.feedStats[feed.id][filter] || 0;
+        var n = this.feedStats[feed.id][filter] || 0;
 
         if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = 0;
 
@@ -693,26 +693,26 @@ export default defineComponent({
     // navigation helper, navigate relative to selected item
     navigateToItem: function (relativePosition) {
       let vm = this;
-      if (vm.itemSelected == null) {
+      if (this.itemSelected == null) {
         // if no item is selected, select first
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id;
+        if (this.items.length !== 0) this.itemSelected = this.items[0].id;
         return;
       }
 
-      var itemPosition = vm.items.findIndex(function (x) {
-        return x.id === vm.itemSelected;
+      var itemPosition = this.items.findIndex((x) => {
+        return x.id === this.itemSelected;
       });
       if (itemPosition === -1) {
-        if (vm.items.length !== 0) vm.itemSelected = vm.items[0].id;
+        if (this.items.length !== 0) this.itemSelected = this.items[0].id;
         return;
       }
 
       var newPosition = itemPosition + relativePosition;
-      if (newPosition < 0 || newPosition >= vm.items.length) return;
+      if (newPosition < 0 || newPosition >= this.items.length) return;
 
-      vm.itemSelected = vm.items[newPosition].id;
+      this.itemSelected = this.items[newPosition].id;
 
-      vm.$nextTick(function () {
+      this.$nextTick(() => {
         var scroll = document.querySelector("#item-list-scroll");
 
         var handle = scroll.querySelector("input[type=radio]:checked");
@@ -720,21 +720,21 @@ export default defineComponent({
 
         if (target && scroll) scrollto(target, scroll);
 
-        vm.loadMoreItems();
+        this.loadMoreItems();
       });
     },
     // navigation helper, navigate relative to selected feed
     navigateToFeed: function (relativePosition) {
       let vm = this;
       const navigationList = this.foldersWithFeeds
-        .filter((folder) => !folder.id || !vm.mustHideFolder(folder))
+        .filter((folder) => !folder.id || !this.mustHideFolder(folder))
         .map((folder) => {
           if (this.mustHideFolder(folder)) return [];
           const folds = folder.id ? [`folder:${folder.id}`] : [];
           const feeds =
             folder.is_expanded || !folder.id
               ? (folder.feeds || [])
-                  .filter((f) => !vm.mustHideFeed(f))
+                  .filter((f) => !this.mustHideFeed(f))
                   .map((f) => `feed:${f.id}`)
               : [];
           return folds.concat(feeds);
@@ -742,19 +742,19 @@ export default defineComponent({
         .flat();
       navigationList.unshift("");
 
-      var currentFeedPosition = navigationList.indexOf(vm.feedSelected);
+      var currentFeedPosition = navigationList.indexOf(this.feedSelected);
 
       if (currentFeedPosition == -1) {
-        vm.feedSelected = "";
+        this.feedSelected = "";
         return;
       }
 
       var newPosition = currentFeedPosition + relativePosition;
       if (newPosition < 0 || newPosition >= navigationList.length) return;
 
-      vm.feedSelected = navigationList[newPosition];
+      this.feedSelected = navigationList[newPosition];
 
-      vm.$nextTick(function () {
+      this.$nextTick(() => {
         var scroll = document.querySelector("#feed-list-scroll");
 
         var handle = scroll.querySelector("input[type=radio]:checked");
