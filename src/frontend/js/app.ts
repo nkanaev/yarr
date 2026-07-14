@@ -424,7 +424,7 @@ export default defineComponent({
 
       var el = this.$refs.itemlist;
 
-      if (el.scrollHeight === 0) return false; // element is invisible (responsive design)
+      if (!el || el.scrollHeight === 0) return false; // element is invisible (responsive design)
 
       var closeToBottom =
         el.scrollHeight - el.scrollTop - el.offsetHeight < bottomSpace * scale;
