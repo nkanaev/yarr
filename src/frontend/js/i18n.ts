@@ -1,3 +1,4 @@
+import type { Plugin } from "vue";
 import { FluentResource, FluentBundle, FluentVariable } from "@fluent/bundle";
 
 const translations = {
@@ -703,7 +704,7 @@ const translations = {
   },
 };
 
-type Lang = "en" | "de" | "fr" | "es" | "ja" | "pt" | "zh" | "ru";
+export type Lang = "en" | "de" | "fr" | "es" | "ja" | "pt" | "zh" | "ru";
 
 function ftlFrom(lang: Lang) {
   return Object.entries(translations)
@@ -721,8 +722,8 @@ export default {
     };
     app.config.globalProperties.$t = function (
       code: string,
-      args: Record<string, FluentVariable>,
-    ) {
+      args?: Record<string, FluentVariable>,
+    ): string | undefined {
       if (!bundle) return;
       const msg = bundle.getMessage(code);
       if (!msg || !msg.value) return;
