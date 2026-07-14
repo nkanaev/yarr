@@ -279,25 +279,21 @@ export default defineComponent({
       }
       if (this.$refs.content) this.$refs.content.scrollTop = 0;
 
-      api.items.get(newVal).then(
-        (item) => {
-          this.itemSelectedDetails = item;
-          if (this.itemSelectedDetails.status == "unread") {
-            api.items
-              .update(this.itemSelectedDetails.id, { status: "read" })
-              .then(
-                () => {
-                  this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1;
-                  var itemInList = this.items.find(function (i) {
-                    return i.id == item.id;
-                  });
-                  if (itemInList) itemInList.status = "read";
-                  this.itemSelectedDetails.status = "read";
-                },
-              );
-          }
-        },
-      );
+      api.items.get(newVal).then((item) => {
+        this.itemSelectedDetails = item;
+        if (this.itemSelectedDetails.status == "unread") {
+          api.items
+            .update(this.itemSelectedDetails.id, { status: "read" })
+            .then(() => {
+              this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1;
+              var itemInList = this.items.find(function (i) {
+                return i.id == item.id;
+              });
+              if (itemInList) itemInList.status = "read";
+              this.itemSelectedDetails.status = "read";
+            });
+        }
+      });
     },
     itemSearch: debounce(function (newVal) {
       this.refreshItems();
@@ -498,14 +494,12 @@ export default defineComponent({
     renameFolder(folder) {
       var newTitle = prompt(this.$t("prompt_new_title"), folder.title);
       if (newTitle) {
-        api.folders.update(folder.id, { title: newTitle }).then(
-          () => {
-            folder.title = newTitle;
-            this.folders.sort(function (a, b) {
-              return a.title.localeCompare(b.title);
-            });
-          },
-        );
+        api.folders.update(folder.id, { title: newTitle }).then(() => {
+          folder.title = newTitle;
+          this.folders.sort(function (a, b) {
+            return a.title.localeCompare(b.title);
+          });
+        });
       }
     },
     deleteFolder(folder) {
@@ -584,18 +578,16 @@ export default defineComponent({
         }
       };
 
-      api.items.update(item.id, { status: newstatus }).then(
-        () => {
-          updateStats(oldstatus, -1);
-          updateStats(newstatus, +1);
+      api.items.update(item.id, { status: newstatus }).then(() => {
+        updateStats(oldstatus, -1);
+        updateStats(newstatus, +1);
 
-          var itemInList = this.items.find(function (i) {
-            return i.id == item.id;
-          });
-          if (itemInList) itemInList.status = newstatus;
-          item.status = newstatus;
-        },
-      );
+        var itemInList = this.items.find(function (i) {
+          return i.id == item.id;
+        });
+        if (itemInList) itemInList.status = newstatus;
+        item.status = newstatus;
+      });
     },
     toggleItemStarred(item) {
       this.toggleItemStatus(item, "starred", "read");
