@@ -40,25 +40,15 @@ export default defineComponent({
     api.feeds.list_errors().then((errors) => {
       this.feed_errors = errors;
     });
-    this.updateMetaTheme(app.settings.theme_name);
+    this.updateMetaTheme();
     this.$setLang(app.settings.language);
 
     // keep the theme-color meta tag in sync when the OS color scheme changes
-    if (window.matchMedia) {
-      this._colorSchemeMql = window.matchMedia("(prefers-color-scheme: dark)");
-      this._colorSchemeHandler = () => {
-        this.updateMetaTheme(this.theme.name);
-      };
-      this._colorSchemeMql.addEventListener("change", this._colorSchemeHandler);
-    }
+    this._colorSchemeMql = window.matchMedia("(prefers-color-scheme: dark)");
+    this._colorSchemeMql.addEventListener("change", this.updateMetaTheme);
   },
   beforeUnmount() {
-    if (this._colorSchemeMql) {
-      this._colorSchemeMql.removeEventListener(
-        "change",
-        this._colorSchemeHandler,
-      );
-    }
+    this._colorSchemeMql?.removeEventListener("change", this.updateMetaTheme);
   },
   mounted() {
     setupKeybindings(this);
@@ -132,6 +122,8 @@ export default defineComponent({
         { code: "ru", name: "Русский" },
         { code: "zh", name: "简体中文" },
       ],
+
+      _colorSchemeMql: null as MediaQueryList | null,
     };
   },
   computed: {
@@ -225,7 +217,7 @@ export default defineComponent({
     theme: {
       deep: true,
       handler(theme) {
-        this.updateMetaTheme(theme.name);
+        this.updateMetaTheme();
         document.body.classList.value = "theme-" + theme.name;
         api.settings.update({
           theme_name: theme.name,
@@ -318,11 +310,10 @@ export default defineComponent({
     },
   },
   methods: {
-    updateMetaTheme(theme: Theme) {
+    updateMetaTheme() {
+      let theme = this.theme.name;
       if (theme == "system") {
-        var dark =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var dark = window?.matchMedia("(prefers-color-scheme: dark)").matches;
         theme = dark ? "night" : "light";
       }
       document.querySelector("meta[name='theme-color']").content =
