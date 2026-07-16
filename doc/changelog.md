@@ -3,6 +3,7 @@
 - (new) add system-based light/dark theme
 - (new) support for HTTP/2 (thanks to @Dean-Corso for the report)
 - (fix) displaying correct title for custom Youtube feeds
+- (fix) mark items as read performance degradation (thanks to @DigitalOne1 for the report)
 - (etc) do not auto-refresh feeds on startup
 - (etc) show current feed/folder in search placeholder
 
