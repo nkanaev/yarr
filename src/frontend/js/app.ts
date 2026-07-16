@@ -37,9 +37,6 @@ export default defineComponent({
       .then(() => this.refreshFeeds())
       .then(() => this.refreshItems(false));
 
-    api.feeds.list_errors().then((errors) => {
-      this.feed_errors = errors;
-    });
     this.updateMetaTheme();
     this.$setLang(app.settings.language);
 
