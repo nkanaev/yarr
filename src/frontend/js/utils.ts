@@ -61,3 +61,14 @@ export function dateRepr(d: Date): string {
   if (neg) return "-" + out;
   return out;
 }
+
+async function to<T, E = Error>(
+  promise: Promise<T>,
+): Promise<[E, undefined] | [undefined, T]> {
+  try {
+    const result = await promise;
+    return [undefined, result];
+  } catch (err) {
+    return [err as E, undefined];
+  }
+}

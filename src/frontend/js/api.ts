@@ -2,25 +2,39 @@ type Query = Record<string, any>;
 
 // TODO: proper types for object arguments
 
-var xfetch = function (resource: string, init: RequestInit = {}) {
-  if (["post", "put", "delete"].indexOf(init.method || "") !== -1) {
-    init["headers"] = new Headers(init["headers"]);
-    init["headers"].set("x-requested-by", "yarr");
-  }
-  return fetch(resource, init);
-};
-var api = function (method: string, endpoint: string, data?: object) {
-  var headers = { "Content-Type": "application/json" };
-  return xfetch(endpoint, {
-    method: method,
-    headers: headers,
-    body: JSON.stringify(data),
-  });
+type ApiOptions = {
+  json?: Record<string, any>;
+  body?: BodyInit;
+  query?: Record<string, string>;
 };
 
-var json = function (res: Response) {
+function api(method: string, endpoint: string, opts: ApiOptions = {}) {
+  const { json, body, query } = opts;
+
+  let url = endpoint;
+
+  const init: RequestInit = {};
+  init.method = method;
+  init.headers = new Headers();
+  init.headers.set("x-requested-by", "yarr");
+
+  if (query !== undefined) {
+    url = url + "?" + new URLSearchParams(query).toString();
+  }
+  if (body !== undefined) {
+    init.body = body;
+  }
+  if (json !== undefined) {
+    init.headers.set("content-type", "application/json");
+    init.body = JSON.stringify(json);
+  }
+
+  return fetch(url, init);
+}
+
+function json(res: Response) {
   return res.json();
-};
+}
 
 function param(query: Query) {
   if (!query) return "";
@@ -40,16 +54,16 @@ export default {
       return api("get", "./api/feeds").then(json);
     },
     create(data: object) {
-      return api("post", "./api/feeds", data).then(json);
+      return api("post", "./api/feeds", { json: data }).then(json);
     },
     update(id: number, data: object) {
-      return api("put", "./api/feeds/" + id, data);
+      return api("put", `./api/feeds/${id}`, { json: data });
     },
     delete(id: number) {
-      return api("delete", "./api/feeds/" + id);
+      return api("delete", `./api/feeds/${id}`);
     },
     list_items(id: number) {
-      return api("get", "./api/feeds/" + id + "/items").then(json);
+      return api("get", `./api/feeds/${id}/items`).then(json);
     },
     refresh() {
       return api("post", "./api/feeds/refresh");
@@ -63,27 +77,27 @@ export default {
       return api("get", "./api/folders").then(json);
     },
     create(data: object) {
-      return api("post", "./api/folders", data).then(json);
+      return api("post", "./api/folders", { json: data }).then(json);
     },
     update(id: number, data: object) {
-      return api("put", "./api/folders/" + id, data);
+      return api("put", `./api/folders/${id}`, { json: data });
     },
     delete(id: number) {
-      return api("delete", "./api/folders/" + id);
+      return api("delete", `./api/folders/${id}`);
     },
     list_items(id: number) {
-      return api("get", "./api/folders/" + id + "/items").then(json);
+      return api("get", `./api/folders/${id}/items`).then(json);
     },
   },
   items: {
     get(id: number) {
-      return api("get", "./api/items/" + id).then(json);
+      return api("get", `./api/items/${id}`).then(json);
     },
     list(query: Query) {
-      return api("get", "./api/items" + param(query)).then(json);
+      return api("get", "./api/items", { query }).then(json);
     },
     update(id: number, data: object) {
-      return api("put", "./api/items/" + id, data);
+      return api("put", `./api/items/${id}`, { json: data });
     },
     mark_read(query: Query) {
       return api("put", "./api/items" + param(query));
@@ -94,22 +108,19 @@ export default {
       return api("get", "./api/settings").then(json);
     },
     update(data: object) {
-      return api("put", "./api/settings", data);
+      return api("put", "./api/settings", { json: data });
     },
   },
   status() {
     return api("get", "./api/status").then(json);
   },
   upload_opml(form: HTMLFormElement) {
-    return xfetch("./opml/import", {
-      method: "post",
-      body: new FormData(form),
-    });
+    return api("post", "./opml/import", { body: new FormData(form) });
   },
   logout() {
     return api("post", "./logout");
   },
   crawl(url: string) {
-    return api("get", "./page?url=" + encodeURIComponent(url)).then(json);
+    return api("get", "./page", { query: { url } }).then(json);
   },
 };
