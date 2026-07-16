@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "esbuild src/frontend/js/main.ts src/frontend/css/app.css --bundle --outdir=src/assets/static --entry-names=bundle"
+    "build": "esbuild src/frontend/js/main.ts src/frontend/css/app.css --bundle --outdir=src/assets/static --entry-names=bundle --minify"
   },
   "devDependencies": {
     "esbuild": "0.28.1"
