@@ -1,9 +1,13 @@
-type Query = Record<string, any>;
-
-// TODO: proper types for object arguments
+import type {
+  Feed, Folder, Item, Settings,
+  StatusResponse, ItemListResponse, FeedCreateResponse, CrawlResponse,
+  FeedCreateData, FeedUpdateData,
+  FolderCreateData, FolderUpdateData,
+  ItemUpdateData, ItemListQuery, SettingsUpdateData,
+} from "./api-types";
 
 type ApiOptions = {
-  json?: Record<string, any>;
+  json?: object;
   body?: BodyInit;
   query?: Record<string, string>;
 };
@@ -32,11 +36,11 @@ function api(method: string, endpoint: string, opts: ApiOptions = {}) {
   return fetch(url, init);
 }
 
-function json(res: Response) {
-  return res.json();
+function json<T>(res: Response): Promise<T> {
+  return res.json() as Promise<T>;
 }
 
-function param(query: Query) {
+function param(query: Record<string, string | number | boolean>) {
   if (!query) return "";
   return (
     "?" +
@@ -50,77 +54,77 @@ function param(query: Query) {
 
 export default {
   feeds: {
-    list() {
-      return api("get", "./api/feeds").then(json);
+    list(): Promise<Feed[]> {
+      return api("get", "./api/feeds").then(json<Feed[]>);
     },
-    create(data: object) {
-      return api("post", "./api/feeds", { json: data }).then(json);
+    create(data: FeedCreateData): Promise<FeedCreateResponse> {
+      return api("post", "./api/feeds", { json: data }).then(json<FeedCreateResponse>);
     },
-    update(id: number, data: object) {
+    update(id: number, data: FeedUpdateData): Promise<Response> {
       return api("put", `./api/feeds/${id}`, { json: data });
     },
-    delete(id: number) {
+    delete(id: number): Promise<Response> {
       return api("delete", `./api/feeds/${id}`);
     },
-    list_items(id: number) {
-      return api("get", `./api/feeds/${id}/items`).then(json);
+    list_items(id: number): Promise<Item[]> {
+      return api("get", `./api/feeds/${id}/items`).then(json<Item[]>);
     },
-    refresh() {
+    refresh(): Promise<Response> {
       return api("post", "./api/feeds/refresh");
     },
-    list_errors() {
-      return api("get", "./api/feeds/errors").then(json);
+    list_errors(): Promise<Record<number, string>> {
+      return api("get", "./api/feeds/errors").then(json<Record<number, string>>);
     },
   },
   folders: {
-    list() {
-      return api("get", "./api/folders").then(json);
+    list(): Promise<Folder[]> {
+      return api("get", "./api/folders").then(json<Folder[]>);
     },
-    create(data: object) {
-      return api("post", "./api/folders", { json: data }).then(json);
+    create(data: FolderCreateData): Promise<Folder> {
+      return api("post", "./api/folders", { json: data }).then(json<Folder>);
     },
-    update(id: number, data: object) {
+    update(id: number, data: FolderUpdateData): Promise<Response> {
       return api("put", `./api/folders/${id}`, { json: data });
     },
-    delete(id: number) {
+    delete(id: number): Promise<Response> {
       return api("delete", `./api/folders/${id}`);
     },
-    list_items(id: number) {
-      return api("get", `./api/folders/${id}/items`).then(json);
+    list_items(id: number): Promise<Item[]> {
+      return api("get", `./api/folders/${id}/items`).then(json<Item[]>);
     },
   },
   items: {
-    get(id: number) {
-      return api("get", `./api/items/${id}`).then(json);
+    get(id: number): Promise<Item> {
+      return api("get", `./api/items/${id}`).then(json<Item>);
     },
-    list(query: Query) {
-      return api("get", "./api/items", { query }).then(json);
+    list(query?: ItemListQuery): Promise<ItemListResponse> {
+      return api("get", "./api/items", { query: query as Record<string, string> }).then(json<ItemListResponse>);
     },
-    update(id: number, data: object) {
+    update(id: number, data: ItemUpdateData): Promise<Response> {
       return api("put", `./api/items/${id}`, { json: data });
     },
-    mark_read(query: Query) {
+    mark_read(query: Record<string, string | number | boolean>): Promise<Response> {
       return api("put", "./api/items" + param(query));
     },
   },
   settings: {
-    get() {
-      return api("get", "./api/settings").then(json);
+    get(): Promise<Settings> {
+      return api("get", "./api/settings").then(json<Settings>);
     },
-    update(data: object) {
+    update(data: SettingsUpdateData): Promise<Response> {
       return api("put", "./api/settings", { json: data });
     },
   },
-  status() {
-    return api("get", "./api/status").then(json);
+  status(): Promise<StatusResponse> {
+    return api("get", "./api/status").then(json<StatusResponse>);
   },
-  upload_opml(form: HTMLFormElement) {
+  upload_opml(form: HTMLFormElement): Promise<Response> {
     return api("post", "./opml/import", { body: new FormData(form) });
   },
-  logout() {
+  logout(): Promise<Response> {
     return api("post", "./logout");
   },
-  crawl(url: string) {
-    return api("get", "./page", { query: { url } }).then(json);
+  crawl(url: string): Promise<CrawlResponse> {
+    return api("get", "./page", { query: { url } }).then(json<CrawlResponse>);
   },
 };
