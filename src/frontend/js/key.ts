@@ -1,4 +1,6 @@
-export function setupKeybindings(vm) {
+import App from "./pages/App.vue";
+
+export function setupKeybindings(vm: InstanceType<typeof App>) {
   var helperFunctions = {
     scrollContent(direction: number) {
       var padding = 40;
@@ -45,7 +47,7 @@ export function setupKeybindings(vm) {
       }
     },
     focusSearch() {
-      document.getElementById("searchbar").focus();
+      document.getElementById("searchbar")?.focus();
     },
     nextItem() {
       vm.navigateToItem(+1);
@@ -97,7 +99,7 @@ export function setupKeybindings(vm) {
     "1": shortcutFunctions.showUnread,
     "2": shortcutFunctions.showStarred,
     "3": shortcutFunctions.showAll,
-  };
+  } as Record<string, CallableFunction>;
 
   var codebindings = {
     KeyO: shortcutFunctions.openItemLink,
@@ -116,7 +118,7 @@ export function setupKeybindings(vm) {
     Digit1: shortcutFunctions.showUnread,
     Digit2: shortcutFunctions.showStarred,
     Digit3: shortcutFunctions.showAll,
-  };
+  } as Record<string, CallableFunction>;
 
   function isTextBox(element: Element) {
     var tagName = element.tagName.toLowerCase();
@@ -138,8 +140,9 @@ export function setupKeybindings(vm) {
     return (
       tagName === "textarea" ||
       (tagName === "input" &&
-        inputBlocklist.indexOf(element.getAttribute("type").toLowerCase()) ==
-          -1)
+        inputBlocklist.indexOf(
+          element.getAttribute("type")?.toLowerCase() || "",
+        ) == -1)
     );
   }
 
