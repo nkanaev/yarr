@@ -12,7 +12,7 @@ import icon from "./components/icon";
 import scrollDir from "./directives/scroll";
 import focusDir from "./directives/focus";
 import { defineComponent } from "vue";
-import { Feed, Folder, Item } from "./api-types";
+import type { Feed, Folder, Item, FeedStat, FeedLink } from "./api-types";
 
 var app = window.app;
 
@@ -55,24 +55,24 @@ export default defineComponent({
     var s = app.settings;
     return {
       filterSelected: s.filter,
-      folders: [],
-      feeds: [],
+      folders: [] as Folder[],
+      feeds: [] as Feed[],
       feedSelected: s.feed,
       feedListWidth: s.feed_list_width || 300,
-      feedNewChoice: [],
+      feedNewChoice: [] as FeedLink[],
       feedNewChoiceSelected: "",
-      items: [],
+      items: [] as Item[],
       itemsHasMore: true,
-      itemSelected: null,
-      itemSelectedDetails: null,
+      itemSelected: null as number | null,
+      itemSelectedDetails: null as Item | null,
       itemSelectedReadability: "",
       itemSearch: "",
-      itemSortNewestFirst: s.sort_newest_first,
+      itemSortNewestFirst: s.sort_newest_first as boolean,
       itemListWidth: s.item_list_width || 300,
 
-      filteredFeedStats: {},
-      filteredFolderStats: {},
-      filteredTotalStats: null,
+      filteredFeedStats: {} as Record<number, number>,
+      filteredFolderStats: {} as Record<number | null, number>,
+      filteredTotalStats: null as number | null,
 
       settings: "",
       loading: {
@@ -82,7 +82,7 @@ export default defineComponent({
         readability: false,
       },
       fonts: ["", "serif", "monospace"],
-      feedStats: {},
+      feedStats: {} as Record<number, FeedStat>,
       theme: {
         name: s.theme_name,
         font: s.theme_font,
@@ -96,7 +96,7 @@ export default defineComponent({
       refreshRate: s.refresh_rate,
       authenticated: app.authenticated,
       requiresAuth: app.requiresAuth,
-      feed_errors: {},
+      feed_errors: {} as Record<number, string>,
 
       refreshRateOptions: [
         { title: "0", value: 0 },
