@@ -12,7 +12,14 @@ import icon from "./components/icon";
 import scrollDir from "./directives/scroll";
 import focusDir from "./directives/focus";
 import { defineComponent } from "vue";
-import type { Feed, Folder, Item, FeedStat, FeedLink } from "./api-types";
+import type {
+  Feed,
+  Folder,
+  Item,
+  FeedStat,
+  FeedLink,
+  MediaLink,
+} from "./api-types";
 
 var app = window.app;
 
@@ -71,7 +78,7 @@ export default defineComponent({
       itemListWidth: s.item_list_width || 300,
 
       filteredFeedStats: {} as Record<number, number>,
-      filteredFolderStats: {} as Record<number | null, number>,
+      filteredFolderStats: {} as Record<number | "null", number>,
       filteredTotalStats: null as number | null,
 
       settings: "",
@@ -125,32 +132,37 @@ export default defineComponent({
     };
   },
   computed: {
-    foldersWithFeeds() {
-      var feedsByFolders = this.feeds.reduce((folders, feed) => {
-        if (!folders[feed.folder_id]) folders[feed.folder_id] = [feed];
-        else folders[feed.folder_id].push(feed);
-        return folders;
-      }, {});
-      var folders = this.folders.slice().map((folder) => {
-        folder.feeds = feedsByFolders[folder.id];
-        return folder;
-      });
-      folders.push({ id: null, feeds: feedsByFolders[null] });
+    foldersWithFeeds(): (Partial<Folder> & { feeds?: Feed[] })[] {
+      var feedsByFolders = this.feeds.reduce(
+        (folders, feed) => {
+          if (!folders[feed.folder_id]) folders[feed.folder_id] = [feed];
+          else folders[feed.folder_id].push(feed);
+          return folders;
+        },
+        {},
+      );
+      const folders = this.folders
+        .slice()
+        .map((folder) => ({ ...folder, feeds: feedsByFolders[folder.id] }));
+      folders.push({ id: null, feeds: feedsByFolders["null"] });
       return folders;
     },
-    feedsById() {
-      return this.feeds.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
+    feedsById(): Record<number, Feed> {
+      return this.feeds.reduce(
+        (acc, f) => ({ ...acc, [f.id]: f }),
+        {},
+      );
     },
-    foldersById() {
+    foldersById(): Record<number, Folder> {
       return this.folders.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
     },
-    current() {
+    current(): { type: string; feed: Partial<Feed>; folder: Partial<Folder> } {
       var parts = (this.feedSelected || "").split(":", 2);
       var type = parts[0];
       var guid = parts[1];
 
-      var folder = {},
-        feed = {};
+      var folder: Partial<Folder> = {},
+        feed: Partial<Feed> = {};
 
       if (type == "feed") feed = this.feedsById[guid] || {};
       if (type == "folder") folder = this.foldersById[guid] || {};
@@ -173,27 +185,25 @@ export default defineComponent({
       if (this.filterSelected == "starred") return this.$t("all_starred");
       return this.$t("all_feeds");
     },
-    itemSelectedContent() {
+    itemSelectedContent(): string {
       if (!this.itemSelected) return "";
-
       if (this.itemSelectedReadability) return this.itemSelectedReadability;
-
-      return this.itemSelectedDetails.content || "";
+      return this.itemSelectedDetails?.content || "";
     },
-    contentImages() {
-      if (!this.itemSelectedDetails) return [];
+    contentImages(): MediaLink[] {
+      if (!this.itemSelectedDetails) return [] as MediaLink[];
       return (this.itemSelectedDetails.media_links || []).filter(
         (l) => l.type === "image",
       );
     },
-    contentAudios() {
-      if (!this.itemSelectedDetails) return [];
+    contentAudios(): MediaLink[] {
+      if (!this.itemSelectedDetails) return [] as MediaLink[];
       return (this.itemSelectedDetails.media_links || []).filter(
         (l) => l.type === "audio",
       );
     },
-    contentVideos() {
-      if (!this.itemSelectedDetails) return [];
+    contentVideos(): MediaLink[] {
+      if (!this.itemSelectedDetails) return [] as MediaLink[];
       return (this.itemSelectedDetails.media_links || []).filter(
         (l) => l.type === "video",
       );
