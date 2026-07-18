@@ -1,9 +1,11 @@
 {
   "scripts": {
-    "build": "esbuild src/frontend/js/main.ts src/frontend/css/app.css --bundle --outdir=src/assets/static --entry-names=bundle --alias:vue=vue/dist/vue.esm-bundler.js"
+    "build": "node build.js"
   },
   "devDependencies": {
-    "esbuild": "0.28.1"
+    "esbuild": "0.28.1",
+    "esbuild-plugin-vue3": "^0.5.1",
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",

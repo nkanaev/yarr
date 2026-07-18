@@ -1,3 +1,4 @@
+<template>
 <div class="login-page">
     <form @submit.prevent="login">
         <div class="logo" v-html="logo"></div>
@@ -13,3 +14,37 @@
         <button class="btn btn-block btn-default" type="submit">{{ $t('login') }}</button>
     </form>
 </div>
+
+</template>
+
+<script lang="ts">
+import icons from "../icons";
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  data() {
+    return {
+      logo: icons.anchor,
+      hasError: false,
+    };
+  },
+  created() {
+    this.$setLang(window.app.settings.language);
+  },
+  methods: {
+    login(event: Event) {
+      event.preventDefault();
+      var data = new FormData(event.target as HTMLFormElement);
+      fetch("./login", { method: "POST", body: data }).then((res) => {
+        if (res.ok) {
+          // TODO: reload settings instead of refreshing the page
+          document.location.assign("./");
+        } else {
+          this.hasError = true;
+        }
+      });
+    },
+  },
+});
+
+</script>

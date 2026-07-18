@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/frontend/js/**/*.ts"]
+  "include": ["src/frontend/js/**/*.ts", "src/frontend/js/**/*.vue"]
 }
