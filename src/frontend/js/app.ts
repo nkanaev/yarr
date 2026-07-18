@@ -12,6 +12,7 @@ import icon from "./components/icon";
 import scrollDir from "./directives/scroll";
 import focusDir from "./directives/focus";
 import { defineComponent } from "vue";
+import { Feed, Folder, Item } from "./api-types";
 
 var app = window.app;
 
@@ -125,12 +126,12 @@ export default defineComponent({
   },
   computed: {
     foldersWithFeeds() {
-      var feedsByFolders = this.feeds.reduce(function (folders, feed) {
+      var feedsByFolders = this.feeds.reduce((folders, feed) => {
         if (!folders[feed.folder_id]) folders[feed.folder_id] = [feed];
         else folders[feed.folder_id].push(feed);
         return folders;
       }, {});
-      var folders = this.folders.slice().map(function (folder) {
+      var folders = this.folders.slice().map((folder) => {
         folder.feeds = feedsByFolders[folder.id];
         return folder;
       });
@@ -138,16 +139,10 @@ export default defineComponent({
       return folders;
     },
     feedsById() {
-      return this.feeds.reduce(function (acc, f) {
-        acc[f.id] = f;
-        return acc;
-      }, {});
+      return this.feeds.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
     },
     foldersById() {
-      return this.folders.reduce(function (acc, f) {
-        acc[f.id] = f;
-        return acc;
-      }, {});
+      return this.folders.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
     },
     current() {
       var parts = (this.feedSelected || "").split(":", 2);
@@ -227,12 +222,10 @@ export default defineComponent({
       deep: true,
       handler: debounce(function () {
         var title = TITLE;
-        var unreadCount = Object.values(this.feedStats).reduce(function (
-          acc,
-          stat,
-        ) {
-          return acc + stat.unread;
-        }, 0);
+        var unreadCount = Object.values(this.feedStats).reduce(
+          (acc, stat) => acc + stat.unread,
+          0,
+        );
         if (unreadCount) {
           title += " (" + unreadCount + ")";
         }
@@ -275,9 +268,7 @@ export default defineComponent({
             .update(this.itemSelectedDetails.id, { status: "read" })
             .then(() => {
               this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1;
-              var itemInList = this.items.find(function (i) {
-                return i.id == item.id;
-              });
+              var itemInList = this.items.find((i) => i.id == item.id);
               if (itemInList) itemInList.status = "read";
               this.itemSelectedDetails.status = "read";
             });
@@ -324,10 +315,10 @@ export default defineComponent({
         if (data.running) {
           setTimeout(() => this.refreshStats(true), 500);
         }
-        this.feedStats = data.stats.reduce((acc, stat) => {
-          acc[stat.feed_id] = stat;
-          return acc;
-        }, {});
+        this.feedStats = data.stats.reduce(
+          (acc, stat) => ({ ...acc, [stat.feed_id]: stat }),
+          {},
+        );
 
         api.feeds.list_errors().then((errors) => {
           this.feed_errors = errors;
@@ -484,9 +475,7 @@ export default defineComponent({
       if (newTitle) {
         api.folders.update(folder.id, { title: newTitle }).then(() => {
           folder.title = newTitle;
-          this.folders.sort(function (a, b) {
-            return a.title.localeCompare(b.title);
-          });
+          this.folders.sort((a, b) => a.title.localeCompare(b.title));
         });
       }
     },
@@ -502,7 +491,7 @@ export default defineComponent({
     updateFeedLink(feed) {
       var newLink = prompt(this.$t("prompt_feed_link"), feed.feed_link);
       if (newLink) {
-        api.feeds.update(feed.id, { feed_link: newLink }).then(function () {
+        api.feeds.update(feed.id, { feed_link: newLink }).then(() => {
           feed.feed_link = newLink;
         });
       }
@@ -510,7 +499,7 @@ export default defineComponent({
     renameFeed(feed) {
       var newTitle = prompt(this.$t("prompt_new_title"), feed.title);
       if (newTitle) {
-        api.feeds.update(feed.id, { title: newTitle }).then(function () {
+        api.feeds.update(feed.id, { title: newTitle }).then(() => {
           feed.title = newTitle;
         });
       }
@@ -570,9 +559,7 @@ export default defineComponent({
         updateStats(oldstatus, -1);
         updateStats(newstatus, +1);
 
-        var itemInList = this.items.find(function (i) {
-          return i.id == item.id;
-        });
+        var itemInList = this.items.find((i) => i.id == item.id);
         if (itemInList) itemInList.status = newstatus;
         item.status = newstatus;
       });
