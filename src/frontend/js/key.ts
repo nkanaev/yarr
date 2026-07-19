@@ -31,7 +31,7 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
       vm.toggleReadability();
     },
     toggleItemRead() {
-      if (vm.itemSelected != null) {
+      if (vm.itemSelectedDetails !== null) {
         vm.toggleItemRead(vm.itemSelectedDetails);
       }
     },
@@ -42,7 +42,7 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
       }
     },
     toggleItemStarred() {
-      if (vm.itemSelected != null) {
+      if (vm.itemSelectedDetails != null) {
         vm.toggleItemStarred(vm.itemSelectedDetails);
       }
     },

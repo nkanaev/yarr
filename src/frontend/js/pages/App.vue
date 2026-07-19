@@ -68,7 +68,7 @@
                     </button>
                     <div class="col-4 d-flex align-items-center justify-content-center">{{ refreshRateTitle }}</div>
                     <button class="dropdown-item col-4 px-0"
-                            @click.stop="changeRefreshRate(1)" :disabled="refreshRate === refreshRateOptions.at(-1).value">
+                            @click.stop="changeRefreshRate(1)" :disabled="refreshRate === refreshRateOptions[refreshRateOptions.length - 1].value">
                         <v-icon name="chevron-up" />
                     </button>
                 </div>
@@ -184,7 +184,7 @@
             <div class="input-icon flex-grow-1">
                 <v-icon name="search" />
                 <!-- id used by keybindings -->
-                <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" :placeholder="$t('search_placeholder', {scope: searchScope})" @keydown.enter="$event.target.blur()">
+                <input id="searchbar" type="" class="d-block toolbar-search" v-model="itemSearch" :placeholder="$t('search_placeholder', {'scope': searchScope})" @keydown.enter="($event.target as HTMLInputElement).blur()">
             </div>
             <button class="toolbar-item ml-2"
                     @click="markItemsRead()"
@@ -432,7 +432,7 @@
 </template>
 
 <script lang="ts">
-import i18n from "../i18n";
+import i18n, { Lang } from "../i18n";
 import api from "../api";
 import icons from "../icons";
 import { setupKeybindings } from "../key";
@@ -452,11 +452,17 @@ import type {
   FeedStat,
   FeedLink,
   MediaLink,
+  ItemStatus,
 } from "../api-types";
 
 var app = window.app;
 
 type Theme = "system" | "light" | "sepia" | "night";
+type Filter = "" | "starred" | "unread";
+type SettingsLanguage = {
+  code: Lang;
+  name: string;
+};
 
 var TITLE = document.title;
 
@@ -493,7 +499,7 @@ export default defineComponent({
   data() {
     var s = app.settings;
     return {
-      filterSelected: s.filter,
+      filterSelected: s.filter as Filter,
       folders: [] as Folder[],
       feeds: [] as Feed[],
       feedSelected: s.feed,
@@ -558,7 +564,7 @@ export default defineComponent({
         { code: "pt", name: "Português" },
         { code: "ru", name: "Русский" },
         { code: "zh", name: "简体中文" },
-      ],
+      ] as SettingsLanguage[],
 
       _colorSchemeMql: null as MediaQueryList | null,
     };
@@ -601,7 +607,7 @@ export default defineComponent({
 
       return { type: type, feed: feed, folder: folder };
     },
-    searchScope() {
+    searchScope(): string {
       void this.language;
       var type = (this.feedSelected || "").split(":", 2)[0];
       if (type == "feed")
@@ -861,7 +867,6 @@ export default defineComponent({
       var query = this.getItemsQuery();
       api.items.mark_read(query).then(() => {
         this.items = [];
-        this.itemsPage = { cur: 1, num: 1 };
         this.itemSelected = null;
         this.itemsHasMore = false;
         this.refreshStats();
@@ -881,14 +886,14 @@ export default defineComponent({
       };
       return new Date(datestr).toLocaleDateString(undefined, options);
     },
-    moveFeed(feed, folder) {
+    moveFeed(feed: Feed, folder: Folder) {
       var folder_id = folder ? folder.id : null;
       api.feeds.update(feed.id, { folder_id: folder_id }).then(() => {
         feed.folder_id = folder_id;
         this.refreshStats();
       });
     },
-    moveFeedToNewFolder(feed) {
+    moveFeedToNewFolder(feed: Feed) {
       var title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
       api.folders.create({ title: title }).then((folder) => {
@@ -912,7 +917,7 @@ export default defineComponent({
         });
       });
     },
-    renameFolder(folder) {
+    renameFolder(folder: Folder) {
       var newTitle = prompt(this.$t("prompt_new_title"), folder.title);
       if (newTitle) {
         api.folders.update(folder.id, { title: newTitle }).then(() => {
@@ -921,7 +926,7 @@ export default defineComponent({
         });
       }
     },
-    deleteFolder(folder) {
+    deleteFolder(folder: Folder) {
       if (confirm(this.$t("confirm_delete", { name: folder.title }))) {
         api.folders.delete(folder.id).then(() => {
           this.feedSelected = null;
@@ -930,23 +935,23 @@ export default defineComponent({
         });
       }
     },
-    updateFeedLink(feed) {
-      var newLink = prompt(this.$t("prompt_feed_link"), feed.feed_link);
-      if (newLink) {
+    updateFeedLink(feed: Feed) {
+      const newLink = prompt(this.$t("prompt_feed_link"), feed.feed_link);
+      if (newLink !== null) {
         api.feeds.update(feed.id, { feed_link: newLink }).then(() => {
           feed.feed_link = newLink;
         });
       }
     },
-    renameFeed(feed) {
-      var newTitle = prompt(this.$t("prompt_new_title"), feed.title);
+    renameFeed(feed: Feed) {
+      const newTitle = prompt(this.$t("prompt_new_title"), feed.title);
       if (newTitle) {
         api.feeds.update(feed.id, { title: newTitle }).then(() => {
           feed.title = newTitle;
         });
       }
     },
-    deleteFeed(feed) {
+    deleteFeed(feed: Feed) {
       if (confirm(this.$t("confirm_delete", { name: feed.title }))) {
         api.feeds.delete(feed.id).then(() => {
           this.feedSelected = null;
@@ -955,8 +960,8 @@ export default defineComponent({
         });
       }
     },
-    createFeed($event) {
-      var form = $event.target;
+    createFeed($event: Event) {
+      var form = $event.target as HTMLFormElement;
       var data = {
         url: form.querySelector("input[name=url]").value,
         folder_id:
@@ -986,9 +991,10 @@ export default defineComponent({
         this.loading.newfeed = false;
       });
     },
-    toggleItemStatus(item, targetstatus, fallbackstatus) {
-      var oldstatus = item.status;
-      var newstatus =
+    toggleItemStatus(item: Item, targetstatus: ItemStatus) {
+      const fallbackstatus: ItemStatus = "read";
+      const oldstatus = item.status;
+      const newstatus =
         item.status !== targetstatus ? targetstatus : fallbackstatus;
 
       var updateStats = (status, incr) => {
@@ -1006,13 +1012,13 @@ export default defineComponent({
         item.status = newstatus;
       });
     },
-    toggleItemStarred(item) {
-      this.toggleItemStatus(item, "starred", "read");
+    toggleItemStarred(item: Item) {
+      this.toggleItemStatus(item, "starred");
     },
-    toggleItemRead(item) {
-      this.toggleItemStatus(item, "unread", "read");
+    toggleItemRead(item: Item) {
+      this.toggleItemStatus(item, "unread");
     },
-    importOPML(event) {
+    importOPML(event: Event) {
       var input = event.target;
       var form = document.querySelector("#opml-import-form");
       this.$refs.menuDropdown.hide();
@@ -1042,7 +1048,7 @@ export default defineComponent({
         });
       }
     },
-    showSettings(settings) {
+    showSettings(settings: string) {
       this.settings = settings;
 
       if (settings === "create") {
@@ -1050,17 +1056,17 @@ export default defineComponent({
         this.feedNewChoiceSelected = "";
       }
     },
-    resizeFeedList(width) {
+    resizeFeedList(width: number) {
       this.feedListWidth = Math.min(Math.max(200, width), 700);
     },
-    resizeItemList(width) {
+    resizeItemList(width: number) {
       this.itemListWidth = Math.min(Math.max(200, width), 700);
     },
     resetFeedChoice() {
       this.feedNewChoice = [];
       this.feedNewChoiceSelected = "";
     },
-    incrFont(x) {
+    incrFont(x: number) {
       this.theme.size = +(this.theme.size + 0.1 * x).toFixed(1);
     },
     fetchAllFeeds() {
@@ -1124,8 +1130,8 @@ export default defineComponent({
       this.$nextTick(() => {
         var scroll = document.querySelector("#item-list-scroll");
 
-        var handle = scroll.querySelector("input[type=radio]:checked");
-        var target = handle && handle.parentElement;
+        var handle = scroll?.querySelector("input[type=radio]:checked");
+        var target = handle?.parentElement;
 
         if (target && scroll) scrollto(target, scroll);
 
@@ -1166,8 +1172,8 @@ export default defineComponent({
       this.$nextTick(() => {
         var scroll = document.querySelector("#feed-list-scroll");
 
-        var handle = scroll.querySelector("input[type=radio]:checked");
-        var target = handle && handle.parentElement;
+        var handle = scroll?.querySelector("input[type=radio]:checked");
+        var target = handle?.parentElement;
 
         if (target && scroll) scrollto(target, scroll);
       });
@@ -1180,7 +1186,7 @@ export default defineComponent({
       if (curIdx >= this.refreshRateOptions.length - 1 && offset > 0) return;
       this.refreshRate = this.refreshRateOptions[curIdx + offset].value;
     },
-    mustHideFolder(folder) {
+    mustHideFolder(folder: Folder) {
       return (
         this.filterSelected &&
         !(
@@ -1193,7 +1199,7 @@ export default defineComponent({
             folder.id)
       );
     },
-    mustHideFeed(feed) {
+    mustHideFeed(feed: Feed) {
       return (
         this.filterSelected &&
         !(this.current.feed.id == feed.id) &&
@@ -1202,7 +1208,7 @@ export default defineComponent({
           this.itemSelectedDetails.feed_id != feed.id)
       );
     },
-    changeLanguage(lang) {
+    changeLanguage(lang: Lang) {
       this.$setLang(lang);
       this.language = lang;
       api.settings.update({ language: lang });
