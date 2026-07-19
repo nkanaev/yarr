@@ -172,9 +172,7 @@
           :tree="feedTree"
           v-model="feedSelected"
           :filter-selected="filterSelected"
-          :filtered-total-stats="filteredTotalStats"
-          :filtered-feed-stats="filteredFeedStats"
-          :filtered-folder-stats="filteredFolderStats"
+          :stats="stats"
           :feed-errors="feed_errors"
           @toggle-folder="toggleFolderExpanded" />
       </div>
@@ -663,10 +661,8 @@ var app = window.app;
 type Theme = "system" | "light" | "sepia" | "night";
 type ThemeFont = "" | "serif" | "monospace";
 type Filter = "" | "starred" | "unread";
-type SettingsLanguage = {
-  code: Lang;
-  name: string;
-};
+type SettingsLanguage = { code: Lang; name: string };
+type Stats = { unread: number; starred: number };
 
 var TITLE = document.title;
 
@@ -720,9 +716,11 @@ export default defineComponent({
       itemSortNewestFirst: s.sort_newest_first as boolean,
       itemListWidth: s.item_list_width || 300,
 
-      filteredFeedStats: {} as Record<number, number>,
-      filteredFolderStats: {} as Record<number, number>,
-      filteredTotalStats: null as number | null,
+      stats: {} as {
+        folders: Record<number, Stats>;
+        feeds: Record<number, Stats>;
+        total: Stats;
+      },
 
       settings: "",
       loading: {
@@ -906,12 +904,13 @@ export default defineComponent({
 
       api.items.get(newVal).then(item => {
         this.itemSelectedDetails = item;
-        if (this.itemSelectedDetails.status == "unread") {
-          api.items.update(this.itemSelectedDetails.id, { status: "read" }).then(() => {
-            this.feedStats[this.itemSelectedDetails.feed_id].unread -= 1;
+        const details = this.itemSelectedDetails;
+        if (details.status == "unread") {
+          api.items.update(details.id, { status: "read" }).then(() => {
+            this.feedStats[details.feed_id].unread -= 1;
             var itemInList = this.items.find(i => i.id == item.id);
             if (itemInList) itemInList.status = "read";
-            this.itemSelectedDetails.status = "read";
+            details.status = "read";
           });
         }
       });
@@ -1252,35 +1251,31 @@ export default defineComponent({
       });
     },
     computeStats() {
-      var filter = this.filterSelected;
-      if (!filter) {
-        this.filteredFeedStats = {};
-        this.filteredFolderStats = {};
-        this.filteredTotalStats = null;
-        return;
-      }
-
-      var statsFeeds = {} as Record<number, number>,
-        statsFolders = {} as Record<number, number>,
-        statsTotal = 0;
+      let statsFeeds: Record<number, Stats> = {},
+        statsFolders: Record<number, Stats> = {},
+        statsTotal: Stats = { unread: 0, starred: 0 };
 
       for (var i = 0; i < this.feeds.length; i++) {
         const feed = this.feeds[i];
         if (!this.feedStats[feed.id]) continue;
 
-        const n = this.feedStats[feed.id][filter] || 0;
+        const n = this.feedStats[feed.id];
+        const feedStats = { unread: n.unread || 0, starred: n.starred || 0 };
 
-        if (feed.folder_id !== null && !statsFolders[feed.folder_id])
-          statsFolders[feed.folder_id] = 0;
+        statsFeeds[feed.id] = feedStats;
 
-        statsFeeds[feed.id] = n;
-        if (feed.folder_id !== null) statsFolders[feed.folder_id] += n;
-        statsTotal += n;
+        if (feed.folder_id !== null) {
+          if (!statsFolders[feed.folder_id])
+            statsFolders[feed.folder_id] = { unread: 0, starred: 0 };
+          statsFolders[feed.folder_id].unread += feedStats.unread;
+          statsFolders[feed.folder_id].starred += feedStats.starred;
+        }
+
+        statsTotal.unread += feedStats.unread;
+        statsTotal.starred += feedStats.starred;
       }
 
-      this.filteredFeedStats = statsFeeds;
-      this.filteredFolderStats = statsFolders;
-      this.filteredTotalStats = statsTotal;
+      this.stats = { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
     },
     // navigation helper, navigate relative to selected item
     navigateToItem(relativePosition: number) {
@@ -1357,7 +1352,7 @@ export default defineComponent({
       return !!(
         this.filterSelected &&
         !(this.current?.folder?.id === folder.id || this.current?.feed?.folder_id == folder.id) &&
-        !this.filteredFolderStats[folder.id] &&
+        !this.stats.folders[folder.id]?.[this.filterSelected] &&
         (!this.itemSelectedDetails ||
           (this.feedsById[this.itemSelectedDetails.feed_id] || {}).folder_id != folder.id)
       );
@@ -1366,7 +1361,7 @@ export default defineComponent({
       return !!(
         this.filterSelected &&
         !(this.current?.feed?.id === feed.id) &&
-        !this.filteredFeedStats[feed.id] &&
+        !this.stats.feeds[feed.id]?.[this.filterSelected] &&
         (!this.itemSelectedDetails || this.itemSelectedDetails.feed_id != feed.id)
       );
     },

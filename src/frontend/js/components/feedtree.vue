@@ -16,7 +16,7 @@
         <span class="flex-fill text-left text-truncate" v-if="filterSelected == ''">{{
           $t("all_feeds")
         }}</span>
-        <span class="counter text-right">{{ filteredTotalStats }}</span>
+        <span class="counter text-right">{{ filterSelected ? stats.total[filterSelected] : "" }}</span>
       </div>
     </div>
     <template
@@ -36,7 +36,7 @@
                 name="chevron-right" />
             </div>
             <span class="flex-fill text-left text-truncate">{{ node.folder.title }}</span>
-            <span class="counter text-right">{{ filteredFolderStats[node.folder.id] || "" }}</span>
+            <span class="counter text-right">{{ filterSelected ? stats.folders[node.folder.id]?.[filterSelected] : "" }}</span>
           </div>
         </div>
         <div v-show="node.folder.is_expanded" class="mt-1 pl-3">
@@ -52,9 +52,7 @@
                 ><img :src="feedNode.feed.icon" alt="" loading="lazy"
               /></span>
               <span class="flex-fill text-left text-truncate">{{ feedNode.feed.title }}</span>
-              <span class="counter text-right">{{
-                filteredFeedStats[feedNode.feed.id] || ""
-              }}</span>
+              <span class="counter text-right">{{ filterSelected ? stats.feeds[feedNode.feed.id]?.[filterSelected] : "" }}</span>
               <v-icon
                 class="flex-shrink-0 mx-2"
                 :title="feedErrors[feedNode.feed.id]"
@@ -76,7 +74,7 @@
               ><img :src="node.feed.icon" alt="" loading="lazy"
             /></span>
             <span class="flex-fill text-left text-truncate">{{ node.feed.title }}</span>
-            <span class="counter text-right">{{ filteredFeedStats[node.feed.id] || "" }}</span>
+            <span class="counter text-right">{{ filterSelected ? stats.feeds[node.feed.id]?.[filterSelected] : "" }}</span>
             <v-icon
               class="flex-shrink-0 mx-2"
               :title="feedErrors[node.feed.id]"
@@ -111,10 +109,15 @@ export default defineComponent({
   props: {
     tree: { type: Array as PropType<FeedTreeNode[]>, required: true },
     modelValue: { type: String, required: true },
-    filterSelected: { type: String, required: true },
-    filteredTotalStats: { type: Number as PropType<number | null>, default: null },
-    filteredFeedStats: { type: Object as PropType<Record<number, number>>, required: true },
-    filteredFolderStats: { type: Object as PropType<Record<string, number>>, required: true },
+    filterSelected: { type: String as PropType<'' | 'unread' | 'starred'>, required: true },
+    stats: {
+      type: Object as PropType<{
+        feeds: Record<number, { unread: number; starred: number }>;
+        folders: Record<number, { unread: number; starred: number }>;
+        total: { unread: number; starred: number };
+      }>,
+      required: true,
+    },
     feedErrors: { type: Object as PropType<Record<number, string>>, required: true },
   },
   emits: ["update:modelValue", "toggle-folder"],
