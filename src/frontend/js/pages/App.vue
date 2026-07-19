@@ -774,21 +774,6 @@ export default defineComponent({
     };
   },
   computed: {
-    foldersWithFeeds(): (Partial<Folder> & { feeds?: Feed[] })[] {
-      var feedsByFolders = this.feeds.reduce((folders, feed) => {
-        if (!folders[feed.folder_id]) folders[feed.folder_id] = [feed];
-        else folders[feed.folder_id].push(feed);
-        return folders;
-      }, {});
-      const folders = this.folders
-        .slice()
-        .map(folder => ({ ...folder, feeds: feedsByFolders[folder.id] }));
-      folders.push({ id: null, feeds: feedsByFolders["null"] });
-      return folders;
-    },
-    feedsById(): Record<number, Feed> {
-      return this.feeds.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
-    },
     feedTree(): FeedTreeNode[] {
       const [rootFeeds, folderFeeds] = this.feeds.reduce(
         (acc, f) => {
@@ -819,6 +804,9 @@ export default defineComponent({
           }),
         ...rootFeeds.filter(f => !this.mustHideFeed(f)).map(feedNode),
       ];
+    },
+    feedsById(): Record<number, Feed> {
+      return this.feeds.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
     },
     foldersById(): Record<number, Folder> {
       return this.folders.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});

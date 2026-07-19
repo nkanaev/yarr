@@ -116,7 +116,7 @@ export interface ItemListQuery {
   status?: string;
   search?: string;
   oldest_first?: boolean;
-  after?: string;
+  after?: number;
 
   [key: string]: string | number | boolean | undefined;
 }
