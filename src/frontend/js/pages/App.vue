@@ -366,14 +366,14 @@
           @click="toggleItemStarred(itemSelectedDetails)"
           :title="$t('mark_starred')">
           <v-icon name="star-full" v-if="itemSelectedDetails.status == 'starred'" />
-          <v-icon name="star" v-else-if="itemSelectedDetails.status != 'starred'" />
+          <v-icon name="star" v-else />
         </button>
         <button
           class="toolbar-item"
           :title="$t('mark_unread')"
           @click="toggleItemRead(itemSelectedDetails)">
           <v-icon name="circle-full" v-if="itemSelectedDetails.status == 'unread'" />
-          <v-icon name="circle" v-if="itemSelectedDetails.status != 'unread'" />
+          <v-icon name="circle" v-else />
         </button>
         <v-dropdown
           class="settings-dropdown"
@@ -896,7 +896,7 @@ export default defineComponent({
       this.items = [];
       this.itemsHasMore = true;
       api.settings.update({ feed: newVal }).then(() => this.refreshItems(false));
-      if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0;
+      if (this.$refs.itemlist) (this.$refs.itemlist as HTMLElement).scrollTop = 0;
     },
     itemSelected(newVal, oldVal) {
       this.itemSelectedReadability = "";
@@ -904,7 +904,7 @@ export default defineComponent({
         this.itemSelectedDetails = null;
         return;
       }
-      if (this.$refs.content) this.$refs.content.scrollTop = 0;
+      if (this.$refs.content) (this.$refs.content as HTMLElement).scrollTop = 0;
 
       api.items.get(newVal).then(item => {
         this.itemSelectedDetails = item;
@@ -1092,7 +1092,7 @@ export default defineComponent({
         this.refreshFeeds().then(() => {
           this.$nextTick(() => {
             if (this.$refs.newFeedFolder) {
-              this.$refs.newFeedFolder.value = result.id;
+              (this.$refs.newFeedFolder as HTMLSelectElement).value = String(result.id);
             }
           });
         });
@@ -1199,7 +1199,7 @@ export default defineComponent({
     importOPML(event: Event) {
       var input = event.target;
       var form = document.querySelector("#opml-import-form");
-      this.$refs.menuDropdown.hide();
+      (this.$refs.menuDropdown as InstanceType<typeof dropdown>).hide();
       api.upload_opml(form).then(() => {
         input.value = "";
         this.refreshFeeds();
