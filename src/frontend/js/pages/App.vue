@@ -455,6 +455,7 @@ import type {
   FeedLink,
   MediaLink,
   ItemStatus,
+  FeedCreateData,
 } from "../api-types";
 
 var app = window.app;
@@ -518,7 +519,7 @@ export default defineComponent({
       itemListWidth: s.item_list_width || 300,
 
       filteredFeedStats: {} as Record<number, number>,
-      filteredFolderStats: {} as Record<number | "null", number>,
+      filteredFolderStats: {} as Partial<Record<number | "null", number>>,
       filteredTotalStats: null as number | null,
 
       settings: "",
@@ -964,10 +965,10 @@ export default defineComponent({
     },
     createFeed($event: Event) {
       var form = $event.target as HTMLFormElement;
-      var data = {
-        url: form.querySelector("input[name=url]").value,
+      var data: FeedCreateData = {
+        url: (form.querySelector("input[name=url]") as HTMLInputElement).value,
         folder_id:
-          parseInt(form.querySelector("select[name=folder_id]").value) || null,
+          parseInt((form.querySelector("select[name=folder_id]") as HTMLSelectElement).value) || null,
       };
       if (this.feedNewChoiceSelected) {
         var choice = this.feedNewChoice.find(
@@ -999,7 +1000,7 @@ export default defineComponent({
       const newstatus =
         item.status !== targetstatus ? targetstatus : fallbackstatus;
 
-      var updateStats = (status, incr) => {
+      const updateStats = (status: ItemStatus, incr: number) => {
         if (status == "unread" || status == "starred") {
           this.feedStats[item.feed_id][status] += incr;
         }
