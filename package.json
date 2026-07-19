@@ -2,6 +2,16 @@
   "scripts": {
     "build": "node build.js"
   },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "sixngleQuote": false,
+    "trailingComma": "all",
+    "semi": true,
+    "arrowParens": "avoid",
+    "htmlWhitespaceSensitivity": "css",
+    "bracketSameLine": true
+  },
   "devDependencies": {
     "@vue/typescript-plugin": "^3.3.7",
     "esbuild": "0.28.1",
