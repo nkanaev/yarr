@@ -34,7 +34,7 @@ function api(method: string, endpoint: string, opts: ApiOptions = {}) {
   init.headers.set("x-requested-by", "yarr");
 
   if (query !== undefined) {
-    url = url + "?" + new URLSearchParams(query).toString();
+    url = url + "?" + new URLSearchParams(query as Record<string, string>).toString();
   }
   if (body !== undefined) {
     init.body = body;
