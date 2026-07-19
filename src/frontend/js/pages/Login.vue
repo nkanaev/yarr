@@ -27,6 +27,9 @@ import icons from "../icons";
 import { defineComponent } from "vue";
 
 export default defineComponent({
+  props: {
+    onLogin: { type: Function, required: true },
+  },
   data() {
     return {
       logo: icons.anchor,
@@ -42,8 +45,7 @@ export default defineComponent({
       var data = new FormData(event.target as HTMLFormElement);
       fetch("./login", { method: "POST", body: data }).then(res => {
         if (res.ok) {
-          // TODO: reload settings instead of refreshing the page
-          document.location.assign("./");
+          this.onLogin();
         } else {
           this.hasError = true;
         }

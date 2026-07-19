@@ -627,10 +627,8 @@
 </template>
 
 <script lang="ts">
-import i18n, { Lang } from "../i18n";
+import type { Lang } from "../i18n";
 import api from "../api";
-import icons from "../icons";
-import { setupKeybindings } from "../key";
 import { scrollto, debounce } from "../utils";
 import drag from "../components/drag.vue";
 import dropdown from "../components/dropdown.vue";
@@ -698,9 +696,6 @@ export default defineComponent({
   },
   beforeUnmount() {
     this._colorSchemeMql?.removeEventListener("change", this.updateMetaTheme);
-  },
-  mounted() {
-    setupKeybindings(this);
   },
   data() {
     var s = app.settings;
