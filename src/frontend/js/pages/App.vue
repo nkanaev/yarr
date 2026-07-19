@@ -407,6 +407,7 @@
             <p class="cursor-default"><b>{{ $t('keyboard_shortcuts') }}</b></p>
 
             <table class="table table-borderless table-sm table-compact m-0">
+                <tbody>
                 <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td>
                                                         <td>{{ $t('kb_show_filters') }}</td></tr>
                 <tr><td><kbd>/</kbd></td>               <td>{{ $t('kb_focus_search') }}</td></tr>
@@ -424,6 +425,7 @@
                 <tr><td><kbd>i</kbd></td>               <td>{{ $t('kb_read_here') }}</td> </tr>
                 <tr><td><kbd>f</kbd> <kbd>b</kbd></td>  <td>{{ $t('kb_scroll_content') }}</td>
                 </tr>
+                </tbody>
             </table>
         </div>
     </v-modal>
@@ -437,11 +439,11 @@ import api from "../api";
 import icons from "../icons";
 import { setupKeybindings } from "../key";
 import { scrollto, debounce, dateRepr } from "../utils";
-import drag from "../components/drag";
-import dropdown from "../components/dropdown";
-import modal from "../components/modal";
-import relativeTime from "../components/relative-time";
-import icon from "../components/icon";
+import drag from "../components/drag.vue";
+import dropdown from "../components/dropdown.vue";
+import modal from "../components/modal.vue";
+import relativeTime from "../components/relative-time.vue";
+import icon from "../components/icon.vue";
 import scrollDir from "../directives/scroll";
 import focusDir from "../directives/focus";
 import { defineComponent } from "vue";
