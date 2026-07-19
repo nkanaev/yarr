@@ -117,6 +117,16 @@ export interface ItemListQuery {
   search?: string;
   oldest_first?: boolean;
   after?: string;
+
+  [key: string]: string | number | boolean | undefined;
+}
+
+export interface ItemMarkQuery {
+  feed_id?: string;
+  folder_id?: string;
+  before?: number;
+
+  [key: string]: string | number | undefined;
 }
 
 export interface SettingsUpdateData {

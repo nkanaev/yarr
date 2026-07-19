@@ -4,12 +4,13 @@ import type {
   FeedCreateData, FeedUpdateData,
   FolderCreateData, FolderUpdateData,
   ItemUpdateData, ItemListQuery, SettingsUpdateData,
+  ItemMarkQuery,
 } from "./api-types";
 
 type ApiOptions = {
   json?: object;
   body?: BodyInit;
-  query?: Record<string, string>;
+  query?: Record<string, string | number| boolean>;
 };
 
 function api(method: string, endpoint: string, opts: ApiOptions = {}) {
@@ -98,13 +99,15 @@ export default {
       return api("get", `./api/items/${id}`).then(json<Item>);
     },
     list(query?: ItemListQuery): Promise<ItemListResponse> {
+      // TODO: fix query annotation
       return api("get", "./api/items", { query: query as Record<string, string> }).then(json<ItemListResponse>);
     },
     update(id: number, data: ItemUpdateData): Promise<Response> {
       return api("put", `./api/items/${id}`, { json: data });
     },
-    mark_read(query: Record<string, string | number | boolean>): Promise<Response> {
-      return api("put", "./api/items" + param(query));
+    mark_read(query: ItemMarkQuery): Promise<Response> {
+      // TODO: fix query annotation
+      return api("put", "./api/items", { query: query as Record<string, string> });
     },
   },
   settings: {

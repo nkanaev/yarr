@@ -457,6 +457,7 @@ import type {
   ItemStatus,
   FeedCreateData,
   ItemListQuery,
+  ItemMarkQuery,
 } from "../api-types";
 
 var app = window.app;
@@ -868,7 +869,11 @@ export default defineComponent({
         return this.refreshItems(true);
     },
     markItemsRead() {
-      var query = this.getItemsQuery();
+      const markQuery = this.getItemsQuery()
+      const query: ItemMarkQuery = {
+        folder_id: markQuery.folder_id,
+        feed_id: markQuery.feed_id,
+      };
       api.items.mark_read(query).then(() => {
         this.items = [];
         this.itemSelected = null;
