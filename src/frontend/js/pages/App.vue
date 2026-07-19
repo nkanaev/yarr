@@ -354,7 +354,9 @@
         </div>
         <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
       </div>
-      <div class="px-3 py-2 border-top text-danger text-break" v-if="current?.feed?.id && feed_errors[current.feed.id]">
+      <div
+        class="px-3 py-2 border-top text-danger text-break"
+        v-if="current?.feed?.id && feed_errors[current.feed.id]">
         {{ feed_errors[current.feed.id] }}
       </div>
     </div>
@@ -524,7 +526,9 @@
             <option
               :value="folder.id"
               v-for="folder in folders"
-              :selected="folder.id === current?.feed?.folder_id || folder.id === current?.folder?.id">
+              :selected="
+                folder.id === current?.feed?.folder_id || folder.id === current?.folder?.id
+              ">
               {{ folder.title }}
             </option>
           </select>
@@ -717,7 +721,7 @@ export default defineComponent({
       itemListWidth: s.item_list_width || 300,
 
       filteredFeedStats: {} as Record<number, number>,
-      filteredFolderStats: {} as Record<number | "null", number>,
+      filteredFolderStats: {} as Record<number, number>,
       filteredTotalStats: null as number | null,
 
       settings: "",
@@ -1256,20 +1260,21 @@ export default defineComponent({
         return;
       }
 
-      var statsFeeds = {},
-        statsFolders = {},
+      var statsFeeds = {} as Record<number, number>,
+        statsFolders = {} as Record<number, number>,
         statsTotal = 0;
 
       for (var i = 0; i < this.feeds.length; i++) {
-        var feed = this.feeds[i];
+        const feed = this.feeds[i];
         if (!this.feedStats[feed.id]) continue;
 
-        var n = this.feedStats[feed.id][filter] || 0;
+        const n = this.feedStats[feed.id][filter] || 0;
 
-        if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = 0;
+        if (feed.folder_id !== null && !statsFolders[feed.folder_id])
+          statsFolders[feed.folder_id] = 0;
 
         statsFeeds[feed.id] = n;
-        statsFolders[feed.folder_id] += n;
+        if (feed.folder_id !== null) statsFolders[feed.folder_id] += n;
         statsTotal += n;
       }
 
