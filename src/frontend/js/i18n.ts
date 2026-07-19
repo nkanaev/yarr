@@ -1,5 +1,5 @@
 import type { Plugin } from "vue";
-import _translations from "./i18n-translations.json" with {type: "json"}
+import _translations from "./i18n-translations.json" with { type: "json" };
 import { FluentResource, FluentBundle, FluentVariable, Message } from "@fluent/bundle";
 import { Pattern } from "@fluent/bundle/esm/ast";
 
@@ -31,7 +31,7 @@ export default {
       if (msg?.value) {
         return bundle.formatPattern(msg.value as Pattern, args);
       }
-      return ""
+      return "";
     };
   },
 };

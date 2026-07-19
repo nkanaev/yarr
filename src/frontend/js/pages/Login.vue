@@ -1,20 +1,25 @@
 <template>
-<div class="login-page">
+  <div class="login-page">
     <form @submit.prevent="login">
-        <div class="logo" v-html="logo"></div>
-        <div class="text-danger text-center my-3" v-if="hasError">{{ $t('login_error') }}</div>
-        <div class="form-group">
-            <label for="username">{{ $t('username') }}</label>
-            <input name="username" class="form-control" id="username" autocomplete="off" required autofocus>
-        </div>
-        <div class="form-group">
-            <label for="password">{{ $t('password') }}</label>
-            <input name="password" class="form-control" id="password" type="password" required>
-        </div>
-        <button class="btn btn-block btn-default" type="submit">{{ $t('login') }}</button>
+      <div class="logo" v-html="logo"></div>
+      <div class="text-danger text-center my-3" v-if="hasError">{{ $t("login_error") }}</div>
+      <div class="form-group">
+        <label for="username">{{ $t("username") }}</label>
+        <input
+          name="username"
+          class="form-control"
+          id="username"
+          autocomplete="off"
+          required
+          autofocus />
+      </div>
+      <div class="form-group">
+        <label for="password">{{ $t("password") }}</label>
+        <input name="password" class="form-control" id="password" type="password" required />
+      </div>
+      <button class="btn btn-block btn-default" type="submit">{{ $t("login") }}</button>
     </form>
-</div>
-
+  </div>
 </template>
 
 <script lang="ts">
@@ -35,7 +40,7 @@ export default defineComponent({
     login(event: Event) {
       event.preventDefault();
       var data = new FormData(event.target as HTMLFormElement);
-      fetch("./login", { method: "POST", body: data }).then((res) => {
+      fetch("./login", { method: "POST", body: data }).then(res => {
         if (res.ok) {
           // TODO: reload settings instead of refreshing the page
           document.location.assign("./");
@@ -46,5 +51,4 @@ export default defineComponent({
     },
   },
 });
-
 </script>

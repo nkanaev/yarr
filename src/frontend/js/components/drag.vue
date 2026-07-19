@@ -1,5 +1,5 @@
 <template>
-<div class="drag"></div>
+  <div class="drag"></div>
 </template>
 
 <script lang="ts">

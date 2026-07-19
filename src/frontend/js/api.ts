@@ -1,16 +1,26 @@
 import type {
-  Feed, Folder, Item, Settings,
-  StatusResponse, ItemListResponse, FeedCreateResponse, CrawlResponse,
-  FeedCreateData, FeedUpdateData,
-  FolderCreateData, FolderUpdateData,
-  ItemUpdateData, ItemListQuery, SettingsUpdateData,
+  Feed,
+  Folder,
+  Item,
+  Settings,
+  StatusResponse,
+  ItemListResponse,
+  FeedCreateResponse,
+  CrawlResponse,
+  FeedCreateData,
+  FeedUpdateData,
+  FolderCreateData,
+  FolderUpdateData,
+  ItemUpdateData,
+  ItemListQuery,
+  SettingsUpdateData,
   ItemMarkQuery,
 } from "./api-types";
 
 type ApiOptions = {
   json?: object;
   body?: BodyInit;
-  query?: Record<string, string | number| boolean>;
+  query?: Record<string, string | number | boolean>;
 };
 
 function api(method: string, endpoint: string, opts: ApiOptions = {}) {
@@ -100,7 +110,9 @@ export default {
     },
     list(query?: ItemListQuery): Promise<ItemListResponse> {
       // TODO: fix query annotation
-      return api("get", "./api/items", { query: query as Record<string, string> }).then(json<ItemListResponse>);
+      return api("get", "./api/items", { query: query as Record<string, string> }).then(
+        json<ItemListResponse>,
+      );
     },
     update(id: number, data: ItemUpdateData): Promise<Response> {
       return api("put", `./api/items/${id}`, { json: data });

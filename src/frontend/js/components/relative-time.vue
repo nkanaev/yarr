@@ -1,5 +1,5 @@
 <template>
-<time :datetime="val">{{ formatted }}</time>
+  <time :datetime="val">{{ formatted }}</time>
 </template>
 
 <script lang="ts">

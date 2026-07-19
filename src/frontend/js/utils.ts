@@ -22,10 +22,7 @@ export function scrollto(target: Element, scroll: Element) {
   scroll.scrollTop = Math.round(newPos);
 }
 
-export function debounce<T extends (...args: any[]) => any>(
-  fn: T,
-  timeout: number,
-) {
+export function debounce<T extends (...args: any[]) => any>(fn: T, timeout: number) {
   let timerId: ReturnType<typeof setTimeout> | null = null;
   return function (this: any, ...args: Parameters<T>): void {
     const context = this;
@@ -62,9 +59,7 @@ export function dateRepr(d: Date): string {
   return out;
 }
 
-async function to<T, E = Error>(
-  promise: Promise<T>,
-): Promise<[E, undefined] | [undefined, T]> {
+async function to<T, E = Error>(promise: Promise<T>): Promise<[E, undefined] | [undefined, T]> {
   try {
     const result = await promise;
     return [undefined, result];

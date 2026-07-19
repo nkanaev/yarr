@@ -20,11 +20,7 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
   var shortcutFunctions = {
     openItemLink() {
       if (vm.itemSelectedDetails && vm.itemSelectedDetails.link) {
-        window.open(
-          vm.itemSelectedDetails.link,
-          "_blank",
-          "noopener,noreferrer",
-        );
+        window.open(vm.itemSelectedDetails.link, "_blank", "noopener,noreferrer");
       }
     },
     toggleReadability() {
@@ -140,21 +136,14 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
     return (
       tagName === "textarea" ||
       (tagName === "input" &&
-        inputBlocklist.indexOf(
-          element.getAttribute("type")?.toLowerCase() || "",
-        ) == -1)
+        inputBlocklist.indexOf(element.getAttribute("type")?.toLowerCase() || "") == -1)
     );
   }
 
   document.addEventListener("keydown", function (event) {
     // Ignore while focused on text or
     // when using modifier keys (to not clash with browser behaviour)
-    if (
-      isTextBox(event.target as Element) ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey
-    ) {
+    if (isTextBox(event.target as Element) || event.metaKey || event.ctrlKey || event.altKey) {
       return;
     }
     var keybindFunction = keybindings[event.key] || codebindings[event.code];

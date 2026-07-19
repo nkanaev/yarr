@@ -1,8 +1,10 @@
 <template>
-<div class="dropdown" :class="$attrs.class">
-  <button ref="btn" @click="toggle" :class="btnToggleClass" :title="$props.title"><slot name="button"></slot></button>
-  <div ref="menu" class="dropdown-menu" :class="{show: open}"><slot v-if="open"></slot></div>
-</div>
+  <div class="dropdown" :class="$attrs.class">
+    <button ref="btn" @click="toggle" :class="btnToggleClass" :title="$props.title">
+      <slot name="button"></slot>
+    </button>
+    <div ref="menu" class="dropdown-menu" :class="{ show: open }"><slot v-if="open"></slot></div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -54,11 +56,7 @@ export default defineComponent({
           const b = this.$refs.btn as HTMLElement;
           const m = this.$refs.menu as HTMLElement;
           m.style.left =
-            "-" +
-            (m.getBoundingClientRect().width -
-              b.getBoundingClientRect().width) /
-              2 +
-            "px";
+            "-" + (m.getBoundingClientRect().width - b.getBoundingClientRect().width) / 2 + "px";
         });
       }
 
