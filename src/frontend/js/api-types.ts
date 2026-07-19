@@ -115,7 +115,7 @@ export interface ItemListQuery {
   folder_id?: string;
   status?: string;
   search?: string;
-  oldest_first?: string;
+  oldest_first?: boolean;
   after?: string;
 }
 

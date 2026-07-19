@@ -8,7 +8,7 @@ declare module "vue" {
     $t: (
       code: TranslationKey,
       args?: Record<string, FluentVariable>,
-    ) => string | undefined;
+    ) => string;
   }
 }
 

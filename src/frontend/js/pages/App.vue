@@ -438,7 +438,7 @@ import i18n, { Lang } from "../i18n";
 import api from "../api";
 import icons from "../icons";
 import { setupKeybindings } from "../key";
-import { scrollto, debounce, dateRepr } from "../utils";
+import { scrollto, debounce, dateRepr, debounceMethod } from "../utils";
 import drag from "../components/drag.vue";
 import dropdown from "../components/dropdown.vue";
 import modal from "../components/modal.vue";
@@ -456,6 +456,7 @@ import type {
   MediaLink,
   ItemStatus,
   FeedCreateData,
+  ItemListQuery,
 } from "../api-types";
 
 var app = window.app;
@@ -671,7 +672,7 @@ export default defineComponent({
     },
     feedStats: {
       deep: true,
-      handler: debounce(function () {
+      handler: debounce(() => {
         var title = TITLE;
         var unreadCount = Object.values(this.feedStats).reduce(
           (acc, stat) => acc + stat.unread,
@@ -776,8 +777,8 @@ export default defineComponent({
         });
       });
     },
-    getItemsQuery() {
-      var query = {};
+    getItemsQuery(): ItemListQuery {
+      var query: ItemListQuery = {};
       if (this.feedSelected) {
         var parts = this.feedSelected.split(":", 2);
         var type = parts[0];
@@ -880,7 +881,7 @@ export default defineComponent({
       api.folders.update(folder.id, { is_expanded: folder.is_expanded });
     },
     formatDate(datestr: string) {
-      var options = {
+      const options: Intl.DateTimeFormatOptions = {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -890,14 +891,14 @@ export default defineComponent({
       return new Date(datestr).toLocaleDateString(undefined, options);
     },
     moveFeed(feed: Feed, folder: Folder) {
-      var folder_id = folder ? folder.id : null;
+      const folder_id = folder ? folder.id : null;
       api.feeds.update(feed.id, { folder_id: folder_id }).then(() => {
         feed.folder_id = folder_id;
         this.refreshStats();
       });
     },
     moveFeedToNewFolder(feed: Feed) {
-      var title = prompt(this.$t("prompt_folder_name"));
+      const title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
       api.folders.create({ title: title }).then((folder) => {
         api.feeds.update(feed.id, { folder_id: folder.id }).then(() => {
@@ -908,7 +909,7 @@ export default defineComponent({
       });
     },
     createNewFeedFolder() {
-      var title = prompt(this.$t("prompt_folder_name"));
+      const title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
       api.folders.create({ title: title }).then((result) => {
         this.refreshFeeds().then(() => {
@@ -921,7 +922,7 @@ export default defineComponent({
       });
     },
     renameFolder(folder: Folder) {
-      var newTitle = prompt(this.$t("prompt_new_title"), folder.title);
+      const newTitle = prompt(this.$t("prompt_new_title"), folder.title);
       if (newTitle) {
         api.folders.update(folder.id, { title: newTitle }).then(() => {
           folder.title = newTitle;
@@ -1038,7 +1039,7 @@ export default defineComponent({
     },
     toggleReadability() {
       if (this.itemSelectedReadability) {
-        this.itemSelectedReadability = null;
+        this.itemSelectedReadability = "";
         return;
       }
       var item = this.itemSelectedDetails;

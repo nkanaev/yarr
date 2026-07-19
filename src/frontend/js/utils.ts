@@ -22,18 +22,26 @@ export function scrollto(target: Element, scroll: Element) {
   scroll.scrollTop = Math.round(newPos);
 }
 
-export function debounce<A extends unknown[]>(
-  callback: (...args: A) => void,
-  wait: number,
-): (...args: A) => void {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  return function (this: unknown, ...args: A) {
-    const ctx = this;
-    clearTimeout(timeout);
-    timeout = setTimeout(function () {
-      callback.apply(ctx, args);
-    }, wait);
+export function debounce<F extends (...args: any[]) => any>(
+  fn: F,
+  delay: number
+): (...args: Parameters<F>) => void {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  return function (...args: Parameters<F>): void {
+    if (timeoutId) clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
   };
+}
+
+export function debounceMethod<T extends (...args: any[]) => any>(
+  fn: T, 
+  delay: number
+) {
+  return debounce(fn, delay);
 }
 
 export function dateRepr(d: Date): string {
