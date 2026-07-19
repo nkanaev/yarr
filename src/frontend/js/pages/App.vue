@@ -124,7 +124,7 @@
           <header class="dropdown-header" role="heading" aria-level="2">
             {{ $t("subscriptions") }}
           </header>
-          <form id="opml-import-form" enctype="multipart/form-data" tabindex="-1">
+          <form enctype="multipart/form-data" tabindex="-1" ref="opmlInputForm">
             <input
               type="file"
               id="opml-import"
@@ -227,20 +227,20 @@
           toggle-class="btn btn-link toolbar-item px-2 ml-2"
           drop="right"
           :title="$t('feed_settings')"
-          v-if="current.type == 'feed'">
+          v-if="current?.feed?.id">
           <template v-slot:button>
             <v-icon name="more-horizontal" />
           </template>
           <header class="dropdown-header" role="heading" aria-level="2">
-            {{ current.feed.title }}
+            {{ current?.feed?.title }}
           </header>
           <a
             class="dropdown-item"
-            :href="current.feed.link"
+            :href="current?.feed?.link"
             rel="noopener noreferrer"
             target="_blank"
             referrerpolicy="no-referrer"
-            v-if="current.feed.link">
+            v-if="current?.feed?.link">
             <v-icon class="mr-1" name="globe" />
             {{ $t("website") }}
           </a>
@@ -274,7 +274,7 @@
             <button
               class="dropdown-item"
               v-if="folder.id != current.feed.folder_id"
-              @click="moveFeed(current.feed, folder)">
+              @click="moveFeed(current.feed, folder.id)">
               <v-icon class="mr-1" name="folder" />
               {{ folder.title }}
             </button>
@@ -301,12 +301,12 @@
           toggle-class="btn btn-link toolbar-item px-2 ml-2"
           :title="$t('folder_settings')"
           drop="right"
-          v-if="current.type == 'folder'">
+          v-if="current?.folder?.id">
           <template v-slot:button>
             <v-icon name="more-horizontal" />
           </template>
           <header class="dropdown-header" role="heading" aria-level="2">
-            {{ current.folder.title }}
+            {{ current?.folder?.title }}
           </header>
           <button class="dropdown-item" @click="renameFolder(current.folder)">
             <v-icon class="mr-1" name="edit" />
@@ -354,7 +354,7 @@
         </div>
         <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
       </div>
-      <div class="px-3 py-2 border-top text-danger text-break" v-if="feed_errors[current.feed.id]">
+      <div class="px-3 py-2 border-top text-danger text-break" v-if="current?.feed?.id && feed_errors[current.feed.id]">
         {{ feed_errors[current.feed.id] }}
       </div>
     </div>
@@ -524,7 +524,7 @@
             <option
               :value="folder.id"
               v-for="folder in folders"
-              :selected="folder.id === current.feed.folder_id || folder.id === current.folder.id">
+              :selected="folder.id === current?.feed?.folder_id || folder.id === current?.folder?.id">
               {{ folder.title }}
             </option>
           </select>
@@ -654,10 +654,12 @@ import type {
   ItemListQuery,
   ItemMarkQuery,
 } from "../api-types";
+import { InterfaceType } from "typescript";
 
 var app = window.app;
 
 type Theme = "system" | "light" | "sepia" | "night";
+type ThemeFont = "" | "serif" | "monospace";
 type Filter = "" | "starred" | "unread";
 type SettingsLanguage = {
   code: Lang;
@@ -730,12 +732,12 @@ export default defineComponent({
         items: false,
         readability: false,
       },
-      fonts: ["", "serif", "monospace"],
+      fonts: ["", "serif", "monospace"] as ThemeFont[],
       feedStats: {} as Record<number, FeedStat>,
       theme: {
-        name: s.theme_name,
-        font: s.theme_font,
-        size: s.theme_size,
+        name: s.theme_name as Theme,
+        font: s.theme_font as ThemeFont,
+        size: s.theme_size as number,
       },
       themeColors: {
         night: "#0e0e0e",
@@ -811,16 +813,13 @@ export default defineComponent({
     foldersById(): Record<number, Folder> {
       return this.folders.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
     },
-    current(): { type: string; feed: Partial<Feed>; folder: Partial<Folder> } {
+    current(): { type: string; feed: Feed | null; folder: Folder | null } {
       var parts = (this.feedSelected || "").split(":", 2);
       var type = parts[0];
       var guid = parts[1];
 
-      var folder: Partial<Folder> = {},
-        feed: Partial<Feed> = {};
-
-      if (type == "feed") feed = this.feedsById[guid] || {};
-      if (type == "folder") folder = this.foldersById[guid] || {};
+      const feed = type == "feed" ? this.feedsById[guid] : null;
+      const folder = type == "folder" ? this.foldersById[guid] : null;
 
       return { type: type, feed: feed, folder: folder };
     },
@@ -945,7 +944,8 @@ export default defineComponent({
         var dark = window?.matchMedia("(prefers-color-scheme: dark)").matches;
         theme = dark ? "night" : "light";
       }
-      document.querySelector("meta[name='theme-color']").content = this.themeColors[theme];
+      const metaTag: HTMLMetaElement | null = document.querySelector("meta[name='theme-color']");
+      metaTag && (metaTag.content = this.themeColors[theme]);
     },
     refreshStats(loopMode?: boolean) {
       return api.status().then(data => {
@@ -1067,9 +1067,8 @@ export default defineComponent({
       };
       return new Date(datestr).toLocaleDateString(undefined, options);
     },
-    moveFeed(feed: Feed, folder: Folder) {
-      const folder_id = folder ? folder.id : null;
-      api.feeds.update(feed.id, { folder_id: folder_id }).then(() => {
+    moveFeed(feed: Feed, folder_id: number | null) {
+      api.feeds.update(feed.id, { folder_id }).then(() => {
         feed.folder_id = folder_id;
         this.refreshStats();
       });
@@ -1197,8 +1196,8 @@ export default defineComponent({
       this.toggleItemStatus(item, "unread");
     },
     importOPML(event: Event) {
-      var input = event.target;
-      var form = document.querySelector("#opml-import-form");
+      const input = event.target as HTMLInputElement;
+      const form = this.$refs.opmlInputForm as HTMLFormElement;
       (this.$refs.menuDropdown as InstanceType<typeof dropdown>).hide();
       api.upload_opml(form).then(() => {
         input.value = "";
@@ -1357,7 +1356,7 @@ export default defineComponent({
     mustHideFolder(folder: Folder): boolean {
       return !!(
         this.filterSelected &&
-        !(this.current.folder.id == folder.id || this.current.feed.folder_id == folder.id) &&
+        !(this.current?.folder?.id === folder.id || this.current?.feed?.folder_id == folder.id) &&
         !this.filteredFolderStats[folder.id] &&
         (!this.itemSelectedDetails ||
           (this.feedsById[this.itemSelectedDetails.feed_id] || {}).folder_id != folder.id)
@@ -1366,7 +1365,7 @@ export default defineComponent({
     mustHideFeed(feed: Feed): boolean {
       return !!(
         this.filterSelected &&
-        !(this.current.feed.id == feed.id) &&
+        !(this.current?.feed?.id === feed.id) &&
         !this.filteredFeedStats[feed.id] &&
         (!this.itemSelectedDetails || this.itemSelectedDetails.feed_id != feed.id)
       );
