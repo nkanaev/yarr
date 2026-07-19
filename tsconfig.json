@@ -7,7 +7,8 @@
     "noEmit": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "plugins": [{ "name": "@vue/typescript-plugin" }]
   },
   "include": ["src/frontend/js/**/*.ts", "src/frontend/js/**/*.vue"]
 }
