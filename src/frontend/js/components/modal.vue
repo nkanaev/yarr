@@ -1,18 +1,20 @@
+<template>
+<div class="modal custom-modal" tabindex="-1" v-if="$props.open">
+  <div class="modal-dialog">
+    <div class="modal-content" ref="content">
+      <div class="modal-body">
+        <slot v-if="$props.open"></slot>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
   props: ["open"],
-  template: `
-    <div class="modal custom-modal" tabindex="-1" v-if="$props.open">
-      <div class="modal-dialog">
-        <div class="modal-content" ref="content">
-          <div class="modal-body">
-            <slot v-if="$props.open"></slot>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
   data() {
     return { opening: false };
   },
@@ -37,3 +39,4 @@ export default defineComponent({
     },
   },
 });
+</script>

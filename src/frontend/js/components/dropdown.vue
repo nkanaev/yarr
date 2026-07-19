@@ -1,3 +1,11 @@
+<template>
+<div class="dropdown" :class="$attrs.class">
+  <button ref="btn" @click="toggle" :class="btnToggleClass" :title="$props.title"><slot name="button"></slot></button>
+  <div ref="menu" class="dropdown-menu" :class="{show: open}"><slot v-if="open"></slot></div>
+</div>
+</template>
+
+<script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -19,12 +27,6 @@ export default defineComponent({
   data() {
     return { open: false };
   },
-  template: `
-    <div class="dropdown" :class="$attrs.class">
-      <button ref="btn" @click="toggle" :class="btnToggleClass" :title="$props.title"><slot name="button"></slot></button>
-      <div ref="menu" class="dropdown-menu" :class="{show: open}"><slot v-if="open"></slot></div>
-    </div>
-  `,
   computed: {
     btnToggleClass() {
       var c = this.$props.toggleClass || "";
@@ -74,3 +76,4 @@ export default defineComponent({
     },
   },
 });
+</script>

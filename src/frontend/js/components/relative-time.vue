@@ -1,3 +1,8 @@
+<template>
+<time :datetime="val">{{ formatted }}</time>
+</template>
+
+<script lang="ts">
 import { dateRepr } from "../utils";
 import { defineComponent } from "vue";
 
@@ -11,7 +16,6 @@ export default defineComponent({
       interval: undefined as number | undefined,
     };
   },
-  template: '<time :datetime="val">{{ formatted }}</time>',
   mounted() {
     this.interval = setInterval(() => {
       this.formatted = dateRepr(this.date);
@@ -21,3 +25,4 @@ export default defineComponent({
     clearInterval(this.interval);
   },
 });
+</script>

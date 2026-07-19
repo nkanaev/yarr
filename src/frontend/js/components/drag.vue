@@ -1,8 +1,12 @@
+<template>
+<div class="drag"></div>
+</template>
+
+<script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
   props: ["width"],
-  template: '<div class="drag"></div>',
   mounted() {
     var self = this;
     let startX = 0;
@@ -24,3 +28,4 @@ export default defineComponent({
     });
   },
 });
+</script>
