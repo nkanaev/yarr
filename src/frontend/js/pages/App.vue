@@ -125,47 +125,15 @@
             </v-dropdown>
         </div>
         <div id="feed-list-scroll" class="p-2 overflow-auto scroll-touch border-top flex-grow-1">
-            <label class="selectgroup">
-                <input type="radio" name="feed" value="" v-model="feedSelected">
-                <div class="selectgroup-label d-flex align-items-center w-100">
-                    <v-icon class="mr-2" name="layers" />
-                    <span class="flex-fill text-left text-truncate" v-if="filterSelected=='unread'">{{ $t('all_unread') }}</span>
-                    <span class="flex-fill text-left text-truncate" v-if="filterSelected=='starred'">{{ $t('all_starred') }}</span>
-                    <span class="flex-fill text-left text-truncate" v-if="filterSelected==''">{{ $t('all_feeds') }}</span>
-                    <span class="counter text-right">{{ filteredTotalStats }}</span>
-                </div>
-            </label>
-            <div v-for="folder in foldersWithFeeds">
-                <label class="selectgroup mt-1"
-                        :class="{'d-none': mustHideFolder(folder)}"
-                        v-if="folder.id">
-                    <input type="radio" name="feed" :value="'folder:'+folder.id" v-model="feedSelected" v-if="folder.id">
-                    <div class="selectgroup-label d-flex align-items-center w-100" v-if="folder.id">
-                        <div @click.prevent="toggleFolderExpanded(folder)" class="m-n1 p-1">
-                            <v-icon class="mr-2" :class="{expanded: folder.is_expanded}" name="chevron-right" />
-                        </div>
-                        <span class="flex-fill text-left text-truncate">{{ folder.title }}</span>
-                        <span class="counter text-right">{{ filteredFolderStats[folder.id] || '' }}</span>
-                    </div>
-                </label>
-                <div v-show="!folder.id || folder.is_expanded" class="mt-1" :class="{'pl-3': folder.id}">
-                    <label class="selectgroup"
-                            :class="{'d-none': mustHideFeed(feed)}"
-                            v-for="feed in folder.feeds">
-                        <input type="radio" name="feed" :value="'feed:'+feed.id" v-model="feedSelected">
-                        <div class="selectgroup-label d-flex align-items-center w-100">
-                            <v-icon class="mr-2" name="rss" v-if="!feed.icon" />
-                            <span class="icon mr-2" v-else><img :src="feed.icon" alt="" loading="lazy"></span>
-                            <span class="flex-fill text-left text-truncate">{{ feed.title }}</span>
-                            <span class="counter text-right">{{ filteredFeedStats[feed.id] || '' }}</span>
-                            <v-icon class="flex-shrink-0 mx-2"
-                                    :title="feed_errors[feed.id]"
-                                    v-if="!filterSelected && feed_errors[feed.id]"
-                                    name="alert-circle" />
-                        </div>
-                    </label>
-                </div>
-            </div>
+            <v-feedtree
+                :tree="feedTree"
+                v-model="feedSelected"
+                :filter-selected="filterSelected"
+                :filtered-total-stats="filteredTotalStats"
+                :filtered-feed-stats="filteredFeedStats"
+                :filtered-folder-stats="filteredFolderStats"
+                :feed-errors="feed_errors"
+                @toggle-folder="toggleFolderExpanded"/>
         </div>
         <div class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0" v-if="loading.feeds">
             <span class="icon loading mx-2"></span>
@@ -268,9 +236,7 @@
             </v-dropdown>
         </div>
         <div id="item-list-scroll" class="p-2 overflow-auto scroll-touch border-top flex-grow-1" v-scroll="loadMoreItems" ref="itemlist">
-            <label v-for="item in items" :key="item.id"
-                    class="selectgroup">
-                <input type="radio" name="item" :value="item.id" v-model="itemSelected">
+            <div v-for="item in items" :key="item.id" class="selectgroup" role="radio" :aria-checked="itemSelected === item.id" @click="itemSelected=item.id">
                 <div class="selectgroup-label d-flex flex-column">
                     <div style="line-height: 100%; opacity: .7; margin-bottom: .1rem;" class="d-flex align-items-center">
                         <transition name="indicator">
@@ -284,7 +250,7 @@
                     </div>
                     <div>{{ item.title || $t('untitled') }}</div>
                 </div>
-            </label>
+            </div>
             <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
         </div>
         <div class="px-3 py-2 border-top text-danger text-break" v-if="feed_errors[current.feed.id]">
@@ -392,13 +358,12 @@
                         {{ $t('multiple_feeds_found') }}
                         <a href="#" class="float-right text-decoration-none" @click.prevent="resetFeedChoice()">{{ $t('cancel') }}</a>
                     </p>
-                    <label class="selectgroup" v-for="choice in feedNewChoice">
-                        <input type="radio" name="feedToAdd" :value="choice.url" v-model="feedNewChoiceSelected">
+                    <div class="selectgroup" role="radio" :aria-checked="feedNewChoiceSelected === choice.url" @click="feedNewChoiceSelected = choice.url" v-for="choice in feedNewChoice">
                         <div class="selectgroup-label">
                             <div class="text-truncate">{{ choice.title }}</div>
                             <div class="text-truncate" :class="{light: choice.title}">{{ choice.url }}</div>
                         </div>
-                    </label>
+                    </div>
                 </div>
                 <button class="btn btn-block btn-default mt-3" :class="{loading: loading.newfeed}" type="submit">{{ $t('add') }}</button>
             </form>
@@ -438,12 +403,14 @@ import i18n, { Lang } from "../i18n";
 import api from "../api";
 import icons from "../icons";
 import { setupKeybindings } from "../key";
-import { scrollto, debounce, dateRepr, debounceMethod } from "../utils";
+import { scrollto, debounce } from "../utils";
 import drag from "../components/drag.vue";
 import dropdown from "../components/dropdown.vue";
 import modal from "../components/modal.vue";
 import relativeTime from "../components/relative-time.vue";
 import icon from "../components/icon.vue";
+import feedTree from "../components/feedtree.vue";
+import type { FeedTreeNode, TreeFeedNode, TreeFolderNode } from "../components/feedtree.vue";
 import scrollDir from "../directives/scroll";
 import focusDir from "../directives/focus";
 import { defineComponent } from "vue";
@@ -478,6 +445,7 @@ export default defineComponent({
     "v-modal": modal,
     "v-relative-time": relativeTime,
     "v-icon": icon,
+    "v-feedtree": feedTree,
   },
   directives: {
     scroll: scrollDir,
@@ -521,7 +489,7 @@ export default defineComponent({
       itemListWidth: s.item_list_width || 300,
 
       filteredFeedStats: {} as Record<number, number>,
-      filteredFolderStats: {} as Partial<Record<number | "null", number>>,
+      filteredFolderStats: {} as Record<number | "null", number>,
       filteredTotalStats: null as number | null,
 
       settings: "",
@@ -595,6 +563,33 @@ export default defineComponent({
         (acc, f) => ({ ...acc, [f.id]: f }),
         {},
       );
+    },
+    feedTree(): FeedTreeNode[] {
+      const [rootFeeds, folderFeeds] = this.feeds.reduce((acc, f) => {
+        acc[f.folder_id === null ? 0 : 1].push(f)
+        return acc
+      }, [[] as Feed[], [] as Feed[]])
+
+      const byFolder: Record<number, Feed[]> = folderFeeds.reduce(
+        (acc, f) => {
+          (acc[f.folder_id as number] ||= []).push(f);
+          return acc
+        },
+        {} as Record<number, Feed[]>
+      );
+
+      const feedNode = (feed: Feed): TreeFeedNode => ({type: 'feed', feed});
+
+      return [
+        ...this.folders
+          .filter(folder => !this.mustHideFolder(folder))
+          .map(folder => {
+            const feeds = (byFolder[folder.id] || [])
+              .filter(f => !this.mustHideFeed(f)).map(feedNode);
+            return { type: 'folder' as const, folder, feeds };
+          }),
+        ...rootFeeds.filter(f => !this.mustHideFeed(f)).map(feedNode),
+      ];
     },
     foldersById(): Record<number, Folder> {
       return this.folders.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
@@ -673,9 +668,9 @@ export default defineComponent({
     },
     feedStats: {
       deep: true,
-      handler: debounce(() => {
+      handler: debounce(function (feedStats) {
         var title = TITLE;
-        var unreadCount = Object.values(this.feedStats).reduce(
+        var unreadCount = Object.values(feedStats).reduce(
           (acc, stat) => acc + stat.unread,
           0,
         );
@@ -1138,32 +1133,27 @@ export default defineComponent({
 
       this.$nextTick(() => {
         var scroll = document.querySelector("#item-list-scroll");
-
-        var handle = scroll?.querySelector("input[type=radio]:checked");
-        var target = handle?.parentElement;
-
-        if (target && scroll) scrollto(target, scroll);
+        var handle = scroll?.querySelector('[aria-checked="true"]');
+        if (handle && scroll) scrollto(handle, scroll);
 
         this.loadMoreItems();
       });
     },
     // navigation helper, navigate relative to selected feed
     navigateToFeed(relativePosition: number) {
-      let vm = this;
-      const navigationList = this.foldersWithFeeds
-        .filter((folder) => !folder.id || !this.mustHideFolder(folder))
-        .map((folder) => {
-          if (this.mustHideFolder(folder)) return [];
-          const folds = folder.id ? [`folder:${folder.id}`] : [];
-          const feeds =
-            folder.is_expanded || !folder.id
-              ? (folder.feeds || [])
-                  .filter((f) => !this.mustHideFeed(f))
-                  .map((f) => `feed:${f.id}`)
-              : [];
-          return folds.concat(feeds);
-        })
-        .flat();
+      const navigationList: string[] = [];
+      for (const node of this.feedTree) {
+        if (node.type === 'folder') {
+          navigationList.push('folder:' + node.folder.id);
+          if (node.folder.is_expanded) {
+            for (const feedNode of node.feeds) {
+              navigationList.push('feed:' + feedNode.feed.id);
+            }
+          }
+        } else {
+          navigationList.push('feed:' + node.feed.id);
+        }
+      }
       navigationList.unshift("");
 
       var currentFeedPosition = navigationList.indexOf(this.feedSelected);
@@ -1180,11 +1170,8 @@ export default defineComponent({
 
       this.$nextTick(() => {
         var scroll = document.querySelector("#feed-list-scroll");
-
-        var handle = scroll?.querySelector("input[type=radio]:checked");
-        var target = handle?.parentElement;
-
-        if (target && scroll) scrollto(target, scroll);
+        var handle = scroll?.querySelector('[aria-checked="true"]');
+        if (handle && scroll) scrollto(handle, scroll);
       });
     },
     changeRefreshRate(offset: number) {
@@ -1195,8 +1182,8 @@ export default defineComponent({
       if (curIdx >= this.refreshRateOptions.length - 1 && offset > 0) return;
       this.refreshRate = this.refreshRateOptions[curIdx + offset].value;
     },
-    mustHideFolder(folder: Folder) {
-      return (
+    mustHideFolder(folder: Folder): boolean {
+      return !!(
         this.filterSelected &&
         !(
           this.current.folder.id == folder.id ||
@@ -1208,8 +1195,8 @@ export default defineComponent({
             folder.id)
       );
     },
-    mustHideFeed(feed: Feed) {
-      return (
+    mustHideFeed(feed: Feed): boolean {
+      return !!(
         this.filterSelected &&
         !(this.current.feed.id == feed.id) &&
         !this.filteredFeedStats[feed.id] &&
