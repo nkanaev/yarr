@@ -3,9 +3,11 @@
     "build": "node build.js"
   },
   "devDependencies": {
+    "@vue/typescript-plugin": "^3.3.7",
     "esbuild": "0.28.1",
     "esbuild-plugin-vue3": "^0.5.1",
-    "typescript": "^7.0.2"
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.7"
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
