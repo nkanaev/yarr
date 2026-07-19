@@ -682,7 +682,10 @@ export default defineComponent({
   created() {
     this.refreshStats()
       .then(() => this.refreshFeeds())
-      .then(() => this.refreshItems(false));
+      .then(() => {
+        this.refreshItems(false);
+        this.computeStats();
+      });
 
     this.updateMetaTheme();
     this.$setLang(app.settings.language);
