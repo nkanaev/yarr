@@ -469,7 +469,7 @@ a,
 .toolbar-item.active,
 .dropdown-item.active,
 .dropdown-item:active,
-.selectgroup input:checked + .selectgroup-label {
+.selectgroup[aria-checked="true"] .selectgroup-label {
   color: #fff;
   background-color: #0080d4 !important;
 }
