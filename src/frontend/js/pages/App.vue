@@ -716,7 +716,7 @@ export default defineComponent({
       itemSortNewestFirst: s.sort_newest_first as boolean,
       itemListWidth: s.item_list_width || 300,
 
-      stats: {} as {
+      stats: { folders: {}, feeds: {}, total: { unread: 0, starred: 0 } } as {
         folders: Record<number, Stats>;
         feeds: Record<number, Stats>;
         total: Stats;
