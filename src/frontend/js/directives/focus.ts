@@ -1,5 +1,7 @@
+import type { Directive } from "vue";
+
 export default {
-  inserted: function(el) {
-    el.focus()
-  }
-}
+  mounted(el) {
+    el.focus();
+  },
+} satisfies Directive<HTMLInputElement>;

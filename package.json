@@ -1,13 +1,27 @@
 {
   "scripts": {
-    "build": "esbuild src/frontend/js/main.ts src/frontend/css/app.css --bundle --outdir=src/assets/static --entry-names=bundle --minify"
+    "build": "node build.js"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "sixngleQuote": false,
+    "trailingComma": "all",
+    "semi": true,
+    "arrowParens": "avoid",
+    "htmlWhitespaceSensitivity": "css",
+    "bracketSameLine": true
   },
   "devDependencies": {
-    "esbuild": "0.28.1"
+    "@vue/typescript-plugin": "^3.3.7",
+    "esbuild": "0.28.1",
+    "esbuild-plugin-vue3": "^0.5.1",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.7"
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
     "bootstrap": "4.5",
-    "vue": "^2.7.16"
+    "vue": "^3.5.13"
   }
 }
