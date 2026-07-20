@@ -1,5 +1,9 @@
 # upcoming
 
+- (etc) frontend refactoring (vue 2 -> 3)
+
+# v2.8 (2026-07-16)
+
 - (new) add system-based light/dark theme
 - (new) support for HTTP/2 (thanks to @Dean-Corso for the report)
 - (fix) displaying correct title for custom Youtube feeds
