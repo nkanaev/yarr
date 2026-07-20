@@ -22,16 +22,41 @@ export function scrollto(target: Element, scroll: Element) {
   scroll.scrollTop = Math.round(newPos);
 }
 
+// TODO: replace or rewrite debounce/$debounce.
+// `debounce` has type checker issues with Options API.
+// `$debounce` initialises callback once, capturing only the first variables/arguments.
+
 export function debounce<T extends (...args: any[]) => any>(fn: T, timeout: number) {
   let timerId: ReturnType<typeof setTimeout> | null = null;
-  return function (this: any, ...args: Parameters<T>): void {
-    const context = this;
+  return function (...args: Parameters<T>): void {
     if (timerId) clearTimeout(timerId);
     timerId = setTimeout(() => {
-      fn.apply(context, args);
+      fn(...args);
     }, timeout);
   };
 }
+
+const debounceCache = new WeakMap();
+
+export const debounceMixin = {
+  methods: {
+    $debounce(id: string, fn: (...args: any[]) => any, delay = 300) {
+      // 'this' inside mixin methods automatically refers to the Vue component instance
+      let keywordMap = debounceCache.get(this);
+
+      if (!keywordMap) {
+        keywordMap = {};
+        debounceCache.set(this, keywordMap);
+      }
+
+      if (!keywordMap[id]) {
+        keywordMap[id] = debounce(fn, delay);
+      }
+
+      keywordMap[id]();
+    },
+  },
+};
 
 export function dateRepr(d: Date): string {
   var sec = (new Date().getTime() - d.getTime()) / 1000;

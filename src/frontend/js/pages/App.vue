@@ -631,7 +631,7 @@
 <script lang="ts">
 import type { Lang } from "../i18n";
 import api from "../api";
-import { scrollto, debounce } from "../utils";
+import { scrollto, debounce, debounceMixin } from "../utils";
 import drag from "../components/drag.vue";
 import dropdown from "../components/dropdown.vue";
 import modal from "../components/modal.vue";
@@ -667,6 +667,7 @@ type Stats = { unread: number; starred: number };
 var TITLE = document.title;
 
 export default defineComponent({
+  mixins: [debounceMixin],
   components: {
     "v-drag": drag,
     "v-dropdown": dropdown,
@@ -868,15 +869,9 @@ export default defineComponent({
     },
     feedStats: {
       deep: true,
-      handler: debounce(function (feedStats) {
-        var title = TITLE;
-        var unreadCount = Object.values(feedStats).reduce((acc, stat) => acc + stat.unread, 0);
-        if (unreadCount) {
-          title += " (" + unreadCount + ")";
-        }
-        document.title = title;
-        this.computeStats();
-      }, 500),
+      handler() {
+        this.$debounce("watch:feedStats", this.computeStats, 500);
+      },
     },
     filterSelected(newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
@@ -915,9 +910,9 @@ export default defineComponent({
         }
       });
     },
-    itemSearch: debounce(function (newVal) {
-      this.refreshItems();
-    }, 500),
+    itemSearch() {
+      this.$debounce("watch:itemSearch", this.refreshItems, 500);
+    },
     itemSortNewestFirst(newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
       api.settings.update({ sort_newest_first: newVal }).then(() => this.refreshItems(false));
@@ -1276,6 +1271,9 @@ export default defineComponent({
       }
 
       this.stats = { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
+
+      const unread = this.stats.total.unread;
+      document.title = TITLE + (unread ? ` (${unread})` : "");
     },
     // navigation helper, navigate relative to selected item
     navigateToItem(relativePosition: number) {
