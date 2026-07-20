@@ -17,7 +17,7 @@
         <label for="password">{{ $t("password") }}</label>
         <input name="password" class="form-control" id="password" type="password" required />
       </div>
-      <button class="btn btn-block btn-default" type="submit">{{ $t("login") }}</button>
+      <button class="btn w-100 btn-default" type="submit">{{ $t("login") }}</button>
     </form>
   </div>
 </template>

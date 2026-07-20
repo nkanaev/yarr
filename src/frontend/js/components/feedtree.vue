@@ -6,17 +6,17 @@
       :aria-checked="modelValue === ''"
       @click="$emit('update:modelValue', '')">
       <div class="selectgroup-label d-flex align-items-center w-100">
-        <v-icon class="mr-2" name="layers" />
-        <span class="flex-fill text-left text-truncate" v-if="filterSelected == 'unread'">{{
+        <v-icon class="me-2" name="layers" />
+        <span class="flex-fill text-start text-truncate" v-if="filterSelected == 'unread'">{{
           $t("all_unread")
         }}</span>
-        <span class="flex-fill text-left text-truncate" v-if="filterSelected == 'starred'">{{
+        <span class="flex-fill text-start text-truncate" v-if="filterSelected == 'starred'">{{
           $t("all_starred")
         }}</span>
-        <span class="flex-fill text-left text-truncate" v-if="filterSelected == ''">{{
+        <span class="flex-fill text-start text-truncate" v-if="filterSelected == ''">{{
           $t("all_feeds")
         }}</span>
-        <span class="counter text-right">{{ filterSelected ? stats.total[filterSelected] : "" }}</span>
+        <span class="counter text-end">{{ filterSelected ? stats.total[filterSelected] : "" }}</span>
       </div>
     </div>
     <template
@@ -31,15 +31,15 @@
           <div class="selectgroup-label d-flex align-items-center w-100">
             <div @click.stop="$emit('toggle-folder', node.folder)" class="m-n1 p-1">
               <v-icon
-                class="mr-2"
+                class="me-2"
                 :class="{ expanded: node.folder.is_expanded }"
                 name="chevron-right" />
             </div>
-            <span class="flex-fill text-left text-truncate">{{ node.folder.title }}</span>
-            <span class="counter text-right">{{ filterSelected ? stats.folders[node.folder.id]?.[filterSelected] : "" }}</span>
+            <span class="flex-fill text-start text-truncate">{{ node.folder.title }}</span>
+            <span class="counter text-end">{{ filterSelected ? stats.folders[node.folder.id]?.[filterSelected] : "" }}</span>
           </div>
         </div>
-        <div v-show="node.folder.is_expanded" class="mt-1 pl-3">
+        <div v-show="node.folder.is_expanded" class="mt-1 ps-3">
           <div
             class="selectgroup"
             role="radio"
@@ -47,12 +47,12 @@
             @click="$emit('update:modelValue', 'feed:' + feedNode.feed.id)"
             v-for="feedNode in node.feeds">
             <div class="selectgroup-label d-flex align-items-center w-100">
-              <v-icon class="mr-2" name="rss" v-if="!feedNode.feed.icon" />
-              <span class="icon mr-2" v-else
+              <v-icon class="me-2" name="rss" v-if="!feedNode.feed.icon" />
+              <span class="icon me-2" v-else
                 ><img :src="feedNode.feed.icon" alt="" loading="lazy"
               /></span>
-              <span class="flex-fill text-left text-truncate">{{ feedNode.feed.title }}</span>
-              <span class="counter text-right">{{ filterSelected ? stats.feeds[feedNode.feed.id]?.[filterSelected] : "" }}</span>
+              <span class="flex-fill text-start text-truncate">{{ feedNode.feed.title }}</span>
+              <span class="counter text-end">{{ filterSelected ? stats.feeds[feedNode.feed.id]?.[filterSelected] : "" }}</span>
               <v-icon
                 class="flex-shrink-0 mx-2"
                 :title="feedErrors[feedNode.feed.id]"
@@ -69,12 +69,12 @@
           :aria-checked="modelValue === 'feed:' + node.feed.id"
           @click="$emit('update:modelValue', 'feed:' + node.feed.id)">
           <div class="selectgroup-label d-flex align-items-center w-100">
-            <v-icon class="mr-2" name="rss" v-if="!node.feed.icon" />
-            <span class="icon mr-2" v-else
+            <v-icon class="me-2" name="rss" v-if="!node.feed.icon" />
+            <span class="icon me-2" v-else
               ><img :src="node.feed.icon" alt="" loading="lazy"
             /></span>
-            <span class="flex-fill text-left text-truncate">{{ node.feed.title }}</span>
-            <span class="counter text-right">{{ filterSelected ? stats.feeds[node.feed.id]?.[filterSelected] : "" }}</span>
+            <span class="flex-fill text-start text-truncate">{{ node.feed.title }}</span>
+            <span class="counter text-end">{{ filterSelected ? stats.feeds[node.feed.id]?.[filterSelected] : "" }}</span>
             <v-icon
               class="flex-shrink-0 mx-2"
               :title="feedErrors[node.feed.id]"

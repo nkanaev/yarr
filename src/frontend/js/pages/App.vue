@@ -9,14 +9,14 @@
     <!-- feed list -->
     <div
       id="col-feed-list"
-      class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0"
+      class="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
       :style="{ width: feedListWidth + 'px' }">
       <v-drag :width="feedListWidth" @resize="resizeFeedList"></v-drag>
       <div class="p-2 toolbar d-flex align-items-center">
         <v-icon class="mx-2" name="anchor" />
         <div class="flex-grow-1"></div>
         <button
-          class="toolbar-item ml-1"
+          class="toolbar-item ms-1"
           :class="{ active: filterSelected == 'unread' }"
           :aria-pressed="filterSelected == 'unread'"
           :title="$t('unread')"
@@ -32,7 +32,7 @@
           <v-icon name="star-full" />
         </button>
         <button
-          class="toolbar-item mr-1"
+          class="toolbar-item me-1"
           :class="{ active: filterSelected == '' }"
           :aria-pressed="filterSelected == ''"
           :title="$t('all')"
@@ -51,12 +51,12 @@
           </template>
 
           <button class="dropdown-item" @click="showSettings('create')">
-            <v-icon class="mr-1" name="plus" />
+            <v-icon class="me-1" name="plus" />
             {{ $t("new_feed") }}
           </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" @click="fetchAllFeeds()">
-            <v-icon class="mr-1" name="rotate-cw" />
+            <v-icon class="me-1" name="rotate-cw" />
             {{ $t("refresh_feeds") }}
           </button>
 
@@ -132,17 +132,17 @@
               name="opml"
               style="opacity: 0; width: 1px; height: 0; position: absolute; z-index: -1" />
             <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" @click.stop="">
-              <v-icon class="mr-1" name="download" />
+              <v-icon class="me-1" name="download" />
               {{ $t("import") }}
             </label>
           </form>
           <a class="dropdown-item" href="./opml/export">
-            <v-icon class="mr-1" name="upload" />
+            <v-icon class="me-1" name="upload" />
             {{ $t("export") }}
           </a>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" @click="showSettings('shortcuts')">
-            <v-icon class="mr-1" name="help-circle" />
+            <v-icon class="me-1" name="help-circle" />
             {{ $t("shortcuts") }}
           </button>
           <div class="dropdown-divider"></div>
@@ -162,7 +162,7 @@
           </div>
           <div class="dropdown-divider" v-if="requiresAuth"></div>
           <button class="dropdown-item" v-if="requiresAuth" @click="logout()">
-            <v-icon class="mr-1" name="log-out" />
+            <v-icon class="me-1" name="log-out" />
             {{ $t("log_out") }}
           </button>
         </v-dropdown>
@@ -188,12 +188,12 @@
     <!-- item list -->
     <div
       id="col-item-list"
-      class="vh-100 position-relative d-flex flex-column border-right flex-shrink-0"
+      class="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
       :style="{ width: itemListWidth + 'px' }">
       <v-drag :width="itemListWidth" @resize="resizeItemList"></v-drag>
       <div class="px-2 toolbar d-flex align-items-center">
         <button
-          class="toolbar-item mr-2 d-block d-md-none"
+          class="toolbar-item me-2 d-block d-md-none"
           @click="feedSelected = null"
           :title="$t('show_feeds')">
           <v-icon name="chevron-left" />
@@ -210,19 +210,19 @@
             @keydown.enter="($event.target as HTMLInputElement).blur()" />
         </div>
         <button
-          class="toolbar-item ml-2"
+          class="toolbar-item ms-2"
           @click="markItemsRead()"
           v-if="filterSelected == 'unread'"
           :title="$t('mark_all_read')">
           <v-icon name="check" />
         </button>
 
-        <button class="btn btn-link toolbar-item px-2 ml-2" v-if="!current.type" disabled>
+        <button class="btn btn-link toolbar-item px-2 ms-2" v-if="!current.type" disabled>
           <v-icon name="more-horizontal" />
         </button>
         <v-dropdown
           class="settings-dropdown"
-          toggle-class="btn btn-link toolbar-item px-2 ml-2"
+          toggle-class="btn btn-link toolbar-item px-2 ms-2"
           drop="right"
           :title="$t('feed_settings')"
           v-if="current?.feed?.id">
@@ -239,7 +239,7 @@
             target="_blank"
             referrerpolicy="no-referrer"
             v-if="current?.feed?.link">
-            <v-icon class="mr-1" name="globe" />
+            <v-icon class="me-1" name="globe" />
             {{ $t("website") }}
           </a>
           <a
@@ -249,19 +249,19 @@
             target="_blank"
             referrerpolicy="no-referrer"
             v-if="current.feed.feed_link">
-            <v-icon class="mr-1" name="rss" />
+            <v-icon class="me-1" name="rss" />
             {{ $t("feed_link") }}
           </a>
           <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
           <button class="dropdown-item" @click="renameFeed(current.feed)">
-            <v-icon class="mr-1" name="edit" />
+            <v-icon class="me-1" name="edit" />
             {{ $t("rename") }}
           </button>
           <button
             class="dropdown-item"
             @click="updateFeedLink(current.feed)"
             v-if="current.feed.feed_link">
-            <v-icon class="mr-1" name="edit" />
+            <v-icon class="me-1" name="edit" />
             {{ $t("change_link") }}
           </button>
           <div class="dropdown-divider"></div>
@@ -273,7 +273,7 @@
               class="dropdown-item"
               v-if="folder.id != current.feed.folder_id"
               @click="moveFeed(current.feed, folder.id)">
-              <v-icon class="mr-1" name="folder" />
+              <v-icon class="me-1" name="folder" />
               {{ folder.title }}
             </button>
           </template>
@@ -281,22 +281,22 @@
             class="dropdown-item text-muted"
             @click="moveFeed(current.feed, null)"
             v-if="current.feed.folder_id">
-            <v-icon class="mr-1" name="folder-minus" />
+            <v-icon class="me-1" name="folder-minus" />
             ──
           </button>
           <button class="dropdown-item text-muted" @click="moveFeedToNewFolder(current.feed)">
-            <v-icon class="mr-1" name="folder-plus" />
+            <v-icon class="me-1" name="folder-plus" />
             {{ $t("new_folder") }}
           </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item text-danger" @click.prevent="deleteFeed(current.feed)">
-            <v-icon class="mr-1" name="trash" />
+            <v-icon class="me-1" name="trash" />
             {{ $t("delete") }}
           </button>
         </v-dropdown>
         <v-dropdown
           class="settings-dropdown"
-          toggle-class="btn btn-link toolbar-item px-2 ml-2"
+          toggle-class="btn btn-link toolbar-item px-2 ms-2"
           :title="$t('folder_settings')"
           drop="right"
           v-if="current?.folder?.id">
@@ -307,12 +307,12 @@
             {{ current?.folder?.title }}
           </header>
           <button class="dropdown-item" @click="renameFolder(current.folder)">
-            <v-icon class="mr-1" name="edit" />
+            <v-icon class="me-1" name="edit" />
             {{ $t("rename") }}
           </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">
-            <v-icon class="mr-1" name="trash" />
+            <v-icon class="me-1" name="trash" />
             {{ $t("delete") }}
           </button>
         </v-dropdown>
@@ -334,13 +334,13 @@
               style="line-height: 100%; opacity: 0.7; margin-bottom: 0.1rem"
               class="d-flex align-items-center">
               <transition name="indicator">
-                <v-icon class="icon-small mr-1" name="circle-full" v-if="item.status == 'unread'" />
+                <v-icon class="icon-small me-1" name="circle-full" v-if="item.status == 'unread'" />
                 <v-icon
-                  class="icon-small mr-1"
+                  class="icon-small me-1"
                   name="star-full"
                   v-else-if="item.status == 'starred'" />
               </transition>
-              <small class="flex-fill text-truncate mr-1">
+              <small class="flex-fill text-truncate me-1">
                 {{ (feedsById[item.feed_id] || {}).title }}
               </small>
               <small class="flex-shrink-0"
@@ -350,7 +350,7 @@
             <div>{{ item.title || $t("untitled") }}</div>
           </div>
         </div>
-        <button class="btn btn-link btn-block loading my-3" v-if="itemsHasMore"></button>
+        <button class="btn btn-link w-100 loading my-3" v-if="itemsHasMore"></button>
       </div>
       <div
         class="px-3 py-2 border-top text-danger text-break"
@@ -489,7 +489,7 @@
     </div>
     <v-modal :open="!!settings" @hide="settings = ''">
       <button
-        class="btn btn-link outline-none float-right p-2 mr-n2 mt-n2"
+        class="btn btn-link outline-none float-end p-2 me-n2 mt-n2"
         style="line-height: 1"
         @click="settings = ''">
         <v-icon name="x" />
@@ -514,7 +514,7 @@
             {{ $t("folder") }}
             <a
               href="#"
-              class="float-right text-decoration-none"
+              class="float-end text-decoration-none"
               @click.prevent="createNewFeedFolder()"
               >{{ $t("new_folder") }}</a
             >
@@ -535,7 +535,7 @@
               {{ $t("multiple_feeds_found") }}
               <a
                 href="#"
-                class="float-right text-decoration-none"
+                class="float-end text-decoration-none"
                 @click.prevent="resetFeedChoice()"
                 >{{ $t("cancel") }}</a
               >
@@ -555,7 +555,7 @@
             </div>
           </div>
           <button
-            class="btn btn-block btn-default mt-3"
+            class="btn w-100 btn-default mt-3"
             :class="{ loading: loading.newfeed }"
             type="submit">
             {{ $t("add") }}
