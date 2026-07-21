@@ -12,5 +12,8 @@ esbuild
     entryNames: "bundle",
     alias: { vue: "vue/dist/vue.esm-bundler.js" },
     plugins: [vuePlugin()],
+    supported: {
+      nesting: false,
+    },
   })
   .catch(() => process.exit(1));
