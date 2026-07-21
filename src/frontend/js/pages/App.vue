@@ -931,6 +931,7 @@ export default defineComponent({
   },
   methods: {
     updateMetaTheme() {
+      // TODO: set html[data-theme]
       let theme = this.theme.name;
       if (theme == "system") {
         var dark = window?.matchMedia("(prefers-color-scheme: dark)").matches;

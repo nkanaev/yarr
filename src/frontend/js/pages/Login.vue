@@ -1,23 +1,13 @@
 <template>
-  <div class="login-page">
-    <form @submit.prevent="login">
-      <div class="logo" v-html="logo"></div>
-      <div class="text-danger text-center my-3" v-if="hasError">{{ $t("login_error") }}</div>
-      <div class="form-group">
-        <label for="username">{{ $t("username") }}</label>
-        <input
-          name="username"
-          class="form-control"
-          id="username"
-          autocomplete="off"
-          required
-          autofocus />
-      </div>
-      <div class="form-group">
-        <label for="password">{{ $t("password") }}</label>
-        <input name="password" class="form-control" id="password" type="password" required />
-      </div>
-      <button class="btn w-100 btn-default" type="submit">{{ $t("login") }}</button>
+  <div class="mx-auto my-2 p-3" style="max-width: 20rem">
+    <form @submit.prevent="login" class="d-flex flex-column">
+      <div class="login-logo my-5 d-flex justify-content-center" v-html="logo"></div>
+      <label for="username" class="mb-2">{{ $t("username") }}</label>
+      <input name="username" class="c-input" id="username" autocomplete="off" required autofocus />
+      <label for="password" class="mb-2 mt-3">{{ $t("password") }}</label>
+      <input name="password" class="c-input" id="password" type="password" required />
+      <button class="c-button mt-3" type="submit">{{ $t("login") }}</button>
+      <div class="fixed-top p-2 text-center bg-danger text-white" v-if="hasError">{{ $t("login_error") }}</div>
     </form>
   </div>
 </template>

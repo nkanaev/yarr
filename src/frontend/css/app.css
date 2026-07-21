@@ -1,6 +1,7 @@
 @import "bootstrap/dist/css/bootstrap-reboot.css";
 @import "bootstrap/dist/css/bootstrap-grid.css";
 @import "bootstrap/dist/css/bootstrap-utilities.css";
+@import "components.css";
 
 [v-cloak] {
   display: none !important;
@@ -681,14 +682,7 @@ a,
   }
 }
 
-.login-page {
-  max-width: 300px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-.login-page .logo svg {
+.login-logo svg {
   width: 4rem;
-  height: 4rem;
-  display: block;
-  margin: 3rem auto;
+  height: auto;
 }
