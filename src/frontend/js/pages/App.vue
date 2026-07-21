@@ -1,6 +1,5 @@
 <template>
   <div
-    id="app"
     class="d-flex"
     :class="{
       'feed-selected': feedSelected !== null,
