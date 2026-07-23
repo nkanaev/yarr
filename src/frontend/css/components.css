@@ -102,15 +102,15 @@ body {
 }
 
 .c-dropdown {
-    border: 1px solid var(--v-border-color);
-    border-radius: var(--bs-border-radius);
-    color: var(--v-color-foreground);
-    background-color: var(--v-color-background);
-    overflow: hidden;
-    overflow-y: scroll;
-    max-height: calc(100vh - 3rem);
-    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
-    min-width: 12rem;
+  border: 1px solid var(--v-border-color);
+  border-radius: var(--bs-border-radius);
+  color: var(--v-color-foreground);
+  background-color: var(--v-color-background);
+  overflow: hidden;
+  overflow-y: scroll;
+  max-height: calc(100vh - 3rem);
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
+  min-width: 12rem;
 }
 
 .c-dropdown-item {
@@ -151,4 +151,25 @@ body {
 
 .c-dropdown-divider {
   border-bottom: 1px solid var(--v-border-color);
+}
+
+.c-listitem {
+  padding: 0.375rem 0.5rem;
+  width: 100%;
+  cursor: pointer;
+  border-radius: var(--bs-border-radius);
+
+  &:hover {
+    background-color: #f0f0f0; /* todo: extract to var */
+  }
+
+  &[aria-checked="true"] {
+    color: var(--v-color-background);
+    background-color: var(--v-color-primary);
+  }
+  /* TODO: implement ui states: default / hover / [aria-checked=true] */
+}
+
+.m-n2 {
+  margin: -0.5rem !important;
 }
