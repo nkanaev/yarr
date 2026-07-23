@@ -1,9 +1,18 @@
 <template>
-  <div class="dropdown" :class="$attrs.class">
-    <button ref="btn" @click="toggle" :class="btnToggleClass" :title="$props.title">
+  <div class="position-relative d-inline-flex flex-column">
+    <button class="c-button-pill" @click="toggle">
       <slot name="button"></slot>
     </button>
-    <div ref="menu" class="dropdown-menu" :class="{ show: open }"><slot v-if="open"></slot></div>
+    <div
+      ref="dropdown"
+      class="c-dropdown position-absolute top-100 z-1"
+      :class="{
+        'start-50 translate-middle-x': $props.drop === 'center',
+        'end-0': $props.drop === 'right',
+      }"
+      v-if="open">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -20,6 +29,7 @@ export default defineComponent({
     drop: {
       type: String,
       required: true,
+      validator: (value: string) => ["right", "center"].includes(value),
     },
     title: {
       type: String,
@@ -29,37 +39,13 @@ export default defineComponent({
   data() {
     return { open: false };
   },
-  computed: {
-    btnToggleClass() {
-      var c = this.$props.toggleClass || "";
-      c += " dropdown-toggle dropdown-toggle-no-caret";
-      c += this.open ? " show" : "";
-      return c.trim();
-    },
-  },
   methods: {
-    toggle() {
+    toggle(event: Event) {
+      event.stopPropagation()
       this.open ? this.hide() : this.show();
     },
     show() {
       this.open = true;
-      const menu = this.$refs.menu as HTMLElement;
-      const btn = this.$refs.btn as HTMLElement;
-      menu.style.top = btn.offsetHeight + "px";
-      var drop = this.$props.drop;
-
-      if (drop === "right") {
-        menu.style.left = "auto";
-        menu.style.right = "0";
-      } else if (drop === "center") {
-        this.$nextTick(() => {
-          const b = this.$refs.btn as HTMLElement;
-          const m = this.$refs.menu as HTMLElement;
-          m.style.left =
-            "-" + (m.getBoundingClientRect().width - b.getBoundingClientRect().width) / 2 + "px";
-        });
-      }
-
       document.addEventListener("click", this.clickHandler);
     },
     hide() {
@@ -67,10 +53,12 @@ export default defineComponent({
       document.removeEventListener("click", this.clickHandler);
     },
     clickHandler(e: MouseEvent) {
+      const dropdown = this.$refs.dropdown as HTMLElement;
       const target = e.target as HTMLElement;
-      var dropdown = target.closest(".dropdown");
-      if (dropdown == null || dropdown != this.$el) return this.hide();
-      if (target.closest(".dropdown-item") != null) return this.hide();
+      // Did click happen outside this component's DOM element?
+      if (dropdown === null || !dropdown.contains(target)) this.hide();
+      // Is the target (or its parent) a clickable option (e.g., button or link)?
+      if (target.closest(".c-dropdown-item") !== null) this.hide();
     },
   },
 });

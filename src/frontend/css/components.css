@@ -2,7 +2,7 @@
   --v-color-background: #fff;
   --v-color-foreground: #111;
   --v-border-color: var(--bs-border-color);
-  --v-color-primary: var(--bs-primary);
+  --v-color-primary: #0080d4;
   --v-color-danger: var(--bs-form-invalid-border-color);
 
   --v-button-background: var(--v-color-background);
@@ -12,33 +12,34 @@
 
 [data-theme="night"] {
   &:root {
-      --v-color-background: #111;
-      --v-color-foreground: #fff;
-      --v-border-color: var(--bs-border-color);
-      --v-color-primary: var(--bs-primary);
+    --v-color-background: #111;
+    --v-color-foreground: #fff;
+    --v-border-color: var(--bs-border-color);
+    --v-color-primary: var(--bs-primary);
 
-      --v-button-background: var(--v-color-background);
-      --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
-      --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.10) c h);
+    --v-button-background: var(--v-color-background);
+    --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
+    --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
   }
 }
 
 [data-theme="sepia"] {
   &:root {
-      --v-color-background: #e0d6ba;
-      --v-color-foreground: oklch(from var(--v-color-background) 0.09 c h);
-      --v-border-color: oklch(from var(--v-color-background) calc(l - 0.1) c h);
-      --v-color-primary: var(--bs-primary);
+    --v-color-background: #f4f0e5;
+    --v-color-foreground: oklch(from var(--v-color-background) 0.09 c h);
+    --v-border-color: oklch(from var(--v-color-background) calc(l - 0.1) c h);
+    --v-color-primary: var(--bs-primary);
 
-      --v-button-background: var(--v-color-background);
-      --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.05) c h);
-      --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.10) c h);
+    --v-button-background: var(--v-color-background);
+    --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.05) c h);
+    --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.1) c h);
   }
 }
 
-html, body {
-    color: var(--v-color-foreground);
-    background-color: var(--v-color-background);
+html,
+body {
+  color: var(--v-color-foreground);
+  background-color: var(--v-color-background);
 }
 
 .c-input {
@@ -83,4 +84,71 @@ html, body {
     background-color: var(--v-button-background-active);
     box-shadow: none;
   }
+}
+
+.c-button-pill {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--bs-border-radius);
+  line-height: 1;
+  appearance: none;
+  border: 0;
+
+  color: var(--v-color-foreground);
+  background-color: var(--v-color-background);
+
+  &:hover {
+    background-color: var(--v-button-background-hover);
+  }
+}
+
+.c-dropdown {
+    border: 1px solid var(--v-border-color);
+    border-radius: var(--bs-border-radius);
+    color: var(--v-color-foreground);
+    background-color: var(--v-color-background);
+    overflow: hidden;
+    overflow-y: scroll;
+    max-height: calc(100vh - 3rem);
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
+    min-width: 12rem;
+}
+
+.c-dropdown-item {
+  padding: 0.375rem 0.75rem;
+  white-space: nowrap;
+
+  appearance: none;
+  border: 0;
+
+  color: var(--v-color-foreground);
+  background-color: var(--v-button-background);
+
+  &:hover {
+    background-color: var(--v-button-background-hover);
+  }
+  &[aria-pressed="true"],
+  &:active {
+    /* TODO: color states for menu */
+    color: var(--v-color-background);
+    background-color: var(--v-color-primary);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  &:disabled:active {
+    background-color: inherit;
+  }
+}
+
+.c-dropdown-header {
+  padding: 0.375rem 0.75rem;
+  opacity: 0.7;
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+.c-dropdown-divider {
+  border-bottom: 1px solid var(--v-border-color);
 }

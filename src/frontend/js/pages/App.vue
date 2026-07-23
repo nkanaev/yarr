@@ -49,19 +49,19 @@
             <v-icon name="more-horizontal" />
           </template>
 
-          <button class="dropdown-item" @click="showSettings('create')">
+          <button class="c-dropdown-item w-100 text-start" @click="showSettings('create')">
             <v-icon class="me-1" name="plus" />
             {{ $t("new_feed") }}
           </button>
-          <div class="dropdown-divider"></div>
-          <button class="dropdown-item" @click="fetchAllFeeds()">
+          <div class="c-dropdown-divider"></div>
+          <button class="c-dropdown-item w-100 text-start" @click="fetchAllFeeds()">
             <v-icon class="me-1" name="rotate-cw" />
             {{ $t("refresh_feeds") }}
           </button>
 
-          <div class="dropdown-divider"></div>
+          <div class="c-dropdown-divider"></div>
 
-          <header class="dropdown-header" role="heading" aria-level="2">
+          <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ $t("theme") }}
           </header>
           <div class="row text-center m-0">
@@ -75,52 +75,52 @@
               v-for="t in ['light', 'sepia', 'night', 'system']"></button>
           </div>
 
-          <div class="dropdown-divider"></div>
+          <div class="c-dropdown-divider"></div>
 
-          <header class="dropdown-header" role="heading" aria-level="2">
+          <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ $t("auto_refresh") }}
           </header>
           <div class="row text-center m-0">
             <button
-              class="dropdown-item col-4 px-0"
+              class="c-dropdown-item col-4 px-0"
               @click.stop="changeRefreshRate(-1)"
               :disabled="!refreshRate">
               <v-icon name="chevron-down" />
             </button>
-            <div class="col-4 d-flex align-items-center justify-content-center">
+            <div class="col-4 d-flex align-items-center justify-content-center user-select-none">
               {{ refreshRateTitle }}
             </div>
             <button
-              class="dropdown-item col-4 px-0"
+              class="c-dropdown-item col-4 px-0"
               @click.stop="changeRefreshRate(1)"
               :disabled="refreshRate === refreshRateOptions[refreshRateOptions.length - 1].value">
               <v-icon name="chevron-up" />
             </button>
           </div>
 
-          <div class="dropdown-divider"></div>
+          <div class="c-dropdown-divider"></div>
 
-          <header class="dropdown-header" role="heading" aria-level="2">
+          <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ $t("show_first") }}
           </header>
-          <div class="d-flex text-center">
+          <div class="d-flex">
             <button
-              class="dropdown-item px-0"
+              class="flex-fill c-dropdown-item text-center"
               :aria-pressed="itemSortNewestFirst"
               :class="{ active: itemSortNewestFirst }"
               @click.stop="itemSortNewestFirst = true">
               {{ $t("new") }}
             </button>
             <button
-              class="dropdown-item px-0"
+              class="flex-fill c-dropdown-item text-center"
               :aria-pressed="!itemSortNewestFirst"
               :class="{ active: !itemSortNewestFirst }"
               @click.stop="itemSortNewestFirst = false">
               {{ $t("old") }}
             </button>
           </div>
-          <div class="dropdown-divider"></div>
-          <header class="dropdown-header" role="heading" aria-level="2">
+          <div class="c-dropdown-divider"></div>
+          <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ $t("subscriptions") }}
           </header>
           <form enctype="multipart/form-data" tabindex="-1" ref="opmlInputForm">
@@ -130,37 +130,40 @@
               @change="importOPML"
               name="opml"
               style="opacity: 0; width: 1px; height: 0; position: absolute; z-index: -1" />
-            <label class="dropdown-item mb-0 cursor-pointer" for="opml-import" @click.stop="">
+            <label
+              class="c-dropdown-item mb-0 cursor-pointer w-100"
+              for="opml-import"
+              @click.stop="">
               <v-icon class="me-1" name="download" />
               {{ $t("import") }}
             </label>
           </form>
-          <a class="dropdown-item" href="./opml/export">
+          <a class="c-dropdown-item d-block text-start text-decoration-none" href="./opml/export">
             <v-icon class="me-1" name="upload" />
             {{ $t("export") }}
           </a>
-          <div class="dropdown-divider"></div>
-          <button class="dropdown-item" @click="showSettings('shortcuts')">
+          <div class="c-dropdown-divider"></div>
+          <button class="c-dropdown-item w-100 text-start" @click="showSettings('shortcuts')">
             <v-icon class="me-1" name="help-circle" />
             {{ $t("shortcuts") }}
           </button>
-          <div class="dropdown-divider"></div>
-          <header class="dropdown-header" role="heading" aria-level="2">A / あ / 文</header>
+          <div class="c-dropdown-divider"></div>
+          <header class="c-dropdown-header" role="heading" aria-level="2">A / あ / 文</header>
           <div class="container">
             <div class="row">
               <button
                 v-for="lang in languages"
-                class="dropdown-item text-center col-3 px-0"
+                class="c-dropdown-item text-center col-3 px-0"
                 :aria-label="lang.name"
+                :aria-pressed="language === lang.code"
                 :title="lang.name"
-                :class="{ active: language == lang.code }"
                 @click.stop="changeLanguage(lang.code)">
                 {{ lang.code }}
               </button>
             </div>
           </div>
-          <div class="dropdown-divider" v-if="requiresAuth"></div>
-          <button class="dropdown-item" v-if="requiresAuth" @click="logout()">
+          <div class="c-dropdown-divider" v-if="requiresAuth"></div>
+          <button class="c-dropdown-item w-100 text-start" v-if="requiresAuth" @click="logout()">
             <v-icon class="me-1" name="log-out" />
             {{ $t("log_out") }}
           </button>
@@ -228,11 +231,11 @@
           <template v-slot:button>
             <v-icon name="more-horizontal" />
           </template>
-          <header class="dropdown-header" role="heading" aria-level="2">
+          <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ current?.feed?.title }}
           </header>
           <a
-            class="dropdown-item"
+            class="c-dropdown-item d-block text-start text-decoration-none"
             :href="current?.feed?.link"
             rel="noopener noreferrer"
             target="_blank"
@@ -242,7 +245,7 @@
             {{ $t("website") }}
           </a>
           <a
-            class="dropdown-item"
+            class="c-dropdown-item d-block text-start text-decoration-none"
             :href="current.feed.feed_link"
             rel="noopener noreferrer"
             target="_blank"
@@ -251,25 +254,25 @@
             <v-icon class="me-1" name="rss" />
             {{ $t("feed_link") }}
           </a>
-          <div class="dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
-          <button class="dropdown-item" @click="renameFeed(current.feed)">
+          <div class="c-dropdown-divider" v-if="current.feed.link || current.feed.feed_link"></div>
+          <button class="c-dropdown-item w-100 text-start" @click="renameFeed(current.feed)">
             <v-icon class="me-1" name="edit" />
             {{ $t("rename") }}
           </button>
           <button
-            class="dropdown-item"
+            class="c-dropdown-item w-100 text-start"
             @click="updateFeedLink(current.feed)"
             v-if="current.feed.feed_link">
             <v-icon class="me-1" name="edit" />
             {{ $t("change_link") }}
           </button>
-          <div class="dropdown-divider"></div>
-          <header class="dropdown-header" role="heading" aria-level="2">
+          <div class="c-dropdown-divider"></div>
+          <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ $t("move_to") }}
           </header>
           <template v-for="folder in folders">
             <button
-              class="dropdown-item"
+              class="c-dropdown-item w-100 text-start"
               v-if="folder.id != current.feed.folder_id"
               @click="moveFeed(current.feed, folder.id)">
               <v-icon class="me-1" name="folder" />
@@ -277,18 +280,22 @@
             </button>
           </template>
           <button
-            class="dropdown-item text-muted"
+            class="c-dropdown-item w-100 text-start opacity-75"
             @click="moveFeed(current.feed, null)"
             v-if="current.feed.folder_id">
             <v-icon class="me-1" name="folder-minus" />
             ──
           </button>
-          <button class="dropdown-item text-muted" @click="moveFeedToNewFolder(current.feed)">
+          <button
+            class="c-dropdown-item w-100 text-start opacity-75"
+            @click="moveFeedToNewFolder(current.feed)">
             <v-icon class="me-1" name="folder-plus" />
             {{ $t("new_folder") }}
           </button>
-          <div class="dropdown-divider"></div>
-          <button class="dropdown-item text-danger" @click.prevent="deleteFeed(current.feed)">
+          <div class="c-dropdown-divider"></div>
+          <button
+            class="c-dropdown-item w-100 text-start text-danger"
+            @click.prevent="deleteFeed(current.feed)">
             <v-icon class="me-1" name="trash" />
             {{ $t("delete") }}
           </button>
@@ -302,15 +309,15 @@
           <template v-slot:button>
             <v-icon name="more-horizontal" />
           </template>
-          <header class="dropdown-header" role="heading" aria-level="2">
+          <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ current?.folder?.title }}
           </header>
-          <button class="dropdown-item" @click="renameFolder(current.folder)">
+          <button class="c-dropdown-item w-100 text-start" @click="renameFolder(current.folder)">
             <v-icon class="me-1" name="edit" />
             {{ $t("rename") }}
           </button>
-          <div class="dropdown-divider"></div>
-          <button class="dropdown-item text-danger" @click="deleteFolder(current.folder)">
+          <div class="c-dropdown-divider"></div>
+          <button class="c-dropdown-item w-100 text-start text-danger" @click="deleteFolder(current.folder)">
             <v-icon class="me-1" name="trash" />
             {{ $t("delete") }}
           </button>
@@ -384,29 +391,35 @@
           </template>
 
           <button
-            class="dropdown-item"
-            :class="{ active: !theme.font }"
+            class="c-dropdown-item w-100 text-start"
+            :aria-pressed="theme.font == ''"
             @click.stop="theme.font = ''">
             {{ $t("sans_serif") }}
           </button>
           <button
-            class="dropdown-item font-serif"
-            :class="{ active: theme.font == 'serif' }"
+            class="c-dropdown-item w-100 text-start font-serif"
+            :aria-pressed="theme.font == 'serif'"
             @click.stop="theme.font = 'serif'">
             {{ $t("serif") }}
           </button>
           <button
-            class="dropdown-item font-monospace"
-            :class="{ active: theme.font == 'monospace' }"
+            class="c-dropdown-item w-100 text-start font-monospace"
+            :aria-pressed="theme.font == 'monospace'"
             @click.stop="theme.font = 'monospace'">
             {{ $t("monospace") }}
           </button>
 
           <div class="d-flex text-center">
-            <button class="dropdown-item" style="font-size: 0.8rem" @click.stop="incrFont(-1)">
+            <button
+              class="c-dropdown-item flex-fill"
+              style="font-size: 0.8rem"
+              @click.stop="incrFont(-1)">
               A
             </button>
-            <button class="dropdown-item" style="font-size: 1.2rem" @click.stop="incrFont(1)">
+            <button
+              class="c-dropdown-item flex-fill"
+              style="font-size: 1.2rem"
+              @click.stop="incrFont(1)">
               A
             </button>
           </div>
@@ -858,7 +871,6 @@ export default defineComponent({
       deep: true,
       handler(theme) {
         this.updateMetaTheme();
-        document.body.classList.value = "theme-" + theme.name;
         api.settings.update({
           theme_name: theme.name,
           theme_font: theme.font,
@@ -931,7 +943,6 @@ export default defineComponent({
   },
   methods: {
     updateMetaTheme() {
-      // TODO: set html[data-theme]
       let theme = this.theme.name;
       if (theme == "system") {
         var dark = window?.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -939,6 +950,8 @@ export default defineComponent({
       }
       const metaTag: HTMLMetaElement | null = document.querySelector("meta[name='theme-color']");
       metaTag && (metaTag.content = this.themeColors[theme]);
+
+      document.documentElement.dataset.theme = this.theme.name;
     },
     refreshStats(loopMode?: boolean) {
       return api.status().then(data => {
