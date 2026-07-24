@@ -1,11 +1,14 @@
 {
+  "type": "module",
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "watch": "node build.js --watch",
+    "typecheck": "vue-tsc --noEmit"
   },
   "prettier": {
     "printWidth": 100,
     "tabWidth": 2,
-    "sixngleQuote": false,
+    "singleQuote": false,
     "trailingComma": "all",
     "semi": true,
     "arrowParens": "avoid",
@@ -16,7 +19,7 @@
     "@vue/typescript-plugin": "^3.3.7",
     "esbuild": "0.28.1",
     "esbuild-plugin-vue3": "^0.5.1",
-    "typescript": "^6.0.3",
+    "typescript": "^5.7.0",
     "vue-tsc": "^3.3.7"
   },
   "dependencies": {
