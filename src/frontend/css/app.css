@@ -15,10 +15,6 @@ html {
 
 /* bootstrap customizations */
 
-.btn-link {
-  color: inherit;
-}
-
 .form-control,
 .form-control:focus {
   box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.07) !important;
@@ -32,10 +28,6 @@ select.form-control:not([multiple]):not([size]) {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   padding-right: 1.2rem;
   cursor: pointer;
-}
-
-.btn:focus {
-  box-shadow: none !important;
 }
 
 .dropdown-header {
@@ -218,26 +210,6 @@ select.form-control:not([multiple]):not([size]) {
   stroke-dasharray: 60;
 }
 
-.btn-default {
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.btn-default:active {
-  background: #f5f7f9;
-  box-shadow: none;
-}
-
-.btn-outline {
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-}
-
-.btn-outline:hover {
-  background-color: #f8f9fa;
-}
-
 .toolbar {
   min-height: 2rem !important;
   max-height: 2rem !important;
@@ -415,8 +387,7 @@ button.theme-light {
   border: 0.3rem solid #0080d4;
 }
 
-a,
-.btn-link:hover {
+a {
   color: #0080d4;
 }
 
@@ -437,7 +408,6 @@ a,
   cursor: not-allowed;
 }
 
-.btn-default:focus,
 .form-control:focus {
   border-color: #0080d4;
 }
@@ -445,7 +415,6 @@ a,
 /* theme: sepia */
 
 .theme-sepia,
-.theme-sepia .btn-default,
 .theme-sepia .dropdown-menu,
 .theme-sepia .form-control,
 .theme-sepia .modal-content,
@@ -468,7 +437,6 @@ a,
 /* theme: night */
 
 .theme-night,
-.theme-night .btn-default,
 .theme-night .dropdown-menu,
 .theme-night .dropdown-item,
 .theme-night .form-control,
@@ -500,7 +468,6 @@ a,
 
 @media (prefers-color-scheme: dark) {
   .theme-system,
-  .theme-system .btn-default,
   .theme-system .dropdown-menu,
   .theme-system .dropdown-item,
   .theme-system .form-control,

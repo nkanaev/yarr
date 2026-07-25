@@ -37,7 +37,7 @@
         </button>
         <div class="flex-grow-1"></div>
         <v-dropdown
-          toggle-class="btn btn-link c-button-pill px-2"
+          toggle-class="todo-btn c-button-pill px-2"
           ref="menuDropdown"
           drop="right"
           :title="$t('settings')">
@@ -62,7 +62,7 @@
           </header>
           <div class="row text-center m-0">
             <button
-              class="btn btn-link theme-swatch col-3 px-0 rounded-0"
+              class="todo-btn theme-swatch col-3 px-0 rounded-0"
               :class="'theme-' + t"
               :title="t"
               :aria-label="t"
@@ -215,11 +215,11 @@
           <v-icon name="check" />
         </button>
 
-        <button class="btn btn-link c-button-pill px-2 ms-2" v-if="!current.type" disabled>
+        <button class="todo-btn c-button-pill px-2 ms-2" v-if="!current.type" disabled>
           <v-icon name="more-horizontal" />
         </button>
         <v-dropdown
-          toggle-class="btn btn-link c-button-pill px-2 ms-2"
+          toggle-class="todo-btn c-button-pill px-2 ms-2"
           drop="right"
           :title="$t('feed_settings')"
           v-if="current?.feed?.id">
@@ -296,7 +296,7 @@
           </button>
         </v-dropdown>
         <v-dropdown
-          toggle-class="btn btn-link c-button-pill px-2 ms-2"
+          toggle-class="todo-btn c-button-pill px-2 ms-2"
           :title="$t('folder_settings')"
           drop="right"
           v-if="current?.folder?.id">
@@ -350,7 +350,7 @@
             <div>{{ item.title || $t("untitled") }}</div>
           </div>
         </div>
-        <button class="btn btn-link w-100 loading my-3" v-if="itemsHasMore"></button>
+        <button class="todo-btn w-100 loading my-3" v-if="itemsHasMore"></button>
       </div>
       <div
         class="px-3 py-2 border-top text-danger text-break"
@@ -494,7 +494,7 @@
     </div>
     <v-modal :open="!!settings" @hide="settings = ''">
       <button
-        class="btn btn-link outline-none float-end p-2 me-n2 mt-n2"
+        class="todo-btn outline-none float-end p-2 me-n2 mt-n2"
         style="line-height: 1"
         @click="settings = ''">
         <v-icon name="x" />
@@ -560,7 +560,7 @@
             </div>
           </div>
           <button
-            class="btn w-100 btn-default mt-3"
+            class="todo-btn w-100 mt-3"
             :class="{ loading: loading.newfeed }"
             type="submit">
             {{ $t("add") }}
