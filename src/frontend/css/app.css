@@ -14,12 +14,6 @@ html {
   overscroll-behavior: none;
 }
 
-/* bootstrap customizations */
-
-.popover:focus {
-  outline: none;
-}
-
 /* custom elements */
 
 .font-serif {
