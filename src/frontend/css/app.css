@@ -3,6 +3,7 @@
 @import "bootstrap/dist/css/bootstrap-utilities.css";
 
 @import "components.css";
+@import "colors.css";
 @import "content.css";
 @import "responsive.css";
 @import "utilities.css";

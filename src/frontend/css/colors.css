@@ -1,0 +1,64 @@
+/* theme: light (default) */
+
+:root {
+  --v-color-background: #fff;
+  --v-color-foreground: #111;
+  --v-border-color: var(--bs-border-color);
+  --v-color-primary: #0080d4;
+  --v-color-danger: var(--bs-form-invalid-border-color);
+
+  --v-button-background: var(--v-color-background);
+  --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.02) c h);
+  --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.05) c h);
+}
+
+/* theme: sepia */
+
+[data-theme="sepia"] {
+  &:root {
+    --v-color-background: #f4f0e5;
+    --v-color-foreground: oklch(from var(--v-color-background) 0.09 c h);
+    --v-border-color: oklch(from var(--v-color-background) calc(l - 0.1) c h);
+    --v-color-primary: var(--bs-primary);
+
+    --v-button-background: var(--v-color-background);
+    --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.05) c h);
+    --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.1) c h);
+  }
+}
+
+/* theme: night */
+
+[data-theme="night"] {
+  &:root {
+    --v-color-background: #111;
+    --v-color-foreground: #fff;
+    --v-border-color: var(--bs-border-color);
+    --v-color-primary: var(--bs-primary);
+
+    --v-button-background: var(--v-color-background);
+    --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
+    --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
+  }
+}
+
+[data-theme="system"] {
+  &:root {
+    /* no overrides needed — inherits default :root (light) */
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+[data-theme="system"] {
+  &:root {
+    --v-color-background: #111;
+    --v-color-foreground: #fff;
+    --v-border-color: var(--bs-border-color);
+    --v-color-primary: var(--bs-primary);
+
+    --v-button-background: var(--v-color-background);
+    --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
+    --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
+
+  }
+}
