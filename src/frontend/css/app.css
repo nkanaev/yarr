@@ -144,24 +144,6 @@ html {
 
 /* theme: light */
 
-button.theme-light {
-  background-color: #fff !important;
-}
-
-.theme-swatch {
-  padding: 0;
-  border: none;
-  height: 2.375rem;
-}
-
-.theme-swatch.theme-system {
-  background-image: linear-gradient(135deg, #fff 0, #fff 35%, #0e0e0e 65%, #0e0e0e 100%);
-}
-
-.theme-swatch[aria-pressed="true"] {
-  border: 0.3rem solid #0080d4;
-}
-
 a {
   color: #0080d4;
 }
@@ -185,11 +167,6 @@ a {
 
 /* theme: night */
 
-.theme-night,
-.theme-night .toolbar-search {
-  color: #d1d1d1;
-  background-color: #0e0e0e;
-}
 .theme-night .content hr,
 .theme-night .content pre,
 .theme-night .border-end,
