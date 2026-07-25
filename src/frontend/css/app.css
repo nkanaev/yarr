@@ -15,18 +15,6 @@ html {
 
 /* bootstrap customizations */
 
-.dropdown-header {
-  cursor: default;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dropdown-toggle-no-caret:after {
-  display: none;
-}
-
 .popover:focus {
   outline: none;
 }
