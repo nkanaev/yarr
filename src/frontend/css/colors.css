@@ -1,27 +1,41 @@
 /* theme: light (default) */
 
 :root {
-  --v-color-background: #fff;
-  --v-color-foreground: #111;
-  --v-border-color: var(--bs-border-color);
+  --v-light-bg: #fff;
+  --v-sepia-bg: #f4f0e5;
+  --v-night-bg: #111;
+
+  --v-bg: #fff;
+  --v-fg: #111;
+
+  --v-selected-bg: hsl(from var(--v-sepia-bg) h s 10%);
+  --v-selected-fg: hsl(from var(--v-sepia-bg) h s 90%);
+
+  --v-border-color: #ddd;
   --v-color-primary: #0080d4;
   --v-color-danger: var(--bs-form-invalid-border-color);
 
-  --v-button-background: var(--v-color-background);
+  --v-button-background: var(--v-bg);
   --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.02) c h);
   --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.05) c h);
+
+  /* bootstrap var overrides */
+  --bs-border-color: var(--v-border-color);
 }
 
 /* theme: sepia */
 
 [data-theme="sepia"] {
   &:root {
-    --v-color-background: #f4f0e5;
-    --v-color-foreground: oklch(from var(--v-color-background) 0.09 c h);
-    --v-border-color: oklch(from var(--v-color-background) calc(l - 0.1) c h);
-    --v-color-primary: var(--bs-primary);
+    --v-bg: var(--v-sepia-bg);
+    --v-fg: hsl(from var(--v-sepia-bg) h s 12%);
+    --v-border-color: oklch(from var(--v-bg) calc(l - 0.1) c h);
+    --v-color-primary: hsl(from var(--v-sepia-bg) h s 10%);
 
-    --v-button-background: var(--v-color-background);
+    --v-selected-bg: hsl(from var(--v-sepia-bg) h s 10%);
+    --v-selected-fg: hsl(from var(--v-sepia-bg) h s 90%);
+
+    --v-button-background: var(--v-bg);
     --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.05) c h);
     --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.1) c h);
   }
@@ -31,12 +45,12 @@
 
 [data-theme="night"] {
   &:root {
-    --v-color-background: #111;
-    --v-color-foreground: #fff;
+    --v-bg: #111;
+    --v-fg: #fff;
     --v-border-color: var(--bs-border-color);
     --v-color-primary: var(--bs-primary);
 
-    --v-button-background: var(--v-color-background);
+    --v-button-background: var(--v-bg);
     --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
     --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
   }
@@ -49,16 +63,16 @@
 }
 
 @media (prefers-color-scheme: dark) {
-[data-theme="system"] {
-  &:root {
-    --v-color-background: #111;
-    --v-color-foreground: #fff;
-    --v-border-color: var(--bs-border-color);
-    --v-color-primary: var(--bs-primary);
+  [data-theme="system"] {
+    &:root {
+      --v-bg: var(--v-sepia-bg);
+      --v-fg: #fff;
+      --v-border-color: var(--bs-border-color);
+      --v-color-primary: var(--bs-primary);
 
-    --v-button-background: var(--v-color-background);
-    --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
-    --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
-
+      --v-button-background: var(--v-bg);
+      --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
+      --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
+    }
   }
 }

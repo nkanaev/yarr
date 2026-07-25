@@ -1,7 +1,7 @@
 html,
 body {
-  color: var(--v-color-foreground);
-  background-color: var(--v-color-background);
+  color: var(--v-fg);
+  background-color: var(--v-bg);
 }
 
 .c-input {
@@ -9,8 +9,8 @@ body {
   border: 1px solid var(--v-border-color);
   border-radius: var(--bs-border-radius);
 
-  color: var(--v-color-foreground);
-  background-color: var(--v-color-background);
+  color: var(--v-fg);
+  background-color: var(--v-bg);
 
   outline-offset: -2px;
 
@@ -30,7 +30,7 @@ body {
   border: 1px solid var(--v-border-color);
   border-radius: var(--bs-border-radius);
 
-  color: var(--v-color-foreground);
+  color: var(--v-fg);
   background-color: var(--v-button-background);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
@@ -64,8 +64,8 @@ body {
   appearance: none;
   border: 0;
 
-  color: var(--v-color-foreground);
-  background-color: var(--v-color-background);
+  color: var(--v-fg);
+  background-color: var(--v-bg);
 
   &:hover {
     background-color: var(--v-button-background-hover);
@@ -85,8 +85,8 @@ body {
 .c-dropdown {
   border: 1px solid var(--v-border-color);
   border-radius: var(--bs-border-radius);
-  color: var(--v-color-foreground);
-  background-color: var(--v-color-background);
+  color: var(--v-fg);
+  background-color: var(--v-bg);
   overflow: hidden;
   overflow-y: scroll;
   max-height: calc(100vh - 3rem);
@@ -101,7 +101,7 @@ body {
   appearance: none;
   border: 0;
 
-  color: var(--v-color-foreground);
+  color: var(--v-fg);
   background-color: var(--v-button-background);
 
   &:hover {
@@ -110,7 +110,7 @@ body {
   &[aria-pressed="true"],
   &:active {
     /* TODO: color states for menu */
-    color: var(--v-color-background);
+    color: var(--v-bg);
     background-color: var(--v-color-primary);
   }
 
@@ -145,7 +145,7 @@ body {
   }
 
   &[aria-checked="true"] {
-    color: var(--v-color-background);
+    color: var(--v-bg);
     background-color: var(--v-color-primary);
   }
   /* TODO: implement ui states: default / hover / [aria-checked=true] */
@@ -161,8 +161,8 @@ body {
   border: none;
   border-radius: 0.25rem;
 
-  background: var(--v-color-background);
-  color: var(--v-color-foreground);
+  background: var(--v-bg);
+  color: var(--v-fg);
 
   max-width: 32rem;
   width: 100%;
