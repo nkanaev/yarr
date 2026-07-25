@@ -15,24 +15,21 @@
         <v-icon class="mx-2" name="anchor" />
         <div class="flex-grow-1"></div>
         <button
-          class="toolbar-item ms-1"
-          :class="{ active: filterSelected == 'unread' }"
+          class="c-button-pill ms-1"
           :aria-pressed="filterSelected == 'unread'"
           :title="$t('unread')"
           @click="filterSelected = 'unread'">
           <v-icon name="circle-full" />
         </button>
         <button
-          class="toolbar-item mx-1"
-          :class="{ active: filterSelected == 'starred' }"
+          class="c-button-pill mx-1"
           :aria-pressed="filterSelected == 'starred'"
           :title="$t('starred')"
           @click="filterSelected = 'starred'">
           <v-icon name="star-full" />
         </button>
         <button
-          class="toolbar-item me-1"
-          :class="{ active: filterSelected == '' }"
+          class="c-button-pill me-1"
           :aria-pressed="filterSelected == ''"
           :title="$t('all')"
           @click="filterSelected = ''">
@@ -41,7 +38,7 @@
         <div class="flex-grow-1"></div>
         <v-dropdown
           class="settings-dropdown"
-          toggle-class="btn btn-link toolbar-item px-2"
+          toggle-class="btn btn-link c-button-pill px-2"
           ref="menuDropdown"
           drop="right"
           :title="$t('settings')">
@@ -195,7 +192,7 @@
       <v-drag :width="itemListWidth" @resize="resizeItemList"></v-drag>
       <div class="px-2 toolbar d-flex align-items-center">
         <button
-          class="toolbar-item me-2 d-block d-md-none"
+          class="c-button-pill me-2 d-block d-md-none"
           @click="feedSelected = null"
           :title="$t('show_feeds')">
           <v-icon name="chevron-left" />
@@ -212,19 +209,19 @@
             @keydown.enter="($event.target as HTMLInputElement).blur()" />
         </div>
         <button
-          class="toolbar-item ms-2"
+          class="c-button-pill ms-2"
           @click="markItemsRead()"
           v-if="filterSelected == 'unread'"
           :title="$t('mark_all_read')">
           <v-icon name="check" />
         </button>
 
-        <button class="btn btn-link toolbar-item px-2 ms-2" v-if="!current.type" disabled>
+        <button class="btn btn-link c-button-pill px-2 ms-2" v-if="!current.type" disabled>
           <v-icon name="more-horizontal" />
         </button>
         <v-dropdown
           class="settings-dropdown"
-          toggle-class="btn btn-link toolbar-item px-2 ms-2"
+          toggle-class="btn btn-link c-button-pill px-2 ms-2"
           drop="right"
           :title="$t('feed_settings')"
           v-if="current?.feed?.id">
@@ -302,7 +299,7 @@
         </v-dropdown>
         <v-dropdown
           class="settings-dropdown"
-          toggle-class="btn btn-link toolbar-item px-2 ms-2"
+          toggle-class="btn btn-link c-button-pill px-2 ms-2"
           :title="$t('folder_settings')"
           drop="right"
           v-if="current?.folder?.id">
@@ -368,14 +365,14 @@
     <div id="col-item" class="vh-100 d-flex flex-column w-100" style="min-width: 0">
       <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
         <button
-          class="toolbar-item"
+          class="c-button-pill"
           @click="toggleItemStarred(itemSelectedDetails)"
           :title="$t('mark_starred')">
           <v-icon name="star-full" v-if="itemSelectedDetails.status == 'starred'" />
           <v-icon name="star" v-else />
         </button>
         <button
-          class="toolbar-item"
+          class="c-button-pill"
           :title="$t('mark_unread')"
           @click="toggleItemRead(itemSelectedDetails)">
           <v-icon name="circle-full" v-if="itemSelectedDetails.status == 'unread'" />
@@ -383,7 +380,7 @@
         </button>
         <v-dropdown
           class="settings-dropdown"
-          toggle-class="toolbar-item px-2"
+          toggle-class="c-button-pill px-2"
           drop="center"
           :title="$t('appearance')">
           <template v-slot:button>
@@ -425,14 +422,14 @@
           </div>
         </v-dropdown>
         <button
-          class="toolbar-item"
-          :class="{ active: itemSelectedReadability }"
+          class="c-button-pill"
+          :aria-pressed="!!itemSelectedReadability"
           @click="toggleReadability()"
           :title="$t('read_here')">
           <v-icon :class="{ 'icon-loading': loading.readability }" name="book-open" />
         </button>
         <a
-          class="toolbar-item"
+          class="c-button-pill"
           :href="itemSelectedDetails.link"
           rel="noopener noreferrer"
           target="_blank"
@@ -442,20 +439,20 @@
         </a>
         <div class="flex-grow-1"></div>
         <button
-          class="toolbar-item"
+          class="c-button-pill"
           @click="navigateToItem(-1)"
           :title="$t('previous_article')"
           :disabled="!items.length || itemSelected == items[0].id">
           <v-icon name="chevron-left" />
         </button>
         <button
-          class="toolbar-item"
+          class="c-button-pill"
           @click="navigateToItem(+1)"
           :title="$t('next_article')"
           :disabled="!items.length || itemSelected == items[items.length - 1].id">
           <v-icon name="chevron-right" />
         </button>
-        <button class="toolbar-item" @click="itemSelected = null" :title="$t('close_article')">
+        <button class="c-button-pill" @click="itemSelected = null" :title="$t('close_article')">
           <v-icon name="x" />
         </button>
       </div>

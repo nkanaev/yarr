@@ -1,6 +1,7 @@
 @import "bootstrap/dist/css/bootstrap-reboot.css";
 @import "bootstrap/dist/css/bootstrap-grid.css";
 @import "bootstrap/dist/css/bootstrap-utilities.css";
+
 @import "components.css";
 
 [v-cloak] {
@@ -197,7 +198,6 @@ select.form-control:not([multiple]):not([size]) {
   cursor: pointer;
 }
 
-.toolbar-item:hover,
 .toolbar-search:hover,
 .selectgroup-label:hover,
 .dropdown-item:hover {
@@ -281,33 +281,7 @@ select.form-control:not([multiple]):not([size]) {
   max-height: 2rem !important;
 }
 
-.toolbar-item {
-  display: inline-block;
-  background-color: transparent;
-  text-decoration: none;
-  user-select: none;
-  border: 1px solid transparent;
-  padding: 0.25rem 0.5rem;
-  font-size: 1rem;
-  border-radius: 0.25rem;
-  line-height: 1;
-  color: inherit;
 
-  text-align: center;
-  vertical-align: middle;
-  border-radius: 3px;
-  cursor: pointer;
-  color: inherit;
-}
-
-.toolbar-item:focus {
-  outline: none;
-}
-
-.toolbar-item:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
 
 .cursor-pointer {
   cursor: pointer;
@@ -484,12 +458,21 @@ a,
   color: #0080d4;
 }
 
-.toolbar-item.active,
 .dropdown-item.active,
 .dropdown-item:active,
 .selectgroup[aria-checked="true"] .selectgroup-label {
   color: #fff;
   background-color: #0080d4 !important;
+}
+
+.c-button-pill[aria-pressed="true"] {
+  color: #fff;
+  background-color: #0080d4 !important;
+}
+
+.c-button-pill:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .btn-default:focus,
@@ -514,7 +497,6 @@ a,
   border-color: #e0d6ba !important;
 }
 .theme-sepia .selectgroup-label:hover,
-.theme-sepia .toolbar-item:hover,
 .theme-sepia .toolbar-search:hover,
 .theme-sepia .dropdown-item:hover,
 .theme-sepia .toolbar-search:focus {
@@ -542,7 +524,6 @@ a,
 }
 .theme-night .selectgroup-label:hover,
 .theme-night .dropdown-item:hover,
-.theme-night .toolbar-item:hover,
 .theme-night .toolbar-search:hover,
 .theme-night .toolbar-search:focus {
   background-color: #1a1a1a;
@@ -575,7 +556,6 @@ a,
   }
   .theme-system .selectgroup-label:hover,
   .theme-system .dropdown-item:hover,
-  .theme-system .toolbar-item:hover,
   .theme-system .toolbar-search:hover,
   .theme-system .toolbar-search:focus {
     background-color: #1a1a1a;
@@ -676,7 +656,6 @@ a,
     min-height: 3rem !important;
     max-height: 3rem !important;
   }
-  .toolbar-item,
   .toolbar-search {
     padding: 0.5rem;
   }
