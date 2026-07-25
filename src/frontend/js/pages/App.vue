@@ -311,7 +311,9 @@
             {{ $t("rename") }}
           </button>
           <div class="c-dropdown-divider"></div>
-          <button class="c-dropdown-item w-100 text-start text-danger" @click="deleteFolder(current.folder)">
+          <button
+            class="c-dropdown-item w-100 text-start text-danger"
+            @click="deleteFolder(current.folder)">
             <v-icon class="me-1" name="trash" />
             {{ $t("delete") }}
           </button>
@@ -319,36 +321,34 @@
       </div>
       <div
         id="item-list-scroll"
-        class="p-2 overflow-auto  border-top flex-grow-1"
+        class="d-flex flex-column p-2 overflow-auto border-top flex-grow-1 gap-1"
         v-scroll="loadMoreItems"
         ref="itemlist">
         <div
           v-for="item in items"
           :key="item.id"
-          class="selectgroup"
+          class="c-listitem d-flex flex-column user-select-none"
           role="radio"
           :aria-checked="itemSelected === item.id"
           @click="itemSelected = item.id">
-          <div class="selectgroup-label d-flex flex-column">
-            <div
-              style="line-height: 100%; opacity: 0.7; margin-bottom: 0.1rem"
-              class="d-flex align-items-center">
-              <transition name="indicator">
-                <v-icon class="icon-small me-1" name="circle-full" v-if="item.status == 'unread'" />
-                <v-icon
-                  class="icon-small me-1"
-                  name="star-full"
-                  v-else-if="item.status == 'starred'" />
-              </transition>
-              <small class="flex-fill text-truncate me-1">
-                {{ (feedsById[item.feed_id] || {}).title }}
-              </small>
-              <small class="flex-shrink-0"
-                ><v-relative-time v-bind:title="formatDate(item.date)" :val="item.date"
-              /></small>
-            </div>
-            <div>{{ item.title || $t("untitled") }}</div>
+          <div
+            style="line-height: 100%; opacity: 0.7; margin-bottom: 0.1rem"
+            class="d-flex align-items-center">
+            <transition name="indicator">
+              <v-icon class="icon-small me-1" name="circle-full" v-if="item.status == 'unread'" />
+              <v-icon
+                class="icon-small me-1"
+                name="star-full"
+                v-else-if="item.status == 'starred'" />
+            </transition>
+            <small class="flex-fill text-truncate me-1">
+              {{ (feedsById[item.feed_id] || {}).title }}
+            </small>
+            <small class="flex-shrink-0"
+              ><v-relative-time v-bind:title="formatDate(item.date)" :val="item.date"
+            /></small>
           </div>
+          <div>{{ item.title || $t("untitled") }}</div>
         </div>
         <button class="c-button-link w-100 loading my-3" v-if="itemsHasMore"></button>
       </div>
@@ -375,10 +375,7 @@
           <v-icon name="circle-full" v-if="itemSelectedDetails.status == 'unread'" />
           <v-icon name="circle" v-else />
         </button>
-        <v-dropdown
-          toggle-class="c-button-pill px-2"
-          drop="center"
-          :title="$t('appearance')">
+        <v-dropdown toggle-class="c-button-pill px-2" drop="center" :title="$t('appearance')">
           <template v-slot:button>
             <v-icon name="sliders" />
           </template>
@@ -455,7 +452,7 @@
       <div
         v-if="itemSelectedDetails"
         ref="content"
-        class="content px-4 pt-3 pb-5 border-top overflow-auto "
+        class="content px-4 pt-3 pb-5 border-top overflow-auto"
         :class="{
           'font-serif': theme.font == 'serif',
           'font-monospace': theme.font == 'monospace',
@@ -500,7 +497,9 @@
         <v-icon name="x" />
       </button>
       <div v-if="settings == 'create'" class="d-flex flex-column">
-        <p class="cursor-default mb-3"><b>{{ $t("new_feed") }}</b></p>
+        <p class="cursor-default mb-3">
+          <b>{{ $t("new_feed") }}</b>
+        </p>
         <form @submit.prevent="createFeed($event)" class="d-flex flex-column">
           <label for="feed-url" class="mb-2">{{ $t("url") }}</label>
           <input
@@ -543,13 +542,13 @@
                 >{{ $t("cancel") }}</a
               >
             </p>
-            <div
-              class="selectgroup"
-              role="radio"
-              :aria-checked="feedNewChoiceSelected === choice.url"
-              @click="feedNewChoiceSelected = choice.url"
-              v-for="choice in feedNewChoice">
-              <div class="selectgroup-label">
+            <div class="d-flex flex-column gap-1">
+              <div
+                class="c-listitem d-flex flex-column user-select-none"
+                role="radio"
+                :aria-checked="feedNewChoiceSelected === choice.url"
+                @click="feedNewChoiceSelected = choice.url"
+                v-for="choice in feedNewChoice">
                 <div class="text-truncate">{{ choice.title }}</div>
                 <div class="text-truncate" :class="{ light: choice.title }">
                   {{ choice.url }}
@@ -557,10 +556,7 @@
               </div>
             </div>
           </div>
-          <button
-            class="c-button mt-3"
-            :class="{ loading: loading.newfeed }"
-            type="submit">
+          <button class="c-button mt-3" :class="{ loading: loading.newfeed }" type="submit">
             {{ $t("add") }}
           </button>
         </form>
