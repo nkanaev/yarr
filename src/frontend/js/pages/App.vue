@@ -37,7 +37,7 @@
         </button>
         <div class="flex-grow-1"></div>
         <v-dropdown
-          toggle-class="todo-btn c-button-pill px-2"
+          toggle-class="c-button-link c-button-pill px-2"
           ref="menuDropdown"
           drop="right"
           :title="$t('settings')">
@@ -62,7 +62,7 @@
           </header>
           <div class="row text-center m-0">
             <button
-              class="todo-btn theme-swatch col-3 px-0 rounded-0"
+              class="c-button-link theme-swatch col-3 px-0 rounded-0"
               :class="'theme-' + t"
               :title="t"
               :aria-label="t"
@@ -215,11 +215,11 @@
           <v-icon name="check" />
         </button>
 
-        <button class="todo-btn c-button-pill px-2 ms-2" v-if="!current.type" disabled>
+        <button class="c-button-link c-button-pill px-2 ms-2" v-if="!current.type" disabled>
           <v-icon name="more-horizontal" />
         </button>
         <v-dropdown
-          toggle-class="todo-btn c-button-pill px-2 ms-2"
+          toggle-class="c-button-link c-button-pill px-2 ms-2"
           drop="right"
           :title="$t('feed_settings')"
           v-if="current?.feed?.id">
@@ -296,7 +296,7 @@
           </button>
         </v-dropdown>
         <v-dropdown
-          toggle-class="todo-btn c-button-pill px-2 ms-2"
+          toggle-class="c-button-link c-button-pill px-2 ms-2"
           :title="$t('folder_settings')"
           drop="right"
           v-if="current?.folder?.id">
@@ -350,7 +350,7 @@
             <div>{{ item.title || $t("untitled") }}</div>
           </div>
         </div>
-        <button class="todo-btn w-100 loading my-3" v-if="itemsHasMore"></button>
+        <button class="c-button-link w-100 loading my-3" v-if="itemsHasMore"></button>
       </div>
       <div
         class="px-3 py-2 border-top text-danger text-break"
@@ -494,17 +494,15 @@
     </div>
     <v-modal :open="!!settings" @hide="settings = ''">
       <button
-        class="todo-btn outline-none float-end p-2 me-n2 mt-n2"
+        class="c-button-link outline-none position-absolute top-0 end-0 p-2 m-2"
         style="line-height: 1"
         @click="settings = ''">
         <v-icon name="x" />
       </button>
-      <div v-if="settings == 'create'">
-        <p class="cursor-default">
-          <b>{{ $t("new_feed") }}</b>
-        </p>
-        <form action="" @submit.prevent="createFeed($event)" class="mt-4">
-          <label for="feed-url">{{ $t("url") }}</label>
+      <div v-if="settings == 'create'" class="d-flex flex-column">
+        <p class="cursor-default mb-3"><b>{{ $t("new_feed") }}</b></p>
+        <form @submit.prevent="createFeed($event)" class="d-flex flex-column">
+          <label for="feed-url" class="mb-2">{{ $t("url") }}</label>
           <input
             id="feed-url"
             name="url"
@@ -515,7 +513,7 @@
             :readonly="feedNewChoice.length > 0"
             placeholder="https://example.com/feed"
             v-focus />
-          <label for="feed-folder" class="mt-3 d-block">
+          <label for="feed-folder" class="mb-2 mt-3">
             {{ $t("folder") }}
             <a
               href="#"
@@ -535,7 +533,7 @@
               {{ folder.title }}
             </option>
           </select>
-          <div class="mt-4" v-if="feedNewChoice.length">
+          <div class="mt-3" v-if="feedNewChoice.length">
             <p class="mb-2">
               {{ $t("multiple_feeds_found") }}
               <a
@@ -560,7 +558,7 @@
             </div>
           </div>
           <button
-            class="todo-btn w-100 mt-3"
+            class="c-button mt-3"
             :class="{ loading: loading.newfeed }"
             type="submit">
             {{ $t("add") }}
@@ -572,62 +570,58 @@
           <b>{{ $t("keyboard_shortcuts") }}</b>
         </p>
 
-        <table class="table table-borderless table-sm table-compact m-0">
-          <tbody>
-            <tr>
-              <td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td>
-              <td>{{ $t("kb_show_filters") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>/</kbd></td>
-              <td>{{ $t("kb_focus_search") }}</td>
-            </tr>
+        <div class="d-flex flex-column mt-2">
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></div>
+            <div class="w-75">{{ $t("kb_show_filters") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>/</kbd></div>
+            <div class="w-75">{{ $t("kb_focus_search") }}</div>
+          </div>
 
-            <tr>
-              <td colspan="2">&nbsp;</td>
-            </tr>
-            <tr>
-              <td><kbd>j</kbd> <kbd>k</kbd></td>
-              <td>{{ $t("kb_next_prev_article") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>l</kbd> <kbd>h</kbd></td>
-              <td>{{ $t("kb_next_prev_feed") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>q</kbd></td>
-              <td>{{ $t("kb_close_article") }}</td>
-            </tr>
+          <div class="py-3"></div>
 
-            <tr>
-              <td colspan="2">&nbsp;</td>
-            </tr>
-            <tr>
-              <td><kbd>R</kbd></td>
-              <td>{{ $t("kb_mark_all_read") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>r</kbd></td>
-              <td>{{ $t("kb_mark_read") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>s</kbd></td>
-              <td>{{ $t("kb_mark_starred") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>o</kbd></td>
-              <td>{{ $t("kb_open_link") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>i</kbd></td>
-              <td>{{ $t("kb_read_here") }}</td>
-            </tr>
-            <tr>
-              <td><kbd>f</kbd> <kbd>b</kbd></td>
-              <td>{{ $t("kb_scroll_content") }}</td>
-            </tr>
-          </tbody>
-        </table>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>j</kbd> <kbd>k</kbd></div>
+            <div class="w-75">{{ $t("kb_next_prev_article") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>l</kbd> <kbd>h</kbd></div>
+            <div class="w-75">{{ $t("kb_next_prev_feed") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>q</kbd></div>
+            <div class="w-75">{{ $t("kb_close_article") }}</div>
+          </div>
+
+          <div class="py-3"></div>
+
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>R</kbd></div>
+            <div class="w-75">{{ $t("kb_mark_all_read") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>r</kbd></div>
+            <div class="w-75">{{ $t("kb_mark_read") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>s</kbd></div>
+            <div class="w-75">{{ $t("kb_mark_starred") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>o</kbd></div>
+            <div class="w-75">{{ $t("kb_open_link") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>i</kbd></div>
+            <div class="w-75">{{ $t("kb_read_here") }}</div>
+          </div>
+          <div class="d-flex py-1">
+            <div class="w-25"><kbd>f</kbd> <kbd>b</kbd></div>
+            <div class="w-75">{{ $t("kb_scroll_content") }}</div>
+          </div>
+        </div>
       </div>
     </v-modal>
   </div>

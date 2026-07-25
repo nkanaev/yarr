@@ -1,5 +1,5 @@
 <template>
-  <dialog ref="dialog" @close="$emit('hide')">
+  <dialog class="c-dialog" ref="dialog" @close="$emit('hide')" @click="onBackdropClick">
     <slot></slot>
   </dialog>
 </template>
@@ -15,6 +15,13 @@ export default defineComponent({
       const el = this.$refs.dialog as HTMLDialogElement;
       if (open) el.showModal();
       else el.close();
+    },
+  },
+  methods: {
+    onBackdropClick(e: MouseEvent) {
+      if (e.target === this.$refs.dialog) {
+        this.$emit("hide");
+      }
     },
   },
 });

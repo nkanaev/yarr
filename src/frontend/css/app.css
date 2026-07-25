@@ -19,18 +19,6 @@ html {
   outline: none;
 }
 
-.table-compact {
-  color: unset !important;
-}
-
-.table-compact tr td:first-child {
-  padding-left: 0;
-}
-
-.table-compact tr td:last-child {
-  padding-right: 0;
-}
-
 .scroll-touch {
   -webkit-overflow-scrolling: touch;
 }
@@ -247,20 +235,6 @@ html {
   position: absolute;
   top: -999px;
   left: -999px;
-}
-
-dialog {
-  padding: 1rem;
-  border: none;
-  border-radius: 0.25rem;
-  background: var(--v-color-background);
-  color: var(--v-color-foreground);
-  max-width: 32rem;
-  width: 100%;
-}
-
-dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.9);
 }
 
 /* content */
