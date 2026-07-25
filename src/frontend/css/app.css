@@ -50,44 +50,6 @@ select.form-control:not([multiple]):not([size]) {
   display: none;
 }
 
-.settings-dropdown .dropdown-toggle {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.settings-dropdown .dropdown-menu {
-  padding: 0;
-  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
-  overflow: hidden;
-  max-height: calc(100vh - 3rem);
-  overflow-y: auto;
-}
-
-.settings-dropdown .dropdown-item,
-.settings-dropdown .dropdown-header {
-  padding: 0.375rem 1rem;
-}
-
-.settings-dropdown .dropdown-divider {
-  margin: 0;
-}
-
-.settings-dropdown .dropdown-menu:focus {
-  outline: none;
-}
-
-.settings-dropdown .dropdown-item {
-  cursor: pointer;
-}
-
-.settings-dropdown .dropdown-item:focus {
-  outline: none;
-}
-
-.settings-dropdown form:focus {
-  outline: none;
-}
-
 .popover:focus {
   outline: none;
 }

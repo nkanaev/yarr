@@ -37,7 +37,6 @@
         </button>
         <div class="flex-grow-1"></div>
         <v-dropdown
-          class="settings-dropdown"
           toggle-class="btn btn-link c-button-pill px-2"
           ref="menuDropdown"
           drop="right"
@@ -220,7 +219,6 @@
           <v-icon name="more-horizontal" />
         </button>
         <v-dropdown
-          class="settings-dropdown"
           toggle-class="btn btn-link c-button-pill px-2 ms-2"
           drop="right"
           :title="$t('feed_settings')"
@@ -298,7 +296,6 @@
           </button>
         </v-dropdown>
         <v-dropdown
-          class="settings-dropdown"
           toggle-class="btn btn-link c-button-pill px-2 ms-2"
           :title="$t('folder_settings')"
           drop="right"
@@ -379,7 +376,6 @@
           <v-icon name="circle" v-else />
         </button>
         <v-dropdown
-          class="settings-dropdown"
           toggle-class="c-button-pill px-2"
           drop="center"
           :title="$t('appearance')">
