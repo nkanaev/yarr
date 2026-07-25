@@ -19,32 +19,6 @@ html {
 
 /* custom elements */
 
-.icon {
-  height: 1rem;
-  width: 1rem;
-  display: inline-block;
-  line-height: 1;
-}
-
-.icon > svg,
-.icon > img {
-  width: 1rem;
-  height: 1rem;
-  vertical-align: top;
-}
-
-.icon-small {
-  width: 0.6rem;
-  height: 0.6rem;
-  display: inline-block;
-}
-
-.icon-small > svg,
-.icon-small > img {
-  width: 0.6rem;
-  height: 0.6rem;
-}
-
 .feed-icon {
   width: 16px;
   height: 16px;
@@ -54,10 +28,6 @@ html {
 
 .toolbar-search:hover {
   background-color: #f0f0f0;
-}
-
-.expanded {
-  transform: rotate(90deg);
 }
 
 @keyframes stroke {
@@ -135,7 +105,7 @@ html {
   position: relative;
 }
 
-.input-icon .icon {
+.input-icon .c-icon {
   position: absolute;
   display: flex;
   align-items: center;

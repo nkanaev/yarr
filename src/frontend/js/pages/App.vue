@@ -176,8 +176,8 @@
       </div>
       <div
         class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0"
-        v-if="loading.feeds">
-        <span class="icon loading mx-2"></span>
+        v-if="loading.feeds || true">
+        <span class="c-icon loading mx-2"></span>
         <span class="text-truncate cursor-default user-select-none">{{
           $t("refreshing_progress", { count: loading.feeds })
         }}</span>
@@ -335,9 +335,9 @@
             style="line-height: 100%; opacity: 0.7; margin-bottom: 0.1rem"
             class="d-flex align-items-center">
             <transition name="indicator">
-              <v-icon class="icon-small me-1" name="circle-full" v-if="item.status == 'unread'" />
-              <v-icon
-                class="icon-small me-1"
+              <v-icon small=true class="me-1" name="circle-full" v-if="item.status == 'unread'" />
+              <v-icon small=true
+                class="me-1"
                 name="star-full"
                 v-else-if="item.status == 'starred'" />
             </transition>

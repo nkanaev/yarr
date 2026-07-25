@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column gap-1">
     <div
-      class="c-listitem d-flex align-items-center user-select-none gap-2"
+      class="c-listitem d-flex user-select-none gap-2"
       role="radio"
       :aria-checked="modelValue === ''"
       @click="$emit('update:modelValue', '')">
@@ -24,16 +24,18 @@
       :key="node.type === 'folder' ? 'folder:' + node.folder.id : 'feed:' + node.feed.id">
       <template v-if="node.type === 'folder'">
         <div
-          class="c-listitem d-flex align-items-center user-select-none gap-2"
+          class="c-listitem d-flex user-select-none gap-2"
           role="radio"
           :aria-checked="modelValue === 'folder:' + node.folder.id"
           @click="$emit('update:modelValue', 'folder:' + node.folder.id)">
           <div class="flex-shrink-0">
             <div @click.stop="$emit('toggle-folder', node.folder)" class="p-2 m-n2">
               <v-icon
-                class="flex-shrink-0"
-                :class="{ expanded: node.folder.is_expanded }"
-                name="chevron-right" />
+                name="chevron-right"
+                v-if="!node.folder.is_expanded" />
+              <v-icon
+                name="chevron-down"
+                v-else-if="node.folder.is_expanded" />
             </div>
           </div>
           <div class="flex-grow-1 min-w-0 text-truncate">
@@ -51,13 +53,13 @@
           <div
             v-for="feedNode in node.feeds"
             :key="'feed:' + feedNode.feed.id"
-            class="c-listitem d-flex align-items-center user-select-none gap-2"
+            class="c-listitem d-flex user-select-none gap-2"
             role="radio"
             :aria-checked="modelValue === 'feed:' + feedNode.feed.id"
             @click="$emit('update:modelValue', 'feed:' + feedNode.feed.id)">
             <div class="flex-shrink-0">
               <v-icon class="flex-shrink-0" name="rss" v-if="!feedNode.feed.icon" />
-              <span class="icon" v-else>
+              <span class="c-icon" v-else>
                 <img :src="feedNode.feed.icon" alt="" loading="lazy" />
               </span>
             </div>
@@ -79,13 +81,13 @@
       </template>
       <template v-else-if="node.type === 'feed'">
         <div
-          class="c-listitem d-flex align-items-center user-select-none gap-2"
+          class="c-listitem d-flex user-select-none gap-2"
           role="radio"
           :aria-checked="modelValue === 'feed:' + node.feed.id"
           @click="$emit('update:modelValue', 'feed:' + node.feed.id)">
           <div class="flex-shrink-0">
             <v-icon class="flex-shrink-0" name="rss" v-if="!node.feed.icon" />
-            <span class="icon" v-else>
+            <span class="c-icon" v-else>
               <img :src="node.feed.icon" alt="" loading="lazy" />
             </span>
           </div>

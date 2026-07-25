@@ -171,3 +171,22 @@ body {
 .c-dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.9);
 }
+
+.c-icon {
+  /*display: inline-flex;
+  align-self: center;*/
+  display: inline-block;
+
+  & > svg, & > img {
+    width: 1rem;
+    height: 1rem;
+    vertical-align: -0.125em;
+  }
+
+  &.is-small > svg, &.is-small > img {
+
+    width: 0.6rem;
+    height: 0.6rem;
+    vertical-align: 0.0625em;
+  }
+}
