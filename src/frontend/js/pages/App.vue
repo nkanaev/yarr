@@ -178,7 +178,7 @@
         class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0"
         v-if="loading.feeds">
         <span class="icon loading mx-2"></span>
-        <span class="text-truncate cursor-default noselect">{{
+        <span class="text-truncate cursor-default user-select-none">{{
           $t("refreshing_progress", { count: loading.feeds })
         }}</span>
       </div>

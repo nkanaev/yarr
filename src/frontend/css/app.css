@@ -50,16 +50,7 @@ html {
   margin-left: -18px !important;
 }
 
-.noselect,
-.dropdown-menu * {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.toolbar-search:hover,
-.dropdown-item:hover {
+.toolbar-search:hover {
   background-color: #f0f0f0;
 }
 
@@ -203,26 +194,9 @@ a {
   color: #0080d4;
 }
 
-.dropdown-item.active,
-.dropdown-item:active {
-  color: #fff;
-  background-color: #0080d4 !important;
-}
-
-.c-button-pill[aria-pressed="true"] {
-  color: #fff;
-  background-color: #0080d4 !important;
-}
-
-.c-button-pill:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
 /* theme: sepia */
 
 .theme-sepia,
-.theme-sepia .dropdown-menu,
 .theme-sepia .toolbar-search {
   background-color: #f4f0e5 !important;
 }
@@ -233,7 +207,6 @@ a {
   border-color: #e0d6ba !important;
 }
 .theme-sepia .toolbar-search:hover,
-.theme-sepia .dropdown-item:hover,
 .theme-sepia .toolbar-search:focus {
   background-color: #e0d6ba;
 }
@@ -241,8 +214,6 @@ a {
 /* theme: night */
 
 .theme-night,
-.theme-night .dropdown-menu,
-.theme-night .dropdown-item,
 .theme-night .toolbar-search {
   color: #d1d1d1;
   background-color: #0e0e0e;
@@ -254,22 +225,15 @@ a {
 .theme-night .dropdown-divider {
   border-color: #1a1a1a !important;
 }
-.theme-night .dropdown-item:hover,
 .theme-night .toolbar-search:hover,
 .theme-night .toolbar-search:focus {
   background-color: #1a1a1a;
-}
-
-.theme-night .dropdown-menu {
-  border-color: #1a1a1a;
 }
 
 /* theme: system follows the system color scheme */
 
 @media (prefers-color-scheme: dark) {
   .theme-system,
-  .theme-system .dropdown-menu,
-  .theme-system .dropdown-item,
   .theme-system .toolbar-search {
     color: #d1d1d1;
     background-color: #0e0e0e;
@@ -281,13 +245,9 @@ a {
   .theme-system .dropdown-divider {
     border-color: #1a1a1a !important;
   }
-  .theme-system .dropdown-item:hover,
   .theme-system .toolbar-search:hover,
   .theme-system .toolbar-search:focus {
     background-color: #1a1a1a;
-  }
-  .theme-system .dropdown-menu {
-    border-color: #1a1a1a !important;
   }
 }
 
