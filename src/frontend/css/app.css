@@ -4,6 +4,7 @@
 
 @import "components.css";
 @import "content.css";
+@import "utilities.css";
 
 [v-cloak] {
   display: none !important;
@@ -15,14 +16,6 @@ html {
 }
 
 /* custom elements */
-
-.font-serif {
-  font-family: Georgia, serif;
-}
-
-.font-monospace {
-  font-family: SFMono-Regular, Menlo, Consolas, monospace;
-}
 
 .icon {
   height: 1rem;
@@ -55,10 +48,6 @@ html {
   height: 16px;
   min-width: 16px;
   margin-left: -18px !important;
-}
-
-.light {
-  opacity: 0.6;
 }
 
 .noselect,

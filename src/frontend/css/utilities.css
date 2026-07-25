@@ -1,0 +1,7 @@
+.font-serif {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
+}
+
+.font-sans-serif {
+  font-family: var(--bs-font-sans-serif) !important;
+}

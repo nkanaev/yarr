@@ -381,7 +381,7 @@
           </template>
 
           <button
-            class="c-dropdown-item w-100 text-start"
+            class="c-dropdown-item w-100 text-start font-sans-serif"
             :aria-pressed="theme.font == ''"
             @click.stop="theme.font = ''">
             {{ $t("sans_serif") }}
@@ -454,6 +454,7 @@
         ref="content"
         class="content px-4 pt-3 pb-5 border-top overflow-auto"
         :class="{
+          'font-sans-serif': theme.font == '',
           'font-serif': theme.font == 'serif',
           'font-monospace': theme.font == 'monospace',
         }"
@@ -550,7 +551,7 @@
                 @click="feedNewChoiceSelected = choice.url"
                 v-for="choice in feedNewChoice">
                 <div class="text-truncate">{{ choice.title }}</div>
-                <div class="text-truncate" :class="{ light: choice.title }">
+                <div class="text-truncate" :class="{ 'opacity-50': choice.title }">
                   {{ choice.url }}
                 </div>
               </div>
