@@ -16,7 +16,7 @@
         }}
       </div>
       <div class="flex-shrink-0" v-if="filterSelected">
-        <span class="counter text-end">{{ stats.total[filterSelected] }}</span>
+        <span class="ps-2 text-end opacity-50">{{ stats.total[filterSelected] }}</span>
       </div>
     </div>
     <template
@@ -40,7 +40,7 @@
             {{ node.folder.title }}
           </div>
           <div class="flex-shrink-0" v-if="filterSelected">
-            <span class="counter text-end">{{
+            <span class="ps-2 text-end opacity-50">{{
               stats.folders[node.folder.id]?.[filterSelected]
             }}</span>
           </div>
@@ -65,7 +65,7 @@
               {{ feedNode.feed.title }}
             </div>
             <div class="flex-shrink-0">
-              <span class="counter text-end" v-if="filterSelected">{{
+              <span class="ps-2 text-end opacity-50" v-if="filterSelected">{{
                 stats.feeds[feedNode.feed.id]?.[filterSelected]
               }}</span>
               <v-icon
@@ -93,7 +93,7 @@
             {{ node.feed.title }}
           </div>
           <div class="flex-shrink-0">
-            <span class="counter text-end" v-if="filterSelected">{{
+            <span class="ps-2 text-end opacity-50" v-if="filterSelected">{{
               stats.feeds[node.feed.id]?.[filterSelected]
             }}</span>
             <v-icon
