@@ -509,7 +509,7 @@
             id="feed-url"
             name="url"
             type="url"
-            class="form-control"
+            class="c-input"
             required
             autocomplete="off"
             :readonly="feedNewChoice.length > 0"
@@ -524,7 +524,7 @@
               >{{ $t("new_folder") }}</a
             >
           </label>
-          <select class="form-control" id="feed-folder" name="folder_id" ref="newFeedFolder">
+          <select class="c-input" id="feed-folder" name="folder_id" ref="newFeedFolder">
             <option value="">---</option>
             <option
               :value="folder.id"
