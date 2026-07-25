@@ -165,7 +165,7 @@
           </button>
         </v-dropdown>
       </div>
-      <div id="feed-list-scroll" class="p-2 overflow-auto scroll-touch border-top flex-grow-1">
+      <div id="feed-list-scroll" class="p-2 overflow-auto border-top flex-grow-1">
         <v-feedtree
           :tree="feedTree"
           v-model="feedSelected"
@@ -319,7 +319,7 @@
       </div>
       <div
         id="item-list-scroll"
-        class="p-2 overflow-auto scroll-touch border-top flex-grow-1"
+        class="p-2 overflow-auto  border-top flex-grow-1"
         v-scroll="loadMoreItems"
         ref="itemlist">
         <div
@@ -455,7 +455,7 @@
       <div
         v-if="itemSelectedDetails"
         ref="content"
-        class="content px-4 pt-3 pb-5 border-top overflow-auto scroll-touch"
+        class="content px-4 pt-3 pb-5 border-top overflow-auto "
         :class="{
           'font-serif': theme.font == 'serif',
           'font-monospace': theme.font == 'monospace',

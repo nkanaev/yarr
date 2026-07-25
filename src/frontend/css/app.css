@@ -20,10 +20,6 @@ html {
   outline: none;
 }
 
-.scroll-touch {
-  -webkit-overflow-scrolling: touch;
-}
-
 /* custom elements */
 
 .font-serif {
