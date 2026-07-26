@@ -1,4 +1,4 @@
-/* theme: light (default) */
+/* theme: light (default) + system (prefers-color-scheme: light) */
 
 :root {
   --v-light-bg: #fff;
@@ -53,12 +53,6 @@
     --v-button-background: var(--v-bg);
     --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
     --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
-  }
-}
-
-[data-theme="system"] {
-  &:root {
-    /* no overrides needed — inherits default :root (light) */
   }
 }
 

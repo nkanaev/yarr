@@ -196,13 +196,12 @@
           :title="$t('show_feeds')">
           <v-icon name="chevron-left" />
         </button>
-        <div class="input-icon flex-grow-1">
+        <div class="c-search flex-grow-1">
           <v-icon name="search" />
           <!-- id used by keybindings -->
           <input
             id="searchbar"
-            type=""
-            class="d-block toolbar-search"
+            class="d-block"
             v-model="itemSearch"
             :placeholder="$t('search_placeholder', { scope: searchScope })"
             @keydown.enter="($event.target as HTMLInputElement).blur()" />
@@ -419,7 +418,7 @@
           :aria-pressed="!!itemSelectedReadability"
           @click="toggleReadability()"
           :title="$t('read_here')">
-          <v-icon :class="{ 'icon-loading': loading.readability }" name="book-open" />
+          <v-icon :class="{ 'is-loading': loading.readability }" name="book-open" />
         </button>
         <a
           class="c-button-pill"

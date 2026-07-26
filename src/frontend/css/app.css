@@ -19,24 +19,8 @@ html {
 
 /* custom elements */
 
-.feed-icon {
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  margin-left: -18px !important;
-}
-
 .toolbar-search:hover {
   background-color: #f0f0f0;
-}
-
-@keyframes stroke {
-  from {
-    stroke-dashoffset: 120;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
 }
 
 @keyframes rotate {
@@ -73,11 +57,6 @@ html {
   z-index: 1;
 }
 
-.icon-loading > svg {
-  animation: stroke 2s infinite normal;
-  stroke-dasharray: 60;
-}
-
 .toolbar {
   min-height: 2rem !important;
   max-height: 2rem !important;
@@ -99,43 +78,6 @@ html {
   height: 100%;
   z-index: 900;
   cursor: col-resize;
-}
-
-.input-icon {
-  position: relative;
-}
-
-.input-icon .c-icon {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  width: 2rem;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.input-icon input {
-  padding-left: 2rem !important;
-  width: 100%;
-  background-color: unset;
-  border-radius: var(--bs-border-radius);
-}
-
-.toolbar-search {
-  border: none;
-  border-radius: 3px;
-  padding: 0.25rem 0.5rem;
-  line-height: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.toolbar-search:hover,
-.toolbar-search:focus {
-  background-color: #f3f3f3;
-  outline: none;
 }
 
 #opml-import-form input[type="file"]::-webkit-file-upload-button {
