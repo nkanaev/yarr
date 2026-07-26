@@ -44,7 +44,7 @@
 .content pre {
   overflow-x: auto;
   color: inherit;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--v-border-color);
   border-radius: 3px;
   margin-left: -0.5rem;
   margin-right: -0.5rem;

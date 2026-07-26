@@ -1,5 +1,3 @@
-
-
 .c-input {
   padding: 0.375rem 0.75rem;
   border: 1px solid var(--v-border-color);
@@ -11,7 +9,7 @@
   outline-offset: -2px;
 
   &:focus {
-    outline: 2px solid var(--v-color-primary);
+    outline: 2px solid var(--v-focus-color);
   }
   &:focus:user-invalid {
     outline: 2px solid var(--v-color-danger);
@@ -27,19 +25,21 @@
   border-radius: var(--bs-border-radius);
 
   color: var(--v-fg);
-  background-color: var(--v-button-background);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background-color: var(--v-bg);
+  box-shadow: 0 1px 2px hsl(from var(--v-fg) h s l / 0.1);
 
   outline-offset: -2px;
 
   &:focus-visible {
-    outline: 2px solid var(--v-color-primary);
+    outline: 2px solid var(--v-focus-color);
   }
   &:hover {
-    background-color: var(--v-button-background-hover);
+    color: var(--v-hover-fg);
+    background-color: var(--v-hover-bg);
   }
   &:active {
-    background-color: var(--v-button-background-active);
+    color: var(--v-active-fg);
+    background-color: var(--v-active-bg);
     box-shadow: none;
   }
   &:disabled {
@@ -69,14 +69,13 @@
   background-color: var(--v-bg);
 
   &:hover {
-    background-color: var(--v-button-background-hover);
+    color: var(--v-hover-fg);
+    background-color: var(--v-hover-bg);
   }
-
   &[aria-pressed="true"] {
-    color: #fff;
-    background-color: #0080d4 !important;
+    color: var(--v-active-fg);
+    background-color: var(--v-active-bg);
   }
-
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -103,18 +102,18 @@
   border: 0;
 
   color: var(--v-fg);
-  background-color: var(--v-button-background);
+  background-color: var(--v-bg);
 
   &:hover {
-    background-color: var(--v-button-background-hover);
+    color: var(--v-hover-fg);
+    background-color: var(--v-hover-bg);
   }
   &[aria-pressed="true"],
   &:active {
     /* TODO: color states for menu */
-    color: var(--v-bg);
-    background-color: var(--v-color-primary);
+    color: var(--v-active-fg);
+    background-color: var(--v-active-bg);
   }
-
   &:disabled {
     opacity: 0.7;
     pointer-events: none;
@@ -142,12 +141,13 @@
   border-radius: var(--bs-border-radius);
 
   &:hover {
-    background-color: #f0f0f0; /* todo: extract to var */
+    color: var(--v-hover-fg);
+    background-color: var(--v-hover-bg);
   }
 
   &[aria-checked="true"] {
-    color: var(--v-bg);
-    background-color: var(--v-color-primary);
+    color: var(--v-active-fg);
+    background-color: var(--v-active-bg);
   }
   /* TODO: implement ui states: default / hover / [aria-checked=true] */
 }
@@ -235,15 +235,21 @@
 
     &:hover,
     &:focus {
-      background-color: #f3f3f3;
-      outline: none;
+      color: var(--v-hover-fg);
+      background-color: var(--v-hover-bg);
+      outline: none
     }
+    /* todo: focus-visible */
   }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .c-spinner {

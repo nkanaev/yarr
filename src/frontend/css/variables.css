@@ -25,50 +25,100 @@
   --bs-border-color: var(--v-border-color);
 }
 
-/* theme: sepia */
-
-[data-theme="sepia"] {
+[data-theme="light"] {
   &:root {
-    --v-bg: var(--v-sepia-bg);
-    --v-fg: hsl(from var(--v-sepia-bg) h s 12%);
-    --v-border-color: oklch(from var(--v-bg) calc(l - 0.1) c h);
-    --v-color-primary: hsl(from var(--v-sepia-bg) h s 10%);
+    color-scheme: light;
 
-    --v-selected-bg: hsl(from var(--v-sepia-bg) h s 10%);
-    --v-selected-fg: hsl(from var(--v-sepia-bg) h s 90%);
+    --v-color-dark: #fff;
+    --v-color-blue: #0080d4;
 
-    --v-button-background: var(--v-bg);
-    --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.05) c h);
-    --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.1) c h);
+    --v-border-color: hsl(from var(--v-color-dark) h s 90%);
+    --v-focus-color: hsl(from var(--v-color-dark) h s 10%);
+
+    --v-bg: var(--v-light-bg);
+    --v-fg: hsl(from var(--v-color-dark) h s 5%);
+
+    --v-active-bg: var(--v-color-blue);
+    --v-active-fg: var(--v-bg);
+
+    --v-hover-bg: hsl(from var(--v-color-dark) h s 92%);
+    --v-hover-fg: var(--v-fg);
   }
 }
 
-/* theme: night */
+[data-theme="sepia"] {
+  &:root {
+    --v-border-color: hsl(from var(--v-sepia-bg) h s 80%);
+    --v-focus-color: hsl(from var(--v-sepia-bg) h s 10%);
+
+    --v-bg: var(--v-sepia-bg);
+    --v-fg: hsl(from var(--v-sepia-bg) h s 10%);
+
+    --v-active-bg: hsl(from var(--v-sepia-bg) h 25% 15%);
+    --v-active-fg: var(--v-bg);
+
+    --v-hover-bg: hsl(from var(--v-sepia-bg) h 25% 85%);
+    --v-hover-fg: var(--v-fg);
+  }
+}
 
 [data-theme="night"] {
   &:root {
-    --v-bg: #111;
-    --v-fg: #fff;
-    --v-border-color: var(--bs-border-color);
-    --v-color-primary: var(--bs-primary);
+    color-scheme: dark;
 
-    --v-button-background: var(--v-bg);
-    --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
-    --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
+    --v-border-color: hsl(from var(--v-night-bg) h s 15%);
+    --v-focus-color: hsl(from var(--v-night-bg) h s 10%);
+
+    --v-bg: var(--v-night-bg);
+    --v-fg: hsl(from var(--v-night-bg) h s 90%);
+
+    --v-active-bg: hsl(from var(--v-night-bg) h s 75%);
+    --v-active-fg: var(--v-bg);
+
+    --v-hover-bg: hsl(from var(--v-night-bg) h s 12%);
+    --v-hover-fg: var(--v-fg);
+  }
+}
+
+/* TODO: system is a duplicate of light/night.  */
+
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] {
+    color-scheme: light;
+
+    --v-color-dark: #fff;
+    --v-color-blue: #0080d4;
+
+    --v-border-color: hsl(from var(--v-color-dark) h s 90%);
+    --v-focus-color: hsl(from var(--v-color-dark) h s 10%);
+
+    --v-bg: var(--v-light-bg);
+    --v-fg: hsl(from var(--v-color-dark) h s 5%);
+
+    --v-active-bg: var(--v-color-blue);
+    --v-active-fg: var(--v-bg);
+
+    --v-hover-bg: hsl(from var(--v-color-dark) h s 92%);
+    --v-hover-fg: var(--v-fg);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   [data-theme="system"] {
     &:root {
-      --v-bg: var(--v-sepia-bg);
-      --v-fg: #fff;
-      --v-border-color: var(--bs-border-color);
-      --v-color-primary: var(--bs-primary);
+      color-scheme: dark;
 
-      --v-button-background: var(--v-bg);
-      --v-button-background-hover: oklch(from var(--v-button-background) calc(l + 0.05) c h);
-      --v-button-background-active: oklch(from var(--v-button-background) calc(l + 0.1) c h);
+      --v-border-color: hsl(from var(--v-night-bg) h s 15%);
+      --v-focus-color: hsl(from var(--v-night-bg) h s 10%);
+
+      --v-bg: var(--v-night-bg);
+      --v-fg: hsl(from var(--v-night-bg) h s 90%);
+
+      --v-active-bg: hsl(from var(--v-night-bg) h s 75%);
+      --v-active-fg: var(--v-bg);
+
+      --v-hover-bg: hsl(from var(--v-night-bg) h s 12%);
+      --v-hover-fg: var(--v-fg);
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <span class="c-icon" :class="{ 'is-': $props.small }" v-html="content"></span>
+  <span class="c-icon" :class="{ 'is-small': $props.small }" v-html="content"></span>
 </template>
 
 <script lang="ts">

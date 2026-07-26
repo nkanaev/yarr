@@ -9,14 +9,6 @@
 @import "utilities.css";
 @import "variables.css";
 
-/* theme: light */
-
-/* theme: sepia */
-
-.theme-sepia,
-.theme-sepia .toolbar-search {
-  background-color: #f4f0e5 !important;
-}
 .theme-sepia .content hr,
 .theme-sepia .content pre {
   border-color: #e0d6ba !important;
