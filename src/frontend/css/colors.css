@@ -70,25 +70,3 @@
     }
   }
 }
-
-.theme-swatch {
-  padding: 0;
-  border: none;
-  height: 2.5rem;
-
-  &.theme-light {
-    background-color: var(--v-light-bg) !important;
-  }
-  &.theme-sepia {
-    background-color: var(--v-sepia-bg) !important;
-  }
-  &.theme-night {
-    background-color: var(--v-night-bg) !important;
-  }
-  &.theme-system {
-    background-image: linear-gradient(135deg, #fff 0, #fff 35%, #0e0e0e 65%, #0e0e0e 100%);
-  }
-  &[aria-pressed="true"] {
-    border: 0.3rem solid #0080d4;
-  }
-}

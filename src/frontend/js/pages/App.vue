@@ -176,8 +176,8 @@
       </div>
       <div
         class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0"
-        v-if="loading.feeds || true">
-        <span class="c-icon loading mx-2"></span>
+        v-if="loading.feeds">
+        <span class="c-spinner mx-2"></span>
         <span class="text-truncate cursor-default user-select-none">{{
           $t("refreshing_progress", { count: loading.feeds })
         }}</span>
@@ -349,7 +349,9 @@
           </div>
           <div>{{ item.title || $t("untitled") }}</div>
         </div>
-        <button class="c-button-link w-100 loading my-3" v-if="itemsHasMore"></button>
+        <div class="text-center my-3" v-if="itemsHasMore">
+          <span class="c-spinner"></span>
+        </div>
       </div>
       <div
         class="px-3 py-2 border-top text-danger text-break"
@@ -556,8 +558,9 @@
               </div>
             </div>
           </div>
-          <button class="c-button mt-3" :class="{ loading: loading.newfeed }" type="submit">
-            {{ $t("add") }}
+          <button class="c-button mt-3" :disabled="loading.newfeed" type="submit">
+              <span class="c-spinner" v-if="loading.newfeed"></span>
+              <span v-else>{{ $t("add") }}</span>
           </button>
         </form>
       </div>

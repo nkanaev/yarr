@@ -46,6 +46,10 @@ body {
     background-color: var(--v-button-background-active);
     box-shadow: none;
   }
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
 }
 
 .c-button-link {
@@ -235,5 +239,43 @@ body {
       background-color: #f3f3f3;
       outline: none;
     }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.c-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--v-fg);
+  border-inline-start-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.5s linear infinite;
+}
+
+.theme-swatch {
+  padding: 0;
+  border: none;
+  height: 2.5rem;
+
+  &.theme-light {
+    background-color: var(--v-light-bg) !important;
+  }
+  &.theme-sepia {
+    background-color: var(--v-sepia-bg) !important;
+  }
+  &.theme-night {
+    background-color: var(--v-night-bg) !important;
+  }
+  &.theme-system {
+    background-image: linear-gradient(135deg, #fff 0, #fff 35%, #0e0e0e 65%, #0e0e0e 100%);
+  }
+  &[aria-pressed="true"] {
+    border: 0.3rem solid #0080d4;
   }
 }
