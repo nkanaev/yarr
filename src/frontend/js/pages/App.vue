@@ -189,9 +189,9 @@
       class="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
       :style="{ width: itemListWidth + 'px' }">
       <v-drag :width="itemListWidth" @resize="resizeItemList"></v-drag>
-      <div class="px-2 toolbar d-flex align-items-center">
+      <div class="d-flex gap-1 px-2 toolbar d-flex align-items-center">
         <button
-          class="c-button-pill me-2 d-block d-md-none"
+          class="c-button-pill d-block d-md-none"
           @click="feedSelected = null"
           :title="$t('show_feeds')">
           <v-icon name="chevron-left" />
@@ -208,18 +208,18 @@
             @keydown.enter="($event.target as HTMLInputElement).blur()" />
         </div>
         <button
-          class="c-button-pill ms-2"
+          class="c-button-pill"
           @click="markItemsRead()"
           v-if="filterSelected == 'unread'"
           :title="$t('mark_all_read')">
           <v-icon name="check" />
         </button>
 
-        <button class="c-button-link c-button-pill px-2 ms-2" v-if="!current.type" disabled>
+        <button class="c-button-link c-button-pill px-2" v-if="!current.type" disabled>
           <v-icon name="more-horizontal" />
         </button>
         <v-dropdown
-          toggle-class="c-button-link c-button-pill px-2 ms-2"
+          toggle-class="c-button-link c-button-pill px-2"
           drop="right"
           :title="$t('feed_settings')"
           v-if="current?.feed?.id">
@@ -296,7 +296,7 @@
           </button>
         </v-dropdown>
         <v-dropdown
-          toggle-class="c-button-link c-button-pill px-2 ms-2"
+          toggle-class="c-button-link c-button-pill px-2"
           :title="$t('folder_settings')"
           drop="right"
           v-if="current?.folder?.id">
@@ -360,7 +360,7 @@
     </div>
     <!-- item show -->
     <div id="col-item" class="vh-100 d-flex flex-column w-100" style="min-width: 0">
-      <div class="toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
+      <div class="d-flex gap-1 toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
         <button
           class="c-button-pill"
           @click="toggleItemStarred(itemSelectedDetails)"

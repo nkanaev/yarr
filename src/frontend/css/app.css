@@ -118,6 +118,8 @@ html {
 .input-icon input {
   padding-left: 2rem !important;
   width: 100%;
+  background-color: unset;
+  border-radius: var(--bs-border-radius);
 }
 
 .toolbar-search {
@@ -212,7 +214,7 @@ a {
   margin: 0 !important;
 }
 
-
+/* login icon */
 .login-logo svg {
   width: 4rem;
   height: auto;
