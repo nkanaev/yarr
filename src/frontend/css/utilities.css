@@ -5,3 +5,11 @@
 .font-sans-serif {
   font-family: var(--bs-font-sans-serif) !important;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
+}

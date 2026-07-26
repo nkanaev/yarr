@@ -62,14 +62,6 @@ html {
   max-height: 2rem !important;
 }
 
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.cursor-default {
-  cursor: default;
-}
-
 .drag {
   position: absolute;
   top: 0;
