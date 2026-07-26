@@ -11,7 +11,7 @@
       class="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
       :style="{ width: feedListWidth + 'px' }">
       <v-drag :width="feedListWidth" @resize="resizeFeedList"></v-drag>
-      <div class="p-2 toolbar d-flex align-items-center">
+      <div class="px-2 py-1 d-flex align-items-center">
         <v-icon class="mx-2" name="anchor" />
         <div class="flex-grow-1"></div>
         <button
@@ -175,7 +175,7 @@
           @toggle-folder="toggleFolderExpanded" />
       </div>
       <div
-        class="p-2 toolbar d-flex align-items-center border-top flex-shrink-0"
+        class="px-2 py-1 d-flex align-items-center border-top flex-shrink-0"
         v-if="loading.feeds">
         <span class="c-spinner mx-2"></span>
         <span class="text-truncate cursor-default user-select-none">{{
@@ -189,7 +189,7 @@
       class="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
       :style="{ width: itemListWidth + 'px' }">
       <v-drag :width="itemListWidth" @resize="resizeItemList"></v-drag>
-      <div class="d-flex gap-1 px-2 toolbar d-flex align-items-center">
+      <div class="px-2 py-1 d-flex gap-1 align-items-center">
         <button
           class="c-button-pill d-block d-md-none"
           @click="feedSelected = null"
@@ -361,7 +361,7 @@
     </div>
     <!-- item show -->
     <div id="col-item" class="vh-100 d-flex flex-column w-100" style="min-width: 0">
-      <div class="d-flex gap-1 toolbar px-2 d-flex align-items-center" v-if="itemSelectedDetails">
+      <div class="px-2 py-1 d-flex gap-1 align-items-center" v-if="itemSelectedDetails">
         <button
           class="c-button-pill"
           @click="toggleItemStarred(itemSelectedDetails)"

@@ -19,6 +19,8 @@
   --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.02) c h);
   --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.05) c h);
 
+  --v-chrome-height: 1.49rem;
+
   /* bootstrap var overrides */
   --bs-border-color: var(--v-border-color);
 }

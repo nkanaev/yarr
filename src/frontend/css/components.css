@@ -62,6 +62,7 @@ body {
 }
 
 .c-button-pill {
+  height: var(--v-chrome-height);
   padding: 0.25rem 0.5rem;
   border-radius: var(--bs-border-radius);
   line-height: 1;
@@ -223,8 +224,10 @@ body {
     pointer-events: none;
   }
   & input {
-    padding-left: 2rem !important;
     width: 100%;
+    height: var(--v-chrome-height);
+    padding: 0.25rem 0.5rem;
+    padding-left: 2rem !important;
     background-color: unset;
     border-radius: var(--bs-border-radius);
     border: none;
