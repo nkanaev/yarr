@@ -334,8 +334,8 @@
             style="line-height: 100%; opacity: 0.7; margin-bottom: 0.1rem"
             class="d-flex align-items-center">
             <transition name="indicator">
-              <v-icon small=true class="me-1" name="circle-full" v-if="item.status == 'unread'" />
-              <v-icon small=true
+              <v-icon :small=true class="me-1" name="circle-full" v-if="item.status == 'unread'" />
+              <v-icon :small=true
                 class="me-1"
                 name="star-full"
                 v-else-if="item.status == 'starred'" />
