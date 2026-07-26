@@ -191,7 +191,7 @@
       <v-drag :width="itemListWidth" @resize="resizeItemList"></v-drag>
       <div class="px-2 py-1 d-flex gap-1 align-items-center">
         <button
-          class="c-button-pill d-block d-md-none"
+          class="c-button-pill d-md-none"
           @click="feedSelected = null"
           :title="$t('show_feeds')">
           <v-icon name="chevron-left" />
