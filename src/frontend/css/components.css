@@ -1,8 +1,4 @@
-html,
-body {
-  color: var(--v-fg);
-  background-color: var(--v-bg);
-}
+
 
 .c-input {
   padding: 0.375rem 0.75rem;
@@ -281,4 +277,14 @@ body {
   &[aria-pressed="true"] {
     border: 0.3rem solid #0080d4;
   }
+}
+
+.drag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  z-index: 900;
+  cursor: col-resize;
 }

@@ -1,0 +1,14 @@
+[v-cloak] {
+  display: none !important;
+}
+
+html {
+  font-size: 15px !important;
+  overscroll-behavior: none;
+}
+
+html,
+body {
+  color: var(--v-fg);
+  background-color: var(--v-bg);
+}

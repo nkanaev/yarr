@@ -54,6 +54,7 @@
 .content a {
   color: inherit;
   text-decoration: underline;
+  color: var(--v-color-primary);
 }
 
 .content blockquote {

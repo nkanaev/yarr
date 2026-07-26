@@ -2,53 +2,14 @@
 @import "bootstrap/dist/css/bootstrap-grid.css";
 @import "bootstrap/dist/css/bootstrap-utilities.css";
 
+@import "base.css";
 @import "components.css";
-@import "colors.css";
 @import "content.css";
 @import "responsive.css";
 @import "utilities.css";
-
-[v-cloak] {
-  display: none !important;
-}
-
-html {
-  font-size: 15px !important;
-  overscroll-behavior: none;
-}
-
-/* custom elements */
-
-.toolbar-search:hover {
-  background-color: #f0f0f0;
-}
-
-.toolbar {
-  min-height: 2rem !important;
-  max-height: 2rem !important;
-}
-
-.drag {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 6px;
-  height: 100%;
-  z-index: 900;
-  cursor: col-resize;
-}
-
-#opml-import-form input[type="file"]::-webkit-file-upload-button {
-  position: absolute;
-  top: -999px;
-  left: -999px;
-}
+@import "variables.css";
 
 /* theme: light */
-
-a {
-  color: #0080d4;
-}
 
 /* theme: sepia */
 
