@@ -5,6 +5,9 @@
   --v-sepia-bg: #f4f0e5;
   --v-night-bg: #111;
 
+  --v-color-dark: #fff;
+  --v-color-blue: #0080d4;
+
   --v-bg: #fff;
   --v-fg: #111;
 
@@ -72,8 +75,8 @@
     --v-bg: var(--v-night-bg);
     --v-fg: hsl(from var(--v-night-bg) h s 90%);
 
-    --v-active-bg: hsl(from var(--v-night-bg) h s 75%);
-    --v-active-fg: var(--v-bg);
+    --v-active-bg: var(--v-color-blue);
+    --v-active-fg: var(--v-fg);
 
     --v-hover-bg: hsl(from var(--v-night-bg) h s 12%);
     --v-hover-fg: var(--v-fg);
@@ -85,9 +88,6 @@
 @media (prefers-color-scheme: light) {
   [data-theme="system"] {
     color-scheme: light;
-
-    --v-color-dark: #fff;
-    --v-color-blue: #0080d4;
 
     --v-border-color: hsl(from var(--v-color-dark) h s 90%);
     --v-focus-color: hsl(from var(--v-color-dark) h s 10%);
@@ -114,8 +114,8 @@
       --v-bg: var(--v-night-bg);
       --v-fg: hsl(from var(--v-night-bg) h s 90%);
 
-      --v-active-bg: hsl(from var(--v-night-bg) h s 75%);
-      --v-active-fg: var(--v-bg);
+      --v-active-bg: var(--v-color-blue);
+      --v-active-fg: var(--v-fg);
 
       --v-hover-bg: hsl(from var(--v-night-bg) h s 12%);
       --v-hover-fg: var(--v-fg);
