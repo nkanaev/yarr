@@ -334,8 +334,13 @@
             style="line-height: 100%; opacity: 0.7; margin-bottom: 0.1rem"
             class="d-flex align-items-center">
             <transition name="indicator">
-              <v-icon :small=true class="me-1" name="circle-full" v-if="item.status == 'unread'" />
-              <v-icon :small=true
+              <v-icon
+                :small="true"
+                class="me-1"
+                name="circle-full"
+                v-if="item.status == 'unread'" />
+              <v-icon
+                :small="true"
                 class="me-1"
                 name="star-full"
                 v-else-if="item.status == 'starred'" />
@@ -559,8 +564,8 @@
             </div>
           </div>
           <button class="c-button mt-3" :disabled="loading.newfeed" type="submit">
-              <span class="c-spinner" v-if="loading.newfeed"></span>
-              <span v-else>{{ $t("add") }}</span>
+            <span class="c-spinner" v-if="loading.newfeed"></span>
+            <span v-else>{{ $t("add") }}</span>
           </button>
         </form>
       </div>
@@ -632,7 +637,7 @@ export default defineComponent({
       });
 
     this.updateMetaTheme();
-    this.$setLang(app.settings.language);
+    this.$t.set(document.documentElement.lang);
 
     // keep the theme-color meta tag in sync when the OS color scheme changes
     this._colorSchemeMql = window.matchMedia("(prefers-color-scheme: dark)");
@@ -765,7 +770,6 @@ export default defineComponent({
       return { type: type, feed: feed, folder: folder };
     },
     searchScope(): string {
-      void this.language;
       var type = (this.feedSelected || "").split(":", 2)[0];
       if (type == "feed")
         return (this.feedsById[this.feedSelected.split(":", 2)[1]] || {}).title || "";
@@ -1308,7 +1312,7 @@ export default defineComponent({
       );
     },
     changeLanguage(lang: Lang) {
-      this.$setLang(lang);
+      this.$t.set(lang);
       this.language = lang;
       api.settings.update({ language: lang });
     },

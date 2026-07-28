@@ -1,4 +1,4 @@
-import type { Plugin } from "vue";
+import { reactive, type Plugin } from "vue";
 import _translations from "./i18n-translations.json" with { type: "json" };
 import { FluentResource, FluentBundle, FluentVariable, Message } from "@fluent/bundle";
 import { Pattern } from "@fluent/bundle/esm/ast";
@@ -16,22 +16,24 @@ function ftlFrom(lang: Lang) {
 }
 export default {
   install(app: any) {
-    let bundle = new FluentBundle("en");
-    app.config.globalProperties.$setLang = function (lang: Lang) {
-      const ftl = ftlFrom(lang);
-      const resource = new FluentResource(ftl);
-      bundle = new FluentBundle(lang);
-      bundle.addResource(resource);
-    };
-    app.config.globalProperties.$t = function (
-      code: TranslationKey,
-      args?: Record<string, FluentVariable>,
-    ): string {
-      const msg = bundle.getMessage(code);
+    const i18nstate = reactive({
+      bundle: new FluentBundle("en"),
+    });
+
+    const t = (code: TranslationKey, args?: Record<string, FluentVariable>): string => {
+      const msg = i18nstate.bundle.getMessage(code);
       if (msg?.value) {
-        return bundle.formatPattern(msg.value as Pattern, args);
+        return i18nstate.bundle.formatPattern(msg.value as Pattern, args);
       }
       return "";
     };
+    t.set = (lang: Lang) => {
+      const ftl = ftlFrom(lang);
+      const resource = new FluentResource(ftl);
+      let bundle = new FluentBundle(lang);
+      bundle.addResource(resource);
+      i18nstate.bundle = bundle;
+    };
+    app.config.globalProperties.$t = t;
   },
 };

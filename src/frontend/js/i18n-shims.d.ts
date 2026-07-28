@@ -4,8 +4,10 @@ import { FluentVariable } from "@fluent/bundle";
 
 declare module "vue" {
   interface ComponentCustomProperties {
-    $setLang: (lang: Lang) => void;
-    $t: (code: TranslationKey, args?: Record<string, FluentVariable>) => string;
+    $t: {
+      (): (code: TranslationKey, args?: Record<string, FluentVariable>) => string;
+      set: (lang: Lang) => void;
+    };
   }
 }
 

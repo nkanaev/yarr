@@ -27,7 +27,7 @@ export default defineComponent({
     };
   },
   created() {
-    this.$setLang(window.app.settings.language);
+    this.$t.set(document.documentElement.lang);
   },
   methods: {
     login(event: Event) {
