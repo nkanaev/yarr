@@ -606,6 +606,19 @@ import { InterfaceType } from "typescript";
 
 var app = window.app;
 
+declare module "vue" {
+  interface ComponentCustomProperties {
+    $refs: {
+      itemlist: HTMLElement;
+      content: HTMLElement;
+      newFeedFolder: HTMLSelectElement;
+      opmlInputForm: HTMLFormElement;
+      menuDropdown: InstanceType<typeof dropdown>;
+      toast: InstanceType<typeof toast>;
+    };
+  }
+}
+
 type Theme = "system" | "light" | "sepia" | "night";
 type ThemeFont = "" | "serif" | "monospace";
 type Filter = "" | "starred" | "unread";
@@ -834,7 +847,7 @@ export default defineComponent({
       this.items = [];
       this.itemsHasMore = true;
       api.settings.update({ feed: newVal }).then(() => this.refreshItems(false));
-      if (this.$refs.itemlist) (this.$refs.itemlist as HTMLElement).scrollTop = 0;
+      if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0;
     },
     itemSelected(newVal, oldVal) {
       this.itemSelectedReadability = "";
@@ -842,7 +855,7 @@ export default defineComponent({
         this.itemSelectedDetails = null;
         return;
       }
-      if (this.$refs.content) (this.$refs.content as HTMLElement).scrollTop = 0;
+      if (this.$refs.content) this.$refs.content.scrollTop = 0;
 
       api.items.get(newVal).then(item => {
         this.itemSelectedDetails = item;
@@ -968,7 +981,7 @@ export default defineComponent({
       var bottomSpace = 70;
       var scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
 
-      var el = this.$refs.itemlist as HTMLElement;
+      var el = this.$refs.itemlist;
 
       if (!el || el.scrollHeight === 0) return false; // element is invisible (responsive design)
 
@@ -1033,7 +1046,7 @@ export default defineComponent({
         this.refreshFeeds().then(() => {
           this.$nextTick(() => {
             if (this.$refs.newFeedFolder) {
-              (this.$refs.newFeedFolder as HTMLSelectElement).value = String(result.id);
+              this.$refs.newFeedFolder.value = String(result.id);
             }
           });
         });
@@ -1139,8 +1152,8 @@ export default defineComponent({
     },
     importOPML(event: Event) {
       const input = event.target as HTMLInputElement;
-      const form = this.$refs.opmlInputForm as HTMLFormElement;
-      (this.$refs.menuDropdown as InstanceType<typeof dropdown>).hide();
+      const form = this.$refs.opmlInputForm;
+      this.$refs.menuDropdown.hide();
       api.upload_opml(form).then(() => {
         input.value = "";
         this.refreshFeeds();
