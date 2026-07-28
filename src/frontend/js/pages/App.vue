@@ -571,6 +571,7 @@
       </div>
       <v-shortcuts v-else-if="settings == 'shortcuts'" />
     </v-modal>
+    <v-toast ref="toast" />
   </div>
 </template>
 

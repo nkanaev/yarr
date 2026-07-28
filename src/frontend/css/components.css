@@ -285,6 +285,35 @@
   }
 }
 
+.c-toast {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--v-border-color);
+  border-radius: var(--bs-border-radius);
+  color: var(--v-fg);
+  background-color: var(--v-bg);
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+  pointer-events: auto;
+
+  & > .c-button-link {
+    line-height: 1;
+    opacity: 0.6;
+    &:hover { opacity: 1; }
+  }
+}
+
+.toast-enter-active {
+  transition: opacity 0.2s ease;
+}
+
+.toast-enter-from {
+  opacity: 0;
+}
+
+.toast-move {
+  transition: transform 0.2s ease;
+}
+
 .drag {
   position: absolute;
   top: 0;
