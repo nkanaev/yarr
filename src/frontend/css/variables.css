@@ -1,5 +1,3 @@
-/* theme: light (default) + system (prefers-color-scheme: light) */
-
 :root {
   --v-light-bg: #fff;
   --v-sepia-bg: #f4f0e5;
@@ -15,7 +13,6 @@
   --v-selected-fg: hsl(from var(--v-sepia-bg) h s 90%);
 
   --v-border-color: #ddd;
-  --v-color-primary: #0080d4;
   --v-color-danger: var(--bs-form-invalid-border-color);
 
   --v-button-background: var(--v-bg);
@@ -83,7 +80,7 @@
   }
 }
 
-/* TODO: system is a duplicate of light/night.  */
+/* TODO: system vars are a copy of light/night.  */
 
 @media (prefers-color-scheme: light) {
   [data-theme="system"] {
