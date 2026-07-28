@@ -469,7 +469,7 @@
           <h1>
             <b>{{ itemSelectedDetails.title || $t("untitled") }}</b>
           </h1>
-          <div class="text-muted">
+          <div class="opacity-50">
             <div>
               <span
                 class="cursor-pointer"
