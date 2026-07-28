@@ -108,7 +108,7 @@ func (s *Server) handleManifest(c *router.Context) {
 		"start_url":   "/" + strings.TrimPrefix(s.BasePath, "/"),
 		"icons": []map[string]any{
 			{
-				"src":   s.BasePath + "/static/graphicarts/favicon.png",
+				"src":   s.BasePath + "/static/favicon.png",
 				"sizes": "64x64",
 				"type":  "image/png",
 			},
