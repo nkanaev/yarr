@@ -698,5 +698,35 @@
     "pt": "Senha",
     "zh": "密码",
     "ru": "Пароль"
+  },
+  "fail_readability": {
+    "en": "Failed to load readability",
+    "de": "Fehler beim Lesbarkeits-Modus",
+    "fr": "Échec du chargement de la lisibilité",
+    "es": "Error al cargar la legibilidad",
+    "ja": "読みやすさの読み込みに失敗しました",
+    "pt": "Falha ao carregar legibilidade",
+    "zh": "阅读模式加载失败",
+    "ru": "Не удалось загрузить читаемый режим"
+  },
+  "error_network": {
+    "en": "Network connection error",
+    "de": "Netzwerkfehler",
+    "fr": "Erreur de connexion",
+    "es": "Error de conexión",
+    "ja": "ネットワーク接続エラー",
+    "pt": "Erro de conexão",
+    "zh": "网络连接错误",
+    "ru": "Ошибка сети"
+  },
+  "error_server": {
+    "en": "Server error: {$code} {$text}",
+    "de": "Serverfehler: {$code} {$text}",
+    "fr": "Erreur du serveur : {$code} {$text}",
+    "es": "Error del servidor: {$code} {$text}",
+    "ja": "サーバーエラー: {$code} {$text}",
+    "pt": "Erro do servidor: {$code} {$text}",
+    "zh": "服务器错误：{$code} {$text}",
+    "ru": "Ошибка сервера: {$code} {$text}"
   }
 }

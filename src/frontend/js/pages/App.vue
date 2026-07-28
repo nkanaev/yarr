@@ -578,7 +578,7 @@
 <script lang="ts">
 import type { Lang } from "../i18n";
 import api from "../api";
-import { scrollto, debounce, debounceMixin } from "../utils";
+import { scrollto, debounce, debounceMixin, to } from "../utils";
 import drag from "../components/drag.vue";
 import dropdown from "../components/dropdown.vue";
 import modal from "../components/modal.vue";
@@ -586,6 +586,7 @@ import shortcuts from "../components/shortcuts.vue";
 import relativeTime from "../components/relative-time.vue";
 import icon from "../components/icon.vue";
 import feedTree from "../components/feedtree.vue";
+import toast from "../components/toast.vue";
 import type { FeedTreeNode, TreeFeedNode, TreeFolderNode } from "../components/feedtree.vue";
 import scrollDir from "../directives/scroll";
 import focusDir from "../directives/focus";
@@ -637,6 +638,7 @@ export default defineComponent({
     "v-relative-time": relativeTime,
     "v-icon": icon,
     "v-feedtree": feedTree,
+    "v-toast": toast,
   },
   directives: {
     scroll: scrollDir,
@@ -1165,19 +1167,21 @@ export default defineComponent({
         document.location.reload();
       });
     },
-    toggleReadability() {
+    async toggleReadability() {
       if (this.itemSelectedReadability) {
         this.itemSelectedReadability = "";
         return;
       }
       var item = this.itemSelectedDetails;
-      if (!item) return;
-      if (item.link) {
-        this.loading.readability = true;
-        api.crawl(item.link).then(data => {
-          this.itemSelectedReadability = data && data.content;
-          this.loading.readability = false;
-        });
+      if (!item?.link) return;
+      this.loading.readability = true;
+      const [err, data] = await to(api.crawl(item!.link));
+      this.loading.readability = false;
+
+      if (err) {
+        this.$refs.toast.addToast(this.$t('fail_readability'), { level: "fail", closeable: false, err });
+      } else {
+        this.itemSelectedReadability = data?.content || "";
       }
     },
     showSettings(settings: string) {

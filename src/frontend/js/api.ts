@@ -47,7 +47,18 @@ function api(method: string, endpoint: string, opts: ApiOptions = {}) {
   return fetch(url, init);
 }
 
+export class HTTPError extends Error {
+  status: number;
+  statusText: string;
+  constructor(res: Response) {
+    super(res.statusText);
+    this.status = res.status;
+    this.statusText = res.statusText
+  }
+}
+
 function json<T>(res: Response): Promise<T> {
+  if (!res.ok) throw new HTTPError(res);
   return res.json() as Promise<T>;
 }
 
