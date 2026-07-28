@@ -13,6 +13,7 @@
 </template>
 
 <script lang="ts">
+import { Lang } from "../i18n";
 import icons from "../icons";
 import { defineComponent } from "vue";
 
@@ -27,7 +28,7 @@ export default defineComponent({
     };
   },
   created() {
-    this.$t.set(document.documentElement.lang);
+    this.$t.set(document.documentElement.lang as Lang);
   },
   methods: {
     login(event: Event) {

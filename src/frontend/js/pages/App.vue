@@ -637,7 +637,7 @@ export default defineComponent({
       });
 
     this.updateMetaTheme();
-    this.$t.set(document.documentElement.lang);
+    this.$t.set(document.documentElement.lang as Lang);
 
     // keep the theme-color meta tag in sync when the OS color scheme changes
     this._colorSchemeMql = window.matchMedia("(prefers-color-scheme: dark)");
