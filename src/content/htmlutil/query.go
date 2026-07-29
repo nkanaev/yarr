@@ -44,8 +44,8 @@ func Closest(node *html.Node, sel string) *html.Node {
 
 func NewMatcher(sel string) Matcher {
 	multi := MultiMatch{}
-	parts := strings.Split(sel, ",")
-	for _, part := range parts {
+	parts := strings.SplitSeq(sel, ",")
+	for part := range parts {
 		part := strings.TrimSpace(part)
 		if nodeNameRegex.MatchString(part) {
 			multi.Add(ElementMatch{Name: part})

@@ -143,8 +143,8 @@ func FindIcons(body string, base string) []string {
 		return n.Type == html.ElementNode && n.Data == "link"
 	}
 	for _, node := range htmlutil.FindNodes(doc, isLink) {
-		rels := strings.Split(htmlutil.Attr(node, "rel"), " ")
-		for _, rel := range rels {
+		rels := strings.SplitSeq(htmlutil.Attr(node, "rel"), " ")
+		for rel := range rels {
 			if strings.EqualFold(rel, "icon") {
 				icons = append(icons, htmlutil.AbsoluteUrl(htmlutil.Attr(node, "href"), base))
 			}

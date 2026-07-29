@@ -140,7 +140,7 @@ func BenchmarkFeedStats_MultipleFeeds(b *testing.B) {
 
 	numFeeds := 1000
 	var feeds []*model.Feed
-	for k := 0; k < numFeeds; k++ {
+	for k := range numFeeds {
 		feeds = append(feeds, db.CreateFeed(model.CreateFeedParams{
 			FeedLink: fmt.Sprintf("http://f%d.xml", k),
 		}))
@@ -148,7 +148,7 @@ func BenchmarkFeedStats_MultipleFeeds(b *testing.B) {
 
 	now := time.Now()
 	var all []model.Item
-	for i := 0; i < 100_000; i++ {
+	for i := range 100_000 {
 		all = append(all, model.Item{
 			GUID:   fmt.Sprintf("i-%d", i),
 			FeedId: feeds[i%numFeeds].Id,
@@ -197,7 +197,7 @@ func BenchmarkListItems_Search(b *testing.B) {
 	feed := db.CreateFeed(model.CreateFeedParams{FeedLink: "http://search.xml"})
 	now := time.Now()
 	var all []model.Item
-	for i := 0; i < 10000; i++ {
+	for i := range 10000 {
 		all = append(all, model.Item{
 			GUID:    fmt.Sprintf("s-%d", i),
 			FeedId:  feed.Id,
@@ -250,12 +250,12 @@ func BenchmarkMarkItemsRead_ByFolder(b *testing.B) {
 	folder := db.CreateFolder("perf")
 	now := time.Now()
 	var all []model.Item
-	for k := 0; k < 5; k++ {
+	for k := range 5 {
 		feed := db.CreateFeed(model.CreateFeedParams{
 			FeedLink: fmt.Sprintf("http://f%d.xml", k),
 			FolderID: &folder.Id,
 		})
-		for i := 0; i < 1_000_000/5; i++ {
+		for i := range 1_000_000 / 5 {
 			all = append(all, model.Item{
 				GUID:   fmt.Sprintf("f%d-i%d", k, i),
 				FeedId: feed.Id,

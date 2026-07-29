@@ -231,7 +231,7 @@ func (s *Server) feverItemsHandler(c *router.Context) {
 	switch {
 	case query.Get("with_ids") != "":
 		ids := make([]int64, 0)
-		for _, idstr := range strings.Split(query.Get("with_ids"), ",") {
+		for idstr := range strings.SplitSeq(query.Get("with_ids"), ",") {
 			if idnum, err := strconv.ParseInt(idstr, 10, 64); err == nil {
 				ids = append(ids, idnum)
 			}

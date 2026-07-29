@@ -64,8 +64,8 @@ func TestGetSettings(t *testing.T) {
 func TestSettingsExhaustive(t *testing.T) {
 	dbtest(t, func(t *testing.T, s storage.Storage) {
 
-		settingsType := reflect.TypeOf(model.Settings{})
-		paramsType := reflect.TypeOf(model.UpdateSettingsParams{})
+		settingsType := reflect.TypeFor[model.Settings]()
+		paramsType := reflect.TypeFor[model.UpdateSettingsParams]()
 
 		settings := s.GetSettings()
 		m := settings.Map()
@@ -93,7 +93,7 @@ func TestSettingsExhaustive(t *testing.T) {
 				if pJsonTag == jsonKey {
 					foundInParams = true
 					// Also check it's a pointer
-					if pField.Type.Kind() != reflect.Ptr {
+					if pField.Type.Kind() != reflect.Pointer {
 						t.Errorf("Field %s in UpdateSettingsParams should be a pointer", pField.Name)
 					}
 					break
