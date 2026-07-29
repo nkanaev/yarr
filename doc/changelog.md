@@ -1,7 +1,8 @@
 # upcoming
 
+- (new) show API errors notifications
 - (fix) delayed initial render of feeds (thanks to @Digitalone1 for the report)
-- (etc) frontend refactoring (vue 2 -> 3)
+- (etc) frontend refactoring (vue 2 -> 3, bootstrap 4 -> 5)
 
 # v2.8 (2026-07-16)
 
