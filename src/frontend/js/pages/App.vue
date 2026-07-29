@@ -836,7 +836,7 @@ export default defineComponent({
       handler(theme) {
         this.updateMetaTheme();
         (async () => {
-          const [err] = await to(
+          const [err, _] = await to(
             api.settings.update({
               theme_name: theme.name,
               theme_font: theme.font,
@@ -1552,7 +1552,7 @@ export default defineComponent({
     },
     errDescription(err: unknown): string | undefined {
       if (err instanceof HTTPError)
-        return this.$t("error_server", { code: err.status, text: err.status });
+        return this.$t("error_server", { code: err.status, text: err.statusText });
       if (err instanceof NetworkError) return this.$t("error_network");
       return undefined;
     },
