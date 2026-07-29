@@ -162,29 +162,29 @@ type FeedStat struct {
 }
 
 type Settings struct {
-	Filter          string `json:"filter"`
-	Feed            string `json:"feed"`
-	FeedListWidth   int    `json:"feed_list_width"`
-	ItemListWidth   int    `json:"item_list_width"`
-	SortNewestFirst bool   `json:"sort_newest_first"`
-	ThemeName       string `json:"theme_name"`
-	ThemeFont       string `json:"theme_font"`
-	ThemeSize       int    `json:"theme_size"`
-	RefreshRate     int64  `json:"refresh_rate"`
-	Language        string `json:"language"`
+	Filter          string  `json:"filter"`
+	Feed            string  `json:"feed"`
+	FeedListWidth   int     `json:"feed_list_width"`
+	ItemListWidth   int     `json:"item_list_width"`
+	SortNewestFirst bool    `json:"sort_newest_first"`
+	ThemeName       string  `json:"theme_name"`
+	ThemeFont       string  `json:"theme_font"`
+	ThemeSize       float64 `json:"theme_size"`
+	RefreshRate     int64   `json:"refresh_rate"`
+	Language        string  `json:"language"`
 }
 
 type UpdateSettingsParams struct {
-	Filter          *string `json:"filter"`
-	Feed            *string `json:"feed"`
-	FeedListWidth   *int    `json:"feed_list_width"`
-	ItemListWidth   *int    `json:"item_list_width"`
-	SortNewestFirst *bool   `json:"sort_newest_first"`
-	ThemeName       *string `json:"theme_name"`
-	ThemeFont       *string `json:"theme_font"`
-	ThemeSize       *int    `json:"theme_size"`
-	RefreshRate     *int64  `json:"refresh_rate"`
-	Language        *string `json:"language"`
+	Filter          *string  `json:"filter"`
+	Feed            *string  `json:"feed"`
+	FeedListWidth   *int     `json:"feed_list_width"`
+	ItemListWidth   *int     `json:"item_list_width"`
+	SortNewestFirst *bool    `json:"sort_newest_first"`
+	ThemeName       *string  `json:"theme_name"`
+	ThemeFont       *string  `json:"theme_font"`
+	ThemeSize       *float64 `json:"theme_size"`
+	RefreshRate     *int64   `json:"refresh_rate"`
+	Language        *string  `json:"language"`
 }
 
 func (s Settings) Map() map[string]any {

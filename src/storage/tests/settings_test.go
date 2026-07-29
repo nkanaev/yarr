@@ -27,6 +27,7 @@ func TestUpdateSettings(t *testing.T) {
 			ThemeName:     ptr("night"),
 			FeedListWidth: ptr(400),
 			RefreshRate:   ptr(int64(15)),
+			ThemeSize:     ptr(1.2),
 		}
 
 		if ok := s.UpdateSettings(params); !ok {
@@ -43,6 +44,9 @@ func TestUpdateSettings(t *testing.T) {
 		}
 		if settings.RefreshRate != 15 {
 			t.Errorf("expected refresh_rate 15, got %d", settings.RefreshRate)
+		}
+		if settings.ThemeSize != 1.2 {
+			t.Errorf("expected theme_size 1.2, got %v", settings.ThemeSize)
 		}
 	})
 }
