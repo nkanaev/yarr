@@ -44,7 +44,10 @@ function api(method: string, endpoint: string, opts: ApiOptions = {}) {
     init.body = JSON.stringify(json);
   }
 
-  return fetch(url, init);
+  return fetch(url, init).catch((err) => {
+    if (err instanceof TypeError) throw new NetworkError(err.message);
+    throw err;
+  });
 }
 
 export class HTTPError extends Error {
@@ -54,6 +57,12 @@ export class HTTPError extends Error {
     super(res.statusText);
     this.status = res.status;
     this.statusText = res.statusText
+  }
+}
+
+export class NetworkError extends Error {
+  constructor(msg: string) {
+    super(msg);
   }
 }
 

@@ -577,7 +577,7 @@
 
 <script lang="ts">
 import type { Lang } from "../i18n";
-import api from "../api";
+import api, { NetworkError, HTTPError } from "../api";
 import { scrollto, debounce, debounceMixin, to } from "../utils";
 import drag from "../components/drag.vue";
 import dropdown from "../components/dropdown.vue";
@@ -603,7 +603,6 @@ import type {
   ItemListQuery,
   ItemMarkQuery,
 } from "../api-types";
-import { InterfaceType } from "typescript";
 
 var app = window.app;
 
@@ -1179,7 +1178,10 @@ export default defineComponent({
       this.loading.readability = false;
 
       if (err) {
-        this.$refs.toast.addToast(this.$t('fail_readability'), { level: "fail", closeable: false, err });
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_readability"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
       } else {
         this.itemSelectedReadability = data?.content || "";
       }
@@ -1333,6 +1335,12 @@ export default defineComponent({
       this.$t.set(lang);
       this.language = lang;
       api.settings.update({ language: lang });
+    },
+    errDescription(err: unknown): string | undefined {
+      if (err instanceof HTTPError)
+        return this.$t("error_server", { code: err.status, text: err.status });
+      if (err instanceof NetworkError) return this.$t("error_network");
+      return undefined;
     },
   },
 });
