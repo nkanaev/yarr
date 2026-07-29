@@ -643,20 +643,34 @@ export default defineComponent({
     scroll: scrollDir,
     focus: focusDir,
   },
-  created() {
-    this.refreshStats()
-      .then(() => this.refreshFeeds())
-      .then(() => {
-        this.refreshItems(false);
-        this.computeStats();
-      });
-
+  async created() {
     this.updateMetaTheme();
     this.$t.set(document.documentElement.lang as Lang);
 
     // keep the theme-color meta tag in sync when the OS color scheme changes
     this._colorSchemeMql = window.matchMedia("(prefers-color-scheme: dark)");
     this._colorSchemeMql.addEventListener("change", this.updateMetaTheme);
+
+    const [statsErr] = await to(this.refreshStats());
+    if (statsErr) {
+      this.$refs.toast.addToast(
+        { title: this.$t("fail_load"), description: this.errDescription(statsErr) },
+        { level: "fail", closeable: false },
+      );
+    }
+
+    const [feedsErr] = await to(this.refreshFeeds());
+    if (feedsErr) {
+      this.$refs.toast.addToast(
+        { title: this.$t("fail_load"), description: this.errDescription(feedsErr) },
+        { level: "fail", closeable: false },
+      );
+    }
+
+    if (!feedsErr) {
+      this.refreshItems(false);
+      this.computeStats();
+    }
   },
   beforeUnmount() {
     this._colorSchemeMql?.removeEventListener("change", this.updateMetaTheme);
@@ -821,11 +835,21 @@ export default defineComponent({
       deep: true,
       handler(theme) {
         this.updateMetaTheme();
-        api.settings.update({
-          theme_name: theme.name,
-          theme_font: theme.font,
-          theme_size: theme.size,
-        });
+        (async () => {
+          const [err] = await to(
+            api.settings.update({
+              theme_name: theme.name,
+              theme_font: theme.font,
+              theme_size: theme.size,
+            }),
+          );
+          if (err) {
+            this.$refs.toast.addToast(
+              { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+              { level: "fail", closeable: false },
+            );
+          }
+        })();
       },
     },
     feedStats: {
@@ -834,23 +858,41 @@ export default defineComponent({
         this.$debounce("watch:feedStats", this.computeStats, 500);
       },
     },
-    filterSelected(newVal, oldVal) {
-      if (oldVal === undefined) return; // do nothing, initial setup
+    async filterSelected(newVal, oldVal) {
+      if (oldVal === undefined) return;
       this.itemSelected = null;
       this.items = [];
       this.itemsHasMore = true;
-      api.settings.update({ filter: newVal }).then(() => this.refreshItems(false));
+
+      const [err] = await to(api.settings.update({ filter: newVal }));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      this.refreshItems(false);
       this.computeStats();
     },
-    feedSelected(newVal, oldVal) {
-      if (oldVal === undefined) return; // do nothing, initial setup
+    async feedSelected(newVal, oldVal) {
+      if (oldVal === undefined) return;
       this.itemSelected = null;
       this.items = [];
       this.itemsHasMore = true;
-      api.settings.update({ feed: newVal }).then(() => this.refreshItems(false));
+
+      this.refreshItems(false);
       if (this.$refs.itemlist) this.$refs.itemlist.scrollTop = 0;
+
+      const [err] = await to(api.settings.update({ feed: newVal }));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+      }
     },
-    itemSelected(newVal, oldVal) {
+    async itemSelected(newVal, oldVal) {
       this.itemSelectedReadability = "";
       if (newVal === null) {
         this.itemSelectedDetails = null;
@@ -858,37 +900,81 @@ export default defineComponent({
       }
       if (this.$refs.content) this.$refs.content.scrollTop = 0;
 
-      api.items.get(newVal).then(item => {
-        this.itemSelectedDetails = item;
-        const details = this.itemSelectedDetails;
-        if (details.status == "unread") {
-          api.items.update(details.id, { status: "read" }).then(() => {
-            this.feedStats[details.feed_id].unread -= 1;
-            var itemInList = this.items.find(i => i.id == item.id);
-            if (itemInList) itemInList.status = "read";
-            details.status = "read";
-          });
+      const [itemErr, item] = await to(api.items.get(newVal));
+      if (itemErr) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_load"), description: this.errDescription(itemErr) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      this.itemSelectedDetails = item;
+      const details = this.itemSelectedDetails;
+      if (details.status == "unread") {
+        const [updateErr] = await to(api.items.update(details.id, { status: "read" }));
+        if (updateErr) {
+          this.$refs.toast.addToast(
+            { title: this.$t("fail_update_article"), description: this.errDescription(updateErr) },
+            { level: "fail", closeable: false },
+          );
+          return;
         }
-      });
+        this.feedStats[details.feed_id].unread -= 1;
+        var itemInList = this.items.find(i => i.id == item.id);
+        if (itemInList) itemInList.status = "read";
+        details.status = "read";
+      }
     },
     itemSearch() {
       this.$debounce("watch:itemSearch", this.refreshItems, 500);
     },
-    itemSortNewestFirst(newVal, oldVal) {
-      if (oldVal === undefined) return; // do nothing, initial setup
-      api.settings.update({ sort_newest_first: newVal }).then(() => this.refreshItems(false));
+    async itemSortNewestFirst(newVal, oldVal) {
+      if (oldVal === undefined) return;
+      const [err] = await to(api.settings.update({ sort_newest_first: newVal }));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      this.refreshItems(false);
     },
     feedListWidth: debounce(function (newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
       api.settings.update({ feed_list_width: newVal });
+
+      // const [err] = await to(api.settings.update({ feed_list_width: newVal }));
+      // if (err) {
+      //   this.$refs.toast.addToast(
+      //     { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+      //     { level: "fail", closeable: false },
+      //   );
+      // }
     }, 1000),
     itemListWidth: debounce(function (newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup
       api.settings.update({ item_list_width: newVal });
+
+      // const [err] = await to(api.settings.update({ item_list_width: newVal }));
+      // if (err) {
+      //   this.$refs.toast.addToast(
+      //     { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+      //     { level: "fail", closeable: false },
+      //   );
+      // }
     }, 1000),
     refreshRate(newVal, oldVal) {
-      if (oldVal === undefined) return; // do nothing, initial setup
-      api.settings.update({ refresh_rate: newVal });
+      if (oldVal === undefined) return;
+      (async () => {
+        const [err] = await to(api.settings.update({ refresh_rate: newVal }));
+        if (err) {
+          this.$refs.toast.addToast(
+            { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+            { level: "fail", closeable: false },
+          );
+        }
+      })();
     },
   },
   methods: {
@@ -903,20 +989,33 @@ export default defineComponent({
 
       document.documentElement.dataset.theme = this.theme.name;
     },
-    refreshStats(loopMode?: boolean) {
-      return api.status().then(data => {
-        if (loopMode && !this.itemSelected) this.refreshItems();
+    async refreshStats(loopMode?: boolean) {
+      const [err, data] = await to(api.status());
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_load"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
 
-        this.loading.feeds = data.running;
-        if (data.running) {
-          setTimeout(() => this.refreshStats(true), 500);
-        }
-        this.feedStats = data.stats.reduce((acc, stat) => ({ ...acc, [stat.feed_id]: stat }), {});
+      if (loopMode && !this.itemSelected) this.refreshItems();
 
-        api.feeds.list_errors().then(errors => {
-          this.feed_errors = errors;
-        });
-      });
+      this.loading.feeds = data.running;
+      if (data.running) {
+        setTimeout(() => this.refreshStats(true), 500);
+      }
+      this.feedStats = data.stats.reduce((acc, stat) => ({ ...acc, [stat.feed_id]: stat }), {});
+
+      const [feedErr, errors] = await to(api.feeds.list_errors());
+      if (feedErr) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_load"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      this.feed_errors = errors;
     },
     getItemsQuery(): ItemListQuery {
       var query: ItemListQuery = {};
@@ -941,13 +1040,19 @@ export default defineComponent({
       }
       return query;
     },
-    refreshFeeds() {
-      return Promise.all([api.folders.list(), api.feeds.list()]).then(values => {
-        this.folders = values[0];
-        this.feeds = values[1];
-      });
+    async refreshFeeds() {
+      const [err, values] = await to(Promise.all([api.folders.list(), api.feeds.list()]));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_load"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      this.folders = values[0];
+      this.feeds = values[1];
     },
-    refreshItems(loadMore = false) {
+    async refreshItems(loadMore = false) {
       if (this.feedSelected === null) {
         this.items = [];
         this.itemsHasMore = false;
@@ -960,21 +1065,28 @@ export default defineComponent({
       }
 
       this.loading.items = true;
-      return api.items.list(query).then(data => {
-        if (loadMore) {
-          this.items = this.items.concat(data.list);
-        } else {
-          this.items = data.list;
-        }
-        this.itemsHasMore = data.has_more;
-        this.loading.items = false;
+      const [err, data] = await to(api.items.list(query));
+      this.loading.items = false;
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_load"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
 
-        // load more if there's some space left at the bottom of the item list.
-        this.$nextTick(() => {
-          if (this.itemsHasMore && !this.loading.items && this.itemListCloseToBottom()) {
-            this.refreshItems(true);
-          }
-        });
+      if (loadMore) {
+        this.items = this.items.concat(data.list);
+      } else {
+        this.items = data.list;
+      }
+      this.itemsHasMore = data.has_more;
+
+      // load more if there's some space left at the bottom of the item list.
+      this.$nextTick(() => {
+        if (this.itemsHasMore && !this.loading.items && this.itemListCloseToBottom()) {
+          this.refreshItems(true);
+        }
       });
     },
     itemListCloseToBottom() {
@@ -996,22 +1108,34 @@ export default defineComponent({
       if (this.itemSelected && this.itemSelected === this.items[this.items.length - 1].id)
         return this.refreshItems(true);
     },
-    markItemsRead() {
+    async markItemsRead() {
       const markQuery = this.getItemsQuery();
       const query: ItemMarkQuery = {
         folder_id: markQuery.folder_id,
         feed_id: markQuery.feed_id,
       };
-      api.items.mark_read(query).then(() => {
-        this.items = [];
-        this.itemSelected = null;
-        this.itemsHasMore = false;
-        this.refreshStats();
-      });
+      const [err] = await to(api.items.mark_read(query));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_update_article"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      this.items = [];
+      this.itemSelected = null;
+      this.itemsHasMore = false;
+      this.refreshStats();
     },
-    toggleFolderExpanded(folder: Folder) {
+    async toggleFolderExpanded(folder: Folder) {
       folder.is_expanded = !folder.is_expanded;
-      api.folders.update(folder.id, { is_expanded: folder.is_expanded });
+      const [err] = await to(api.folders.update(folder.id, { is_expanded: folder.is_expanded }));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_folder"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+      }
     },
     formatDate(datestr: string) {
       const options: Intl.DateTimeFormatOptions = {
@@ -1023,80 +1147,139 @@ export default defineComponent({
       };
       return new Date(datestr).toLocaleDateString(undefined, options);
     },
-    moveFeed(feed: Feed, folder_id: number | null) {
-      api.feeds.update(feed.id, { folder_id }).then(() => {
-        feed.folder_id = folder_id;
-        this.refreshStats();
-      });
+    async moveFeed(feed: Feed, folder_id: number | null) {
+      const [err] = await to(api.feeds.update(feed.id, { folder_id }));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_feed"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      feed.folder_id = folder_id;
+      this.refreshStats();
     },
-    moveFeedToNewFolder(feed: Feed) {
+    async moveFeedToNewFolder(feed: Feed) {
       const title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
-      api.folders.create({ title: title }).then(folder => {
-        api.feeds.update(feed.id, { folder_id: folder.id }).then(() => {
-          this.refreshFeeds().then(() => {
-            this.refreshStats();
-          });
-        });
-      });
+
+      const [folderErr, folder] = await to(api.folders.create({ title: title }));
+      if (folderErr) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_folder"), description: this.errDescription(folderErr) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+
+      const [updateErr] = await to(api.feeds.update(feed.id, { folder_id: folder.id }));
+      if (updateErr) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_feed"), description: this.errDescription(updateErr) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+
+      const [feedsErr] = await to(this.refreshFeeds());
+      if (!feedsErr) this.refreshStats();
     },
-    createNewFeedFolder() {
+    async createNewFeedFolder() {
       const title = prompt(this.$t("prompt_folder_name"));
       if (!title) return;
-      api.folders.create({ title: title }).then(result => {
-        this.refreshFeeds().then(() => {
-          this.$nextTick(() => {
-            if (this.$refs.newFeedFolder) {
-              this.$refs.newFeedFolder.value = String(result.id);
-            }
-          });
+
+      const [folderErr, result] = await to(api.folders.create({ title: title }));
+      if (folderErr) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_folder"), description: this.errDescription(folderErr) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+
+      const [feedsErr] = await to(this.refreshFeeds());
+      if (!feedsErr) {
+        this.$nextTick(() => {
+          if (this.$refs.newFeedFolder) {
+            this.$refs.newFeedFolder.value = String(result.id);
+          }
         });
-      });
+      }
     },
-    renameFolder(folder: Folder) {
+    async renameFolder(folder: Folder) {
       const newTitle = prompt(this.$t("prompt_new_title"), folder.title);
       if (newTitle) {
-        api.folders.update(folder.id, { title: newTitle }).then(() => {
-          folder.title = newTitle;
-          this.folders.sort((a, b) => a.title.localeCompare(b.title));
-        });
+        const [err] = await to(api.folders.update(folder.id, { title: newTitle }));
+        if (err) {
+          this.$refs.toast.addToast(
+            { title: this.$t("fail_save_folder"), description: this.errDescription(err) },
+            { level: "fail", closeable: false },
+          );
+          return;
+        }
+        folder.title = newTitle;
+        this.folders.sort((a, b) => a.title.localeCompare(b.title));
       }
     },
-    deleteFolder(folder: Folder) {
+    async deleteFolder(folder: Folder) {
       if (confirm(this.$t("confirm_delete", { name: folder.title }))) {
-        api.folders.delete(folder.id).then(() => {
-          this.feedSelected = null;
-          this.refreshStats();
-          this.refreshFeeds();
-        });
+        const [err] = await to(api.folders.delete(folder.id));
+        if (err) {
+          this.$refs.toast.addToast(
+            { title: this.$t("fail_save_folder"), description: this.errDescription(err) },
+            { level: "fail", closeable: false },
+          );
+          return;
+        }
+        this.feedSelected = null;
+        this.refreshStats();
+        this.refreshFeeds();
       }
     },
-    updateFeedLink(feed: Feed) {
+    async updateFeedLink(feed: Feed) {
       const newLink = prompt(this.$t("prompt_feed_link"), feed.feed_link);
       if (newLink !== null) {
-        api.feeds.update(feed.id, { feed_link: newLink }).then(() => {
-          feed.feed_link = newLink;
-        });
+        const [err] = await to(api.feeds.update(feed.id, { feed_link: newLink }));
+        if (err) {
+          this.$refs.toast.addToast(
+            { title: this.$t("fail_save_feed"), description: this.errDescription(err) },
+            { level: "fail", closeable: false },
+          );
+          return;
+        }
+        feed.feed_link = newLink;
       }
     },
-    renameFeed(feed: Feed) {
+    async renameFeed(feed: Feed) {
       const newTitle = prompt(this.$t("prompt_new_title"), feed.title);
       if (newTitle) {
-        api.feeds.update(feed.id, { title: newTitle }).then(() => {
-          feed.title = newTitle;
-        });
+        const [err] = await to(api.feeds.update(feed.id, { title: newTitle }));
+        if (err) {
+          this.$refs.toast.addToast(
+            { title: this.$t("fail_save_feed"), description: this.errDescription(err) },
+            { level: "fail", closeable: false },
+          );
+          return;
+        }
+        feed.title = newTitle;
       }
     },
-    deleteFeed(feed: Feed) {
+    async deleteFeed(feed: Feed) {
       if (confirm(this.$t("confirm_delete", { name: feed.title }))) {
-        api.feeds.delete(feed.id).then(() => {
-          this.feedSelected = null;
-          this.refreshStats();
-          this.refreshFeeds();
-        });
+        const [err] = await to(api.feeds.delete(feed.id));
+        if (err) {
+          this.$refs.toast.addToast(
+            { title: this.$t("fail_save_feed"), description: this.errDescription(err) },
+            { level: "fail", closeable: false },
+          );
+          return;
+        }
+        this.feedSelected = null;
+        this.refreshStats();
+        this.refreshFeeds();
       }
     },
-    createFeed($event: Event) {
+    async createFeed($event: Event) {
       var form = $event.target as HTMLFormElement;
       var data: FeedCreateData = {
         url: (form.querySelector("input[name=url]") as HTMLInputElement).value,
@@ -1110,22 +1293,28 @@ export default defineComponent({
         if (choice && choice.title_override) data.title_override = choice.title_override;
       }
       this.loading.newfeed = true;
-      api.feeds.create(data).then(result => {
-        if (result.status === "success") {
-          this.refreshFeeds();
-          this.refreshStats();
-          this.settings = "";
-          this.feedSelected = "feed:" + result.feed.id;
-        } else if (result.status === "multiple") {
-          this.feedNewChoice = result.choice;
-          this.feedNewChoiceSelected = result.choice[0].url;
-        } else {
-          alert("No feeds found at the given url.");
-        }
-        this.loading.newfeed = false;
-      });
+      const [err, result] = await to(api.feeds.create(data));
+      this.loading.newfeed = false;
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_feed"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      if (result.status === "success") {
+        this.refreshFeeds();
+        this.refreshStats();
+        this.settings = "";
+        this.feedSelected = "feed:" + result.feed.id;
+      } else if (result.status === "multiple") {
+        this.feedNewChoice = result.choice;
+        this.feedNewChoiceSelected = result.choice[0].url;
+      } else {
+        alert("No feeds found at the given url.");
+      }
     },
-    toggleItemStatus(item: Item, targetstatus: ItemStatus) {
+    async toggleItemStatus(item: Item, targetstatus: ItemStatus) {
       const fallbackstatus: ItemStatus = "read";
       const oldstatus = item.status;
       const newstatus = item.status !== targetstatus ? targetstatus : fallbackstatus;
@@ -1136,14 +1325,21 @@ export default defineComponent({
         }
       };
 
-      api.items.update(item.id, { status: newstatus }).then(() => {
-        updateStats(oldstatus, -1);
-        updateStats(newstatus, +1);
+      const [err] = await to(api.items.update(item.id, { status: newstatus }));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_update_article"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
 
-        var itemInList = this.items.find(i => i.id == item.id);
-        if (itemInList) itemInList.status = newstatus;
-        item.status = newstatus;
-      });
+      updateStats(oldstatus, -1);
+      updateStats(newstatus, +1);
+
+      var itemInList = this.items.find(i => i.id == item.id);
+      if (itemInList) itemInList.status = newstatus;
+      item.status = newstatus;
     },
     toggleItemStarred(item: Item) {
       this.toggleItemStatus(item, "starred");
@@ -1151,20 +1347,32 @@ export default defineComponent({
     toggleItemRead(item: Item) {
       this.toggleItemStatus(item, "unread");
     },
-    importOPML(event: Event) {
+    async importOPML(event: Event) {
       const input = event.target as HTMLInputElement;
       const form = this.$refs.opmlInputForm;
       this.$refs.menuDropdown.hide();
-      api.upload_opml(form).then(() => {
-        input.value = "";
-        this.refreshFeeds();
-        this.refreshStats();
-      });
+      const [err] = await to(api.upload_opml(form));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_import"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      input.value = "";
+      this.refreshFeeds();
+      this.refreshStats();
     },
-    logout() {
-      api.logout().then(() => {
-        document.location.reload();
-      });
+    async logout() {
+      const [err] = await to(api.logout());
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_logout"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      document.location.reload();
     },
     async toggleReadability() {
       if (this.itemSelectedReadability) {
@@ -1207,11 +1415,17 @@ export default defineComponent({
     incrFont(x: number) {
       this.theme.size = +(this.theme.size + 0.1 * x).toFixed(1);
     },
-    fetchAllFeeds() {
+    async fetchAllFeeds() {
       if (this.loading.feeds) return;
-      api.feeds.refresh().then(() => {
-        this.refreshStats();
-      });
+      const [err] = await to(api.feeds.refresh());
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_refresh"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+        return;
+      }
+      this.refreshStats();
     },
     computeStats() {
       let statsFeeds: Record<number, Stats> = {},

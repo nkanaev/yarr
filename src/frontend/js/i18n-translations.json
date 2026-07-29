@@ -699,16 +699,6 @@
     "zh": "密码",
     "ru": "Пароль"
   },
-  "fail_readability": {
-    "en": "Failed to load readability",
-    "de": "Fehler beim Lesbarkeits-Modus",
-    "fr": "Échec du chargement de la lisibilité",
-    "es": "Error al cargar la legibilidad",
-    "ja": "読みやすさの読み込みに失敗しました",
-    "pt": "Falha ao carregar legibilidade",
-    "zh": "阅读模式加载失败",
-    "ru": "Не удалось загрузить читаемый режим"
-  },
   "error_network": {
     "en": "Network connection error",
     "de": "Netzwerkfehler",
@@ -728,5 +718,95 @@
     "pt": "Erro do servidor: {$code} {$text}",
     "zh": "服务器错误：{$code} {$text}",
     "ru": "Ошибка сервера: {$code} {$text}"
+  },
+  "fail_load": {
+    "en": "Failed to load",
+    "de": "Fehler beim Laden",
+    "fr": "Échec du chargement",
+    "es": "Error al cargar",
+    "ja": "読み込みに失敗しました",
+    "pt": "Falha ao carregar",
+    "zh": "加载失败",
+    "ru": "Не удалось загрузить"
+  },
+  "fail_save_feed": {
+    "en": "Failed to save feed",
+    "de": "Fehler beim Speichern des Feeds",
+    "fr": "Échec de l'enregistrement du flux",
+    "es": "Error al guardar el feed",
+    "ja": "フィードの保存に失敗しました",
+    "pt": "Falha ao salvar o feed",
+    "zh": "保存订阅失败",
+    "ru": "Не удалось сохранить ленту"
+  },
+  "fail_save_folder": {
+    "en": "Failed to save folder",
+    "de": "Fehler beim Speichern des Ordners",
+    "fr": "Échec de l'enregistrement du dossier",
+    "es": "Error al guardar la carpeta",
+    "ja": "フォルダの保存に失敗しました",
+    "pt": "Falha ao salvar a pasta",
+    "zh": "保存文件夹失败",
+    "ru": "Не удалось сохранить папку"
+  },
+  "fail_update_article": {
+    "en": "Failed to update article",
+    "de": "Fehler beim Aktualisieren des Artikels",
+    "fr": "Échec de la mise à jour de l'article",
+    "es": "Error al actualizar el artículo",
+    "ja": "記事の更新に失敗しました",
+    "pt": "Falha ao atualizar o artigo",
+    "zh": "更新文章失败",
+    "ru": "Не удалось обновить статью"
+  },
+  "fail_save_settings": {
+    "en": "Failed to save settings",
+    "de": "Fehler beim Speichern der Einstellungen",
+    "fr": "Échec de l'enregistrement des paramètres",
+    "es": "Error al guardar las configuraciones",
+    "ja": "設定の保存に失敗しました",
+    "pt": "Falha ao salvar as configurações",
+    "zh": "保存设置失败",
+    "ru": "Не удалось сохранить настройки"
+  },
+  "fail_refresh": {
+    "en": "Failed to refresh feeds",
+    "de": "Fehler beim Aktualisieren der Feeds",
+    "fr": "Échec de l'actualisation des flux",
+    "es": "Error al actualizar los feeds",
+    "ja": "フィードの更新に失敗しました",
+    "pt": "Falha ao atualizar os feeds",
+    "zh": "刷新订阅失败",
+    "ru": "Не удалось обновить ленты"
+  },
+  "fail_import": {
+    "en": "Failed to import",
+    "de": "Fehler beim Importieren",
+    "fr": "Échec de l'importation",
+    "es": "Error al importar",
+    "ja": "インポートに失敗しました",
+    "pt": "Falha ao importar",
+    "zh": "导入失败",
+    "ru": "Не удалось импортировать"
+  },
+  "fail_logout": {
+    "en": "Failed to log out",
+    "de": "Fehler beim Abmelden",
+    "fr": "Échec de la déconnexion",
+    "es": "Error al cerrar sesión",
+    "ja": "ログアウトに失敗しました",
+    "pt": "Falha ao sair",
+    "zh": "退出登录失败",
+    "ru": "Не удалось выйти из системы"
+  },
+  "fail_readability": {
+    "en": "Failed to load readability",
+    "de": "Fehler beim Lesbarkeits-Modus",
+    "fr": "Échec du chargement de la lisibilité",
+    "es": "Error al cargar la legibilidad",
+    "ja": "読みやすさの読み込みに失敗しました",
+    "pt": "Falha ao carregar legibilidade",
+    "zh": "阅读模式加载失败",
+    "ru": "Не удалось загрузить читаемый режим"
   }
 }
