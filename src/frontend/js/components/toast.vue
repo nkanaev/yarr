@@ -1,7 +1,7 @@
 <template>
   <TransitionGroup
     tag="div"
-    class="position-fixed bottom-0 end-0 pb-3 pe-3 d-flex flex-column gap-2 z-4 pe-none"
+    class="position-fixed bottom-0 end-0 pb-3 pe-3 d-flex flex-column align-items-end gap-2 z-4 pe-none"
     name="toast">
     <div
       class="c-toast d-flex align-items-start gap-2"
