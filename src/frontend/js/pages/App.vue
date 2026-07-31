@@ -352,7 +352,7 @@
               ><v-relative-time v-bind:title="formatDate(item.date)" :val="item.date"
             /></small>
           </div>
-          <div>{{ item.title || $t("untitled") }}</div>
+          <div class="text-break">{{ item.title || $t("untitled") }}</div>
         </div>
         <div class="text-center my-3" v-if="itemsHasMore">
           <span class="c-spinner"></span>
@@ -1545,10 +1545,16 @@ export default defineComponent({
         (!this.itemSelectedDetails || this.itemSelectedDetails.feed_id != feed.id)
       );
     },
-    changeLanguage(lang: Lang) {
+    async changeLanguage(lang: Lang) {
       this.$t.set(lang);
       this.language = lang;
-      api.settings.update({ language: lang });
+      const [err] = await to(api.settings.update({ language: lang }));
+      if (err) {
+        this.$refs.toast.addToast(
+          { title: this.$t("fail_save_settings"), description: this.errDescription(err) },
+          { level: "fail", closeable: false },
+        );
+      }
     },
     errDescription(err: unknown): string | undefined {
       if (err instanceof HTTPError)
