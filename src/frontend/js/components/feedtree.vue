@@ -30,12 +30,8 @@
           @click="$emit('update:modelValue', 'folder:' + node.folder.id)">
           <div class="flex-shrink-0">
             <div @click.stop="$emit('toggle-folder', node.folder)" class="p-2 m-n2">
-              <v-icon
-                name="chevron-right"
-                v-if="!node.folder.is_expanded" />
-              <v-icon
-                name="chevron-down"
-                v-else-if="node.folder.is_expanded" />
+              <v-icon name="chevron-right" v-if="!node.folder.is_expanded" />
+              <v-icon name="chevron-down" v-else-if="node.folder.is_expanded" />
             </div>
           </div>
           <div class="flex-grow-1 min-w-0 text-truncate">

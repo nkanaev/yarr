@@ -20,11 +20,11 @@
   }
 
   select& {
-      background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-      background-repeat: no-repeat;
-      background-position: right 0.5rem center;
-      background-size: 1.25em;
-      padding-right: 2rem; /* Leave room for arrow */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.25em;
+    padding-right: 2rem; /* Leave room for arrow */
   }
 }
 
@@ -246,7 +246,7 @@
     &:focus {
       color: var(--v-hover-fg);
       background-color: var(--v-hover-bg);
-      outline: none
+      outline: none;
     }
     /* todo: focus-visible */
   }
@@ -307,7 +307,9 @@
   & > .c-button-link {
     line-height: 1;
     opacity: 0.6;
-    &:hover { opacity: 1; }
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 

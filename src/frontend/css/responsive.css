@@ -72,7 +72,8 @@
   .drag {
     cursor: default;
   }
-  .c-button-pill, .c-search input {
+  .c-button-pill,
+  .c-search input {
     height: 2rem;
   }
 }

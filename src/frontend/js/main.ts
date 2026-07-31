@@ -24,10 +24,7 @@ const Root = defineComponent({
       if (appRef.value) setupKeybindings(appRef.value);
     });
 
-    return () =>
-      ready.value
-        ? h(App, { ref: appRef })
-        : h(Login, { onLogin });
+    return () => (ready.value ? h(App, { ref: appRef }) : h(Login, { onLogin }));
   },
 });
 

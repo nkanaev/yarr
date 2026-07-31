@@ -41,7 +41,7 @@ export default defineComponent({
   },
   methods: {
     toggle(event: Event) {
-      event.stopPropagation()
+      event.stopPropagation();
       this.open ? this.hide() : this.show();
     },
     show() {

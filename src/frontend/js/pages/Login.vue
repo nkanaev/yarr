@@ -7,7 +7,9 @@
       <label for="password" class="mb-2 mt-3">{{ $t("password") }}</label>
       <input name="password" class="c-input" id="password" type="password" required />
       <button class="c-button mt-3" type="submit">{{ $t("login") }}</button>
-      <div class="fixed-top p-2 text-center bg-danger text-white" v-if="hasError">{{ $t("login_error") }}</div>
+      <div class="fixed-top p-2 text-center bg-danger text-white" v-if="hasError">
+        {{ $t("login_error") }}
+      </div>
     </form>
   </div>
 </template>
