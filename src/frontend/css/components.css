@@ -333,4 +333,6 @@
   height: 100%;
   z-index: 900;
   cursor: col-resize;
+  touch-action: none;
+  user-select: none;
 }
