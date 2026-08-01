@@ -1,0 +1,14 @@
+baseURL = "/"
+title = "yarr"
+languageCode = "en"
+disableKinds = ["taxonomy", "term", "RSS", "sitemap"]
+
+[[menu.main]]
+  name = "Overview"
+  url = "/"
+  weight = 1
+
+[[menu.main]]
+  name = "Installation"
+  url = "/installation/"
+  weight = 2

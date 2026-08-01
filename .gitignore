@@ -8,3 +8,4 @@
 versioninfo.rc
 .DS_Store
 node_modules/
+/docs/public
