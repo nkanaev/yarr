@@ -45,7 +45,7 @@
             <v-icon name="more-horizontal" />
           </template>
 
-          <button class="c-dropdown-item w-100 text-start" @click="showSettings('create')">
+          <button class="c-dropdown-item w-100 text-start" @click="showModal = 'newfeed'">
             <v-icon class="me-1" name="plus" />
             {{ $t("new_feed") }}
           </button>
@@ -139,7 +139,7 @@
             {{ $t("export") }}
           </a>
           <div class="c-dropdown-divider"></div>
-          <button class="c-dropdown-item w-100 text-start" @click="showSettings('shortcuts')">
+          <button class="c-dropdown-item w-100 text-start" @click="showModal = 'shortcuts'">
             <v-icon class="me-1" name="help-circle" />
             {{ $t("shortcuts") }}
           </button>
@@ -496,80 +496,20 @@
         </div>
       </div>
     </div>
-    <v-modal :open="!!settings" @hide="settings = ''">
+    <v-modal :open="showModal !== ''" @hide="showModal = ''">
       <button
         class="c-button-link outline-none position-absolute top-0 end-0 p-2 m-2"
         style="line-height: 1"
-        @click="settings = ''">
+        @click="showModal = ''">
         <v-icon name="x" />
       </button>
-      <div v-if="settings == 'create'" class="d-flex flex-column">
-        <p class="cursor-default mb-3">
-          <b>{{ $t("new_feed") }}</b>
-        </p>
-        <form @submit.prevent="createFeed($event)" class="d-flex flex-column">
-          <label for="feed-url" class="mb-2">{{ $t("url") }}</label>
-          <input
-            id="feed-url"
-            name="url"
-            type="url"
-            class="c-input"
-            required
-            autocomplete="off"
-            :readonly="feedNewChoice.length > 0"
-            placeholder="https://example.com/feed"
-            v-focus />
-          <label for="feed-folder" class="mb-2 mt-3">
-            {{ $t("folder") }}
-            <a
-              href="#"
-              class="float-end text-decoration-none"
-              @click.prevent="createNewFeedFolder()"
-              >{{ $t("new_folder") }}</a
-            >
-          </label>
-          <select class="c-input" id="feed-folder" name="folder_id" ref="newFeedFolder">
-            <option value="">---</option>
-            <option
-              :value="folder.id"
-              v-for="folder in folders"
-              :selected="
-                folder.id === current?.feed?.folder_id || folder.id === current?.folder?.id
-              ">
-              {{ folder.title }}
-            </option>
-          </select>
-          <div class="mt-3" v-if="feedNewChoice.length">
-            <p class="mb-2">
-              {{ $t("multiple_feeds_found") }}
-              <a
-                href="#"
-                class="float-end text-decoration-none"
-                @click.prevent="resetFeedChoice()"
-                >{{ $t("cancel") }}</a
-              >
-            </p>
-            <div class="d-flex flex-column gap-1">
-              <div
-                class="c-listitem d-flex flex-column user-select-none"
-                role="radio"
-                :aria-checked="feedNewChoiceSelected === choice.url"
-                @click="feedNewChoiceSelected = choice.url"
-                v-for="choice in feedNewChoice">
-                <div class="text-truncate">{{ choice.title }}</div>
-                <div class="text-truncate" :class="{ 'opacity-50': choice.title }">
-                  {{ choice.url }}
-                </div>
-              </div>
-            </div>
-          </div>
-          <button class="c-button mt-3" :disabled="loading.newfeed" type="submit">
-            <span class="c-spinner" v-if="loading.newfeed"></span>
-            <span v-else>{{ $t("add") }}</span>
-          </button>
-        </form>
-      </div>
-      <v-shortcuts v-else-if="settings == 'shortcuts'" />
+      <v-newfeed
+        v-if="showModal === 'newfeed'"
+        :folders="folders"
+        :folder-id="current?.feed?.folder_id ?? current?.folder?.id ?? null"
+        @created="onFeedCreated"
+        @folder-created="refreshFeeds" />
+      <v-shortcuts v-else-if="showModal === 'shortcuts'" />
     </v-modal>
     <v-toast ref="toast" />
   </div>
@@ -586,6 +526,7 @@ import shortcuts from "../components/shortcuts.vue";
 import relativeTime from "../components/relative-time.vue";
 import icon from "../components/icon.vue";
 import feedTree from "../components/feedtree.vue";
+import newfeed from "../components/newfeed.vue";
 import toast from "../components/toast.vue";
 import type { FeedTreeNode, TreeFeedNode, TreeFolderNode } from "../components/feedtree.vue";
 import scrollDir from "../directives/scroll";
@@ -596,10 +537,8 @@ import type {
   Folder,
   Item,
   FeedStat,
-  FeedLink,
   MediaLink,
   ItemStatus,
-  FeedCreateData,
   ItemListQuery,
   ItemMarkQuery,
 } from "../api-types";
@@ -611,7 +550,6 @@ declare module "vue" {
     $refs: {
       itemlist: HTMLElement;
       content: HTMLElement;
-      newFeedFolder: HTMLSelectElement;
       opmlInputForm: HTMLFormElement;
       menuDropdown: InstanceType<typeof dropdown>;
       toast: InstanceType<typeof toast>;
@@ -637,6 +575,7 @@ export default defineComponent({
     "v-relative-time": relativeTime,
     "v-icon": icon,
     "v-feedtree": feedTree,
+    "v-newfeed": newfeed,
     "v-toast": toast,
   },
   directives: {
@@ -683,8 +622,6 @@ export default defineComponent({
       feeds: [] as Feed[],
       feedSelected: s.feed,
       feedListWidth: s.feed_list_width || 300,
-      feedNewChoice: [] as FeedLink[],
-      feedNewChoiceSelected: "",
       items: [] as Item[],
       itemsHasMore: true,
       itemSelected: null as number | null,
@@ -700,10 +637,9 @@ export default defineComponent({
         total: Stats;
       },
 
-      settings: "",
+      showModal: "" as "" | "shortcuts" | "newfeed",
       loading: {
         feeds: 0,
-        newfeed: false,
         items: false,
         readability: false,
       },
@@ -1195,28 +1131,6 @@ export default defineComponent({
       const [feedsErr] = await to(this.refreshFeeds());
       if (!feedsErr) this.refreshStats();
     },
-    async createNewFeedFolder() {
-      const title = prompt(this.$t("prompt_folder_name"));
-      if (!title) return;
-
-      const [folderErr, result] = await to(api.folders.create({ title: title }));
-      if (folderErr) {
-        this.$refs.toast.addToast(
-          { title: this.$t("fail_save_folder"), description: this.errDescription(folderErr) },
-          { level: "fail", closeable: false },
-        );
-        return;
-      }
-
-      const [feedsErr] = await to(this.refreshFeeds());
-      if (!feedsErr) {
-        this.$nextTick(() => {
-          if (this.$refs.newFeedFolder) {
-            this.$refs.newFeedFolder.value = String(result.id);
-          }
-        });
-      }
-    },
     async renameFolder(folder: Folder) {
       const newTitle = prompt(this.$t("prompt_new_title"), folder.title);
       if (newTitle) {
@@ -1290,40 +1204,11 @@ export default defineComponent({
         this.refreshFeeds();
       }
     },
-    async createFeed($event: Event) {
-      var form = $event.target as HTMLFormElement;
-      var data: FeedCreateData = {
-        url: (form.querySelector("input[name=url]") as HTMLInputElement).value,
-        folder_id:
-          parseInt((form.querySelector("select[name=folder_id]") as HTMLSelectElement).value) ||
-          null,
-      };
-      if (this.feedNewChoiceSelected) {
-        var choice = this.feedNewChoice.find(c => c.url === this.feedNewChoiceSelected);
-        data.url = this.feedNewChoiceSelected;
-        if (choice && choice.title_override) data.title_override = choice.title_override;
-      }
-      this.loading.newfeed = true;
-      const [err, result] = await to(api.feeds.create(data));
-      this.loading.newfeed = false;
-      if (err) {
-        this.$refs.toast.addToast(
-          { title: this.$t("fail_save_feed"), description: this.errDescription(err) },
-          { level: "fail", closeable: false },
-        );
-        return;
-      }
-      if (result.status === "success") {
-        this.refreshFeeds();
-        this.refreshStats();
-        this.settings = "";
-        this.feedSelected = "feed:" + result.feed.id;
-      } else if (result.status === "multiple") {
-        this.feedNewChoice = result.choice;
-        this.feedNewChoiceSelected = result.choice[0].url;
-      } else {
-        alert("No feeds found at the given url.");
-      }
+    onFeedCreated(feed: Feed) {
+      this.refreshFeeds();
+      this.refreshStats();
+      this.showModal = "";
+      this.feedSelected = "feed:" + feed.id;
     },
     async toggleItemStatus(item: Item, targetstatus: ItemStatus) {
       const fallbackstatus: ItemStatus = "read";
@@ -1405,23 +1290,11 @@ export default defineComponent({
         this.itemSelectedReadability = data?.content || "";
       }
     },
-    showSettings(settings: string) {
-      this.settings = settings;
-
-      if (settings === "create") {
-        this.feedNewChoice = [];
-        this.feedNewChoiceSelected = "";
-      }
-    },
     resizeFeedList(width: number) {
       this.feedListWidth = Math.min(Math.max(200, width), 700);
     },
     resizeItemList(width: number) {
       this.itemListWidth = Math.min(Math.max(200, width), 700);
-    },
-    resetFeedChoice() {
-      this.feedNewChoice = [];
-      this.feedNewChoiceSelected = "";
     },
     incrFont(x: number) {
       this.theme.size = +(this.theme.size + 0.1 * x).toFixed(1);
