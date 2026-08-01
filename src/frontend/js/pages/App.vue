@@ -720,7 +720,6 @@ export default defineComponent({
         light: "#fff",
       },
       refreshRate: s.refresh_rate,
-      authenticated: app.authenticated,
       requiresAuth: app.requiresAuth,
       feed_errors: {} as Record<number, string>,
 
@@ -783,10 +782,22 @@ export default defineComponent({
       ];
     },
     feedsById(): Record<number, Feed> {
-      return this.feeds.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
+      return this.feeds.reduce(
+        (acc, f) => {
+          acc[f.id] = f;
+          return acc;
+        },
+        {} as Record<number, Feed>,
+      );
     },
     foldersById(): Record<number, Folder> {
-      return this.folders.reduce((acc, f) => ({ ...acc, [f.id]: f }), {});
+      return this.folders.reduce(
+        (acc, f) => {
+          acc[f.id] = f;
+          return acc;
+        },
+        {} as Record<number, Folder>,
+      );
     },
     current(): { type: string; feed: Feed | null; folder: Folder | null } {
       var parts = (this.feedSelected || "").split(":", 2);
