@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="{{ or site.Language.LanguageCode site.Language.Lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ if not .IsHome }}{{ .Title }} &middot; {{ end }}{{ site.Title }}</title>
+  {{ with .Description }}<meta name="description" content="{{ . }}">{{ end }}
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+</head>
+<body>
+  <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>
+  <div class="overlay" hidden></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="{{ site.Home.RelPermalink }}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-anchor" aria-hidden="true"><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="22" x2="12" y2="8"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>
+        <span>yarr</span>
+      </a>
+      <nav>
+        {{ $current := . }}
+        {{ range site.Sections }}
+          {{ $section := . }}
+          <span class="section">{{ $section.Title }}</span>
+          {{ range $section.Pages.ByWeight }}
+            <a href="{{ .RelPermalink }}"{{ if eq $current.RelPermalink .RelPermalink }} class="active"{{ end }}>{{ .Title }}</a>
+          {{ end }}
+        {{ end }}
+      </nav>
+      <nav class="langs">
+        {{ range $.Translations }}
+          <a href="{{ .RelPermalink }}">{{ .Language.LanguageName }}</a>
+        {{ end }}
+      </nav>
+    </aside>
+    <main class="content">
+      {{ block "main" . }}{{ end }}
+    </main>
+  </div>
+  <script>
+    (function () {
+      var toggle = document.querySelector('.nav-toggle');
+      var sidebar = document.querySelector('.sidebar');
+      var overlay = document.querySelector('.overlay');
+      function close() {
+        sidebar.classList.remove('open');
+        overlay.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('no-scroll');
+      }
+      toggle.addEventListener('click', function () {
+        if (sidebar.classList.contains('open')) { close(); return; }
+        sidebar.classList.add('open');
+        overlay.hidden = false;
+        toggle.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('no-scroll');
+      });
+      overlay.addEventListener('click', close);
+      sidebar.addEventListener('click', function (e) {
+        if (e.target.tagName === 'A') close();
+      });
+    })();
+  </script>
+</body>
+</html>

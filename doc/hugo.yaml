@@ -1,0 +1,19 @@
+baseURL: "/"
+disableKinds: [taxonomy, rss, sitemap, "404"]
+
+defaultContentLanguage: "en"
+defaultContentLanguageInSubdir: true
+
+markup:
+  tableOfContents:
+    startLevel: 2
+    endLevel: 2
+  highlight:
+    codeFences: false
+
+languages:
+  en:
+    languageCode: "en-us"
+    languageName: "English"
+    weight: 1
+    title: "Docs"
