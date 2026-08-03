@@ -25,6 +25,7 @@ jobs:
       uses: actions/checkout@v6
 
     - name: Configure Pages
+      id: configure
       uses: actions/configure-pages@v6
 
     - name: Setup Hugo
