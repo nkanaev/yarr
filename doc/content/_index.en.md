@@ -5,7 +5,7 @@ description: Web-based feed aggregator for desktop and self-hosted server.
 
 *yarr* (yet another rss reader) is a web-based feed aggregator.
 
-![yarr promo](/promo.png)
+{{< img src="promo.png" alt="yarr promo" >}}
 
 ## Features
 

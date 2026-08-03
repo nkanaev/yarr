@@ -3,7 +3,7 @@ title: Overview
 weight: 1
 ---
 
-![yarr overview](/promo.png)
+{{< img src="promo.png" alt="yarr overview" >}}
 
 The main screen has three sections.
 
