@@ -186,6 +186,11 @@ body {
   color: var(--muted);
 }
 
+.content ol {
+  padding-left: 0;
+  list-style-position: inside;
+}
+
 .list {
   list-style: none;
   padding: 0;
