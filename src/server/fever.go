@@ -80,8 +80,9 @@ func (s *Server) feverAuth(c *router.Context) bool {
 		if !auth.StringsEqual(apiKey, hexMD5HashValue) {
 			return false
 		}
+		return true
 	}
-	return true
+	return false
 }
 
 func formHasValue(values url.Values, value string) bool {
