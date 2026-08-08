@@ -1,10 +1,16 @@
 # yarr
 
-**yarr** (yet another rss reader) is a web-based feed aggregator which can be used both
-as a desktop application and a personal self-hosted server.
+**yarr** (yet another rss reader) is a web-based feed aggregator.
 
-The app is a single binary with an embedded database (SQLite).
+* Single binary, no dependencies
+* Cross-platform - Windows / macOS / Linux
+* Desktop app or Self-hosted
+* SQLite or Postgres
 
 ![screenshot](etc/promo.png)
 
-[documentation](https://nkanaev.github.io/yarr/en/) / [releases](https://github.com/nkanaev/yarr/releases) ([feed](https://github.com/nkanaev/yarr/releases.atom))
+<div align="center">
+  <a href="https://nkanaev.github.io/yarr/en/">documentation</a> / 
+  <a href="https://github.com/nkanaev/yarr/releases">releases</a>
+    (<a href="https://github.com/nkanaev/yarr/releases.atom">feed</a>)
+</div>
