@@ -55,15 +55,11 @@ body {
   margin-top: auto;
   padding-top: 2rem;
 }
-.langs a {
-  color: var(--muted);
-  text-decoration: none;
-  margin-right: 0.9rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-}
 .langs a:hover {
   color: var(--text);
+}
+.langs span.current {
+  color: var(--accent);
 }
 .sidebar nav > a {
   margin: 0.25rem 0;
@@ -82,7 +78,6 @@ body {
 }
 .sidebar nav > a:not(.section) {
   color: var(--text);
-  font-size: 0.95rem;
 }
 .sidebar nav > a:not(.section):hover {
   color: var(--accent);

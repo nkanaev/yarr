@@ -30,8 +30,14 @@
         {{ end }}
       </nav>
       <nav class="langs">
-        {{ range $.Translations }}
-          <a href="{{ .RelPermalink }}">{{ .Language.LanguageName }}</a>
+        {{ $current := . }}
+        {{ range site.Languages }}
+          {{ if eq .Lang $current.Language.Lang }}
+            <span class="current">{{ .LanguageName }}</span>
+          {{ else }}
+            {{ $trans := index (where $current.Translations "Language.Lang" .Lang) 0 }}
+              <a href="{{ $trans.RelPermalink }}">{{ $trans.Language.LanguageName }}</a>
+          {{ end }}
         {{ end }}
       </nav>
     </aside>
