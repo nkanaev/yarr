@@ -19,6 +19,14 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-anchor" aria-hidden="true"><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="22" x2="12" y2="8"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>
         <span>yarr</span>
       </a>
+      <details class="langs">
+        <summary>A / あ / 文</summary>
+        <nav>
+          {{ range $.Translations }}
+            <a href="{{ .RelPermalink }}">{{ .Language.LanguageName }}</a>
+          {{ end }}
+        </nav>
+      </details>
       <nav>
         {{ $current := . }}
         {{ range site.Sections }}
@@ -26,17 +34,6 @@
           <span class="section">{{ $section.Title }}</span>
           {{ range $section.Pages.ByWeight }}
             <a href="{{ .RelPermalink }}"{{ if eq $current.RelPermalink .RelPermalink }} class="active"{{ end }}>{{ .Title }}</a>
-          {{ end }}
-        {{ end }}
-      </nav>
-      <nav class="langs">
-        {{ $current := . }}
-        {{ range site.Languages }}
-          {{ if eq .Lang $current.Language.Lang }}
-            <span class="current">{{ .LanguageName }}</span>
-          {{ else }}
-            {{ $trans := index (where $current.Translations "Language.Lang" .Lang) 0 }}
-              <a href="{{ $trans.RelPermalink }}">{{ $trans.Language.LanguageName }}</a>
           {{ end }}
         {{ end }}
       </nav>

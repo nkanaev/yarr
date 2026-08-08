@@ -49,17 +49,41 @@ body {
   letter-spacing: -0.01em;
   color: var(--text);
   text-decoration: none;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .langs {
-  margin-top: auto;
-  padding-top: 2rem;
+  margin-bottom: 2rem;
 }
-.langs a:hover {
+.langs summary {
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+.langs summary::-webkit-details-marker {
+  display: none;
+}
+.langs summary:hover {
   color: var(--text);
 }
-.langs span.current {
-  color: var(--accent);
+.langs nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  margin-top: 0.5rem;
+}
+.langs nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.1rem 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+.langs nav a:hover {
+  color: var(--text);
 }
 .sidebar nav > a {
   margin: 0.25rem 0;
