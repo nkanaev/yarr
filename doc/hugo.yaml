@@ -17,3 +17,38 @@ languages:
     languageName: "English"
     weight: 1
     title: "Docs"
+  de:
+    languageCode: "de-de"
+    languageName: "Deutsch"
+    weight: 2
+    title: "Dokumentation"
+  es:
+    languageCode: "es-es"
+    languageName: "Español"
+    weight: 3
+    title: "Documentación"
+  fr:
+    languageCode: "fr-fr"
+    languageName: "Français"
+    weight: 4
+    title: "Documentation"
+  ja:
+    languageCode: "ja-jp"
+    languageName: "日本語"
+    weight: 5
+    title: "ドキュメント"
+  pt:
+    languageCode: "pt-pt"
+    languageName: "Português"
+    weight: 6
+    title: "Documentação"
+  ru:
+    languageCode: "ru-ru"
+    languageName: "Русский"
+    weight: 7
+    title: "Документация"
+  zh:
+    languageCode: "zh-cn"
+    languageName: "中文"
+    weight: 8
+    title: "文档"

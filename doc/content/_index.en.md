@@ -15,7 +15,7 @@ One small app that runs almost anywhere.
 - Single binary with zero dependencies
 - Desktop app or self-hosted server
 - Responsive web UI for desktop, tablet and mobile
-- Installable as a home-screen web app
+- Installable as a home-screen web app (PWA)
 - SQLite or Postgres storage
 
 Quiet to look at. Comfortable to use.
