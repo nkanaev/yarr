@@ -352,7 +352,7 @@
               ><v-relative-time v-bind:title="formatDate(item.date)" :val="item.date"
             /></small>
           </div>
-          <div class="text-break">{{ item.title || $t("untitled") }}</div>
+          <div class="text-break line-clamp-3">{{ item.title || $t("untitled") }}</div>
         </div>
         <div class="text-center my-3" v-if="itemsHasMore">
           <span class="c-spinner"></span>
