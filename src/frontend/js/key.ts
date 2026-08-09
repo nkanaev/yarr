@@ -66,6 +66,9 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
     closeItem() {
       vm.itemSelected = null;
     },
+    showShortcuts() {
+      vm.showModal = "shortcuts";
+    },
     showAll() {
       vm.filterSelected = "";
     },
@@ -92,6 +95,7 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
     f: shortcutFunctions.scrollForward,
     b: shortcutFunctions.scrollBackward,
     q: shortcutFunctions.closeItem,
+    "?": shortcutFunctions.showShortcuts,
     "1": shortcutFunctions.showUnread,
     "2": shortcutFunctions.showStarred,
     "3": shortcutFunctions.showAll,
