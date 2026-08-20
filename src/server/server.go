@@ -12,9 +12,9 @@ import (
 )
 
 type Server struct {
-	Addr        string
-	db          storage.Storage
-	worker      *worker.Worker
+	Addr   string
+	db     storage.Storage
+	worker *worker.Worker
 
 	BasePath string
 
