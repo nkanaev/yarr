@@ -546,7 +546,7 @@ func TestSearch(t *testing.T) {
 		}
 
 		// 5. Trigger: Update
-		db.UpdateItem(MustGet(itemsByGUID, "i1").Id, model.UpdateItemParams{Title: ptr("Updated Title")})
+		db.UpdateItem(MustGet(itemsByGUID, "i1").Id, model.UpdateItemParams{Title: new("Updated Title")})
 		s7 := "Updated"
 		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s7}, 10, true, false))
 		if !reflect.DeepEqual(have, []string{"i1"}) {

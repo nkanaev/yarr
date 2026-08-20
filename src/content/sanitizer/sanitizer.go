@@ -240,7 +240,7 @@ func hasRequiredAttributes(tagName string, attributes []string) bool {
 
 // See https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 func hasValidURIScheme(src string) bool {
-	scheme := strings.SplitN(src, ":", 2)[0]
+	scheme, _, _ := strings.Cut(src, ":")
 	return allowedURISchemes.has(scheme)
 }
 

@@ -24,10 +24,10 @@ func TestUpdateSettings(t *testing.T) {
 	dbtest(t, func(t *testing.T, s storage.Storage) {
 
 		params := model.UpdateSettingsParams{
-			ThemeName:     ptr("night"),
-			FeedListWidth: ptr(400),
-			RefreshRate:   ptr(int64(15)),
-			ThemeSize:     ptr(1.2),
+			ThemeName:     new("night"),
+			FeedListWidth: new(400),
+			RefreshRate:   new(int64(15)),
+			ThemeSize:     new(1.2),
 		}
 
 		if ok := s.UpdateSettings(params); !ok {
@@ -53,7 +53,7 @@ func TestUpdateSettings(t *testing.T) {
 
 func TestGetSettings(t *testing.T) {
 	dbtest(t, func(t *testing.T, s storage.Storage) {
-		s.UpdateSettings(model.UpdateSettingsParams{Language: ptr("fr")})
+		s.UpdateSettings(model.UpdateSettingsParams{Language: new("fr")})
 
 		settings := s.GetSettings()
 		if settings.Language != "fr" {
@@ -82,7 +82,7 @@ func TestSettingsExhaustive(t *testing.T) {
 				continue
 			}
 			// json tags might have options like "name,omitempty", take only the first part
-			jsonKey := strings.Split(jsonTag, ",")[0]
+			jsonKey, _, _ := strings.Cut(jsonTag, ",")
 
 			// 1. Check Map()
 			if _, ok := m[jsonKey]; !ok {
@@ -91,9 +91,9 @@ func TestSettingsExhaustive(t *testing.T) {
 
 			// 2. Check UpdateSettingsParams
 			foundInParams := false
-			for j := 0; j < paramsType.NumField(); j++ {
-				pField := paramsType.Field(j)
-				pJsonTag := strings.Split(pField.Tag.Get("json"), ",")[0]
+			for pField := range paramsType.Fields() {
+				pField := pField
+				pJsonTag, _, _ := strings.Cut(pField.Tag.Get("json"), ",")
 				if pJsonTag == jsonKey {
 					foundInParams = true
 					// Also check it's a pointer
@@ -112,7 +112,7 @@ func TestSettingsExhaustive(t *testing.T) {
 			paramsValue := reflect.New(paramsType).Elem()
 			for j := 0; j < paramsType.NumField(); j++ {
 				pField := paramsType.Field(j)
-				pJsonTag := strings.Split(pField.Tag.Get("json"), ",")[0]
+				pJsonTag, _, _ := strings.Cut(pField.Tag.Get("json"), ",")
 				if pJsonTag == jsonKey {
 					// Create a new value of the underlying type
 					val := reflect.New(field.Type).Elem()

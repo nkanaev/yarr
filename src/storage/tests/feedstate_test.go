@@ -110,7 +110,7 @@ func TestListFeedStates(t *testing.T) {
 
 		errMsg := "fail"
 		s.UpdateFeedState(f1.Id, model.UpdateFeedStateParams{LastError: &errMsg})
-		s.UpdateFeedState(f2.Id, model.UpdateFeedStateParams{HTTPEtag: ptr("e")})
+		s.UpdateFeedState(f2.Id, model.UpdateFeedStateParams{HTTPEtag: new("e")})
 
 		states, err := s.ListFeedStates()
 		if err != nil {
@@ -121,8 +121,4 @@ func TestListFeedStates(t *testing.T) {
 			t.Errorf("expected 2 states, got %d", len(states))
 		}
 	})
-}
-
-func ptr[T any](v T) *T {
-	return &v
 }
