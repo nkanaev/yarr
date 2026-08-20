@@ -1,31 +1,63 @@
 package auth
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"crypto/subtle"
+	"encoding/hex"
 	"net/http"
 	"strings"
-
-	"github.com/nkanaev/yarr/src/server/router"
-	"github.com/nkanaev/yarr/src/storage"
 )
 
-type Middleware struct {
-	Username string
-	Password string
-	BasePath string
-	Public   []string
-	DB       storage.Storage
+func IsAuthenticated(req *http.Request, username, password string) bool {
+	cookie, _ := req.Cookie("auth")
+	if cookie == nil {
+		return false
+	}
+	parts := strings.Split(cookie.Value, ":")
+	if len(parts) != 2 || !StringsEqual(parts[0], username) {
+		return false
+	}
+	return StringsEqual(parts[1], secret(username, password))
 }
 
-func (m *Middleware) Handler(c *router.Context) {
-	for _, path := range m.Public {
-		if strings.HasPrefix(c.Req.URL.Path, m.BasePath+path) {
-			c.Next()
-			return
+func Authenticate(rw http.ResponseWriter, username, password, basepath string) {
+	http.SetCookie(rw, &http.Cookie{
+		Name:     "auth",
+		Value:    username + ":" + secret(username, password),
+		MaxAge:   604800, // 1 week
+		Path:     basepath,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
+func Logout(rw http.ResponseWriter, basepath string) {
+	http.SetCookie(rw, &http.Cookie{
+		Name:   "auth",
+		Value:  "",
+		MaxAge: -1,
+		Path:   basepath,
+	})
+}
+
+func StringsEqual(p1, p2 string) bool {
+	return subtle.ConstantTimeCompare([]byte(p1), []byte(p2)) == 1
+}
+
+func secret(msg, key string) string {
+	mac := hmac.New(sha256.New, []byte(key))
+	mac.Write([]byte(msg))
+	src := mac.Sum(nil)
+	return hex.EncodeToString(src)
+}
+
+func Middleware(username, password string, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if IsAuthenticated(r, username, password) {
+			next.ServeHTTP(w, r)
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
 		}
-	}
-	if IsAuthenticated(c.Req, m.Username, m.Password) {
-		c.Next()
-	} else {
-		c.Out.WriteHeader(http.StatusUnauthorized)
-	}
+	})
 }

@@ -2,42 +2,54 @@ package gzip
 
 import (
 	"compress/gzip"
+	"io"
 	"net/http"
 	"strings"
-
-	"github.com/nkanaev/yarr/src/server/router"
+	"sync"
 )
 
+// gzipResponseWriter wraps http.ResponseWriter to route writes through gzip.Writer
 type gzipResponseWriter struct {
 	http.ResponseWriter
-
-	out *gzip.Writer
-	src http.ResponseWriter
+	Writer io.Writer
 }
 
-func (rw *gzipResponseWriter) Header() http.Header {
-	return rw.src.Header()
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
 }
 
-func (rw *gzipResponseWriter) Write(x []byte) (int, error) {
-	return rw.out.Write(x)
+// Pool gzip writers to reduce memory allocations under high traffic
+var gzipPool = sync.Pool{
+	New: func() any {
+		return gzip.NewWriter(io.Discard)
+	},
 }
 
-func (rw *gzipResponseWriter) WriteHeader(statusCode int) {
-	rw.src.WriteHeader(statusCode)
-}
+func Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 1. Check if client accepts gzip encoding
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			next.ServeHTTP(w, r)
+			return
+		}
 
-func Middleware(c *router.Context) {
-	if !strings.Contains(c.Req.Header.Get("Accept-Encoding"), "gzip") {
-		c.Next()
-		return
-	}
+		// 2. Set headers
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Vary", "Accept-Encoding")
 
-	gz := &gzipResponseWriter{out: gzip.NewWriter(c.Out), src: c.Out}
-	defer gz.out.Close()
+		// 3. Acquire gzip writer from pool
+		gz := gzipPool.Get().(*gzip.Writer)
+		defer gzipPool.Put(gz)
 
-	c.Out.Header().Set("Content-Encoding", "gzip")
-	c.Out = gz
+		gz.Reset(w)
+		defer gz.Close()
 
-	c.Next()
+		// 4. Wrap response writer and execute next handler
+		gzw := gzipResponseWriter{
+			ResponseWriter: w,
+			Writer:         gz,
+		}
+
+		next.ServeHTTP(gzw, r)
+	})
 }

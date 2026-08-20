@@ -11,7 +11,7 @@ import (
 //go:embed static/*
 var static embed.FS
 
-//go:embed templates
+//go:embed templates/*.html
 var templates embed.FS
 
 func Templates() *template.Template {
