@@ -25,6 +25,6 @@
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
     "bootstrap": "^5.3.8",
-    "vue": "^3.5.13"
+    "vue": "^3.5.41"
   }
 }
