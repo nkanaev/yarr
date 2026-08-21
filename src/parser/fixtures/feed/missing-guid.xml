@@ -1,0 +1,20 @@
+<!--
+RSS 2.0 items without guids. Uses ParseAndFix so missing guids are generated.
+Verifies guids are present and unique across items.
+
+@ len(feed.Items) == 2
+@ feed.Items[0].GUID != ""
+@ feed.Items[1].GUID != ""
+@ feed.Items[0].GUID != feed.Items[1].GUID
+-->
+<?xml version="1.0" encoding="windows-1251"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<channel>
+		<item>
+			<title>foo</title>
+		</item>
+		<item>
+			<title>bar</title>
+		</item>
+	</channel>
+</rss>

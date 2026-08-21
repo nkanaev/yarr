@@ -1,0 +1,14 @@
+<!--
+Atom entry whose content already contains the thumbnail image url. Verifies the
+media link is dropped when it is already present in the content.
+
+@ feed.Items[0].Content == "<img src=\"https://example.com/image.png?width=100&height=100\">"
+@ len(feed.Items[0].MediaLinks) == 0
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+	<entry>
+		<content type="html">&lt;img src="https://example.com/image.png?width=100&amp;height=100"&gt;</content>
+		<media:thumbnail url="https://example.com/image.png?width=100&height=100" />
+	</entry>
+</feed>

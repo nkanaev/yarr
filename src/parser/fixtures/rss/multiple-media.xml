@@ -1,0 +1,34 @@
+<!--
+RSS 2.0 item with multiple media:content entries (two images and one video with
+medium="image"). Verifies media links preserve order and use the description.
+
+@ feed.Items[0].GUID == "http://example.com/posts/1"
+@ feed.Items[0].URL == "http://example.com/posts/1"
+@ len(feed.Items[0].MediaLinks) == 3
+@ feed.Items[0].MediaLinks[0].URL == "https://example.com/path/to/image1.png"
+@ feed.Items[0].MediaLinks[0].Type == "image"
+@ feed.Items[0].MediaLinks[0].Description == "description 1"
+@ feed.Items[0].MediaLinks[1].URL == "https://example.com/path/to/image2.png"
+@ feed.Items[0].MediaLinks[1].Type == "image"
+@ feed.Items[0].MediaLinks[1].Description == "description 2"
+@ feed.Items[0].MediaLinks[2].URL == "https://example.com/path/to/video1.mp4"
+@ feed.Items[0].MediaLinks[2].Type == "video"
+@ feed.Items[0].MediaLinks[2].Description == "video description"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<item>
+			<guid isPermaLink="true">http://example.com/posts/1</guid>
+			<media:content url="https://example.com/path/to/image1.png" type="image/png" fileSize="1000" medium="image">
+				<media:description type="plain">description 1</media:description>
+			</media:content>
+			<media:content url="https://example.com/path/to/image2.png" type="image/png" fileSize="2000" medium="image">
+				<media:description type="plain">description 2</media:description>
+			</media:content>
+			<media:content url="https://example.com/path/to/video1.mp4" type="video/mp4" fileSize="2000" medium="image">
+				<media:description type="plain">video description</media:description>
+			</media:content>
+		</item>
+	</channel>
+</rss>

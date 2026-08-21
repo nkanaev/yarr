@@ -1,0 +1,8 @@
+<!--
+Atom feed with no items. Verifies an empty feed parses to an empty *Feed.
+
+@ feed.Title == ""
+@ len(feed.Items) == 0
+-->
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom"></feed>

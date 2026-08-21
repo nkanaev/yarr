@@ -1,0 +1,18 @@
+<!--
+RSS 2.0 item whose content already contains the audio enclosure url. Verifies
+the media link is dropped when it is already present in the item content.
+
+@ feed.Items[0].Content == "<audio src=\"http://example.com/audio.ext\"></audio>"
+@ len(feed.Items[0].MediaLinks) == 0
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<channel>
+		<item>
+		<content:encoded>
+			<![CDATA[ <audio src="http://example.com/audio.ext"></audio> ]]>
+		</content:encoded>
+			<enclosure length="100500" type="audio/x-m4a" url="http://example.com/audio.ext"/>
+		</item>
+	</channel>
+</rss>

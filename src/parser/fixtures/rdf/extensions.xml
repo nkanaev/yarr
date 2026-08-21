@@ -1,0 +1,18 @@
+<!--
+RDF 1.0 item using dc:date and content:encoded extensions. Verifies the date is
+parsed and content:encoded is used as the content.
+
+@ len(feed.Items) == 1
+@ feed.Items[0].Content == "test"
+@ feed.Items[0].Date == time.Date(2006, 1, 2, 15, 4, 5, 0, time.FixedZone("", -7*3600))
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns="http://purl.org/rss/1.0/"
+		xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+		xmlns:dc="http://purl.org/dc/elements/1.1/"
+		xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<item>
+		<dc:date>2006-01-02T15:04:05-07:00</dc:date>
+		<content:encoded><![CDATA[test]]></content:encoded>
+	</item>
+</rdf:RDF>

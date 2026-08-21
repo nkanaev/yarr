@@ -1,0 +1,14 @@
+<!--
+RSS 2.0 feed wrapped in a huge run of leading whitespace (500 spaces).
+Verifies sniff() trims leading whitespace so the real <rss> root is found.
+
+@ feed.Title == "finally"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" media="screen" href="/~files/feed-premium.xsl"?>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <!-- end of line -->
+<rss version="2.0">
+<channel>
+<title>finally</title>
+</channel>
+</rss>

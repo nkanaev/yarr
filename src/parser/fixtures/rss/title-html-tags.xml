@@ -1,0 +1,18 @@
+<!--
+RSS 2.0 item titles containing escaped HTML. Verifies the title is flattened to
+plain text (tags/entities stripped).
+
+@ feed.Items[0].Title == "title in p"
+@ feed.Items[1].Title == "very strong title"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<channel>
+		<item>
+			<title>&lt;p&gt;title in p&lt;/p&gt;</title>
+		</item>
+		<item>
+			<title>very &lt;strong&gt;strong&lt;/strong&gt; title</title>
+		</item>
+	</channel>
+</rss>

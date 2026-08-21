@@ -1,0 +1,35 @@
+<!--
+Atom feed with entries using the id as the link. Verifies guid/url derivation
+from a link-like id, the ::updated guid suffix, and empty dates for entries
+without a date.
+
+@ len(feed.Items) == 3
+@ feed.Items[0].GUID == "https://example.com/posts/1::2003-12-13T09:17:51"
+@ feed.Items[0].URL == "https://example.com/posts/1"
+@ feed.Items[0].Title == "one updated"
+@ feed.Items[0].Date == time.Date(2003, 12, 13, 9, 17, 51, 0, time.UTC)
+@ feed.Items[1].GUID == "urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6"
+@ feed.Items[1].URL == ""
+@ feed.Items[1].Title == "two"
+@ feed.Items[1].Date == time.Now()
+@ feed.Items[2].GUID == "https://example.com/posts/1::"
+@ feed.Items[2].URL == "https://example.com/posts/1"
+@ feed.Items[2].Title == "one"
+@ feed.Items[2].Date == time.Now()
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+	<entry>
+		<title>one updated</title>
+		<id>https://example.com/posts/1</id>
+		<updated>2003-12-13T09:17:51</updated>
+	</entry>
+	<entry>
+		<title>two</title>
+		<id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>
+	</entry>
+	<entry>
+		<title>one</title>
+		<id>https://example.com/posts/1</id>
+	</entry>
+</feed>

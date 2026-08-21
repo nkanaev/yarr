@@ -1,0 +1,10 @@
+<!--
+Atom entry title with type="xhtml" containing escaped tags. Verifies the title
+is flattened to plain text.
+
+@ feed.Items[0].Title == "say what?"
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<entry><title type="xhtml">say &lt;code&gt;what&lt;/code&gt;?</title></entry>
+</feed>

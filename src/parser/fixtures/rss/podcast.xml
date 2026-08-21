@@ -1,0 +1,16 @@
+<!--
+RSS 2.0 item with an audio enclosure. Verifies the enclosure is turned into an
+audio media link.
+
+@ len(feed.Items[0].MediaLinks) == 1
+@ feed.Items[0].MediaLinks[0].URL == "http://example.com/audio.ext"
+@ feed.Items[0].MediaLinks[0].Type == "audio"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+	<channel>
+		<item>
+			<enclosure length="100500" type="audio/x-m4a" url="http://example.com/audio.ext"/>
+		</item>
+	</channel>
+</rss>

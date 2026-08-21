@@ -1,0 +1,25 @@
+<!--
+RSS 2.0 feed with whitespace-padded title and a CDATA description. Verifies
+title trimming and raw CDATA content passthrough.
+
+@ feed.Title == "Title"
+@ len(feed.Items) == 1
+@ feed.Items[0].Title == "Item 1"
+@ feed.Items[0].Content == "<div>content</div>"
+-->
+<?xml version="1.0"?>
+<rss version="2.0">
+   <channel>
+	  <title>
+		 Title
+	  </title>
+	  <item>
+		 <title>
+		  Item 1
+		 </title>
+		 <description>
+			<![CDATA[<div>content</div>]]>
+		 </description>
+	  </item>
+   </channel>
+</rss>

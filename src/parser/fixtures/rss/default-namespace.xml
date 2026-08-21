@@ -1,0 +1,20 @@
+<!--
+RSS 2.0 feed that declares a default namespace on the root <rss> element (legacy
+UserLand namespace). Verifies it still parses via the namespace stripper.
+
+@ feed.Title == "Feed"
+@ len(feed.Items) == 1
+@ feed.Items[0].GUID == "https://example.com/news/1"
+@ feed.Items[0].URL == "https://example.com/news/1"
+@ feed.Items[0].Title == "Title 1"
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns="http://backend.userland.com/rss2" version="2.0">
+	<channel>
+		<title>Feed</title>
+		<item>
+			<title>Title 1</title>
+			<link>https://example.com/news/1</link>
+		</item>
+	</channel>
+</rss>

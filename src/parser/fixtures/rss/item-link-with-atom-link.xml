@@ -1,0 +1,21 @@
+<!--
+RSS 2.0 item that carries both an RSS <link> and an Atom <atom:link>. Verifies
+the RSS link is not lost to the namespaced atom link.
+
+@ feed.Title == "Example"
+@ len(feed.Items) == 1
+@ feed.Items[0].GUID == "http://example.com/article/1"
+@ feed.Items[0].URL == "http://example.com/article/1"
+@ feed.Items[0].Title == "Article"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Example</title>
+		<item>
+			<title>Article</title>
+			<link>http://example.com/article/1</link>
+			<atom:link href="http://example.com/article/1/atom" rel="alternate" type="text/html"/>
+		</item>
+	</channel>
+</rss>

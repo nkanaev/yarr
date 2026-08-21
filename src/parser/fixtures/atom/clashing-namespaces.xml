@@ -1,0 +1,15 @@
+<!--
+Atom entry whose content is plain "atom content" while a namespaced media:content
+sits alongside it. Verifies the content field is not confused by clashing
+namespaces.
+
+@ len(feed.Items) == 1
+@ feed.Items[0].Content == "atom content"
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<entry>
+		<content>atom content</content>
+		<media:content xmlns:media="http://search.yahoo.com/mrss/" />
+	</entry>
+</feed>

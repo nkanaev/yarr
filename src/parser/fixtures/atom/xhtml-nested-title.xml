@@ -1,0 +1,16 @@
+<!--
+Atom entry title with type="xhtml" wrapping a hyperlink. Verifies the nested
+link text is extracted.
+
+@ feed.Items[0].Title == "Link to Example"
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<entry>
+		<title type="xhtml">
+			<div xmlns="http://www.w3.org/1999/xhtml">
+				<a href="https://example.com">Link to Example</a>
+			</div>
+		</title>
+	</entry>
+</feed>

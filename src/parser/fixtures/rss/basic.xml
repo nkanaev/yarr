@@ -1,0 +1,36 @@
+<!--
+RSS 0.91 feed with a channel title/link and two items. Verifies basic field
+mapping of title, site url, guid, link, item title and description.
+
+@ feed.Title == "Scripting News"
+@ feed.SiteURL == "http://www.scripting.com/"
+@ len(feed.Items) == 2
+@ feed.Items[0].GUID == "http://www.scripting.com/one/"
+@ feed.Items[0].URL == "http://www.scripting.com/one/"
+@ feed.Items[0].Title == "Title 1"
+@ feed.Items[0].Content == "Description 1"
+@ feed.Items[1].GUID == "http://www.scripting.com/two/"
+@ feed.Items[1].URL == "http://www.scripting.com/two/"
+@ feed.Items[1].Title == "Title 2"
+@ feed.Items[1].Content == "Description 2"
+-->
+<?xml version="1.0"?>
+<!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+<rss version="0.91">
+<channel>
+	<language>en</language>
+	<description>???</description>
+	<link>http://www.scripting.com/</link>
+	<title>Scripting News</title>
+	<item>
+		<title>Title 1</title>
+		<link>http://www.scripting.com/one/</link>
+		<description>Description 1</description>
+	</item>
+	<item>
+		<title>Title 2</title>
+		<link>http://www.scripting.com/two/</link>
+		<description>Description 2</description>
+	</item>
+</channel>
+</rss>

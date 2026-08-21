@@ -1,0 +1,18 @@
+<!--
+RSS 2.0 item with an image enclosure. Verifies image/* enclosures become image
+media links.
+
+@ len(feed.Items[0].MediaLinks) == 1
+@ feed.Items[0].MediaLinks[0].URL == "http://example.com/photo.jpg"
+@ feed.Items[0].MediaLinks[0].Type == "image"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+	<channel>
+		<item>
+			<title>Post with image</title>
+			<link>http://example.com/post/1</link>
+			<enclosure url="http://example.com/photo.jpg" type="image/jpeg" length="123456"/>
+		</item>
+	</channel>
+</rss>

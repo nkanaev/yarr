@@ -1,0 +1,7 @@
+<!--
+Atom feed with a UTF-8 BOM before the XML declaration. Verifies the BOM is
+stripped during sniffing and the feed still parses to an empty *Feed.
+
+@ feed.Title == ""
+@ len(feed.Items) == 0
+-->﻿<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"></feed>

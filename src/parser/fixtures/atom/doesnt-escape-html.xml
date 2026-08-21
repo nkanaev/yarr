@@ -1,0 +1,10 @@
+<!--
+Atom entry summary with type="html" that is double-escaped. Verifies the html
+summary is kept as-is and not re-escaped.
+
+@ feed.Items[0].Content == "&lt;script&gt;alert(1);&lt;/script&gt;"
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<entry><summary type="html">&amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</summary></entry>
+</feed>

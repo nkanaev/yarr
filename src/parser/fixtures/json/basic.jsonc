@@ -1,0 +1,32 @@
+/*
+JSON Feed 1.1 document with two items. Verifies json field mapping for
+content_text, content_html, id and url.
+
+@ feed.Title == "My Example Feed"
+@ feed.SiteURL == "https://example.org/"
+@ len(feed.Items) == 2
+@ feed.Items[0].GUID == "2"
+@ feed.Items[0].Content == "This is a second item."
+@ feed.Items[0].URL == "https://example.org/second-item"
+@ feed.Items[1].GUID == "1"
+@ feed.Items[1].Content == "<p>Hello, world!</p>"
+@ feed.Items[1].URL == "https://example.org/initial-post"
+*/
+{
+	"version": "https://jsonfeed.org/version/1",
+	"title": "My Example Feed",
+	"home_page_url": "https://example.org/",
+	"feed_url": "https://example.org/feed.json",
+	"items": [
+		{
+			"id": "2",
+			"content_text": "This is a second item.",
+			"url": "https://example.org/second-item"
+		},
+		{
+			"id": "1",
+			"content_html": "<p>Hello, world!</p>",
+			"url": "https://example.org/initial-post"
+		}
+	]
+}

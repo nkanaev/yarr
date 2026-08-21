@@ -1,0 +1,15 @@
+<!--
+RSS 2.0 item with guid isPermaLink="true". Verifies the guid is also used as
+the item url.
+
+@ feed.Items[0].GUID == "http://example.com/posts/1"
+@ feed.Items[0].URL == "http://example.com/posts/1"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<channel>
+		<item>
+			<guid isPermaLink="true">http://example.com/posts/1</guid>
+		</item>
+	</channel>
+</rss>

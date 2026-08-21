@@ -1,0 +1,43 @@
+<!--
+RDF 0.9/1.0 feed (RDF root) with a channel and two items. Verifies basic field
+mapping for the RDF dialect.
+
+@ feed.Title == "Mozilla Dot Org"
+@ feed.SiteURL == "http://www.mozilla.org"
+@ len(feed.Items) == 2
+@ feed.Items[0].GUID == "http://www.mozilla.org/status/"
+@ feed.Items[0].URL == "http://www.mozilla.org/status/"
+@ feed.Items[0].Title == "New Status Updates"
+@ feed.Items[1].GUID == "http://www.mozilla.org/bugs/"
+@ feed.Items[1].URL == "http://www.mozilla.org/bugs/"
+@ feed.Items[1].Title == "Bugzilla Reorganized"
+-->
+<?xml version="1.0"?>
+<rdf:RDF
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns="http://channel.netscape.com/rdf/simple/0.9/">
+
+  <channel>
+	<title>Mozilla Dot Org</title>
+	<link>http://www.mozilla.org</link>
+	<description>the Mozilla Organization
+	  web site</description>
+  </channel>
+
+  <image>
+	<title>Mozilla</title>
+	<url>http://www.mozilla.org/images/moz.gif</url>
+	<link>http://www.mozilla.org</link>
+  </image>
+
+  <item>
+	<title>New Status Updates</title>
+	<link>http://www.mozilla.org/status/</link>
+  </item>
+
+  <item>
+	<title>Bugzilla Reorganized</title>
+	<link>http://www.mozilla.org/bugs/</link>
+  </item>
+
+</rdf:RDF>
