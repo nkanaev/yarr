@@ -4,6 +4,7 @@ go 1.26.0
 
 require (
 	fyne.io/systray v1.12.0
+	github.com/expr-lang/expr v1.17.8
 	github.com/lib/pq v1.12.3
 	github.com/mattn/go-sqlite3 v1.14.24
 	golang.org/x/net v0.56.0
