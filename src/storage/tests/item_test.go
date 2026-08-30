@@ -281,6 +281,30 @@ func TestListItemsPaginated(t *testing.T) {
 	})
 }
 
+func TestListItemsDateBoundsTimezone(t *testing.T) {
+	dbtest(t, func(t *testing.T, db storage.Storage) {
+		testItemsSetup(db)
+
+		itemsByGUID := make(map[string]model.Item)
+		for _, item := range db.ListItems(model.ItemFilter{}, 1000, false, false) {
+			itemsByGUID[item.GUID] = item
+		}
+		bound := MustGet(itemsByGUID, "item121").Date
+		elsewhere := bound.In(time.FixedZone("X", -7*3600))
+
+		want := getItemGuids(db.ListItems(model.ItemFilter{Before: &bound}, 20, false, false))
+		have := getItemGuids(db.ListItems(model.ItemFilter{Before: &elsewhere}, 20, false, false))
+		if len(want) == 0 {
+			t.Fatalf("fixture produced an empty result; the test proves nothing")
+		}
+		if !reflect.DeepEqual(have, want) {
+			t.Logf("want: %#v", want)
+			t.Logf("have: %#v", have)
+			t.Fail()
+		}
+	})
+}
+
 func TestMarkAllItemsRead(t *testing.T) {
 	var read model.ItemStatus = model.READ
 	dbtest(t, func(t *testing.T, db storage.Storage) {

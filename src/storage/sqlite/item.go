@@ -87,6 +87,10 @@ func (s *SQLiteStorage) CreateItems(items []model.Item) bool {
 	return true
 }
 
+func sqliteDate(t time.Time) string {
+	return t.UTC().Format("2006-01-02 15:04:05.000")
+}
+
 func listQueryPredicate(filter model.ItemFilter, newestFirst bool) (string, []any) {
 	cond := make([]string, 0)
 	args := make([]any, 0)
@@ -148,7 +152,7 @@ func listQueryPredicate(filter model.ItemFilter, newestFirst bool) (string, []an
 	}
 	if filter.Before != nil {
 		cond = append(cond, "i.date < :before")
-		args = append(args, sql.Named("before", filter.Before))
+		args = append(args, sql.Named("before", sqliteDate(*filter.Before)))
 	}
 
 	predicate := "1"
