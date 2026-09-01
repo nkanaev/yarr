@@ -1,7 +1,10 @@
 services:
   yarr:
     image: nkanaev/yarr:latest
-    command: ["-db", "postgres://yarr:yarr@postgres:5432/yarr?sslmode=disable", "-addr", "0.0.0.0:7070"]
+    command: ["-addr", "0.0.0.0:7070"]
+    environment:
+      YARR_DB: postgres://dbuser:dbpass@postgres:5432/dbname?sslmode=disable
+      YARR_AUTH: username:password
     ports:
       - "7070:7070"
     depends_on:
@@ -11,13 +14,13 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_USER: yarr
-      POSTGRES_PASSWORD: yarr
-      POSTGRES_DB: yarr
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: dbpass
+      POSTGRES_DB: dbname
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U yarr -d yarr"]
+      test: ["CMD-SHELL", "pg_isready -U user -d dbname"]
       interval: 5s
       timeout: 5s
       retries: 5
