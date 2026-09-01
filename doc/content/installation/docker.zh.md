@@ -22,3 +22,42 @@ docker run -d --name yarr \
 ```
 
 数据库存储在数据卷 `yarr-data` 中。
+
+## Docker Compose 与 PostgreSQL
+
+要结合 PostgreSQL 运行 yarr，请使用 `docker-compose.yml` 文件：
+
+```yaml
+services:
+  yarr:
+    image: nkanaev/yarr:latest
+    command: ["-db", "postgres://yarr:yarr@postgres:5432/yarr?sslmode=disable", "-addr", "0.0.0.0:7070"]
+    ports:
+      - "7070:7070"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: yarr
+      POSTGRES_PASSWORD: yarr
+      POSTGRES_DB: yarr
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yarr -d yarr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+```
+
+启动服务：
+
+```sh
+docker compose up -d
+```
