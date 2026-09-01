@@ -1,0 +1,5 @@
+{{ $file := .Get 0 }}
+{{ $lang := index (split (path.Ext $file) ".") 1 }}
+{{ if eq $lang "yml" }}{{ $lang = "yaml" }}{{ end }}
+{{ $code := readFile (printf "code/%s" $file) }}
+<pre><code class="language-{{ $lang }}">{{ $code }}</code></pre>

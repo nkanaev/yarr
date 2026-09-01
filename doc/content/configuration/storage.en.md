@@ -19,9 +19,7 @@ the user's config directory:
 
 To use a custom SQLite file:
 
-```sh
-yarr -db /path/to/data.db
-```
+{{< code "storage-sqlite.sh" >}}
 
 SQLite support is backed by the `mattn/go-sqlite3` driver. The file path accepts
 the [connection string arguments](https://pkg.go.dev/github.com/mattn/go-sqlite3#readme-connection-string)
@@ -34,9 +32,7 @@ own arguments, they replace the defaults entirely.
 PostgreSQL is enabled when the `-db` value is a connection string that starts
 with `postgres://` or `postgresql://`.
 
-```sh
-yarr -db 'postgres://user:password@host:port/dbname?sslmode=disable'
-```
+{{< code "storage-postgres.sh" >}}
 
 The database must already exist; yarr creates and updates the tables
 automatically on startup.

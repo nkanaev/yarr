@@ -10,9 +10,7 @@ yarr 在 `/fever` 端点支持 Fever API。这允许兼容 Fever 的第三方客
 
 Fever API 需要身份验证。在 yarr 服务器上使用 `-auth` 标志（或 `YARR_AUTH` 环境变量）设置用户名和密码：
 
-```sh
-yarr -auth username:password
-```
+{{< code "command-line-auth.sh" >}}
 
 ## 配置兼容 Fever 的客户端
 

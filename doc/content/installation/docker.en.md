@@ -8,18 +8,11 @@ The image is available on [Docker Hub](https://hub.docker.com/r/nkanaev/yarr) an
 
 Pull the image from the registry:
 
-```sh
-docker pull nkanaev/yarr:latest
-```
+{{< code "docker-pull.sh" >}}
 
 Run the container:
 
-```sh
-docker run -d --name yarr \
-  -p 7070:7070 \
-  -v yarr-data:/data \
-  nkanaev/yarr:latest -db /data/yarr.db -addr 0.0.0.0:7070
-```
+{{< code "docker-run.sh" >}}
 
 The database is stored in the volume `yarr-data`.
 
@@ -27,37 +20,8 @@ The database is stored in the volume `yarr-data`.
 
 To run yarr with PostgreSQL, use a `docker-compose.yml` file:
 
-```yaml
-services:
-  yarr:
-    image: nkanaev/yarr:latest
-    command: ["-db", "postgres://yarr:yarr@postgres:5432/yarr?sslmode=disable", "-addr", "0.0.0.0:7070"]
-    ports:
-      - "7070:7070"
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  postgres:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_USER: yarr
-      POSTGRES_PASSWORD: yarr
-      POSTGRES_DB: yarr
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U yarr -d yarr"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres-data:
-```
+{{< code "docker-compose.yml" >}}
 
 Start the services:
 
-```sh
-docker compose up -d
-```
+{{< code "docker-compose-up.sh" >}}

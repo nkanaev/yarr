@@ -16,9 +16,7 @@ SQLite 是默认选项，当 `-db` 的值为普通文件路径时使用。如果
 
 要使用自定义 SQLite 文件：
 
-```sh
-yarr -db /path/to/data.db
-```
+{{< code "storage-sqlite.sh" >}}
 
 SQLite 支持由 `mattn/go-sqlite3` 驱动提供。文件路径支持该驱动的[连接字符串参数](https://pkg.go.dev/github.com/mattn/go-sqlite3#readme-connection-string)。未提供参数时，yarr 默认使用 `_journal=WAL&_sync=NORMAL&_busy_timeout=5000&cache=shared`。如果您传递自定义参数，将完全覆盖默认参数。
 
@@ -26,9 +24,7 @@ SQLite 支持由 `mattn/go-sqlite3` 驱动提供。文件路径支持该驱动�
 
 当 `-db` 的值是以 `postgres://` 或 `postgresql://` 开头的连接字符串时，启用 PostgreSQL。
 
-```sh
-yarr -db 'postgres://user:password@host:port/dbname?sslmode=disable'
-```
+{{< code "storage-postgres.sh" >}}
 
 数据库必须事先存在；yarr 会在启动时自动创建并更新表结构。
 

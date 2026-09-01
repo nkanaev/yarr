@@ -22,9 +22,7 @@ weight: 2
 
 启动服务器：
 
-```sh
-./yarr
-```
+{{< code "command-line-run.sh" >}}
 
 服务器默认监听 `127.0.0.1:7070`。yarr 会自动将数据存储在用户配置文件夹中。
 
@@ -32,8 +30,6 @@ weight: 2
 
 在所有网络接口上运行服务器并启用密码保护：
 
-```sh
-yarr -addr 0.0.0.0:7070 -auth alice:secret
-```
+{{< code "command-line-auth.sh" >}}
 
 在浏览器中打开 `http://host:7070`，使用 `alice` / `secret` 登录。

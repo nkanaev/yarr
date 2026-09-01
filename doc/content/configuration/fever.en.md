@@ -13,9 +13,7 @@ instance and read your feeds.
 The Fever API requires authentication. Set a username and password on your yarr
 server with the `-auth` flag (or the `YARR_AUTH` environment variable):
 
-```sh
-yarr -auth username:password
-```
+{{< code "command-line-auth.sh" >}}
 
 ## Configure a Fever-compatible client
 

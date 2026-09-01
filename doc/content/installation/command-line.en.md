@@ -22,9 +22,7 @@ Download the command line version from the [releases page](https://github.com/nk
 
 Start the server:
 
-```sh
-./yarr
-```
+{{< code "command-line-run.sh" >}}
 
 The server listens on `127.0.0.1:7070` by default. yarr stores the data automatically in the user config folder.
 
@@ -32,8 +30,6 @@ The server listens on `127.0.0.1:7070` by default. yarr stores the data automati
 
 Run the server on all interfaces with password protection:
 
-```sh
-yarr -addr 0.0.0.0:7070 -auth alice:secret
-```
+{{< code "command-line-auth.sh" >}}
 
 Open `http://host:7070` in a browser and sign in with `alice` / `secret`.
