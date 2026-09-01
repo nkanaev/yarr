@@ -1,5 +1,5 @@
 ---
-title: Command Line
+title: Terminal
 description: Run yarr as a server and access it from any browser.
 weight: 2
 ---

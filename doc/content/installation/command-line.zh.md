@@ -1,5 +1,5 @@
 ---
-title: 命令行
+title: 终端
 description: 将 yarr 作为服务器运行，并从任何浏览器访问。
 weight: 2
 ---

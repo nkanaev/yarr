@@ -1,5 +1,5 @@
 ---
-title: Desktop App
+title: Desktop
 description: Install the desktop application on macOS or Windows.
 weight: 1
 ---

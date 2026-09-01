@@ -1,5 +1,5 @@
 ---
-title: 桌面应用
+title: 桌面
 description: 在 macOS 或 Windows 上安装桌面应用程序。
 weight: 1
 ---
