@@ -16,9 +16,9 @@ languages:
     languageCode: "en-us"
     languageName: "English"
     weight: 1
-    title: "Docs"
+    title: "yarr"
   zh:
     languageCode: "zh-cn"
     languageName: "中文"
     weight: 2
-    title: "文档"
+    title: "yarr"
