@@ -1,4 +1,4 @@
-package auth
+package middleware
 
 import (
 	"crypto/hmac"
@@ -52,12 +52,14 @@ func secret(msg, key string) string {
 	return hex.EncodeToString(src)
 }
 
-func Middleware(username, password string, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if IsAuthenticated(r, username, password) {
-			next.ServeHTTP(w, r)
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-		}
-	})
+func LocalAuth(username, password string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if IsAuthenticated(r, username, password) {
+				next.ServeHTTP(w, r)
+			} else {
+				w.WriteHeader(http.StatusUnauthorized)
+			}
+		})
+	}
 }

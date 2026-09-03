@@ -16,9 +16,8 @@ import (
 	"github.com/nkanaev/yarr/src/content/readability"
 	"github.com/nkanaev/yarr/src/content/sanitizer"
 	"github.com/nkanaev/yarr/src/content/silo"
-	"github.com/nkanaev/yarr/src/server/auth"
 	"github.com/nkanaev/yarr/src/parser/opml"
-	"github.com/nkanaev/yarr/src/server/gzip"
+	"github.com/nkanaev/yarr/src/server/middleware"
 	"github.com/nkanaev/yarr/src/storage/model"
 	"github.com/nkanaev/yarr/src/worker"
 )
@@ -67,7 +66,7 @@ func (s *Server) handler() http.Handler {
 
 	var protected http.Handler = secureMux
 	if s.Username != "" && s.Password != "" {
-		protected = auth.Middleware(s.Username, s.Password, secureMux)
+		protected = middleware.LocalAuth(s.Username, s.Password)(secureMux)
 	}
 
 	dispatch := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +95,7 @@ func (s *Server) handler() http.Handler {
 		})
 	}
 
-	return gzip.Middleware(dispatch)
+	return middleware.Gzip(dispatch)
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +105,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		isAuthenticated = true
 	} else {
 		requiresAuth = true
-		isAuthenticated = auth.IsAuthenticated(r, s.Username, s.Password)
+		isAuthenticated = middleware.IsAuthenticated(r, s.Username, s.Password)
 	}
 
 	settings := s.db.GetSettings()
@@ -572,8 +571,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		username := r.FormValue("username")
 		password := r.FormValue("password")
-		if auth.StringsEqual(username, s.Username) && auth.StringsEqual(password, s.Password) {
-			auth.Authenticate(w, s.Username, s.Password, s.BasePath)
+		if middleware.StringsEqual(username, s.Username) && middleware.StringsEqual(password, s.Password) {
+			middleware.Authenticate(w, s.Username, s.Password, s.BasePath)
 			return
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -585,6 +584,6 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
-	auth.Logout(w, s.BasePath)
+	middleware.Logout(w, s.BasePath)
 	w.WriteHeader(http.StatusNoContent)
 }

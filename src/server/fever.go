@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nkanaev/yarr/src/server/auth"
+	"github.com/nkanaev/yarr/src/server/middleware"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/storage/model"
 )
@@ -77,7 +77,7 @@ func (s *Server) feverAuth(r *http.Request) bool {
 		apiKey = strings.ToLower(apiKey)
 		md5HashValue := md5.Sum(fmt.Appendf(nil, "%s:%s", s.Username, s.Password))
 		hexMD5HashValue := fmt.Sprintf("%x", md5HashValue[:])
-		if !auth.StringsEqual(apiKey, hexMD5HashValue) {
+		if !middleware.StringsEqual(apiKey, hexMD5HashValue) {
 			return false
 		}
 		return true
