@@ -436,7 +436,7 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 		}
 		if s.db.UpdateSettings(params) {
 			if params.RefreshRate != nil {
-				s.worker.SetRefreshRate(s.db.GetSettings().RefreshRate)
+				s.worker.SetRefreshRate(*params.RefreshRate)
 			}
 			w.WriteHeader(http.StatusOK)
 		} else {
