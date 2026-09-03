@@ -7,9 +7,9 @@ import (
 )
 
 func TestBaseRedirect(t *testing.T) {
-	handler := Base("/base")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Base(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-	}))
+	}), "/base")
 
 	req := httptest.NewRequest("GET", "/base", nil)
 	rec := httptest.NewRecorder()
@@ -25,9 +25,9 @@ func TestBaseRedirect(t *testing.T) {
 
 func TestBaseOutsidePath(t *testing.T) {
 	called := false
-	handler := Base("/base")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Base(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		called = true
-	}))
+	}), "/base")
 
 	req := httptest.NewRequest("GET", "/other", nil)
 	rec := httptest.NewRecorder()
@@ -43,9 +43,9 @@ func TestBaseOutsidePath(t *testing.T) {
 
 func TestBaseStripPrefix(t *testing.T) {
 	var gotPath string
-	handler := Base("/base")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Base(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotPath = r.URL.Path
-	}))
+	}), "/base")
 
 	req := httptest.NewRequest("GET", "/base/api/status", nil)
 	rec := httptest.NewRecorder()
@@ -57,9 +57,9 @@ func TestBaseStripPrefix(t *testing.T) {
 }
 
 func TestBaseEmpty(t *testing.T) {
-	handler := Base("")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := Base(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-	}))
+	}), "")
 
 	req := httptest.NewRequest("GET", "/api/status", nil)
 	rec := httptest.NewRecorder()

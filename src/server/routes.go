@@ -66,7 +66,7 @@ func (s *Server) handler() http.Handler {
 
 	var protected http.Handler = secureMux
 	if s.Username != "" && s.Password != "" {
-		protected = middleware.LocalAuth(s.Username, s.Password)(secureMux)
+		protected = middleware.LocalAuth(secureMux, s.Username, s.Password)
 	}
 
 	var dispatch http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -78,9 +78,7 @@ func (s *Server) handler() http.Handler {
 		}
 	})
 
-	if s.BasePath != "" {
-		dispatch = middleware.Base(s.BasePath)(dispatch)
-	}
+	dispatch = middleware.Base(dispatch, s.BasePath)
 
 	return middleware.Gzip(dispatch)
 }

@@ -50,9 +50,9 @@ func TestIsAuthenticated(t *testing.T) {
 
 func TestLocalAuth(t *testing.T) {
 	username, password := "user", "pass"
-	handler := LocalAuth(username, password)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LocalAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-	}))
+	}), username, password)
 
 	tests := []struct {
 		name   string
