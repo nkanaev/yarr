@@ -31,15 +31,20 @@ func opt(envVar, defaultValue string) string {
 }
 
 func parseAuthfile(authfile io.Reader) (username, password string, err error) {
-	scanner := bufio.NewScanner(authfile)
-	if scanner.Scan() {
+	if scanner := bufio.NewScanner(authfile); scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.SplitN(line, ":", 2)
 		if len(parts) != 2 {
 			return "", "", fmt.Errorf("wrong syntax (expected `username:password`)")
 		}
-		username = parts[0]
-		password = parts[1]
+		username = strings.TrimSpace(parts[0])
+		password = strings.TrimSpace(parts[1])
+
+		if username == "" || password == "" {
+			return "", "", fmt.Errorf("missing username and/or password")
+		}
+	} else {
+		return "", "", fmt.Errorf("empty auth line")
 	}
 	return username, password, nil
 }

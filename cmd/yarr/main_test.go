@@ -28,6 +28,14 @@ func TestPasswordFromAuthfile(t *testing.T) {
 			expectedPassword: "password:with:columns",
 			expectedError:    false,
 		},
+		{
+			authfile:      "",
+			expectedError: true,
+		},
+		{
+			authfile:      "   :   ",
+			expectedError: true,
+		},
 	} {
 		t.Run(tc.authfile, func(t *testing.T) {
 			username, password, err := parseAuthfile(strings.NewReader(tc.authfile))
