@@ -17,8 +17,8 @@ import (
 	"github.com/nkanaev/yarr/src/content/sanitizer"
 	"github.com/nkanaev/yarr/src/content/silo"
 	"github.com/nkanaev/yarr/src/server/auth"
+	"github.com/nkanaev/yarr/src/parser/opml"
 	"github.com/nkanaev/yarr/src/server/gzip"
-	"github.com/nkanaev/yarr/src/server/opml"
 	"github.com/nkanaev/yarr/src/storage/model"
 	"github.com/nkanaev/yarr/src/worker"
 )
