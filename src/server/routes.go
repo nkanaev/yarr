@@ -38,59 +38,50 @@ func writeHTML(w http.ResponseWriter, status int, tmpl *template.Template, data 
 	}
 }
 
-func (s *Server) handler() http.Handler {
+func (s *Server) Handler() http.Handler {
 	staticFS := http.FileServer(http.FS(assets.StaticFS()))
 
-	publicMux := http.NewServeMux()
-	publicMux.HandleFunc("/{$}", s.handleIndex)
-	publicMux.HandleFunc("/login", s.handleLogin)
-	publicMux.HandleFunc("/static/{path...}", http.StripPrefix("/static/", staticFS).ServeHTTP)
-	publicMux.HandleFunc("/fever/", s.handleFever)
-	publicMux.HandleFunc("/manifest.json", s.handleManifest)
-
-	secureMux := http.NewServeMux()
-	secureMux.HandleFunc("/api/status", s.handleStatus)
-	secureMux.HandleFunc("/api/folders", s.handleFolderList)
-	secureMux.HandleFunc("/api/folders/{id}", s.handleFolder)
-	secureMux.HandleFunc("/api/feeds", s.handleFeedList)
-	secureMux.HandleFunc("/api/feeds/refresh", s.handleFeedRefresh)
-	secureMux.HandleFunc("/api/feeds/errors", s.handleFeedErrors)
-	secureMux.HandleFunc("/api/feeds/{id}", s.handleFeed)
-	secureMux.HandleFunc("/api/items", s.handleItemList)
-	secureMux.HandleFunc("/api/items/{id}", s.handleItem)
-	secureMux.HandleFunc("/api/settings", s.handleSettings)
-	secureMux.HandleFunc("/opml/import", s.handleOPMLImport)
-	secureMux.HandleFunc("/opml/export", s.handleOPMLExport)
-	secureMux.HandleFunc("/page", s.handlePageCrawl)
-	secureMux.HandleFunc("/logout", s.handleLogout)
-
-	var protected http.Handler = secureMux
-	if s.Username != "" && s.Password != "" {
-		protected = middleware.LocalAuth(secureMux, s.Username, s.Password)
+	secure := func(next http.HandlerFunc) http.HandlerFunc {
+		if s.Auth == nil {
+			return next
+		}
+		return s.Auth.Middleware(next)
 	}
 
-	var dispatch http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, pattern := secureMux.Handler(r)
-		if pattern != "" {
-			protected.ServeHTTP(w, r)
-		} else {
-			publicMux.ServeHTTP(w, r)
-		}
-	})
+	mux := http.NewServeMux()
+	mux.HandleFunc("/{$}", s.handleIndex)
+	mux.HandleFunc("/login", s.handleLogin)
+	mux.HandleFunc("/static/{path...}", http.StripPrefix("/static/", staticFS).ServeHTTP)
+	mux.HandleFunc("/fever/", s.handleFever)
+	mux.HandleFunc("/manifest.json", s.handleManifest)
+	mux.HandleFunc("/api/status", secure(s.handleStatus))
+	mux.HandleFunc("/api/folders", secure(s.handleFolderList))
+	mux.HandleFunc("/api/folders/{id}", secure(s.handleFolder))
+	mux.HandleFunc("/api/feeds", secure(s.handleFeedList))
+	mux.HandleFunc("/api/feeds/refresh", secure(s.handleFeedRefresh))
+	mux.HandleFunc("/api/feeds/errors", secure(s.handleFeedErrors))
+	mux.HandleFunc("/api/feeds/{id}", secure(s.handleFeed))
+	mux.HandleFunc("/api/items", secure(s.handleItemList))
+	mux.HandleFunc("/api/items/{id}", secure(s.handleItem))
+	mux.HandleFunc("/api/settings", secure(s.handleSettings))
+	mux.HandleFunc("/opml/import", secure(s.handleOPMLImport))
+	mux.HandleFunc("/opml/export", secure(s.handleOPMLExport))
+	mux.HandleFunc("/page", secure(s.handlePageCrawl))
+	mux.HandleFunc("/logout", secure(s.handleLogout))
 
-	dispatch = middleware.Base(dispatch, s.BasePath)
+	handler := middleware.Base(mux, s.BasePath)
 
-	return middleware.Gzip(dispatch)
+	return middleware.Gzip(handler)
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	isAuthenticated := false
 	requiresAuth := false
-	if s.Username == "" && s.Password == "" {
+	if s.Auth == nil {
 		isAuthenticated = true
 	} else {
 		requiresAuth = true
-		isAuthenticated = middleware.IsAuthenticated(r, s.Username, s.Password)
+		isAuthenticated = s.Auth.IsAuthenticated(r)
 	}
 
 	settings := s.db.GetSettings()
@@ -556,10 +547,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		username := r.FormValue("username")
 		password := r.FormValue("password")
-		if middleware.StringsEqual(username, s.Username) && middleware.StringsEqual(password, s.Password) {
-			middleware.Authenticate(w, s.Username, s.Password, s.BasePath)
-			return
-		} else {
+		if s.Auth == nil || !s.Auth.Authenticate(w, username, password) {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -569,6 +557,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
-	middleware.Logout(w, s.BasePath)
+	if s.Auth != nil {
+		s.Auth.Logout(w)
+	}
 	w.WriteHeader(http.StatusNoContent)
 }

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"crypto/md5"
 	"fmt"
 	"log"
 	"net/http"
@@ -72,17 +71,15 @@ func getLastRefreshedOnTime(feedStates []model.FeedState) int64 {
 }
 
 func (s *Server) feverAuth(r *http.Request) bool {
-	if s.Username != "" && s.Password != "" {
-		apiKey := r.FormValue("api_key")
-		apiKey = strings.ToLower(apiKey)
-		md5HashValue := md5.Sum(fmt.Appendf(nil, "%s:%s", s.Username, s.Password))
-		hexMD5HashValue := fmt.Sprintf("%x", md5HashValue[:])
-		if !middleware.StringsEqual(apiKey, hexMD5HashValue) {
-			return false
-		}
-		return true
+	if s.Auth == nil {
+		return false
 	}
-	return false
+	apiKey := r.FormValue("api_key")
+	apiKey = strings.ToLower(apiKey)
+	if !middleware.StringsEqual(apiKey, s.Auth.FeverAPIKey()) {
+		return false
+	}
+	return true
 }
 
 func formHasValue(values url.Values, value string) bool {

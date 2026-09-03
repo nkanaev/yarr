@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/nkanaev/yarr/src/platform"
-	"github.com/nkanaev/yarr/src/server"
+	yarr "github.com/nkanaev/yarr/src/server"
 	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/worker"
 )
@@ -142,25 +142,24 @@ func main() {
 	}
 
 	worker.SetVersion(Version)
-	srv := server.NewServer(store, addr)
+	server := yarr.NewServer(store, addr)
 
 	if basepath != "" {
-		srv.BasePath = "/" + strings.Trim(basepath, "/")
+		server.BasePath = "/" + strings.Trim(basepath, "/")
 	}
 
 	if certfile != "" && keyfile != "" {
-		srv.CertFile = certfile
-		srv.KeyFile = keyfile
+		server.CertFile = certfile
+		server.KeyFile = keyfile
 	}
 
 	if username != "" && password != "" {
-		srv.Username = username
-		srv.Password = password
+		server.Auth = yarr.LocalAuth{Username: username, Password: password, BasePath: server.BasePath}
 	}
 
-	log.Printf("starting server at %s", srv.GetAddr())
+	log.Printf("starting server at %s", server.GetAddr())
 	if open {
-		platform.Open(srv.GetAddr())
+		platform.Open(server.GetAddr())
 	}
-	platform.Start(srv)
+	platform.Start(server)
 }

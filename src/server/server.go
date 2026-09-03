@@ -17,10 +17,8 @@ type Server struct {
 	worker *worker.Worker
 
 	BasePath string
+	Auth     Auth
 
-	// auth
-	Username string
-	Password string
 	// https
 	CertFile string
 	KeyFile  string
@@ -64,7 +62,7 @@ func (s *Server) Start() {
 		log.Fatal(err)
 	}
 
-	httpserver := &http.Server{Handler: s.handler()}
+	httpserver := &http.Server{Handler: s.Handler()}
 	if s.CertFile != "" && s.KeyFile != "" {
 		err = httpserver.ServeTLS(ln, s.CertFile, s.KeyFile)
 		ln.Close()
