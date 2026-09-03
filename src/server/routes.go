@@ -69,7 +69,7 @@ func (s *Server) handler() http.Handler {
 		protected = middleware.LocalAuth(s.Username, s.Password)(secureMux)
 	}
 
-	dispatch := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	var dispatch http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, pattern := secureMux.Handler(r)
 		if pattern != "" {
 			protected.ServeHTTP(w, r)
@@ -79,20 +79,7 @@ func (s *Server) handler() http.Handler {
 	})
 
 	if s.BasePath != "" {
-		baseDispatch := dispatch
-		dispatch = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == s.BasePath {
-				http.Redirect(w, r, s.BasePath+"/", http.StatusFound)
-				return
-			}
-			if !strings.HasPrefix(r.URL.Path, s.BasePath) {
-				w.WriteHeader(http.StatusNotFound)
-				return
-			}
-			r2 := r.Clone(r.Context())
-			r2.URL.Path = strings.TrimPrefix(r.URL.Path, s.BasePath)
-			baseDispatch.ServeHTTP(w, r2)
-		})
+		dispatch = middleware.Base(s.BasePath)(dispatch)
 	}
 
 	return middleware.Gzip(dispatch)
