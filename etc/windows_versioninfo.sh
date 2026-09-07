@@ -52,7 +52,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Strip leading 'v' and replace dots with commas for version_comma
-version_num="${version#v}"
+version_num="${version#[!0-9.]*}"
+version_num="${version_num%%[!0-9.]*}"
 version_comma="${version_num//./,}"
 
 # Use a here document for the template with ENDFILE delimiter
