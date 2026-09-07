@@ -1,4 +1,4 @@
-# upcoming
+# v2.9 (2026-09-07)
 
 - (new) show API errors notifications
 - (fix) delayed initial render of feeds (thanks to @Digitalone1 for the report)

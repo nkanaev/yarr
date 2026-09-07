@@ -81,7 +81,7 @@
           role="radio"
           :aria-checked="modelValue === 'feed:' + node.feed.id"
           @click="$emit('update:modelValue', 'feed:' + node.feed.id)">
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 d-flex">
             <v-icon class="flex-shrink-0" name="rss" v-if="!node.feed.icon" />
             <span class="c-icon" v-else>
               <img :src="node.feed.icon" alt="" loading="lazy" />
