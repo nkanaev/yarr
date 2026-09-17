@@ -31,7 +31,6 @@ type Storage interface {
 	UpdateFeed(feedId int64, params model.UpdateFeedParams) (bool, error)
 	UpdateFeedState(feedID int64, params model.UpdateFeedStateParams) (bool, error)
 	UpdateFolder(folderId int64, params model.UpdateFolderParams) (bool, error)
-	UpdateItem(id int64, params model.UpdateItemParams) bool
 	UpdateItemStatus(item_id int64, status model.ItemStatus) bool
 	UpdateSettings(params model.UpdateSettingsParams) bool
 }
