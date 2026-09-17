@@ -1461,11 +1461,16 @@ export default defineComponent({
         this.refreshItems(false);
         return;
       }
-      this.feedSelected = "feed:" + item.feed_id;
+      const feedKey = "feed:" + item.feed_id;
+      const feedChanged = feedKey !== this.feedSelected;
+      this.feedSelected = feedKey;
       // feedSelected's own watcher resets itemSelected to null as its first
-      // action; wait for that to settle before assigning the linked item, or
-      // it gets clobbered.
+      // action, and (when feedSelected actually changes) refreshes the item
+      // list itself; wait for that to settle before assigning the linked
+      // item. If feedSelected was already equal to feedKey, the watcher
+      // never fires, so refresh the list ourselves in that case.
       await this.$nextTick();
+      if (!feedChanged) this.refreshItems(false);
       this.itemSelected = item.id;
     },
     updateItemURL(id: number | null) {
