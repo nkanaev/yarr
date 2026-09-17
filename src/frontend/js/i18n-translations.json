@@ -399,6 +399,26 @@
     "zh": "关闭文章",
     "ru": "Закрыть статью"
   },
+  "fullscreen_enter": {
+    "en": "Fullscreen",
+    "de": "Vollbild",
+    "fr": "Plein écran",
+    "es": "Pantalla completa",
+    "ja": "全画面",
+    "pt": "Tela cheia",
+    "zh": "全屏",
+    "ru": "Полный экран"
+  },
+  "fullscreen_leave": {
+    "en": "Exit Fullscreen",
+    "de": "Vollbild verlassen",
+    "fr": "Quitter le plein écran",
+    "es": "Salir de pantalla completa",
+    "ja": "全画面を終了",
+    "pt": "Sair da tela cheia",
+    "zh": "退出全屏",
+    "ru": "Выйти из полноэкранного режима"
+  },
   "untitled": {
     "en": "untitled",
     "de": "unbenannt",
