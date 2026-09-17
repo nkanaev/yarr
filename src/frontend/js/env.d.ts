@@ -4,11 +4,6 @@ declare module "*.vue" {
   export default component;
 }
 
-declare module "*.svg" {
-  const content: string;
-  export default content;
-}
-
 interface Window {
   app: any;
 }
