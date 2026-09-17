@@ -4,6 +4,7 @@
     :class="{
       'feed-selected': feedSelected !== null,
       'item-selected': itemSelected !== null,
+      'item-fullscreen': itemFullscreen,
     }">
     <!-- feed list -->
     <div
@@ -437,6 +438,12 @@
           :disabled="!items.length || itemSelected == items[items.length - 1].id">
           <v-icon name="chevron-right" />
         </button>
+        <button
+          class="c-button-pill d-none d-lg-flex"
+          @click="itemFullscreen = !itemFullscreen"
+          :title="itemFullscreen ? $t('fullscreen_leave') : $t('fullscreen_enter')">
+          <v-icon :name="itemFullscreen ? 'fullscreen-exit' : 'fullscreen'" />
+        </button>
         <button class="c-button-pill" @click="itemSelected = null" :title="$t('close_article')">
           <v-icon name="x" />
         </button>
@@ -613,6 +620,7 @@ export default defineComponent({
       itemSelected: null as number | null,
       itemSelectedDetails: null as Item | null,
       itemSelectedReadability: "",
+      itemFullscreen: false,
       itemSearch: "",
       itemSortNewestFirst: s.sort_newest_first as boolean,
       itemListWidth: s.item_list_width || 300,
@@ -830,6 +838,7 @@ export default defineComponent({
       this.itemSelectedReadability = "";
       if (newVal === null) {
         this.itemSelectedDetails = null;
+        this.itemFullscreen = false;
         return;
       }
       if (this.$refs.content) this.$refs.content.scrollTop = 0;
