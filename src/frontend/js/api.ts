@@ -75,18 +75,6 @@ function json<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-function param(query: Record<string, string | number | boolean>) {
-  if (!query) return "";
-  return (
-    "?" +
-    Object.keys(query)
-      .map(function (key) {
-        return encodeURIComponent(key) + "=" + encodeURIComponent(query[key]);
-      })
-      .join("&")
-  );
-}
-
 export default {
   feeds: {
     list(): Promise<Feed[]> {
