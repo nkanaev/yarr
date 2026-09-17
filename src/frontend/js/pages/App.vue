@@ -608,7 +608,12 @@ export default defineComponent({
     }
 
     if (!feedsErr) {
-      this.refreshItems(false);
+      const linkedItemId = this.getLinkedItemId();
+      if (linkedItemId !== null) {
+        await this.openLinkedItem(linkedItemId);
+      } else {
+        this.refreshItems(false);
+      }
       this.computeStats();
     }
   },
@@ -842,6 +847,7 @@ export default defineComponent({
       }
     },
     async itemSelected(newVal, oldVal) {
+      this.updateItemURL(newVal);
       this.itemSelectedReadability = "";
       if (newVal === null) {
         this.itemSelectedDetails = null;
@@ -1441,6 +1447,35 @@ export default defineComponent({
         return this.$t("error_server", { code: err.status, text: err.statusText });
       if (err instanceof NetworkError) return this.$t("error_network");
       return undefined;
+    },
+    getLinkedItemId(): number | null {
+      const raw = new URLSearchParams(window.location.search).get("item");
+      if (!raw) return null;
+      const id = Number(raw);
+      return Number.isInteger(id) ? id : null;
+    },
+    async openLinkedItem(id: number) {
+      const [err, item] = await to(api.items.get(id));
+      if (err) {
+        this.updateItemURL(null);
+        this.refreshItems(false);
+        return;
+      }
+      this.feedSelected = "feed:" + item.feed_id;
+      // feedSelected's own watcher resets itemSelected to null as its first
+      // action; wait for that to settle before assigning the linked item, or
+      // it gets clobbered.
+      await this.$nextTick();
+      this.itemSelected = item.id;
+    },
+    updateItemURL(id: number | null) {
+      const url = new URL(window.location.href);
+      if (id === null) {
+        url.searchParams.delete("item");
+      } else {
+        url.searchParams.set("item", String(id));
+      }
+      history.replaceState(null, "", url);
     },
   },
 });
