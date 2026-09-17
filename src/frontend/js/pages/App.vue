@@ -98,27 +98,6 @@
           </div>
 
           <div class="c-dropdown-divider"></div>
-
-          <header class="c-dropdown-header" role="heading" aria-level="2">
-            {{ $t("show_first") }}
-          </header>
-          <div class="d-flex">
-            <button
-              class="flex-fill c-dropdown-item text-center"
-              :aria-pressed="itemSortNewestFirst"
-              :class="{ active: itemSortNewestFirst }"
-              @click.stop="itemSortNewestFirst = true">
-              {{ $t("new") }}
-            </button>
-            <button
-              class="flex-fill c-dropdown-item text-center"
-              :aria-pressed="!itemSortNewestFirst"
-              :class="{ active: !itemSortNewestFirst }"
-              @click.stop="itemSortNewestFirst = false">
-              {{ $t("old") }}
-            </button>
-          </div>
-          <div class="c-dropdown-divider"></div>
           <header class="c-dropdown-header" role="heading" aria-level="2">
             {{ $t("subscriptions") }}
           </header>
@@ -198,6 +177,12 @@
           @click="feedSelected = null"
           :title="$t('show_feeds')">
           <v-icon name="chevron-left" />
+        </button>
+        <button
+          class="c-button-pill"
+          @click="itemSortNewestFirst = !itemSortNewestFirst"
+          :title="$t('show_first') + ': ' + (itemSortNewestFirst ? $t('new') : $t('old'))">
+          <v-icon :name="itemSortNewestFirst ? 'sort-new-first' : 'sort-old-first'" />
         </button>
         <div class="c-search flex-grow-1">
           <v-icon name="search" />
