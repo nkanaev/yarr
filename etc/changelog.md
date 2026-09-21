@@ -1,3 +1,7 @@
+# upcoming
+
+- (fix) parsing attachments in JSON feeds
+
 # v2.9 (2026-09-07)
 
 - (new) show API errors notifications

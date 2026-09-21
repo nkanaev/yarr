@@ -1,0 +1,51 @@
+/*
+JSON Feed 1.1 item with attachments of different mime types. Verifies
+attachments become media links with the mime type mapped to image/audio/video
+and the attachment title used as the description.
+
+@ len(feed.Items[0].MediaLinks) == 3
+@ feed.Items[0].MediaLinks[0].URL == "https://example.org/audio.mp3"
+@ feed.Items[0].MediaLinks[0].Type == "audio"
+@ feed.Items[0].MediaLinks[0].Description == "Episode 1"
+@ feed.Items[0].MediaLinks[1].URL == "https://example.org/cover.png"
+@ feed.Items[0].MediaLinks[1].Type == "image"
+@ feed.Items[0].MediaLinks[1].Description == "Cover art"
+@ feed.Items[0].MediaLinks[2].URL == "https://example.org/video.mp4"
+@ feed.Items[0].MediaLinks[2].Type == "video"
+*/
+{
+	"version": "https://jsonfeed.org/version/1.1",
+	"title": "Podcast Feed",
+	"home_page_url": "https://example.org/",
+	"items": [
+		{
+			"id": "1",
+			"url": "https://example.org/episode-1",
+			"content_text": "Episode one.",
+			"attachments": [
+  			{
+  				"url": "https://example.org/file.doc",
+  				"mime_type": "text/css",
+  				"title": "stylesheets",
+  				"size_in_bytes": 123
+  			},
+				{
+					"url": "https://example.org/audio.mp3",
+					"mime_type": "audio/mpeg",
+					"title": "Episode 1",
+					"size_in_bytes": 123456,
+					"duration_in_seconds": 1800
+				},
+				{
+					"url": "https://example.org/cover.png",
+					"mime_type": "image/png",
+					"title": "Cover art"
+				},
+				{
+					"url": "https://example.org/video.mp4",
+					"mime_type": "video/mp4"
+				}
+			]
+		}
+	]
+}

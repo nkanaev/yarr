@@ -4,6 +4,7 @@ package parser
 import (
 	"encoding/json"
 	"io"
+	"strings"
 )
 
 type jsonFeed struct {
@@ -33,6 +34,31 @@ type jsonAttachment struct {
 	Duration int    `json:"duration_in_seconds"`
 }
 
+func (item *jsonItem) mediaLinks() []MediaLink {
+	links := make([]MediaLink, 0)
+	for _, a := range item.Attachments {
+		if a.URL == "" {
+			continue
+		}
+		var typ string
+		switch {
+		case strings.HasPrefix(a.MimeType, "image/"):
+			typ = "image"
+		case strings.HasPrefix(a.MimeType, "audio/"):
+			typ = "audio"
+		case strings.HasPrefix(a.MimeType, "video/"):
+			typ = "video"
+		default:
+			continue
+		}
+		links = append(links, MediaLink{URL: a.URL, Type: typ, Description: a.Title})
+	}
+	if len(links) == 0 {
+		return nil
+	}
+	return links
+}
+
 func ParseJSON(data io.Reader) (*Feed, error) {
 	srcfeed := new(jsonFeed)
 	decoder := json.NewDecoder(data)
@@ -46,11 +72,12 @@ func ParseJSON(data io.Reader) (*Feed, error) {
 	}
 	for _, srcitem := range srcfeed.Items {
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:    firstNonEmpty(srcitem.ID, srcitem.URL),
-			Date:    dateParse(firstNonEmpty(srcitem.DatePublished, srcitem.DateModified)),
-			URL:     srcitem.URL,
-			Title:   srcitem.Title,
-			Content: firstNonEmpty(srcitem.HTML, srcitem.Text, srcitem.Summary),
+			GUID:       firstNonEmpty(srcitem.ID, srcitem.URL),
+			Date:       dateParse(firstNonEmpty(srcitem.DatePublished, srcitem.DateModified)),
+			URL:        srcitem.URL,
+			Title:      srcitem.Title,
+			Content:    firstNonEmpty(srcitem.HTML, srcitem.Text, srcitem.Summary),
+			MediaLinks: srcitem.mediaLinks(),
 		})
 	}
 	return dstfeed, nil
