@@ -110,13 +110,13 @@ jobs:
       with:
         id: windows_amd64
         cmd: make windows_amd64
-        out: out/windows_amd64/yarr
+        out: out/windows_amd64/yarr.exe
     - name: Build windows/arm64
       uses: ./.github/actions/prepare
       with:
         id: windows_arm64
         cmd: make windows_arm64
-        out: out/windows_arm64/yarr
+        out: out/windows_arm64/yarr.exe
 
   create_release:
     name: Create Release
