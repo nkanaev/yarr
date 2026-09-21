@@ -106,7 +106,8 @@ func listQueryPredicate(filter model.ItemFilter, newestFirst bool) (string, []an
 		words := strings.Fields(*filter.Search)
 		terms := make([]string, len(words))
 		for idx, word := range words {
-			terms[idx] = word + "*"
+			word = strings.ReplaceAll(word, "\"", "\"\"")
+			terms[idx] = "\"" + word + "\"" + "*"
 		}
 
 		cond = append(
@@ -219,6 +220,9 @@ func (s *SQLiteStorage) ListItems(
 			return result
 		}
 		result = append(result, x)
+	}
+	if err := rows.Err(); err != nil {
+		log.Print(err)
 	}
 	return result
 }
