@@ -25,6 +25,7 @@ func TestFindFeedsLinks(t *testing.T) {
 			<link rel="alternate" href="/feed.xml" type="application/rss+xml" title="rss with title">
 			<link rel="alternate" href="/atom.xml" type="application/atom+xml">
 			<link rel="alternate" href="/feed.json" type="application/json">
+			<link rel="alternate" href="/jsonfeed.json" type="application/feed+json">
 		</head>
 		<body>
 			<a href="/feed.xml">rss</a>
@@ -36,6 +37,7 @@ func TestFindFeedsLinks(t *testing.T) {
 	want := []FeedLink{
 		{URL: base + "/atom.xml", Title: ""},
 		{URL: base + "/feed.json", Title: ""},
+		{URL: base + "/jsonfeed.json", Title: ""},
 		{URL: base + "/feed.xml", Title: "rss with title"},
 	}
 	if !reflect.DeepEqual(have, want) {
@@ -187,7 +189,7 @@ func TestFindIcons(t *testing.T) {
 			<link rel="icon macicon" href="path/to/favicon.png">
 		</head>
 		<body>
-			
+
 		</body>
 		</html>
 	`

@@ -26,7 +26,7 @@ func FindFeeds(body string, base string) []FeedLink {
 
 	// find direct links
 	// css: link[type=application/atom+xml]
-	linkTypes := []string{"application/atom+xml", "application/rss+xml", "application/json"}
+	linkTypes := []string{"application/atom+xml", "application/rss+xml", "application/json", "application/feed+json"}
 	isFeedLink := func(n *html.Node) bool {
 		if n.Type == html.ElementNode && n.Data == "link" {
 			t := htmlutil.Attr(n, "type")
