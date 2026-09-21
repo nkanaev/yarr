@@ -76,7 +76,7 @@ func (s *Server) feverAuth(r *http.Request) bool {
 	}
 	apiKey := r.FormValue("api_key")
 	apiKey = strings.ToLower(apiKey)
-	if !middleware.StringsEqual(apiKey, s.Auth.FeverAPIKey()) {
+	if !middleware.StringsEqual(apiKey, s.Auth.FeverAPIKey(r)) {
 		return false
 	}
 	return true

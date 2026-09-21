@@ -13,7 +13,7 @@ type AuthProvider interface {
 	IsAuthenticated(request *http.Request) bool
 	Authenticate(rw http.ResponseWriter, username, password string) bool
 	Logout(rw http.ResponseWriter)
-	FeverAPIKey() string
+	FeverAPIKey(request *http.Request) string
 }
 
 type localAuth struct {
@@ -46,7 +46,7 @@ func (a *localAuth) Logout(rw http.ResponseWriter) {
 	middleware.Logout(rw, a.BasePath)
 }
 
-func (a *localAuth) FeverAPIKey() string {
+func (a *localAuth) FeverAPIKey(r *http.Request) string {
 	md5HashValue := md5.Sum(fmt.Appendf(nil, "%s:%s", a.Username, a.Password))
 	return fmt.Sprintf("%x", md5HashValue[:])
 }
