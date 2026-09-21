@@ -59,10 +59,10 @@ linux_armv7: assets
 	go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
 
 windows_amd64: assets
-	CC="zig cc -target x86_64-windows-gnu" GOOS=windows GOARCH=amd64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+	CC="zig cc -target x86_64-windows-gnu" GOOS=windows GOARCH=amd64 go build $(GO_FLAGS) -o out/$@/yarr.exe ./cmd/yarr
 
 windows_arm64: assets
-	CC="zig cc -target aarch64-windows-gnu" GOOS=windows GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr ./cmd/yarr
+	CC="zig cc -target aarch64-windows-gnu" GOOS=windows GOARCH=arm64 go build $(GO_FLAGS) -o out/$@/yarr.exe ./cmd/yarr
 
 darwin_arm64_gui: assets etc/icon.icns
 	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS_GUI) -o out/$@/yarr ./cmd/yarr
