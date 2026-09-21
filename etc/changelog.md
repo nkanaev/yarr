@@ -1,6 +1,7 @@
 # upcoming
 
 - (fix) parsing attachments in JSON feeds
+- (fix) filename extension for Windows CLI builds (thanks to @lux-liang and @junakavora)
 
 # v2.9 (2026-09-07)
 
