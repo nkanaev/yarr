@@ -341,6 +341,7 @@ func (s *Server) feverMarkHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.Form.Get("id"), 10, 64)
 	if err != nil {
 		log.Print("invalid id:", err)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -364,6 +365,7 @@ func (s *Server) feverMarkHandler(w http.ResponseWriter, r *http.Request) {
 	case "feed":
 		if r.Form.Get("as") != "read" {
 			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 		markFilter := model.MarkFilter{FeedID: &id}
 		x, _ := strconv.ParseInt(r.Form.Get("before"), 10, 64)
@@ -375,6 +377,7 @@ func (s *Server) feverMarkHandler(w http.ResponseWriter, r *http.Request) {
 	case "group":
 		if r.Form.Get("as") != "read" {
 			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 		markFilter := model.MarkFilter{}
 		if id > 0 {
