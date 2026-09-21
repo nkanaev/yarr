@@ -405,7 +405,7 @@ func TestDeleteOldItems(t *testing.T) {
 				for _, item := range allItems {
 					guid, _ := strconv.Atoi(item.GUID)
 					if guid < 10 {
-						db.UpdateItemStatus(item.Id, model.STARRED)
+						db.UpdateItem(item.Id, model.UpdateItemParams{Status: new(model.STARRED)})
 					}
 				}
 
@@ -476,6 +476,7 @@ func TestCountItems(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
+	// TODO: the test is only sqlite3-specific
 	dbtest(t, func(t *testing.T, db storage.Storage) {
 		feed := db.CreateFeed(model.CreateFeedParams{Title: "f", FeedLink: "http://f.xml"})
 
@@ -545,18 +546,10 @@ func TestSearch(t *testing.T) {
 			t.Errorf("unicode search (CJK) failed: expected [i2], got %v", have)
 		}
 
-		// 5. Trigger: Update
-		db.UpdateItem(MustGet(itemsByGUID, "i1").Id, model.UpdateItemParams{Title: new("Updated Title")})
-		s7 := "Updated"
-		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s7}, 10, true, false))
-		if !reflect.DeepEqual(have, []string{"i1"}) {
-			t.Errorf("update trigger failed: expected [i1], got %v", have)
-		}
-
-		// 6. Trigger: Delete
+		// 5. Trigger: Delete
 		// db.db.Exec("delete from items where guid = 'i1'")
 		db.DeleteItem(MustGet(itemsByGUID, "i1").Id)
-		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s7}, 10, true, false))
+		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s1}, 10, true, false))
 		if len(have) > 0 {
 			t.Errorf("delete trigger failed: found deleted item: %v", have)
 		}

@@ -132,9 +132,7 @@ type ItemFilter struct {
 }
 
 type UpdateItemParams struct {
-	Title       *string
-	Status      *ItemStatus
-	LastArrived *time.Time
+	Status *ItemStatus
 }
 
 type MarkFilter struct {

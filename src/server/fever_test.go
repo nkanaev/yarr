@@ -24,9 +24,9 @@ func (s *feverTestStorage) MarkItemsRead(filter model.MarkFilter) bool {
 	return true
 }
 
-func (s *feverTestStorage) UpdateItemStatus(id int64, status model.ItemStatus) bool {
+func (s *feverTestStorage) UpdateItem(id int64, params model.UpdateItemParams) bool {
 	s.itemStatusID = id
-	s.itemStatus = &status
+	s.itemStatus = params.Status
 	return true
 }
 
@@ -220,7 +220,7 @@ func TestFeverMarkItem(t *testing.T) {
 				t.Fatalf("expected 200, got %d", rec.Result().StatusCode)
 			}
 			if f.storage.itemStatus == nil {
-				t.Fatal("expected UpdateItemStatus to be invoked")
+				t.Fatal("expected UpdateItem to be invoked")
 			}
 			if f.storage.itemStatusID != 42 {
 				t.Fatalf("expected item id 42, got %d", f.storage.itemStatusID)

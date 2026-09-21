@@ -361,7 +361,7 @@ func (s *Server) feverMarkHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		s.db(r).UpdateItemStatus(id, status)
+		s.db(r).UpdateItem(id, model.UpdateItemParams{Status: &status})
 	case "feed":
 		if r.Form.Get("as") != "read" {
 			w.WriteHeader(http.StatusBadRequest)

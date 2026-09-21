@@ -339,7 +339,7 @@ func (s *Server) handleItem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if body.Status != nil {
-			s.db(r).UpdateItemStatus(id, *body.Status)
+			s.db(r).UpdateItem(id, model.UpdateItemParams{Status: body.Status})
 		}
 		w.WriteHeader(http.StatusOK)
 	default:
