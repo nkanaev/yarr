@@ -1,9 +1,20 @@
 .font-serif {
-  font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
+  font-family:
+    Georgia, Cambria, "Times New Roman", Times, "Noto Serif CJK SC", "Noto Serif CJK TC",
+    "Noto Serif CJK JP", "Noto Serif CJK KR", "Source Han Serif SC", "Source Han Serif TC",
+    "Source Han Serif JP", "Source Han Serif KR", "Songti SC", "STSong", SimSun, PMingLiU, MingLiU,
+    "Yu Mincho", "Hiragino Mincho ProN", Batang, serif !important;
 }
 
 .font-sans-serif {
   font-family: var(--bs-font-sans-serif) !important;
+}
+
+.font-monospace {
+  font-family:
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    "Noto Sans Mono CJK SC", "Noto Sans Mono CJK TC", "Noto Sans Mono CJK JP",
+    "Noto Sans Mono CJK KR", monospace !important;
 }
 
 .cursor-pointer {
