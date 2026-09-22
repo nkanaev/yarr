@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"github.com/nkanaev/yarr/src/content/readability"
 	"github.com/nkanaev/yarr/src/content/sanitizer"
@@ -39,7 +38,7 @@ func writeHTML(w http.ResponseWriter, status int, tmpl *template.Template, data 
 }
 
 func (s *Server) Handler() http.Handler {
-	staticFS := http.FileServer(http.FS(assets.StaticFS()))
+	staticFS := http.FileServer(http.FS(s.StaticFS))
 
 	secure := func(next http.HandlerFunc) http.HandlerFunc {
 		if s.Auth == nil {
@@ -84,15 +83,12 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		isAuthenticated = s.Auth.IsAuthenticated(r)
 	}
 
-	settings := s.db(r).GetSettings()
-	if !isAuthenticated {
-		settings = model.Settings{
-			Language:  settings.Language,
-			ThemeName: settings.ThemeName,
-		}
+	settings := model.SettingsDefault()
+	if isAuthenticated {
+		settings = s.db(r).GetSettings()
 	}
 
-	writeHTML(w, http.StatusOK, assets.Templates().Lookup("index.html"), map[string]any{
+	writeHTML(w, http.StatusOK, s.Template.Lookup("index.html"), map[string]any{
 		"settings":      settings.Map(),
 		"authenticated": isAuthenticated,
 		"requiresAuth":  requiresAuth,

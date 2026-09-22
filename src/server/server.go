@@ -1,6 +1,8 @@
 package server
 
 import (
+	"html/template"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -17,6 +19,9 @@ type Server struct {
 	Storage   StorageProvider
 	Scheduler FeedScheduler
 	Auth      AuthProvider
+
+	StaticFS fs.FS
+	Template *template.Template
 
 	// https
 	CertFile string

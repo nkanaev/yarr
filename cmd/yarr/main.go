@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/platform"
 	"github.com/nkanaev/yarr/src/server"
 	"github.com/nkanaev/yarr/src/storage"
@@ -143,6 +144,8 @@ func main() {
 
 	worker.SetVersion(Version)
 	srv := server.NewServer(addr)
+	srv.StaticFS = assets.StaticFS()
+	srv.Template = assets.Templates()
 
 	if basepath != "" {
 		srv.BasePath = "/" + strings.Trim(basepath, "/")
