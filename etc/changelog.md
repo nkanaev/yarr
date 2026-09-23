@@ -2,6 +2,7 @@
 
 - (fix) parsing attachments in JSON feeds
 - (fix) filename extension for Windows CLI builds (thanks to @lux-liang and @junakavora)
+- (fix) article fallback fonts for CJK serif/monospace (thanks to @gengyue2468)
 
 # v2.9 (2026-09-07)
 
