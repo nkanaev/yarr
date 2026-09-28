@@ -257,11 +257,6 @@ func (s *SQLiteStorage) UpdateItem(id int64, params model.UpdateItemParams) bool
 	return err == nil
 }
 
-func (s *SQLiteStorage) DeleteItem(id int64) bool {
-	_, err := s.db.Exec(`delete from items where id = :id`, sql.Named("id", id))
-	return err == nil
-}
-
 func (s *SQLiteStorage) MarkItemsRead(filter model.MarkFilter) bool {
 	predicate, args := listQueryPredicate(model.ItemFilter{
 		FolderID: filter.FolderID,

@@ -422,33 +422,6 @@ func TestDeleteOldItems(t *testing.T) {
 	// })
 }
 
-func TestDeleteItem(t *testing.T) {
-	dbtest(t, func(t *testing.T, db storage.Storage) {
-		feed := db.CreateFeed(model.CreateFeedParams{FeedLink: "http://test.com/feed.xml"})
-		db.CreateItems([]model.Item{{GUID: "i1", FeedId: feed.Id, Title: "item"}})
-
-		items := db.ListItems(model.ItemFilter{}, 10, false, false)
-		if len(items) != 1 {
-			t.Fatal("expected 1 item")
-		}
-
-		// delete non-existent returns true (err == nil)
-		if !db.DeleteItem(99999) {
-			t.Error("expected true when deleting non-existent item")
-		}
-
-		// delete existing
-		if !db.DeleteItem(items[0].Id) {
-			t.Fatal("delete failed")
-		}
-
-		items = db.ListItems(model.ItemFilter{}, 10, false, false)
-		if len(items) != 0 {
-			t.Errorf("expected 0 items, got %d", len(items))
-		}
-	})
-}
-
 func TestCountItems(t *testing.T) {
 	dbtest(t, func(t *testing.T, db storage.Storage) {
 		if count := db.CountItems(); count != 0 {
@@ -464,13 +437,6 @@ func TestCountItems(t *testing.T) {
 
 		if count := db.CountItems(); count != 3 {
 			t.Errorf("expected 3, got %d", count)
-		}
-
-		items := db.ListItems(model.ItemFilter{}, 10, false, false)
-		db.DeleteItem(items[0].Id)
-
-		if count := db.CountItems(); count != 2 {
-			t.Errorf("expected 2, got %d", count)
 		}
 	})
 }
@@ -500,11 +466,6 @@ func TestSearch(t *testing.T) {
 				Content: `<div class="secret-class">Don't find me by my class name</div>`,
 			},
 		})
-
-		itemsByGUID := make(map[string]model.Item)
-		for _, item := range db.ListItems(model.ItemFilter{}, 1000, false, false) {
-			itemsByGUID[item.GUID] = item
-		}
 
 		// 1. Basic search
 		s1 := "emergency"
@@ -544,14 +505,6 @@ func TestSearch(t *testing.T) {
 		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s6}, 10, true, false))
 		if !reflect.DeepEqual(have, []string{"i2"}) {
 			t.Errorf("unicode search (CJK) failed: expected [i2], got %v", have)
-		}
-
-		// 5. Trigger: Delete
-		// db.db.Exec("delete from items where guid = 'i1'")
-		db.DeleteItem(MustGet(itemsByGUID, "i1").Id)
-		have = getItemGuids(db.ListItems(model.ItemFilter{Search: &s1}, 10, true, false))
-		if len(have) > 0 {
-			t.Errorf("delete trigger failed: found deleted item: %v", have)
 		}
 	})
 }

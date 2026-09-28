@@ -258,11 +258,6 @@ func (s *PostgresStorage) UpdateItem(id int64, params model.UpdateItemParams) bo
 	return err == nil
 }
 
-func (s *PostgresStorage) DeleteItem(id int64) bool {
-	_, err := s.db.Exec(`delete from items where id = $1`, id)
-	return err == nil
-}
-
 func (s *PostgresStorage) MarkItemsRead(filter model.MarkFilter) bool {
 	predicate, args := listQueryPredicate(model.ItemFilter{
 		FolderID: filter.FolderID,
