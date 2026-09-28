@@ -210,41 +210,64 @@ func (s *Server) handleFeedList(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		result, err := worker.DiscoverFeed(form.Url)
+		feedLink := FeedLink{URL: form.Url, Title: form.TitleOverride}
+		result, err := s.Ingestor.AddFeed(r.Context(), s.db(r), feedLink)
 		switch {
 		case err != nil:
-			log.Printf("Faild to discover feed for %s: %s", form.Url, err)
-			writeJSON(w, http.StatusOK, map[string]string{"status": "notfound"})
-		case len(result.Sources) > 0:
+			log.Printf("Faild to discover feed for %s: %s", feedLink.URL, err)
+			writeJSON(w, http.StatusInternalServerError, nil)
+		case len(result.Choices) > 0:
 			writeJSON(
 				w,
 				http.StatusOK,
-				map[string]any{"status": "multiple", "choice": result.Sources},
+				map[string]any{"status": "multiple", "choice": result.Choices},
 			)
 		case result.Feed != nil:
-			title := result.Feed.Title
-			if form.TitleOverride != "" {
-				title = form.TitleOverride
-			}
-			feed := s.db(r).CreateFeed(model.CreateFeedParams{
-				Title:    title,
-				Link:     result.Feed.SiteURL,
-				FeedLink: result.FeedLink,
-				FolderID: form.FolderID,
-			})
-			items := worker.ConvertItems(result.Feed.Items, *feed)
-			if len(items) > 0 {
-				s.db(r).CreateItems(items)
-			}
-			// TODO: DiscoverFeed must search for favicon too
-
 			writeJSON(w, http.StatusOK, map[string]any{
 				"status": "success",
-				"feed":   feed,
+				"feed":   result.Feed,
 			})
 		default:
-			writeJSON(w, http.StatusOK, map[string]string{"status": "notfound"})
+			writeJSON(w, http.StatusNoContent, nil)
 		}
+
+		/*
+			result, err := worker.DiscoverFeed(form.Url)
+			switch {
+			case err != nil:
+				log.Printf("Faild to discover feed for %s: %s", form.Url, err)
+				writeJSON(w, http.StatusOK, map[string]string{"status": "notfound"})
+			case len(result.Sources) > 0:
+				writeJSON(
+					w,
+					http.StatusOK,
+					map[string]any{"status": "multiple", "choice": result.Sources},
+				)
+			case result.Feed != nil:
+				title := result.Feed.Title
+				if form.TitleOverride != "" {
+					title = form.TitleOverride
+				}
+				feed := s.db(r).CreateFeed(model.CreateFeedParams{
+					Title:    title,
+					Link:     result.Feed.SiteURL,
+					FeedLink: result.FeedLink,
+					FolderID: form.FolderID,
+				})
+				items := worker.ConvertItems(result.Feed.Items, *feed)
+				if len(items) > 0 {
+					s.db(r).CreateItems(items)
+				}
+				// TODO: DiscoverFeed must search for favicon too
+
+				writeJSON(w, http.StatusOK, map[string]any{
+					"status": "success",
+					"feed":   feed,
+				})
+			default:
+				writeJSON(w, http.StatusOK, map[string]string{"status": "notfound"})
+			}
+		*/
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -430,9 +453,19 @@ func (s *Server) handleOPMLImport(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		file, _, err := r.FormFile("opml")
 		if err != nil {
-			log.Print(err)
+			log.Printf("Failed to open OPML: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		if err := s.Ingestor.AddOPML(r.Context(), s.db(r), file); err != nil {
+			log.Printf("Failed to ingest OPML: %s", err)
+			// TODO: separate error 
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		/*
 		doc, err := opml.Parse(file)
 		if err != nil {
 			log.Print(err)
@@ -461,6 +494,7 @@ func (s *Server) handleOPMLImport(w http.ResponseWriter, r *http.Request) {
 		if s.Scheduler != nil {
 			s.Scheduler.RefreshFeeds()
 		}
+		*/
 
 		w.WriteHeader(http.StatusOK)
 	default:

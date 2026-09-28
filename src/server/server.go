@@ -3,6 +3,8 @@ package server
 import (
 	"html/template"
 	"io/fs"
+	"context"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -10,7 +12,31 @@ import (
 	"strings"
 
 	"github.com/nkanaev/yarr/src/storage"
+	"github.com/nkanaev/yarr/src/storage/model"
 )
+
+type FeedScheduler interface {
+	FeedsPending() int32
+	RefreshFeeds()
+	SetRefreshRate(minutes int64)
+}
+
+type FeedLink struct {
+	URL   string `json:"url"`
+	Title string `json:"title"`
+	// TODO: bad idea, remove
+	TitleOverride string `json:"title_override,omitempty"`
+}
+
+type AddFeedResult struct {
+	Feed    *model.Feed
+	Choices []FeedLink
+}
+
+type FeedIngestor interface {
+	AddFeed(ctx context.Context, store storage.Storage, feed FeedLink) (AddFeedResult, error)
+	AddOPML(ctx context.Context, store storage.Storage, file io.Reader) error
+}
 
 type Server struct {
 	Addr     string
@@ -19,6 +45,7 @@ type Server struct {
 	Storage   StorageProvider
 	Scheduler FeedScheduler
 	Auth      AuthProvider
+	Ingestor  FeedIngestor
 
 	StaticFS fs.FS
 	Template *template.Template
