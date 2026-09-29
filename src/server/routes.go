@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nkanaev/yarr/src/client"
 	"github.com/nkanaev/yarr/src/content/htmlutil"
 	"github.com/nkanaev/yarr/src/content/readability"
 	"github.com/nkanaev/yarr/src/content/sanitizer"
@@ -460,40 +461,40 @@ func (s *Server) handleOPMLImport(w http.ResponseWriter, r *http.Request) {
 
 		if err := s.Ingestor.AddOPML(r.Context(), s.db(r), file); err != nil {
 			log.Printf("Failed to ingest OPML: %s", err)
-			// TODO: separate error 
+			// TODO: separate error
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		/*
-		doc, err := opml.Parse(file)
-		if err != nil {
-			log.Print(err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		for _, f := range doc.Feeds {
-			s.db(r).CreateFeed(model.CreateFeedParams{
-				Title:    f.Title,
-				Link:     f.SiteUrl,
-				FeedLink: f.FeedUrl,
-			})
-		}
-		for _, f := range doc.Folders {
-			folder := s.db(r).CreateFolder(f.Title)
-			for _, ff := range f.AllFeeds() {
+			doc, err := opml.Parse(file)
+			if err != nil {
+				log.Print(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			for _, f := range doc.Feeds {
 				s.db(r).CreateFeed(model.CreateFeedParams{
-					Title:    ff.Title,
-					Link:     ff.SiteUrl,
-					FeedLink: ff.FeedUrl,
-					FolderID: &folder.Id,
+					Title:    f.Title,
+					Link:     f.SiteUrl,
+					FeedLink: f.FeedUrl,
 				})
 			}
-		}
+			for _, f := range doc.Folders {
+				folder := s.db(r).CreateFolder(f.Title)
+				for _, ff := range f.AllFeeds() {
+					s.db(r).CreateFeed(model.CreateFeedParams{
+						Title:    ff.Title,
+						Link:     ff.SiteUrl,
+						FeedLink: ff.FeedUrl,
+						FolderID: &folder.Id,
+					})
+				}
+			}
 
-		if s.Scheduler != nil {
-			s.Scheduler.RefreshFeeds()
-		}
+			if s.Scheduler != nil {
+				s.Scheduler.RefreshFeeds()
+			}
 		*/
 
 		w.WriteHeader(http.StatusOK)
@@ -562,7 +563,11 @@ func (s *Server) handlePageCrawl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := worker.GetBody(url)
+	httpClient := client.NewBuilder().
+		Middleware(client.UserAgent(r.UserAgent())).
+		Build()
+
+	body, err := worker.GetBody(httpClient, url)
 	if err != nil {
 		log.Print(err)
 		w.WriteHeader(http.StatusBadRequest)

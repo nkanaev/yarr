@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nkanaev/yarr/src/assets"
+	"github.com/nkanaev/yarr/src/client"
 	"github.com/nkanaev/yarr/src/platform"
 	"github.com/nkanaev/yarr/src/server"
 	"github.com/nkanaev/yarr/src/storage"
@@ -165,7 +165,13 @@ func main() {
 		log.Fatal("Failed to initialise database: ", err)
 	}
 
-	worker.SetVersion(Version)
+	httpClient := client.NewBuilder().
+		Middleware(
+			client.UserAgent("Yarr/"+Version),
+			client.ConditionalRequests(worker.NewFeedStateStore(store)),
+		).
+		Build()
+
 	srv := server.NewServer(addr)
 	srv.StaticFS = assets.StaticFS()
 	srv.Template = assets.Templates()
@@ -179,7 +185,7 @@ func main() {
 		srv.KeyFile = keyfile
 	}
 
-	wrk := worker.NewWorker(store)
+	wrk := worker.NewWorker(store, httpClient)
 
 	if username != "" && password != "" {
 		srv.Auth = server.NewLocalAuthProvider(username, password, basepath)

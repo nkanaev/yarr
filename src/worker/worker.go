@@ -2,6 +2,7 @@ package worker
 
 import (
 	"log"
+	"net/http"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -14,15 +15,16 @@ const NUM_WORKERS = 4
 
 type Worker struct {
 	db      storage.Storage
+	client  *http.Client
 	pending *int32
 	refresh *time.Ticker
 	reflock sync.Mutex
 	stopper chan bool
 }
 
-func NewWorker(db storage.Storage) *Worker {
+func NewWorker(db storage.Storage, client *http.Client) *Worker {
 	pending := int32(0)
-	return &Worker{db: db, pending: &pending}
+	return &Worker{db: db, client: client, pending: &pending}
 }
 
 func (w *Worker) FeedsPending() int32 {
@@ -41,7 +43,7 @@ func (w *Worker) StartFeedCleaner() {
 }
 
 func (w *Worker) FindFeedFavicon(feed model.Feed) {
-	icon, err := findFavicon(feed.Link, feed.FeedLink)
+	icon, err := findFavicon(w.client, feed.Link, feed.FeedLink)
 	if err != nil {
 		log.Printf("Failed to find favicon for %s (%s): %s", feed.FeedLink, feed.Link, err)
 	}
@@ -131,7 +133,7 @@ func (w *Worker) worker(srcqueue <-chan model.Feed, dstqueue chan<- []model.Item
 		empty := ""
 		w.db.UpdateFeedState(feed.Id, model.UpdateFeedStateParams{LastError: &empty})
 
-		items, err := listItems(feed, w.db)
+		items, err := listItems(w.client, feed)
 		if err != nil {
 			errMsg := err.Error()
 			w.db.UpdateFeedState(feed.Id, model.UpdateFeedStateParams{LastError: &errMsg})
