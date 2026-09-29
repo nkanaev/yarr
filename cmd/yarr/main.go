@@ -192,6 +192,7 @@ func main() {
 	}
 	srv.Storage = server.NewLocalStorage(store)
 	srv.Scheduler = wrk
+	srv.Ingestor = wrk
 
 	log.Printf("starting server at %s", srv.GetAddr())
 	if open {
