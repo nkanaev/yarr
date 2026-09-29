@@ -224,9 +224,15 @@ func (s *Server) handleFeedList(w http.ResponseWriter, r *http.Request) {
 				map[string]any{"status": "multiple", "choice": result.Choices},
 			)
 		case result.Feed != nil:
+			feed := result.Feed
+			s.db(r).UpdateFeed(
+				feed.Id,
+				model.UpdateFeedParams{FolderID: model.SetNullable(form.FolderID)},
+			)
+			feed.FolderId = form.FolderID
 			writeJSON(w, http.StatusOK, map[string]any{
 				"status": "success",
-				"feed":   result.Feed,
+				"feed":   feed,
 			})
 		default:
 			writeJSON(w, http.StatusNoContent, nil)
