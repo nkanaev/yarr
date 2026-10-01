@@ -90,10 +90,10 @@ func TestFindFeedsYouTubeOGTitle(t *testing.T) {
 
 	youtubeURL := "https://www.youtube.com/feeds/videos.xml?playlist_id="
 	want := []FeedLink{
-		{URL: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc123", Title: "YouTube Channel - All"},
-		{URL: youtubeURL + "UULVabc123", Title: "YouTube Channel - Live Streams", TitleOverride: "My Channel - Live Streams"},
-		{URL: youtubeURL + "UUSHabc123", Title: "YouTube Channel - Short videos", TitleOverride: "My Channel - Short videos"},
-		{URL: youtubeURL + "UULFabc123", Title: "YouTube Channel - Videos", TitleOverride: "My Channel - Videos"},
+		{URL: "https://www.youtube.com/feeds/videos.xml?channel_id=UCabc123", Title: "My Channel - All"},
+		{URL: youtubeURL + "UULVabc123", Title: "My Channel - Live Streams"},
+		{URL: youtubeURL + "UUSHabc123", Title: "My Channel - Short videos"},
+		{URL: youtubeURL + "UULFabc123", Title: "My Channel - Videos"},
 	}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -118,9 +118,9 @@ func TestFindFeedsYouTubeNoOGTitle(t *testing.T) {
 	youtubeURL := "https://www.youtube.com/feeds/videos.xml?playlist_id="
 	want := []FeedLink{
 		{URL: "https://www.youtube.com/feeds/videos.xml?channel_id=UCxyz789", Title: "Channel Name - All"},
-		{URL: youtubeURL + "UULVxyz789", Title: "Channel Name - Live Streams", TitleOverride: "Channel Name - Live Streams"},
-		{URL: youtubeURL + "UUSHxyz789", Title: "Channel Name - Short videos", TitleOverride: "Channel Name - Short videos"},
-		{URL: youtubeURL + "UULFxyz789", Title: "Channel Name - Videos", TitleOverride: "Channel Name - Videos"},
+		{URL: youtubeURL + "UULVxyz789", Title: "Channel Name - Live Streams"},
+		{URL: youtubeURL + "UUSHxyz789", Title: "Channel Name - Short videos"},
+		{URL: youtubeURL + "UULFxyz789", Title: "Channel Name - Videos"},
 	}
 	if !reflect.DeepEqual(have, want) {
 		t.Logf("want: %#v", want)
@@ -152,7 +152,7 @@ func TestFindFeedsYouTubeNoChannelID(t *testing.T) {
 	}
 }
 
-func TestFindFeedsNonYouTubeNoTitleOverride(t *testing.T) {
+func TestFindFeedsNonYouTube(t *testing.T) {
 	body := `
 		<!DOCTYPE html>
 		<html lang="en">
@@ -172,9 +172,6 @@ func TestFindFeedsNonYouTubeNoTitleOverride(t *testing.T) {
 		t.Logf("want: %#v", want)
 		t.Logf("have: %#v", have)
 		t.Fatal("invalid result")
-	}
-	if have[0].TitleOverride != "" {
-		t.Fatal("expected empty TitleOverride for non-YouTube feed")
 	}
 }
 
