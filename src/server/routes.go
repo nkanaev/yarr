@@ -209,7 +209,7 @@ func (s *Server) handleFeedList(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		feedLink := FeedLink{URL: form.Url, Title: form.TitleOverride}
+		feedLink := FeedLink{URL: form.Url, Title: form.Title}
 		result, err := s.Ingestor.AddFeed(r.Context(), s.db(r), feedLink)
 		switch {
 		case err != nil:

@@ -24,8 +24,6 @@ type FeedScheduler interface {
 type FeedLink struct {
 	URL   string `json:"url"`
 	Title string `json:"title"`
-	// TODO: bad idea, remove
-	TitleOverride string `json:"title_override,omitempty"`
 }
 
 type AddFeedResult struct {

@@ -28,7 +28,6 @@ func (w *Worker) AddFeed(ctx context.Context, store storage.Storage, link server
 			choices[i] = server.FeedLink{
 				URL:           source.URL,
 				Title:         source.Title,
-				TitleOverride: source.TitleOverride,
 			}
 		}
 		return server.AddFeedResult{Choices: choices}, nil
@@ -39,9 +38,7 @@ func (w *Worker) AddFeed(ctx context.Context, store storage.Storage, link server
 	}
 
 	title := result.Feed.Title
-	if link.TitleOverride != "" {
-		title = link.TitleOverride
-	} else if link.Title != "" {
+	if link.Title != "" {
 		title = link.Title
 	}
 
