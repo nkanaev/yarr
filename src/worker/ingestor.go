@@ -51,6 +51,9 @@ func (w *Worker) AddFeed(ctx context.Context, store storage.Storage, link server
 	if len(items) > 0 {
 		store.CreateItems(items)
 	}
+	if feed.Icon == nil {
+		w.FindFeedFavicon(*feed)
+	}
 	return server.AddFeedResult{Feed: feed}, nil
 }
 
