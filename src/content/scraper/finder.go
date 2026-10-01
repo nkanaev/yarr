@@ -13,7 +13,6 @@ import (
 type FeedLink struct {
 	URL           string `json:"url"`
 	Title         string `json:"title"`
-	TitleOverride string `json:"title_override,omitempty"`
 }
 
 func FindFeeds(body string, base string) []FeedLink {
@@ -50,38 +49,31 @@ func FindFeeds(body string, base string) []FeedLink {
 				if found {
 					const baseURL string = "https://www.youtube.com/feeds/videos.xml?playlist_id="
 
-					ogTitle := ""
+					ytTitle := name
 					isOG := func(n *html.Node) bool {
 						return n.Type == html.ElementNode && n.Data == "meta" &&
 							htmlutil.Attr(n, "property") == "og:title"
 					}
 					for _, n := range htmlutil.FindNodes(doc, isOG) {
-						ogTitle = htmlutil.Attr(n, "content")
+						ytTitle = htmlutil.Attr(n, "content")
 						break
-					}
-					override := name
-					if ogTitle != "" {
-						override = ogTitle
 					}
 
 					candidates[link] = FeedLink{
 						URL:   link,
-						Title: name + " - All",
+						Title: ytTitle + " - All",
 					}
 					candidates[baseURL+"UULF"+channelID] = FeedLink{
 						URL:           baseURL + "UULF" + channelID,
-						Title:         name + " - Videos",
-						TitleOverride: override + " - Videos",
+						Title:         ytTitle + " - Videos",
 					}
 					candidates[baseURL+"UULV"+channelID] = FeedLink{
 						URL:           baseURL + "UULV" + channelID,
-						Title:         name + " - Live Streams",
-						TitleOverride: override + " - Live Streams",
+						Title:         ytTitle + " - Live Streams",
 					}
 					candidates[baseURL+"UUSH"+channelID] = FeedLink{
 						URL:           baseURL + "UUSH" + channelID,
-						Title:         name + " - Short videos",
-						TitleOverride: override + " - Short videos",
+						Title:         ytTitle + " - Short videos",
 					}
 				}
 			}

@@ -67,7 +67,6 @@ export interface ItemListResponse {
 export interface FeedLink {
   url: string;
   title: string;
-  title_override?: string;
 }
 
 export interface FeedCreateSuccess {
@@ -88,8 +87,8 @@ export interface CrawlResponse {
 
 export interface FeedCreateData {
   url: string;
+  title: string;
   folder_id?: number | null;
-  title_override?: string;
 }
 
 export interface FeedUpdateData {

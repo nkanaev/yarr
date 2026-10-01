@@ -1,8 +1,9 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/storage"
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
 func testServer() *Server {
@@ -88,70 +90,88 @@ func TestIndexGzipped(t *testing.T) {
 	}
 }
 
-func TestFeedCreateWithTitleOverride(t *testing.T) {
+type fakeIngestor struct {
+	result AddFeedResult
+	err    error
+}
+
+func (f fakeIngestor) AddFeed(ctx context.Context, store storage.Storage, feed FeedLink) (AddFeedResult, error) {
+	return f.result, f.err
+}
+
+func (f fakeIngestor) AddOPML(ctx context.Context, store storage.Storage, file io.Reader) error {
+	return f.err
+}
+
+func newFeedCreateServer(t *testing.T, ingestor FeedIngestor) http.Handler {
+	t.Helper()
+	db, err := storage.New(":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	server := NewServer("127.0.0.1:8000")
+	server.Storage = NewLocalStorage(db)
+	server.Ingestor = ingestor
+	return server.Handler()
+}
+
+func feedCreateRequest(t *testing.T, handler http.Handler, body string) *httptest.ResponseRecorder {
+	t.Helper()
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("POST", "/api/feeds", strings.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+	handler.ServeHTTP(recorder, request)
+	return recorder
+}
+
+func TestFeedCreateSuccess(t *testing.T) {
 	log.SetOutput(io.Discard)
 	defer log.SetOutput(os.Stderr)
 
-	feedSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/rss+xml")
-		w.Write([]byte(`<?xml version="1.0"?>
-			<rss version="2.0">
-				<channel>
-					<title>RSS Title</title>
-					<link>http://example.com</link>
-					<item>
-						<title>Item 1</title>
-						<link>http://example.com/1</link>
-					</item>
-				</channel>
-			</rss>
-		`))
-	}))
-	defer feedSrv.Close()
+	feed := &model.Feed{Id: 1, Title: "RSS Title", FeedLink: "http://example.com/feed"}
 
-	handler := testServer().Handler()
+	handler := newFeedCreateServer(t, fakeIngestor{result: AddFeedResult{Feed: feed}})
+	recorder := feedCreateRequest(t, handler, `{"url":"http://example.com"}`)
 
-	t.Run("override title", func(t *testing.T) {
-		body := fmt.Sprintf(`{"url":%q,"title_override":"Override Title"}`, feedSrv.URL)
-		recorder := httptest.NewRecorder()
-		request := httptest.NewRequest("POST", "/api/feeds", strings.NewReader(body))
-		request.Header.Set("Content-Type", "application/json")
-		handler.ServeHTTP(recorder, request)
+	if recorder.Result().StatusCode != http.StatusOK {
+		t.Fatalf("expected 200, got %d", recorder.Result().StatusCode)
+	}
+	var resp map[string]any
+	json.NewDecoder(recorder.Result().Body).Decode(&resp)
+	if resp["status"] != "success" {
+		t.Fatalf("expected success, got %v", resp["status"])
+	}
+}
 
-		if recorder.Result().StatusCode != http.StatusOK {
-			t.Fatalf("expected 200, got %d", recorder.Result().StatusCode)
-		}
+func TestFeedCreateMultiple(t *testing.T) {
+	log.SetOutput(io.Discard)
+	defer log.SetOutput(os.Stderr)
 
-		var resp map[string]any
-		json.NewDecoder(recorder.Result().Body).Decode(&resp)
-		if resp["status"] != "success" {
-			t.Fatalf("expected success, got %v", resp["status"])
-		}
-		feed := resp["feed"].(map[string]any)
-		if feed["title"] != "Override Title" {
-			t.Fatalf("expected 'Override Title', got %v", feed["title"])
-		}
-	})
+	choices := []FeedLink{{URL: "http://example.com/rss", Title: "RSS"}}
+	handler := newFeedCreateServer(t, fakeIngestor{result: AddFeedResult{Choices: choices}})
+	recorder := feedCreateRequest(t, handler, `{"url":"http://example.com"}`)
 
-	t.Run("no override uses rss title", func(t *testing.T) {
-		body := fmt.Sprintf(`{"url":%q}`, feedSrv.URL)
-		recorder := httptest.NewRecorder()
-		request := httptest.NewRequest("POST", "/api/feeds", strings.NewReader(body))
-		request.Header.Set("Content-Type", "application/json")
-		handler.ServeHTTP(recorder, request)
+	if recorder.Result().StatusCode != http.StatusOK {
+		t.Fatalf("expected 200, got %d", recorder.Result().StatusCode)
+	}
+	var resp map[string]any
+	json.NewDecoder(recorder.Result().Body).Decode(&resp)
+	if resp["status"] != "multiple" {
+		t.Fatalf("expected multiple, got %v", resp["status"])
+	}
+	if len(resp["choice"].([]any)) != 1 {
+		t.Fatalf("expected 1 choice, got %v", resp["choice"])
+	}
+}
 
-		if recorder.Result().StatusCode != http.StatusOK {
-			t.Fatalf("expected 200, got %d", recorder.Result().StatusCode)
-		}
+func TestFeedCreateError(t *testing.T) {
+	log.SetOutput(io.Discard)
+	defer log.SetOutput(os.Stderr)
 
-		var resp map[string]any
-		json.NewDecoder(recorder.Result().Body).Decode(&resp)
-		if resp["status"] != "success" {
-			t.Fatalf("expected success, got %v", resp["status"])
-		}
-		feed := resp["feed"].(map[string]any)
-		if feed["title"] != "RSS Title" {
-			t.Fatalf("expected 'RSS Title', got %v", feed["title"])
-		}
-	})
+	handler := newFeedCreateServer(t, fakeIngestor{err: errors.New("discovery failed")})
+	recorder := feedCreateRequest(t, handler, `{"url":"http://example.com"}`)
+
+	if recorder.Result().StatusCode != http.StatusInternalServerError {
+		t.Fatalf("expected 500, got %d", recorder.Result().StatusCode)
+	}
 }

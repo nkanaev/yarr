@@ -18,7 +18,6 @@ import (
 	"github.com/nkanaev/yarr/src/parser/opml"
 	"github.com/nkanaev/yarr/src/server/middleware"
 	"github.com/nkanaev/yarr/src/storage/model"
-	"github.com/nkanaev/yarr/src/worker"
 )
 
 func writeJSON(w http.ResponseWriter, status int, data any) {
@@ -210,41 +209,33 @@ func (s *Server) handleFeedList(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		result, err := worker.DiscoverFeed(form.Url)
+		feedLink := FeedLink{URL: form.Url, Title: form.Title}
+		result, err := s.Ingestor.AddFeed(r.Context(), s.db(r), feedLink)
 		switch {
 		case err != nil:
-			log.Printf("Faild to discover feed for %s: %s", form.Url, err)
-			writeJSON(w, http.StatusOK, map[string]string{"status": "notfound"})
-		case len(result.Sources) > 0:
+			log.Printf("Faild to discover feed for %s: %s", feedLink.URL, err)
+			writeJSON(w, http.StatusInternalServerError, nil)
+		case len(result.Choices) > 0:
 			writeJSON(
 				w,
 				http.StatusOK,
-				map[string]any{"status": "multiple", "choice": result.Sources},
+				map[string]any{"status": "multiple", "choice": result.Choices},
 			)
 		case result.Feed != nil:
-			title := result.Feed.Title
-			if form.TitleOverride != "" {
-				title = form.TitleOverride
-			}
-			feed := s.db(r).CreateFeed(model.CreateFeedParams{
-				Title:    title,
-				Link:     result.Feed.SiteURL,
-				FeedLink: result.FeedLink,
-				FolderID: form.FolderID,
-			})
-			items := worker.ConvertItems(result.Feed.Items, *feed)
-			if len(items) > 0 {
-				s.db(r).CreateItems(items)
-			}
-			// TODO: DiscoverFeed must search for favicon too
-
+			feed := result.Feed
+			s.db(r).UpdateFeed(
+				feed.Id,
+				model.UpdateFeedParams{FolderID: model.SetNullable(form.FolderID)},
+			)
+			feed.FolderId = form.FolderID
 			writeJSON(w, http.StatusOK, map[string]any{
 				"status": "success",
 				"feed":   feed,
 			})
 		default:
-			writeJSON(w, http.StatusOK, map[string]string{"status": "notfound"})
+			writeJSON(w, http.StatusNoContent, nil)
 		}
+
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -430,36 +421,16 @@ func (s *Server) handleOPMLImport(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		file, _, err := r.FormFile("opml")
 		if err != nil {
-			log.Print(err)
+			log.Printf("Failed to open OPML: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
-		}
-		doc, err := opml.Parse(file)
-		if err != nil {
-			log.Print(err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		for _, f := range doc.Feeds {
-			s.db(r).CreateFeed(model.CreateFeedParams{
-				Title:    f.Title,
-				Link:     f.SiteUrl,
-				FeedLink: f.FeedUrl,
-			})
-		}
-		for _, f := range doc.Folders {
-			folder := s.db(r).CreateFolder(f.Title)
-			for _, ff := range f.AllFeeds() {
-				s.db(r).CreateFeed(model.CreateFeedParams{
-					Title:    ff.Title,
-					Link:     ff.SiteUrl,
-					FeedLink: ff.FeedUrl,
-					FolderID: &folder.Id,
-				})
-			}
 		}
 
-		if s.Scheduler != nil {
-			s.Scheduler.RefreshFeeds()
+		if err := s.Ingestor.AddOPML(r.Context(), s.db(r), file); err != nil {
+			log.Printf("Failed to ingest OPML: %s", err)
+			// TODO: separate error
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -528,12 +499,22 @@ func (s *Server) handlePageCrawl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := worker.GetBody(url)
-	if err != nil {
-		log.Print(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	// TODO: restore page fetching through an interface instead of calling worker directly.
+	body := ""
+	/*
+		httpClient := client.NewBuilder().
+			Middleware(client.UserAgent(r.UserAgent())).
+			Build()
+
+		var err error
+		body, err = worker.GetBody(httpClient, url)
+		if err != nil {
+			log.Print(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	*/
+
 	content, err := readability.ExtractContent(strings.NewReader(body))
 	if err != nil {
 		writeJSON(w, http.StatusOK, map[string]string{

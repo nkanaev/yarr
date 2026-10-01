@@ -107,12 +107,13 @@ export default defineComponent({
       var form = $event.target as HTMLFormElement;
       var data: FeedCreateData = {
         url: (form.querySelector("input[name=url]") as HTMLInputElement).value,
+        title: '',
         folder_id: this.selectedFolder,
       };
       if (this.feedNewChoiceSelected) {
-        var choice = this.feedNewChoice.find(c => c.url === this.feedNewChoiceSelected);
+        const choice = this.feedNewChoice.find(c => c.url === this.feedNewChoiceSelected);
         data.url = this.feedNewChoiceSelected;
-        if (choice && choice.title_override) data.title_override = choice.title_override;
+        data.title = choice?.title || '';
       }
       this.loading.newfeed = true;
       const [err, result] = await to(api.feeds.create(data));

@@ -2,6 +2,7 @@ package worker
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -9,11 +10,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/nkanaev/yarr/src/content/scraper"
 	"github.com/nkanaev/yarr/src/parser"
-	"github.com/nkanaev/yarr/src/storage"
 	"github.com/nkanaev/yarr/src/storage/model"
 	"golang.org/x/net/html/charset"
 )
@@ -24,10 +23,18 @@ type DiscoverResult struct {
 	Sources  []scraper.FeedLink
 }
 
-func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
+func get(c *http.Client, url string) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	return c.Do(req)
+}
+
+func DiscoverFeed(c *http.Client, candidateUrl string) (*DiscoverResult, error) {
 	result := &DiscoverResult{}
 	// Query URL
-	res, err := client.get(candidateUrl)
+	res, err := get(c, candidateUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +74,7 @@ func DiscoverFeed(candidateUrl string) (*DiscoverResult, error) {
 		if sources[0].URL == candidateUrl {
 			return nil, errors.New("recursion")
 		}
-		return DiscoverFeed(sources[0].URL)
+		return DiscoverFeed(c, sources[0].URL)
 	}
 
 	result.Sources = sources
@@ -82,7 +89,7 @@ var imageTypes = map[string]bool{
 	"image/gif":    true,
 }
 
-func findFavicon(siteUrl, feedUrl string) (*model.Icon, error) {
+func findFavicon(c *http.Client, siteUrl, feedUrl string) (*model.Icon, error) {
 	urls := make([]string, 0)
 
 	favicon := func(link string) string {
@@ -94,7 +101,7 @@ func findFavicon(siteUrl, feedUrl string) (*model.Icon, error) {
 	}
 
 	if siteUrl != "" {
-		if res, err := client.get(siteUrl); err == nil {
+		if res, err := get(c, siteUrl); err == nil {
 			defer res.Body.Close()
 			if body, err := io.ReadAll(res.Body); err == nil {
 				urls = append(urls, scraper.FindIcons(string(body), siteUrl)...)
@@ -110,7 +117,7 @@ func findFavicon(siteUrl, feedUrl string) (*model.Icon, error) {
 	}
 
 	for _, u := range urls {
-		res, err := client.get(u)
+		res, err := get(c, u)
 		if err != nil {
 			continue
 		}
@@ -154,15 +161,14 @@ func ConvertItems(items []parser.Item, feed model.Feed) []model.Item {
 	return result
 }
 
-func listItems(f model.Feed, db storage.Storage) ([]model.Item, error) {
-	lmod := ""
-	etag := ""
-	if state, _ := db.GetFeedState(f.Id); state != nil {
-		lmod = state.HTTPLastModified
-		etag = state.HTTPEtag
+func listItems(c *http.Client, f model.Feed) ([]model.Item, error) {
+	ctx := contextSetFeedID(context.Background(), f.Id)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, f.FeedLink, nil)
+	if err != nil {
+		return nil, err
 	}
 
-	res, err := client.getConditional(f.FeedLink, lmod, etag)
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -183,16 +189,6 @@ func listItems(f model.Feed, db storage.Storage) ([]model.Item, error) {
 		return nil, err
 	}
 
-	lmod = res.Header.Get("Last-Modified")
-	etag = res.Header.Get("Etag")
-	now := time.Now().UTC()
-	if lmod != "" || etag != "" {
-		db.UpdateFeedState(f.Id, model.UpdateFeedStateParams{
-			HTTPLastModified: &lmod,
-			HTTPEtag:         &etag,
-			LastRefreshed:    &now,
-		})
-	}
 	return ConvertItems(feed.Items, f), nil
 }
 
@@ -208,8 +204,8 @@ func getCharset(res *http.Response) string {
 	return ""
 }
 
-func GetBody(url string) (string, error) {
-	res, err := client.get(url)
+func GetBody(c *http.Client, url string) (string, error) {
+	res, err := get(c, url)
 	if err != nil {
 		return "", err
 	}
