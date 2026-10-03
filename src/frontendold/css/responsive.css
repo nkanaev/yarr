@@ -1,0 +1,89 @@
+/* responsive layout
+
+   tablet:
+     none selected: show feed list & item list
+     feed selected: show feed list & item list
+     item selected: show item
+   mobile:
+     none selected: show feed list
+     feed selected: show item list
+     item selected: show item
+*/
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  #app #col-feed-list {
+    width: 35% !important;
+  }
+  #app #col-item-list {
+    width: 65% !important;
+    border-right-width: 0 !important;
+  }
+  #app #col-item {
+    display: none !important;
+  }
+
+  #app .item-selected #col-feed-list {
+    display: none !important;
+  }
+  #app .item-selected #col-item-list {
+    display: none !important;
+  }
+  #app .item-selected #col-item {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  #app #col-feed-list {
+    width: 100% !important;
+    border-right-width: 0 !important;
+  }
+  #app #col-item-list {
+    width: 100% !important;
+    display: none !important;
+    border-right-width: 0 !important;
+  }
+  #app #col-item {
+    width: 100% !important;
+    display: none !important;
+  }
+
+  #app .feed-selected #col-feed-list {
+    display: none !important;
+  }
+  #app .feed-selected #col-item-list {
+    display: flex !important;
+  }
+
+  #app .item-selected #col-feed-list {
+    display: none !important;
+  }
+  #app .item-selected #col-item-list {
+    display: none !important;
+  }
+  #app .item-selected #col-item {
+    display: flex !important;
+  }
+}
+
+/* styles for both mobile & tablet layout */
+
+@media (max-width: 991.98px) {
+  .drag {
+    cursor: default;
+  }
+  .c-button-pill,
+  .c-search input {
+    height: 2rem;
+  }
+}
+
+/* fullscreen article view: hide the feed & item lists, expand the article */
+#app .item-fullscreen #col-feed-list,
+#app .item-fullscreen #col-item-list {
+  display: none !important;
+}
+#app .item-fullscreen #col-item {
+  display: flex !important;
+  width: 100% !important;
+}

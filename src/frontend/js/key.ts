@@ -1,87 +1,61 @@
-import App from "./pages/App.vue";
+export interface KeyActions {
+  openItemLink: () => void;
+  toggleReadability: () => void;
+  toggleItemRead: () => void;
+  markAllRead: () => void;
+  toggleItemStarred: () => void;
+  nextItem: () => void;
+  previousItem: () => void;
+  nextFeed: () => void;
+  previousFeed: () => void;
+  closeItem: () => void;
+  showShortcuts: () => void;
+  showAll: () => void;
+  showUnread: () => void;
+  showStarred: () => void;
+}
 
-export function setupKeybindings(vm: InstanceType<typeof App>) {
-  var helperFunctions = {
-    scrollContent(direction: number) {
-      var padding = 40;
-      var scroll = document.querySelector(".content");
-      if (!scroll) return;
+export function setupKeybindings(actionsRef: { current: KeyActions }) {
+  const scrollContent = (direction: number) => {
+    const padding = 40;
+    const scroll = document.querySelector(".content");
+    if (!scroll) return;
 
-      var height = scroll.getBoundingClientRect().height;
-      var newpos = scroll.scrollTop + (height - padding) * direction;
+    const height = scroll.getBoundingClientRect().height;
+    const newpos = scroll.scrollTop + (height - padding) * direction;
 
-      if (typeof scroll.scrollTo == "function") {
-        scroll.scrollTo({ top: newpos, left: 0, behavior: "smooth" });
-      } else {
-        scroll.scrollTop = newpos;
-      }
-    },
-  };
-  var shortcutFunctions = {
-    openItemLink() {
-      if (vm.itemSelectedDetails && vm.itemSelectedDetails.link) {
-        window.open(vm.itemSelectedDetails.link, "_blank", "noopener,noreferrer");
-      }
-    },
-    toggleReadability() {
-      vm.toggleReadability();
-    },
-    toggleItemRead() {
-      if (vm.itemSelectedDetails !== null) {
-        vm.toggleItemRead(vm.itemSelectedDetails);
-      }
-    },
-    markAllRead() {
-      // same condition as 'Mark all read button'
-      if (vm.filterSelected == "unread") {
-        vm.markItemsRead();
-      }
-    },
-    toggleItemStarred() {
-      if (vm.itemSelectedDetails != null) {
-        vm.toggleItemStarred(vm.itemSelectedDetails);
-      }
-    },
-    focusSearch() {
-      document.getElementById("searchbar")?.focus();
-    },
-    nextItem() {
-      vm.navigateToItem(+1);
-    },
-    previousItem() {
-      vm.navigateToItem(-1);
-    },
-    nextFeed() {
-      vm.navigateToFeed(+1);
-    },
-    previousFeed() {
-      vm.navigateToFeed(-1);
-    },
-    scrollForward() {
-      helperFunctions.scrollContent(+1);
-    },
-    scrollBackward() {
-      helperFunctions.scrollContent(-1);
-    },
-    closeItem() {
-      vm.itemSelected = null;
-    },
-    showShortcuts() {
-      vm.showModal = "shortcuts";
-    },
-    showAll() {
-      vm.filterSelected = "";
-    },
-    showUnread() {
-      vm.filterSelected = "unread";
-    },
-    showStarred() {
-      vm.filterSelected = "starred";
-    },
+    if (typeof scroll.scrollTo === "function") {
+      scroll.scrollTo({ top: newpos, left: 0, behavior: "smooth" });
+    } else {
+      scroll.scrollTop = newpos;
+    }
   };
 
-  // If you edit, make sure you update the help modal
-  var keybindings = {
+  const focusSearch = () => {
+    document.getElementById("searchbar")?.focus();
+  };
+
+  const shortcutFunctions = {
+    openItemLink: () => actionsRef.current.openItemLink(),
+    toggleReadability: () => actionsRef.current.toggleReadability(),
+    toggleItemRead: () => actionsRef.current.toggleItemRead(),
+    markAllRead: () => actionsRef.current.markAllRead(),
+    toggleItemStarred: () => actionsRef.current.toggleItemStarred(),
+    focusSearch,
+    nextItem: () => actionsRef.current.nextItem(),
+    previousItem: () => actionsRef.current.previousItem(),
+    nextFeed: () => actionsRef.current.nextFeed(),
+    previousFeed: () => actionsRef.current.previousFeed(),
+    scrollForward: () => scrollContent(+1),
+    scrollBackward: () => scrollContent(-1),
+    closeItem: () => actionsRef.current.closeItem(),
+    showShortcuts: () => actionsRef.current.showShortcuts(),
+    showAll: () => actionsRef.current.showAll(),
+    showUnread: () => actionsRef.current.showUnread(),
+    showStarred: () => actionsRef.current.showStarred(),
+  };
+
+  const keybindings: Record<string, () => void> = {
     o: shortcutFunctions.openItemLink,
     i: shortcutFunctions.toggleReadability,
     r: shortcutFunctions.toggleItemRead,
@@ -99,13 +73,11 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
     "1": shortcutFunctions.showUnread,
     "2": shortcutFunctions.showStarred,
     "3": shortcutFunctions.showAll,
-  } as Record<string, CallableFunction>;
+  };
 
-  var codebindings = {
+  const codebindings: Record<string, () => void> = {
     KeyO: shortcutFunctions.openItemLink,
     KeyI: shortcutFunctions.toggleReadability,
-    //"r": shortcutFunctions.toggleItemRead,
-    //"KeyR": shortcutFunctions.markAllRead,
     KeyS: shortcutFunctions.toggleItemStarred,
     Slash: shortcutFunctions.focusSearch,
     KeyJ: shortcutFunctions.nextItem,
@@ -118,12 +90,11 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
     Digit1: shortcutFunctions.showUnread,
     Digit2: shortcutFunctions.showStarred,
     Digit3: shortcutFunctions.showAll,
-  } as Record<string, CallableFunction>;
+  };
 
   function isTextBox(element: Element) {
-    var tagName = element.tagName.toLowerCase();
-    // Input elements that aren't text
-    var inputBlocklist = [
+    const tagName = element.tagName.toLowerCase();
+    const inputBlocklist = [
       "button",
       "checkbox",
       "color",
@@ -140,20 +111,21 @@ export function setupKeybindings(vm: InstanceType<typeof App>) {
     return (
       tagName === "textarea" ||
       (tagName === "input" &&
-        inputBlocklist.indexOf(element.getAttribute("type")?.toLowerCase() || "") == -1)
+        inputBlocklist.indexOf(element.getAttribute("type")?.toLowerCase() || "") === -1)
     );
   }
 
-  document.addEventListener("keydown", function (event) {
-    // Ignore while focused on text or
-    // when using modifier keys (to not clash with browser behaviour)
+  const handler = (event: KeyboardEvent) => {
     if (isTextBox(event.target as Element) || event.metaKey || event.ctrlKey || event.altKey) {
       return;
     }
-    var keybindFunction = keybindings[event.key] || codebindings[event.code];
+    const keybindFunction = keybindings[event.key] || codebindings[event.code];
     if (keybindFunction) {
       event.preventDefault();
       keybindFunction();
     }
-  });
+  };
+
+  document.addEventListener("keydown", handler);
+  return () => document.removeEventListener("keydown", handler);
 }

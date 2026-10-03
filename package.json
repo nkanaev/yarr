@@ -1,9 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "build": "node build.js",
-    "watch": "node build.js --watch",
-    "typecheck": "vue-tsc --noEmit"
+    "build": "esbuild src/frontend/js/main.tsx src/frontend/css/app.css --bundle --outdir=src/assets/static --entry-names=bundle --jsx=automatic --jsx-import-source=preact --supported:nesting=false --target=es2020 --sourcemap",
+    "typecheck": "tsc --noEmit"
   },
   "prettier": {
     "printWidth": 100,
@@ -16,16 +15,13 @@
     "bracketSameLine": true
   },
   "devDependencies": {
-    "@vue/typescript-plugin": "^3.3.7",
     "esbuild": "0.28.1",
-    "esbuild-plugin-vue3": "^0.5.1",
-    "typescript": "^5.7.0",
-    "vue-tsc": "^3.3.7"
+    "typescript": "^5.7.0"
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
     "bootstrap": "^5.3.8",
     "lucide": "^1.47.0",
-    "vue": "^3.5.41"
+    "preact": "^11.0.0"
   }
 }
