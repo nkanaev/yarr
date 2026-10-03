@@ -1,19 +1,19 @@
 export function scrollto(target: Element, scroll: Element) {
-  var padding = 10;
-  var targetRect = target.getBoundingClientRect();
-  var scrollRect = scroll.getBoundingClientRect();
+  const padding = 10;
+  const targetRect = target.getBoundingClientRect();
+  const scrollRect = scroll.getBoundingClientRect();
 
-  // target
-  var relativeOffset = targetRect.y - scrollRect.y;
-  var absoluteOffset = relativeOffset + scroll.scrollTop;
+  const relativeOffset = targetRect.y - scrollRect.y;
+  const absoluteOffset = relativeOffset + scroll.scrollTop;
 
   if (
     padding <= relativeOffset &&
     relativeOffset + targetRect.height <= scrollRect.height - padding
-  )
+  ) {
     return;
+  }
 
-  var newPos = scroll.scrollTop;
+  let newPos = scroll.scrollTop;
   if (relativeOffset < padding) {
     newPos = absoluteOffset - padding;
   } else {
@@ -21,10 +21,6 @@ export function scrollto(target: Element, scroll: Element) {
   }
   scroll.scrollTop = Math.round(newPos);
 }
-
-// TODO: replace or rewrite debounce/$debounce.
-// `debounce` has type checker issues with Options API.
-// `$debounce` initialises callback once, capturing only the first variables/arguments.
 
 export function debounce<T extends (...args: any[]) => any>(fn: T, timeout: number) {
   let timerId: ReturnType<typeof setTimeout> | null = null;
@@ -36,63 +32,39 @@ export function debounce<T extends (...args: any[]) => any>(fn: T, timeout: numb
   };
 }
 
-const debounceCache = new WeakMap();
-
-export const debounceMixin = {
-  methods: {
-    $debounce(id: string, fn: (...args: any[]) => any, delay = 300) {
-      // 'this' inside mixin methods automatically refers to the Vue component instance
-      let keywordMap = debounceCache.get(this);
-
-      if (!keywordMap) {
-        keywordMap = {};
-        debounceCache.set(this, keywordMap);
-      }
-
-      if (!keywordMap[id]) {
-        keywordMap[id] = debounce(fn, delay);
-      }
-
-      keywordMap[id]();
-    },
-  },
-};
-
 export type RelUnit = "minute" | "hour" | "day";
 
 export function dateRepr(d: Date, locale?: string): string {
-  var sec = (new Date().getTime() - d.getTime()) / 1000;
-  var neg = sec < 0;
-  var out = "";
+  let sec = (new Date().getTime() - d.getTime()) / 1000;
+  const neg = sec < 0;
+  let out = "";
 
   sec = Math.abs(sec);
-  if (sec < 2700)
-    // less than 45 minutes
+  if (sec < 2700) {
     out = formatRel(Math.round(sec / 60), "minute", locale);
-  else if (sec < 86400)
-    // less than 24 hours
+  } else if (sec < 86400) {
     out = formatRel(Math.round(sec / 3600), "hour", locale);
-  else if (sec < 604800)
-    // less than a week
+  } else if (sec < 604800) {
     out = formatRel(Math.round(sec / 86400), "day", locale);
-  else
+  } else {
     return dateString(d, locale);
+  }
 
   if (neg) return "-" + out;
   return out;
 }
 
 export function dateString(d: Date, locale?: string): string {
-  if (locale == "en") locale = "en-GB";  // empire strikes back
+  if (locale === "en") locale = "en-GB";
   return d.toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",
-  })
+  });
 }
 
 export function dateTimeString(d: Date, locale: string): string {
-  if (locale == "en") locale = "en-GB";  // empire strikes back
+  if (locale === "en") locale = "en-GB";
   return d.toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
@@ -106,36 +78,22 @@ function formatRel(n: number, unit: RelUnit, locale?: string): string {
   return new Intl.NumberFormat(locale, { style: "unit", unit }).format(n);
 }
 
-// returns ms until relative text rendered by dateRepr would change,
-// or null when static (older than a week).
 export function relRepaintDelay(d: Date): number | null {
   const sec = (Date.now() - d.getTime()) / 1000;
   if (isNaN(sec)) return null;
 
   if (sec >= 0) {
     let unit: number;
-    if (sec < 2700) {
-      // less than 45 minutes
-      unit = 60;
-    } else if (sec < 86400) {
-      // less than 24 hours
-      unit = 3600;
-    } else if (sec < 604800) {
-      // less than a week
-      unit = 86400;
-    } else {
-      // older than a week
-      return null;
-    }
+    if (sec < 2700) unit = 60;
+    else if (sec < 86400) unit = 3600;
+    else if (sec < 604800) unit = 86400;
+    else return null;
 
     const next = (Math.round(sec / unit) + 0.5) * unit;
     const delay = next - sec;
     return Math.max(delay * 1000, 1000);
   } else {
-    // future dates
-    if (Math.abs(sec) >= 604800) {
-      return null;
-    }
+    if (Math.abs(sec) >= 604800) return null;
     return 60 * 1000;
   }
 }

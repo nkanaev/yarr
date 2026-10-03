@@ -1,0 +1,32 @@
+[v-cloak] {
+  display: none !important;
+}
+
+html {
+  font-size: 15px !important;
+  overscroll-behavior: none;
+}
+
+html,
+body {
+  color: var(--v-fg);
+  background-color: var(--v-bg);
+}
+
+/* animation */
+.indicator-enter-active,
+.indicator-leave-active {
+  transition: all 0.3s;
+}
+.indicator-enter,
+.indicator-leave-to {
+  width: 0;
+  opacity: 0;
+  margin: 0 !important;
+}
+
+/* login icon */
+.login-logo svg {
+  width: 4rem;
+  height: auto;
+}

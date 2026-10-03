@@ -14,12 +14,12 @@ body {
 }
 
 /* animation */
-.indicator-enter-active,
-.indicator-leave-active {
-  transition: all 0.3s;
+.indicator {
+  width: 0.6rem;
+  transition: width 0.3s;
 }
-.indicator-enter,
-.indicator-leave-to {
+
+.indicator.is-hidden {
   width: 0;
   opacity: 0;
   margin: 0 !important;
