@@ -94,6 +94,7 @@ export function setupKeybindings(actionsRef: { current: KeyActions }) {
 
   function isTextBox(element: Element) {
     const tagName = element.tagName.toLowerCase();
+    // Input elements that aren't text
     const inputBlocklist = [
       "button",
       "checkbox",
@@ -104,7 +105,6 @@ export function setupKeybindings(actionsRef: { current: KeyActions }) {
       "radio",
       "range",
       "reset",
-      "search",
       "submit",
     ];
 

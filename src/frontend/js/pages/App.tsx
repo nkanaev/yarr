@@ -913,6 +913,7 @@ export default function App() {
             <Icon name="search" />
             <input
               id="searchbar"
+              type="search"
               className="d-block"
               value={itemSearch}
               placeholder={t("search_placeholder", { scope: searchScope })}
