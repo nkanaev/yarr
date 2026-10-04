@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useSignal } from "@preact/signals";
 import { useI18n } from "../i18n";
 import icons from "../icons";
 
@@ -8,7 +8,7 @@ interface LoginProps {
 
 export default function Login({ onLogin }: LoginProps) {
   const { t } = useI18n();
-  const [hasError, setHasError] = useState(false);
+  const hasError = useSignal(false);
 
   const handleSubmit = (event: Event) => {
     event.preventDefault();
@@ -17,7 +17,7 @@ export default function Login({ onLogin }: LoginProps) {
       if (res.ok) {
         onLogin();
       } else {
-        setHasError(true);
+        hasError.value = true;
       }
     });
   };
@@ -47,7 +47,7 @@ export default function Login({ onLogin }: LoginProps) {
         <button className="c-button mt-3" type="submit">
           {t("login")}
         </button>
-        {hasError && (
+        {hasError.value && (
           <div className="fixed-top p-2 text-center bg-danger text-white">{t("login_error")}</div>
         )}
       </form>
