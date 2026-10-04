@@ -73,28 +73,6 @@ export default function App() {
   const feedListWidth = useSignal<number>(appSettings.feed_list_width || 300);
   const feedErrors = useSignal<Record<number, string>>({});
   const feedStats = useSignal<Record<number, FeedStat>>({});
-  const stats = useComputed(() => {
-    const statsFeeds: Record<number, Stats> = {};
-    const statsFolders: Record<number, Stats> = {};
-    const statsTotal: Stats = { unread: 0, starred: 0 };
-
-    for (const feed of feeds.value) {
-      const n = feedStats.value[feed.id];
-      if (!n) continue;
-      const fStat = { unread: n.unread || 0, starred: n.starred || 0 };
-      statsFeeds[feed.id] = fStat;
-
-      if (feed.folder_id !== null) {
-        if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = { unread: 0, starred: 0 };
-        statsFolders[feed.folder_id].unread += fStat.unread;
-        statsFolders[feed.folder_id].starred += fStat.starred;
-      }
-      statsTotal.unread += fStat.unread;
-      statsTotal.starred += fStat.starred;
-    }
-
-    return { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
-  });
 
   // Items
   const itemListWidth = useSignal<number>(appSettings.item_list_width || 300);
@@ -211,6 +189,27 @@ export default function App() {
           ? t("all_starred")
           : t("all_feeds"))
     );
+  });
+  const stats = useComputed(() => {
+    const statsFeeds: Record<number, Stats> = {};
+    const statsFolders: Record<number, Stats> = {};
+    const statsTotal: Stats = { unread: 0, starred: 0 };
+
+    for (const feed of feeds.value) {
+      const n = feedStats.value[feed.id];
+      if (!n) continue;
+      const fStat = { unread: n.unread || 0, starred: n.starred || 0 };
+      statsFeeds[feed.id] = fStat;
+
+      if (feed.folder_id !== null) {
+        if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = { unread: 0, starred: 0 };
+        statsFolders[feed.folder_id].unread += fStat.unread;
+        statsFolders[feed.folder_id].starred += fStat.starred;
+      }
+      statsTotal.unread += fStat.unread;
+      statsTotal.starred += fStat.starred;
+    }
+    return { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
   });
 
   const refreshRateTitle = useComputed(() => {
