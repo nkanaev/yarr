@@ -114,16 +114,10 @@ func listQueryPredicate(filter model.ItemFilter, newestFirst bool) (string, []an
 		args = append(args, *filter.Status)
 	}
 	if filter.Search != nil {
-		words := strings.Fields(*filter.Search)
-		terms := make([]string, len(words))
-		for idx, word := range words {
-			terms[idx] = word + ":*"
-		}
-
 		cond = append(cond, fmt.Sprintf(
 			"i.search @@ websearch_to_tsquery('simple', $%d)", next(),
 		))
-		args = append(args, strings.Join(terms, " & "))
+		args = append(args, *filter.Search)
 	}
 	if filter.After != nil {
 		compare := ">"
