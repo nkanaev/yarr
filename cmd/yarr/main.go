@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/nkanaev/yarr/src/assets"
 	"github.com/nkanaev/yarr/src/client"
@@ -48,10 +49,25 @@ func parseAuthfile(authfile io.Reader) (username, password string, err error) {
 	return username, password, nil
 }
 
+func resolveDuration(raw string) (time.Duration, error) {
+	if raw == "" {
+		raw = "30s"
+	}
+
+	duration, err := time.ParseDuration(raw)
+	if err != nil {
+		return 0, err
+	}
+	if duration <= 0 {
+		return 0, fmt.Errorf("must be greater than zero")
+	}
+	return duration, nil
+}
+
 func main() {
 	platform.FixConsoleIfNeeded()
 
-	var addr, db, authfile, auth, certfile, keyfile, basepath, logfile string
+	var addr, db, authfile, auth, certfile, keyfile, basepath, logfile, clientTimeout string
 	var ver, open bool
 
 	flag.CommandLine.SetOutput(os.Stdout)
@@ -98,6 +114,12 @@ func main() {
 		opt("YARR_LOGFILE", ""),
 		"`path` to the log file, defaults to stdout\n(env: YARR_LOGFILE)",
 	)
+	flag.StringVar(
+		&clientTimeout,
+		"client-timeout",
+		opt("YARR_CLIENT_TIMEOUT", "30s"),
+		"overall HTTP `timeout` for feed and site fetches, e.g. 120s or 2m\n(env: YARR_CLIENT_TIMEOUT)",
+	)
 	flag.BoolVar(&ver, "version", false, "print version and exit")
 	flag.BoolVar(&open, "open", false, "open the server url in the default browser")
 	flag.Parse()
@@ -138,8 +160,9 @@ func main() {
 
 	log.Printf("using db file %s", db)
 
-	var username, password string
 	var err error
+
+	var username, password string
 	if authfile != "" {
 		f, err := os.Open(authfile)
 		if err != nil {
@@ -166,7 +189,16 @@ func main() {
 		log.Fatal("Failed to initialise database: ", err)
 	}
 
+	timeoutDuration, err := resolveDuration(clientTimeout)
+	if err != nil {
+		log.Fatal("Invalid client timeout: ", err)
+	}
+
+	httpTimeout := client.DefaultTimeout()
+	httpTimeout.Request = timeoutDuration
+	httpTimeout.ResponseHeader = 0
 	httpClient := client.NewBuilder().
+		Timeout(httpTimeout).
 		Middleware(
 			client.UserAgent("Yarr/"+Version),
 			client.ConditionalRequests(worker.NewFeedStateStore(store)),

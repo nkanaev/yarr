@@ -17,8 +17,13 @@ A command line flag takes precedence over its environment variable.
 | `-key-file`  | `YARR_KEYFILE`       | Path to the TLS key file                                                     |
 | `-db`        | `YARR_DB`            | Storage file path                                                            |
 | `-log-file`  | `YARR_LOGFILE`       | Path to the log file                                                         |
+| `-client-timeout` | `YARR_CLIENT_TIMEOUT` | Overall HTTP timeout for feed and site fetches (default `30s`)     |
 | `-open`      | —                    | Open the server in the browser                                               |
 
 ## HTTPS
 
 Both `-cert-file` and `-key-file` are required to enable HTTPS.
+
+## Timeout
+
+`-client-timeout` accepts a human-readable duration such as `120s`, `2m` or `1m30s`. Increase it when slow upstreams (e.g. self-hosted feed generators) take longer than the default `30s` to respond.

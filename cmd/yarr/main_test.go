@@ -3,7 +3,39 @@ package main
 import (
 	"strings"
 	"testing"
+	"time"
 )
+
+func TestResolveDuratoin(t *testing.T) {
+	for _, tc := range [...]struct {
+		raw      string
+		expected time.Duration
+		error    bool
+	}{
+		{raw: "", expected: 30 * time.Second},
+		{raw: "120s", expected: 120 * time.Second},
+		{raw: "2m", expected: 2 * time.Minute},
+		{raw: "abc", error: true},
+		{raw: "0", error: true},
+		{raw: "-5s", error: true},
+	} {
+		t.Run(tc.raw, func(t *testing.T) {
+			got, err := resolveDuration(tc.raw)
+			if tc.error {
+				if err == nil {
+					t.Errorf("expected error for %q, got nil", tc.raw)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tc.expected {
+				t.Errorf("got %v; want %v", got, tc.expected)
+			}
+		})
+	}
+}
 
 func TestPasswordFromAuthfile(t *testing.T) {
 	for _, tc := range [...]struct {

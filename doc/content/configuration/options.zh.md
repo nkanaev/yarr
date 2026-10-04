@@ -16,8 +16,13 @@ weight: 3
 | `-key-file` | `YARR_KEYFILE` | TLS 密钥文件路径 |
 | `-db` | `YARR_DB` | 存储数据库文件路径 |
 | `-log-file` | `YARR_LOGFILE` | 日志文件路径 |
+| `-client-timeout` | `YARR_CLIENT_TIMEOUT` | 获取订阅源和网站的整体 HTTP 超时时间（默认 `30s`） |
 | `-open` | — | 在浏览器中打开服务器 |
 
 ## HTTPS
 
 同时需要 `-cert-file` 和 `-key-file` 才能启用 HTTPS。
+
+## 超时
+
+`-client-timeout` 接受 Go 时长格式，例如 `120s`、`2m` 或 `1m30s`。当上游响应较慢（例如自建的订阅源生成服务）超过默认的 `30s` 时，可增大该值。
