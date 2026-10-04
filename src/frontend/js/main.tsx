@@ -1,6 +1,3 @@
-if (process.env.NODE_ENV !== "production") {
-  import("preact/debug");
-}
 import { render } from "preact";
 import { useState } from "preact/hooks";
 import type { Lang } from "./i18n";
