@@ -82,9 +82,12 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		isAuthenticated = s.Auth.IsAuthenticated(r)
 	}
 
-	settings := model.SettingsDefault()
-	if isAuthenticated {
-		settings = s.db(r).GetSettings()
+	settings := s.db(r).GetSettings()
+	if !isAuthenticated {
+		settings = model.Settings{
+			Language:  settings.Language,
+			ThemeName: settings.ThemeName,
+		}
 	}
 
 	writeHTML(w, http.StatusOK, s.Template.Lookup("index.html"), map[string]any{

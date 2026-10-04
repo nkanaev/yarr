@@ -90,6 +90,59 @@ func TestIndexGzipped(t *testing.T) {
 	}
 }
 
+func TestIndexSettingsWhenUnauthenticated(t *testing.T) {
+	server := testServer()
+	db := server.Storage.(*localStorage).storage
+	db.UpdateSettings(model.UpdateSettingsParams{
+		Language:      new("fr"),
+		ThemeName:     new("night"),
+		RefreshRate:   new(int64(15)),
+		FeedListWidth: new(400),
+	})
+	server.Auth = NewLocalAuthProvider("u", "p", "")
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", "/", nil)
+	server.Handler().ServeHTTP(recorder, request)
+	body := recorder.Body.String()
+
+	if !strings.Contains(body, `"language":"fr"`) {
+		t.Error("expected language to be preserved")
+	}
+	if !strings.Contains(body, `"theme_name":"night"`) {
+		t.Error("expected theme_name to be preserved")
+	}
+	if strings.Contains(body, `"refresh_rate":15`) {
+		t.Error("expected refresh_rate to be hidden")
+	}
+	if strings.Contains(body, `"feed_list_width":400`) {
+		t.Error("expected feed_list_width to be hidden")
+	}
+}
+
+func TestIndexSettingsWhenAuthenticated(t *testing.T) {
+	server := testServer()
+	db := server.Storage.(*localStorage).storage
+	db.UpdateSettings(model.UpdateSettingsParams{
+		Language:      new("fr"),
+		ThemeName:     new("night"),
+		RefreshRate:   new(int64(15)),
+		FeedListWidth: new(400),
+	})
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", "/", nil)
+	server.Handler().ServeHTTP(recorder, request)
+	body := recorder.Body.String()
+
+	if !strings.Contains(body, `"refresh_rate":15`) {
+		t.Error("expected refresh_rate to be exposed")
+	}
+	if !strings.Contains(body, `"feed_list_width":400`) {
+		t.Error("expected feed_list_width to be exposed")
+	}
+}
+
 type fakeIngestor struct {
 	result AddFeedResult
 	err    error
