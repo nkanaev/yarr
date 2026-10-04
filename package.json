@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
+    "@preact/signals": "^2.11.3",
     "bootstrap": "^5.3.8",
     "lucide": "^1.47.0",
     "preact": "^11.0.0"
