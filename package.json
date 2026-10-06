@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "esbuild": "0.28.1",
-    "typescript": "^5.7.0"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
