@@ -1,5 +1,6 @@
 import { useState, useEffect } from "preact/hooks";
 import { dateRepr, dateTimeString, relRepaintDelay } from "../utils";
+import Tooltip from "./Tooltip";
 
 interface RelativeTimeProps {
   val: string;
@@ -30,8 +31,8 @@ export default function RelativeTime({ val, locale }: RelativeTimeProps) {
   }, [val, locale]);
 
   return (
-    <time dateTime={val} title={title}>
-      {formatted}
-    </time>
+    <Tooltip label={title}>
+      <time dateTime={val}>{formatted}</time>
+    </Tooltip>
   );
 }

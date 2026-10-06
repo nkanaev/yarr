@@ -10,6 +10,7 @@ import Modal from "../components/Modal";
 import Shortcuts from "../components/Shortcuts";
 import RelativeTime from "../components/RelativeTime";
 import Icon from "../components/Icon";
+import Tooltip from "../components/Tooltip";
 import FeedTree from "../components/FeedTree";
 import NewFeed from "../components/NewFeed";
 import ToastContainer, { showToast } from "../components/Toast";
@@ -773,39 +774,45 @@ export default function App() {
         <div className="px-2 py-1 d-flex align-items-center">
           <Icon className="mx-2" name="anchor" />
           <div className="flex-grow-1" />
-          <button
-            type="button"
-            className="c-button-pill ms-1"
-            aria-pressed={filterSelected.value === "unread"}
-            title={t("unread")}
-            onClick={() => {
-              filterSelected.value = "unread";
-              updateSettings({ filter: "unread" });
-            }}>
-            <Icon name="circle-full" />
-          </button>
-          <button
-            type="button"
-            className="c-button-pill mx-1"
-            aria-pressed={filterSelected.value === "starred"}
-            title={t("starred")}
-            onClick={() => {
-              filterSelected.value = "starred";
-              updateSettings({ filter: "starred" });
-            }}>
-            <Icon name="star-full" />
-          </button>
-          <button
-            type="button"
-            className="c-button-pill me-1"
-            aria-pressed={filterSelected.value === ""}
-            title={t("all")}
-            onClick={() => {
-              filterSelected.value = "";
-              updateSettings({ filter: "" });
-            }}>
-            <Icon name="assorted" />
-          </button>
+          <Tooltip label={t("unread")} className="ms-1">
+            <button
+              type="button"
+              className="c-button-pill"
+              aria-label={t("unread")}
+              aria-pressed={filterSelected.value === "unread"}
+              onClick={() => {
+                filterSelected.value = "unread";
+                updateSettings({ filter: "unread" });
+              }}>
+              <Icon name="circle-full" />
+            </button>
+          </Tooltip>
+          <Tooltip label={t("starred")} className="mx-1">
+            <button
+              type="button"
+              className="c-button-pill"
+              aria-label={t("starred")}
+              aria-pressed={filterSelected.value === "starred"}
+              onClick={() => {
+                filterSelected.value = "starred";
+                updateSettings({ filter: "starred" });
+              }}>
+              <Icon name="star-full" />
+            </button>
+          </Tooltip>
+          <Tooltip label={t("all")} className="me-1">
+            <button
+              type="button"
+              className="c-button-pill"
+              aria-label={t("all")}
+              aria-pressed={filterSelected.value === ""}
+              onClick={() => {
+                filterSelected.value = "";
+                updateSettings({ filter: "" });
+              }}>
+              <Icon name="assorted" />
+            </button>
+          </Tooltip>
           <div className="flex-grow-1" />
 
           <DropdownSettings
@@ -877,24 +884,28 @@ export default function App() {
         style={{ width: `${itemListWidth.value}px` }}>
         <Drag width={itemListWidth.value} onResize={resizeItemList} />
         <div className="px-2 py-1 d-flex gap-1 align-items-center">
-          <button
-            type="button"
-            className="c-button-pill d-md-none"
-            onClick={() => (feedSelected.value = null)}
-            title={t("show_feeds")}>
-            <Icon name="chevron-left" />
-          </button>
-          <button
-            type="button"
-            className="c-button-pill"
-            onClick={() => {
-              const next = !itemSortNewestFirst.value;
-              itemSortNewestFirst.value = next;
-              updateSettings({ sort_newest_first: next });
-            }}
-            title={`${t("show_first")}: ${itemSortNewestFirst.value ? t("new") : t("old")}`}>
-            <Icon name={itemSortNewestFirst.value ? "sort-new-first" : "sort-old-first"} />
-          </button>
+          <Tooltip label={t("show_feeds")}>
+            <button
+              type="button"
+              className="c-button-pill d-md-none"
+              aria-label={t("show_feeds")}
+              onClick={() => (feedSelected.value = null)}>
+              <Icon name="chevron-left" />
+            </button>
+          </Tooltip>
+          <Tooltip label={`${t("show_first")}: ${itemSortNewestFirst.value ? t("new") : t("old")}`}>
+            <button
+              type="button"
+              className="c-button-pill"
+              aria-label={t("show_first")}
+              onClick={() => {
+                const next = !itemSortNewestFirst.value;
+                itemSortNewestFirst.value = next;
+                updateSettings({ sort_newest_first: next });
+              }}>
+              <Icon name={itemSortNewestFirst.value ? "sort-new-first" : "sort-old-first"} />
+            </button>
+          </Tooltip>
 
           <div className="c-search flex-grow-1">
             <Icon name="search" />
@@ -916,13 +927,15 @@ export default function App() {
           </div>
 
           {filterSelected.value === "unread" && (
-            <button
-              type="button"
-              className="c-button-pill"
-              onClick={markItemsRead}
-              title={t("mark_all_read")}>
-              <Icon name="check" />
-            </button>
+            <Tooltip label={t("mark_all_read")}>
+              <button
+                type="button"
+                className="c-button-pill"
+                aria-label={t("mark_all_read")}
+                onClick={markItemsRead}>
+                <Icon name="check" />
+              </button>
+            </Tooltip>
           )}
 
           {currentFeed.value ? (

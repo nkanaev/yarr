@@ -4,6 +4,7 @@ import { useI18n } from "../i18n";
 import { dateTimeString } from "../utils";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
+import Tooltip from "./Tooltip";
 
 export type ThemeFont = "" | "serif" | "monospace";
 
@@ -71,20 +72,24 @@ export default function ArticleView({
   return (
     <>
       <div className="px-2 py-1 d-flex gap-1 align-items-center">
-        <button
-          type="button"
-          className="c-button-pill"
-          onClick={() => onToggleStarred(item)}
-          title={t("mark_starred")}>
-          <Icon name={item.status === "starred" ? "star-full" : "star"} />
-        </button>
-        <button
-          type="button"
-          className="c-button-pill"
-          title={t("mark_unread")}
-          onClick={() => onToggleRead(item)}>
-          <Icon name={item.status === "unread" ? "circle-full" : "circle"} />
-        </button>
+        <Tooltip label={t("mark_starred")}>
+          <button
+            type="button"
+            className="c-button-pill"
+            aria-label={t("mark_starred")}
+            onClick={() => onToggleStarred(item)}>
+            <Icon name={item.status === "starred" ? "star-full" : "star"} />
+          </button>
+        </Tooltip>
+        <Tooltip label={t("mark_unread")}>
+          <button
+            type="button"
+            className="c-button-pill"
+            aria-label={t("mark_unread")}
+            onClick={() => onToggleRead(item)}>
+            <Icon name={item.status === "unread" ? "circle-full" : "circle"} />
+          </button>
+        </Tooltip>
 
         <Dropdown
           toggleClass="px-2"
@@ -145,57 +150,69 @@ export default function ArticleView({
           </div>
         </Dropdown>
 
-        <button
-          type="button"
-          className="c-button-pill"
-          aria-pressed={!!readabilityContent}
-          onClick={onToggleReadability}
-          title={t("read_here")}>
-          <Icon className={loadingReadability ? "is-loading" : ""} name="book-open" />
-        </button>
+        <Tooltip label={t("read_here")}>
+          <button
+            type="button"
+            className="c-button-pill"
+            aria-label={t("read_here")}
+            aria-pressed={!!readabilityContent}
+            onClick={onToggleReadability}>
+            <Icon className={loadingReadability ? "is-loading" : ""} name="book-open" />
+          </button>
+        </Tooltip>
 
-        <a
-          className="c-button-pill"
-          href={item.link}
-          rel="noopener noreferrer"
-          target="_blank"
-          referrerPolicy="no-referrer"
-          title={t("open_link")}>
-          <Icon name="external-link" />
-        </a>
+        <Tooltip label={t("open_link")}>
+          <a
+            className="c-button-pill"
+            href={item.link}
+            rel="noopener noreferrer"
+            target="_blank"
+            referrerPolicy="no-referrer"
+            aria-label={t("open_link")}>
+            <Icon name="external-link" />
+          </a>
+        </Tooltip>
 
         <div className="flex-grow-1" />
 
-        <button
-          type="button"
-          className="c-button-pill"
-          onClick={() => onNavigate(-1)}
-          title={t("previous_article")}
-          disabled={!canPrev}>
-          <Icon name="chevron-left" />
-        </button>
-        <button
-          type="button"
-          className="c-button-pill"
-          onClick={() => onNavigate(1)}
-          title={t("next_article")}
-          disabled={!canNext}>
-          <Icon name="chevron-right" />
-        </button>
-        <button
-          type="button"
-          className="c-button-pill d-none d-lg-flex"
-          onClick={onToggleFullscreen}
-          title={isFullscreen ? t("fullscreen_leave") : t("fullscreen_enter")}>
-          <Icon name={isFullscreen ? "fullscreen-exit" : "fullscreen"} />
-        </button>
-        <button
-          type="button"
-          className="c-button-pill"
-          onClick={onClose}
-          title={t("close_article")}>
-          <Icon name="x" />
-        </button>
+        <Tooltip label={t("previous_article")}>
+          <button
+            type="button"
+            className="c-button-pill"
+            aria-label={t("previous_article")}
+            onClick={() => onNavigate(-1)}
+            disabled={!canPrev}>
+            <Icon name="chevron-left" />
+          </button>
+        </Tooltip>
+        <Tooltip label={t("next_article")}>
+          <button
+            type="button"
+            className="c-button-pill"
+            aria-label={t("next_article")}
+            onClick={() => onNavigate(1)}
+            disabled={!canNext}>
+            <Icon name="chevron-right" />
+          </button>
+        </Tooltip>
+        <Tooltip label={isFullscreen ? t("fullscreen_leave") : t("fullscreen_enter")}>
+          <button
+            type="button"
+            className="c-button-pill d-none d-lg-flex"
+            aria-label={isFullscreen ? t("fullscreen_leave") : t("fullscreen_enter")}
+            onClick={onToggleFullscreen}>
+            <Icon name={isFullscreen ? "fullscreen-exit" : "fullscreen"} />
+          </button>
+        </Tooltip>
+        <Tooltip label={t("close_article")}>
+          <button
+            type="button"
+            className="c-button-pill"
+            aria-label={t("close_article")}
+            onClick={onClose}>
+            <Icon name="x" />
+          </button>
+        </Tooltip>
       </div>
 
       <div
