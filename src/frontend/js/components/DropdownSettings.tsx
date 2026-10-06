@@ -5,6 +5,7 @@ import { useI18n } from "../i18n";
 import type { DropdownHandle } from "./Dropdown";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
+import Tooltip from "./Tooltip";
 
 export type Theme = "system" | "light" | "sepia" | "night";
 
@@ -95,18 +96,18 @@ export default function DropdownSettings({
       </div>
       <div className="row text-center m-0">
         {THEMES.map(th => (
-          <button
-            key={th}
-            type="button"
-            className={`c-button-link theme-swatch col-3 px-0 rounded-0 theme-${th}`}
-            title={th}
-            aria-label={th}
-            aria-pressed={theme === th}
-            onClick={e => {
-              e.stopPropagation();
-              onThemeChange(th);
-            }}
-          />
+          <Tooltip key={th} label={th} className="col-3 px-0">
+            <button
+              type="button"
+              className={`c-button-link theme-swatch w-100 px-0 rounded-0 theme-${th}`}
+              aria-label={th}
+              aria-pressed={theme === th}
+              onClick={e => {
+                e.stopPropagation();
+                onThemeChange(th);
+              }}
+            />
+          </Tooltip>
         ))}
       </div>
 
@@ -188,19 +189,19 @@ export default function DropdownSettings({
       <div className="container">
         <div className="row">
           {LANGUAGES.map(lang => (
-            <button
-              key={lang.code}
-              type="button"
-              className="c-dropdown-item text-center col-3 px-0"
-              aria-label={lang.name}
-              aria-pressed={language === lang.code}
-              title={lang.name}
-              onClick={e => {
-                e.stopPropagation();
-                onLanguageChange(lang.code);
-              }}>
-              {lang.code}
-            </button>
+            <Tooltip key={lang.code} label={lang.name} className="col-3 px-0">
+              <button
+                type="button"
+                className="c-dropdown-item text-center w-100"
+                aria-label={lang.name}
+                aria-pressed={language === lang.code}
+                onClick={e => {
+                  e.stopPropagation();
+                  onLanguageChange(lang.code);
+                }}>
+                {lang.code}
+              </button>
+            </Tooltip>
           ))}
         </div>
       </div>

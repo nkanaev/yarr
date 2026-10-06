@@ -1,4 +1,5 @@
 import icons from "../icons";
+import Tooltip from "./Tooltip";
 
 export type IconName = keyof typeof icons;
 
@@ -12,5 +13,7 @@ interface IconProps {
 export default function Icon({ name, small, className = "", title }: IconProps) {
   const svgHtml = (icons as Record<string, string>)[name] || "";
   const cls = `c-icon ${small ? "is-small" : ""} ${className}`.trim();
-  return <span className={cls} title={title} dangerouslySetInnerHTML={{ __html: svgHtml }} />;
+  const span = <span className={cls} dangerouslySetInnerHTML={{ __html: svgHtml }} />;
+  if (!title) return span;
+  return <Tooltip label={title}>{span}</Tooltip>;
 }

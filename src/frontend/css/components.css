@@ -326,6 +326,35 @@
   transition: transform 0.2s ease;
 }
 
+.c-tooltip {
+  display: inline-flex;
+}
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.c-tooltip-bubble {
+  position: fixed;
+  transform: translateX(-50%);
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--bs-border-radius);
+  color: var(--v-bg);
+  background-color: var(--v-fg);
+  font-size: 0.75rem;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
+  animation: tooltip-in 120ms ease-out;
+}
+
 .drag {
   position: absolute;
   top: 0;

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "preact/hooks";
 import type { ComponentChildren, Ref } from "preact";
+import Tooltip from "./Tooltip";
 
 export interface DropdownHandle {
   hide: () => void;
@@ -70,14 +71,16 @@ export default function Dropdown({
 
   return (
     <div className="position-relative d-inline-flex flex-column" ref={containerRef}>
-      <button
-        type="button"
-        className={`c-button-pill ${toggleClass}`}
-        onClick={onButtonClick}
-        title={title}
-        disabled={disabled}>
-        {button}
-      </button>
+      <Tooltip label={title}>
+        <button
+          type="button"
+          className={`c-button-pill ${toggleClass}`}
+          onClick={onButtonClick}
+          aria-label={title}
+          disabled={disabled}>
+          {button}
+        </button>
+      </Tooltip>
       {open && (
         <div ref={menuRef} className={menuCls}>
           {children}
