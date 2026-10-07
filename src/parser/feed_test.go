@@ -96,6 +96,115 @@ func TestParseCleanIllegalCharsInNonUTF8(t *testing.T) {
 	}
 }
 
+func TestTranslateURLs(t *testing.T) {
+	testcases := []struct {
+		name     string
+		base     string
+		site     string
+		urls     []string
+		wantSite string
+		wantURLs []string
+	}{
+		{
+			name: "absolute site",
+			base: "https://feeds.example.com/feed.xml",
+			site: "https://example.com/blog/",
+			urls: []string{
+				"post", "../post", "/post", "//other.example.com/post",
+				"https://other.example.com/post", "?page=2", "#part", "a%2Fb?x=a%2Fb", "",
+			},
+			wantSite: "https://example.com/blog/",
+			wantURLs: []string{
+				"https://example.com/blog/post", "https://example.com/post", "https://example.com/post",
+				"https://other.example.com/post", "https://other.example.com/post",
+				"https://example.com/blog/?page=2", "https://example.com/blog/#part", "https://example.com/blog/a%2Fb?x=a%2Fb", "",
+			},
+		},
+		{
+			name:     "root relative site",
+			base:     "https://example.com/feeds/feed.xml",
+			site:     "/blog/",
+			urls:     []string{"post", "../post", "/post"},
+			wantSite: "https://example.com/blog/",
+			wantURLs: []string{"https://example.com/blog/post", "https://example.com/post", "https://example.com/post"},
+		},
+		{
+			name:     "relative site",
+			base:     "https://example.com/feeds/feed.xml",
+			site:     "../blog/",
+			urls:     []string{"post"},
+			wantSite: "https://example.com/blog/",
+			wantURLs: []string{"https://example.com/blog/post"},
+		},
+		{
+			name:     "scheme relative site",
+			base:     "https://feeds.example.com/feed.xml",
+			site:     "//example.com/blog/",
+			urls:     []string{"post"},
+			wantSite: "https://example.com/blog/",
+			wantURLs: []string{"https://example.com/blog/post"},
+		},
+		{
+			name:     "missing site",
+			base:     "https://example.com/feeds/feed.xml",
+			urls:     []string{"post", ""},
+			wantSite: "https://example.com/feeds/feed.xml",
+			wantURLs: []string{"https://example.com/feeds/post", ""},
+		},
+	}
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			feed := &Feed{SiteURL: testcase.site}
+			for _, link := range testcase.urls {
+				feed.Items = append(feed.Items, Item{URL: link, Title: "title", GUID: "id"})
+			}
+			if err := feed.TranslateURLs(testcase.base); err != nil {
+				t.Fatal(err)
+			}
+			if feed.SiteURL != testcase.wantSite {
+				t.Errorf("site URL: got %q, want %q", feed.SiteURL, testcase.wantSite)
+			}
+			for i, item := range feed.Items {
+				if item.URL != testcase.wantURLs[i] {
+					t.Errorf("item %d URL: got %q, want %q", i, item.URL, testcase.wantURLs[i])
+				}
+				if item.Title != "title" || item.GUID != "id" {
+					t.Errorf("item %d metadata changed: %#v", i, item)
+				}
+			}
+		})
+	}
+}
+
+func TestParseAndFixRelativeItemURLs(t *testing.T) {
+	testcases := []struct {
+		name string
+		data string
+	}{
+		{"rss", `<rss version="2.0"><channel><link>/blog/</link><item><link>post</link></item></channel></rss>`},
+		{"atom", `<feed xmlns="http://www.w3.org/2005/Atom"><link href="/blog/"/><entry><link href="post"/></entry></feed>`},
+		{"rdf", `<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/"><channel><link>/blog/</link></channel><item><link>post</link></item></rdf:RDF>`},
+		{"json", `{"version":"https://jsonfeed.org/version/1.1","title":"feed","home_page_url":"/blog/","items":[{"id":"post","url":"post","content_text":"text"}]}`},
+	}
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			feed, err := ParseAndFix(strings.NewReader(testcase.data), "https://example.com/feeds/feed.xml", "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if feed.SiteURL != "https://example.com/blog/" {
+				t.Errorf("site URL: got %q", feed.SiteURL)
+			}
+			if len(feed.Items) != 1 {
+				t.Fatalf("item count: got %d, want 1", len(feed.Items))
+			}
+			if feed.Items[0].URL != "https://example.com/blog/post" {
+				t.Errorf("item URL: got %q, want https://example.com/blog/post", feed.Items[0].URL)
+			}
+		})
+	}
+}
+
 // TestParseCases discovers every fixture under the "fixtures" directory and
 // runs it as a subtest. Each fixture is a feed document (xml or json) whose
 // leading comment block describes the case and lists assertions. The assertions
