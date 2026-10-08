@@ -27,11 +27,11 @@ type jsonItem struct {
 }
 
 type jsonAttachment struct {
-	URL      string `json:"url"`
-	MimeType string `json:"mime_type"`
-	Title    string `json:"title"`
-	Size     int64  `json:"size_in_bytes"`
-	Duration int    `json:"duration_in_seconds"`
+	URL      string  `json:"url"`
+	MimeType string  `json:"mime_type"`
+	Title    string  `json:"title"`
+	Size     float64 `json:"size_in_bytes"`
+	Duration float64 `json:"duration_in_seconds"`
 }
 
 func (item *jsonItem) mediaLinks() []MediaLink {
