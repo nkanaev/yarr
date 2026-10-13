@@ -61,7 +61,6 @@ export default function Dropdown({
   }, [open, hide]);
 
   const onButtonClick = (e: MouseEvent) => {
-    e.stopPropagation();
     if (!disabled) toggle();
   };
 
