@@ -163,13 +163,17 @@ func (feed *Feed) TranslateURLs(base string) error {
 	if err != nil {
 		return fmt.Errorf("failed to parse feed url: %#v", feed.SiteURL)
 	}
-	feed.SiteURL = baseUrl.ResolveReference(siteUrl).String()
-	for _, item := range feed.Items {
+	siteUrl = baseUrl.ResolveReference(siteUrl)
+	feed.SiteURL = siteUrl.String()
+	for i, item := range feed.Items {
+		if item.URL == "" {
+			continue
+		}
 		itemUrl, err := url.Parse(item.URL)
 		if err != nil {
 			return fmt.Errorf("failed to parse item url: %#v", item.URL)
 		}
-		item.URL = siteUrl.ResolveReference(itemUrl).String()
+		feed.Items[i].URL = siteUrl.ResolveReference(itemUrl).String()
 	}
 	return nil
 }
