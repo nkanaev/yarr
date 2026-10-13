@@ -1,30 +1,13 @@
 import { useRef } from "preact/hooks";
 import type { Ref } from "preact";
-import type { Lang } from "../i18n";
 import { useI18n } from "../i18n";
 import type { DropdownHandle } from "./Dropdown";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
-import Tooltip from "./Tooltip";
 
 export type Theme = "system" | "light" | "sepia" | "night";
 
-const THEMES: Theme[] = ["light", "sepia", "night", "system"];
-
-const LANGUAGES: { code: Lang; name: string }[] = [
-  { code: "en", name: "English" },
-  { code: "de", name: "Deutsch" },
-  { code: "es", name: "Español" },
-  { code: "fr", name: "Français" },
-  { code: "ja", name: "日本語" },
-  { code: "pt", name: "Português" },
-  { code: "ru", name: "Русский" },
-  { code: "zh", name: "简体中文" },
-];
-
 interface DropdownSettingsProps {
-  theme: Theme;
-  onThemeChange: (t: Theme) => void;
   refreshAvailable: boolean;
   refreshRate: number;
   refreshRateTitle: string;
@@ -32,18 +15,11 @@ interface DropdownSettingsProps {
   onRefreshRateChange: (delta: number) => void;
   onFetchAllFeeds: () => void;
   onImportOPML: (e: Event) => void;
-  onShowShortcuts: () => void;
   onShowNewFeed: () => void;
-  language: Lang;
-  onLanguageChange: (lang: Lang) => void;
-  requiresAuth: boolean;
-  onLogout: () => void;
   dropdownRef?: Ref<DropdownHandle>;
 }
 
 export default function DropdownSettings({
-  theme,
-  onThemeChange,
   refreshAvailable,
   refreshRate,
   refreshRateTitle,
@@ -51,12 +27,7 @@ export default function DropdownSettings({
   onRefreshRateChange,
   onFetchAllFeeds,
   onImportOPML,
-  onShowShortcuts,
   onShowNewFeed,
-  language,
-  onLanguageChange,
-  requiresAuth,
-  onLogout,
   dropdownRef,
 }: DropdownSettingsProps) {
   const { t } = useI18n();
@@ -66,7 +37,7 @@ export default function DropdownSettings({
     <Dropdown
       ref={dropdownRef}
       toggleClass="c-button-link px-2"
-      drop="right"
+      drop="end"
       title={t("settings")}
       button={<Icon name="more-horizontal" />}>
       <button
@@ -89,27 +60,6 @@ export default function DropdownSettings({
           </button>
         </>
       )}
-
-      <div className="c-dropdown-divider" />
-      <div className="c-dropdown-header" role="heading" aria-level={2}>
-        {t("theme")}
-      </div>
-      <div className="row text-center m-0">
-        {THEMES.map(th => (
-          <Tooltip key={th} label={th} className="col-3 px-0">
-            <button
-              type="button"
-              className={`c-button-link theme-swatch w-100 px-0 rounded-0 theme-${th}`}
-              aria-label={th}
-              aria-pressed={theme === th}
-              onClick={e => {
-                e.stopPropagation();
-                onThemeChange(th);
-              }}
-            />
-          </Tooltip>
-        ))}
-      </div>
 
       {refreshAvailable && (
         <>
@@ -172,49 +122,6 @@ export default function DropdownSettings({
         <Icon className="me-1" name="upload" />
         {t("export")}
       </a>
-
-      <div className="c-dropdown-divider" />
-      <button
-        type="button"
-        className="c-dropdown-item w-100 text-start d-flex gap-1"
-        onClick={onShowShortcuts}>
-        <Icon className="me-1" name="help-circle" />
-        {t("shortcuts")}
-      </button>
-
-      <div className="c-dropdown-divider" />
-      <div className="c-dropdown-header" role="heading" aria-level={2}>
-        A / あ / 文
-      </div>
-      <div className="container">
-        <div className="row">
-          {LANGUAGES.map(lang => (
-            <Tooltip key={lang.code} label={lang.name} className="col-3 px-0">
-              <button
-                type="button"
-                className="c-dropdown-item text-center w-100"
-                aria-label={lang.name}
-                aria-pressed={language === lang.code}
-                onClick={e => {
-                  e.stopPropagation();
-                  onLanguageChange(lang.code);
-                }}>
-                {lang.code}
-              </button>
-            </Tooltip>
-          ))}
-        </div>
-      </div>
-
-      {requiresAuth && (
-        <>
-          <div className="c-dropdown-divider" />
-          <button type="button" className="c-dropdown-item w-100 text-start" onClick={onLogout}>
-            <Icon className="me-1" name="log-out" />
-            {t("log_out")}
-          </button>
-        </>
-      )}
     </Dropdown>
   );
 }

@@ -15,6 +15,7 @@ import FeedTree from "../components/FeedTree";
 import NewFeed from "../components/NewFeed";
 import ToastContainer, { showToast } from "../components/Toast";
 import DropdownSettings, { Theme } from "../components/DropdownSettings";
+import DropdownApp from "../components/DropdownApp";
 import DropdownFeed from "../components/DropdownFeed";
 import DropdownFolder from "../components/DropdownFolder";
 import ArticleView, { ThemeFont } from "../components/ArticleView";
@@ -772,7 +773,30 @@ export default function App() {
         style={{ width: `${feedListWidth.value}px` }}>
         <Drag width={feedListWidth.value} onResize={resizeFeedList} />
         <div className="px-2 py-1 d-flex align-items-center">
-          <Icon className="mx-2" name="anchor" />
+          <DropdownApp
+            theme={theme.value.name}
+            onThemeChange={th => {
+              theme.value = { ...theme.value, name: th };
+              updateSettings({ theme_name: th });
+            }}
+            onShowShortcuts={() => (showModal.value = "shortcuts")}
+            language={language.value}
+            onLanguageChange={code => {
+              setLang(code);
+              language.value = code;
+              updateSettings({ language: code });
+            }}
+            requiresAuth={window.app?.requiresAuth}
+            onLogout={async () => {
+              const [err] = await to(api.logout());
+              if (err)
+                showToast(
+                  { title: t("fail_logout"), description: errDescription(err) },
+                  { level: "fail" },
+                );
+              else document.location.reload();
+            }}
+          />
           <div className="flex-grow-1" />
           <Tooltip label={t("unread")} className="ms-1">
             <button
@@ -817,11 +841,6 @@ export default function App() {
 
           <DropdownSettings
             dropdownRef={menuDropdownRef}
-            theme={theme.value.name}
-            onThemeChange={th => {
-              theme.value = { ...theme.value, name: th };
-              updateSettings({ theme_name: th });
-            }}
             refreshAvailable={refreshAvailable.value}
             refreshRate={refreshRate.value}
             refreshRateTitle={refreshRateTitle.value}
@@ -831,24 +850,7 @@ export default function App() {
             onRefreshRateChange={changeRefreshRate}
             onFetchAllFeeds={fetchAllFeeds}
             onImportOPML={importOPML}
-            onShowShortcuts={() => (showModal.value = "shortcuts")}
             onShowNewFeed={() => (showModal.value = "newfeed")}
-            language={language.value}
-            onLanguageChange={code => {
-              setLang(code);
-              language.value = code;
-              updateSettings({ language: code });
-            }}
-            requiresAuth={window.app?.requiresAuth}
-            onLogout={async () => {
-              const [err] = await to(api.logout());
-              if (err)
-                showToast(
-                  { title: t("fail_logout"), description: errDescription(err) },
-                  { level: "fail" },
-                );
-              else document.location.reload();
-            }}
           />
         </div>
 
