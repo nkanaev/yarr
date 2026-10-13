@@ -11,7 +11,7 @@ export interface DropdownHandle {
 interface DropdownProps {
   button: ComponentChildren;
   toggleClass: string;
-  drop: "right" | "center";
+  drop: "start" | "end" | "center";
   title: string;
   disabled?: boolean;
   children: ComponentChildren;
@@ -66,7 +66,7 @@ export default function Dropdown({
   };
 
   const menuCls = `c-dropdown position-absolute top-100 z-1 ${
-    drop === "center" ? "start-50 translate-middle-x" : "end-0"
+    drop === "center" ? "start-50 translate-middle-x" : drop === "end" ? "end-0" : "start-0"
   }`;
 
   return (

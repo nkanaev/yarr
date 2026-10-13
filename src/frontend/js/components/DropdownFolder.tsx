@@ -15,7 +15,7 @@ export default function DropdownFolder({ folder, onRename, onDelete }: DropdownF
   return (
     <Dropdown
       toggleClass="c-button-link px-2"
-      drop="right"
+      drop="end"
       title={t("folder_settings")}
       button={<Icon name="more-horizontal" />}>
       <div className="c-dropdown-header text-break line-clamp-1" role="heading" aria-level={2}>
