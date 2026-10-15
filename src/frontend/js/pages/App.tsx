@@ -999,7 +999,7 @@ export default function App() {
             </div>
           ))}
           {(itemsHasMore.value || loadingItems.value) && (
-            <div className="text-center my-3">
+            <div className={`text-center my-3 ${items.value.length === 0 ? "show-delayed" : ""}`}>
               <span className="c-spinner" />
             </div>
           )}
