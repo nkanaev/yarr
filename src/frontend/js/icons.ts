@@ -29,7 +29,6 @@ import {
   SlidersHorizontal,
   SquarePen,
   Star,
-  TextAlignJustify,
   Trash,
   Upload,
   X,
@@ -39,10 +38,16 @@ import type { IconNode, SVGProps } from "lucide";
 
 const svg = (icon: IconNode, attrs?: SVGProps) => createElement(icon, attrs).outerHTML;
 
+const ListAssorted: IconNode = [
+  ["path", { d: "M15 5H3", key: "qmgq9p" }],
+  ["path", { d: "M3 12h18", key: "1i2n21" }],
+  ["path", { d: "M9 19H3", key: "s61nz1" }],
+];
+
 export default {
   anchor: svg(Anchor),
   "alert-circle": svg(CircleAlert),
-  assorted: svg(TextAlignJustify),
+  assorted: svg(ListAssorted),
   "book-open": svg(BookOpen),
   check: svg(Check),
   "chevron-down": svg(ChevronDown),
