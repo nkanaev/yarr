@@ -29,6 +29,8 @@ func (s *SQLiteStorage) GetSettings() model.Settings {
 			json.Unmarshal(val, &result.Feed)
 		case "feed_list_width":
 			json.Unmarshal(val, &result.FeedListWidth)
+		case "feed_list_collapsed":
+			json.Unmarshal(val, &result.FeedListCollapsed)
 		case "item_list_width":
 			json.Unmarshal(val, &result.ItemListWidth)
 		case "sort_newest_first":
@@ -79,6 +81,9 @@ func (s *SQLiteStorage) UpdateSettings(params model.UpdateSettingsParams) bool {
 	}
 	if params.FeedListWidth != nil {
 		errs = append(errs, update("feed_list_width", *params.FeedListWidth))
+	}
+	if params.FeedListCollapsed != nil {
+		errs = append(errs, update("feed_list_collapsed", *params.FeedListCollapsed))
 	}
 	if params.ItemListWidth != nil {
 		errs = append(errs, update("item_list_width", *params.ItemListWidth))
