@@ -81,7 +81,7 @@ windows_arm64_gui: assets src/platform/versioninfo.rc
 YARR_DB ?= local.db
 
 serve: assets
-	go run $(GO_FLAGS_DEBUG) ./cmd/yarr -db "$(YARR_DB)"
+	go run $(GO_FLAGS_DEBUG) ./cmd/yarr -db "$(YARR_DB)" -addr 127.0.0.1:7071
 
 test: assets
 	go test $(GO_FLAGS) ./...
