@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"reflect"
@@ -18,6 +19,7 @@ import (
 	"github.com/nkanaev/yarr/src/parser/opml"
 	"github.com/nkanaev/yarr/src/server/middleware"
 	"github.com/nkanaev/yarr/src/storage/model"
+	"golang.org/x/net/html/charset"
 )
 
 func writeJSON(w http.ResponseWriter, status int, data any) {
@@ -502,23 +504,41 @@ func (s *Server) handlePageCrawl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: restore page fetching through an interface instead of calling worker directly.
-	body := ""
-	/*
-		httpClient := client.NewBuilder().
-			Middleware(client.UserAgent(r.UserAgent())).
-			Build()
+	req, err := http.NewRequestWithContext(r.Context(), http.MethodGet, url, nil)
+	if err != nil {
+		log.Printf("failed to construct request for %s: %s", url, err)
+		http.Error(w, "", http.StatusBadRequest)
+		return
+	}
+	if userAgent := r.UserAgent(); userAgent != "" {
+		req.Header.Set("User-Agent", userAgent)
+	}
+	res, err := s.crawlClient.Do(req)
+	if err != nil {
+		log.Printf("failed to fetch %s: %s", url, err)
+		http.Error(w, "", http.StatusBadGateway)
+		return
+	}
+	defer res.Body.Close()
 
-		var err error
-		body, err = worker.GetBody(httpClient, url)
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		log.Printf("failed to fetch %s: status %d", url, res.StatusCode)
+		http.Error(w, "", http.StatusBadGateway)
+		return
+	}
+
+	var body io.Reader = res.Body
+	contentType := res.Header.Get("Content-Type")
+	if strings.Contains(contentType, "charset") {
+		body, err = charset.NewReader(res.Body, contentType)
 		if err != nil {
-			log.Print(err)
-			w.WriteHeader(http.StatusBadRequest)
+			log.Printf("failed to decode body from %s: %s", url, err)
+			http.Error(w, "", http.StatusBadGateway)
 			return
 		}
-	*/
+	}
 
-	content, err := readability.ExtractContent(strings.NewReader(body))
+	content, err := readability.ExtractContent(body)
 	if err != nil {
 		writeJSON(w, http.StatusOK, map[string]string{
 			"content": "error: " + err.Error(),
