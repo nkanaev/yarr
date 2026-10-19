@@ -1,10 +1,10 @@
 package server
 
 import (
-	"html/template"
-	"io/fs"
 	"context"
+	"html/template"
 	"io"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -48,6 +48,8 @@ type Server struct {
 	StaticFS fs.FS
 	Template *template.Template
 
+	crawlClient *http.Client
+
 	// https
 	CertFile string
 	KeyFile  string
@@ -55,7 +57,8 @@ type Server struct {
 
 func NewServer(addr string) *Server {
 	return &Server{
-		Addr: addr,
+		Addr:        addr,
+		crawlClient: newCrawlClient(),
 	}
 }
 

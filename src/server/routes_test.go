@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -226,5 +227,130 @@ func TestFeedCreateError(t *testing.T) {
 
 	if recorder.Result().StatusCode != http.StatusInternalServerError {
 		t.Fatalf("expected 500, got %d", recorder.Result().StatusCode)
+	}
+}
+
+type crawlTestTransport struct {
+	target *url.URL
+}
+
+func (t *crawlTestTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req = req.Clone(req.Context())
+	req.URL.Scheme = t.target.Scheme
+	req.URL.Host = t.target.Host
+	return http.DefaultTransport.RoundTrip(req)
+}
+
+func newCrawlTestServer(t *testing.T, handler http.HandlerFunc) *Server {
+	t.Helper()
+
+	target := httptest.NewServer(handler)
+	t.Cleanup(target.Close)
+
+	targetURL, err := url.Parse(target.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	server := testServer()
+	server.crawlClient = &http.Client{
+		Transport: &crawlTestTransport{target: targetURL},
+	}
+	return server
+}
+
+func crawlPage(t *testing.T, server *Server, pageURL, userAgent string) *httptest.ResponseRecorder {
+	t.Helper()
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", "/page?url="+url.QueryEscape(pageURL), nil)
+	if userAgent != "" {
+		request.Header.Set("User-Agent", userAgent)
+	}
+	server.handlePageCrawl(recorder, request)
+	return recorder
+}
+
+func TestPageCrawlSuccess(t *testing.T) {
+	server := newCrawlTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("User-Agent"); got != "test-agent" {
+			t.Errorf("expected user agent %q, got %q", "test-agent", got)
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		io.WriteString(w, `<!doctype html>
+<html>
+<head><title>Test article</title></head>
+<body>
+<article>
+<h1>Test article</h1>
+<p>Hello readability world. This is the first paragraph with enough text for extraction.</p>
+<p>This is the second paragraph with more text to make the article look real.</p>
+</article>
+</body>
+</html>`)
+	})
+
+	recorder := crawlPage(t, server, "http://example.com/article", "test-agent")
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", recorder.Code)
+	}
+
+	var response map[string]string
+	if err := json.NewDecoder(recorder.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(response["content"], "Hello readability world") {
+		t.Fatalf("expected extracted content, got %q", response["content"])
+	}
+}
+
+func TestPageCrawlEmptyBody(t *testing.T) {
+	log.SetOutput(io.Discard)
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+
+	server := newCrawlTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	})
+
+	recorder := crawlPage(t, server, "http://example.com/empty", "")
+	if recorder.Code != http.StatusBadGateway {
+		t.Fatalf("expected 502, got %d", recorder.Code)
+	}
+}
+
+func TestPageCrawlUpstreamError(t *testing.T) {
+	log.SetOutput(io.Discard)
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+
+	server := newCrawlTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	recorder := crawlPage(t, server, "http://example.com/missing", "")
+	if recorder.Code != http.StatusBadGateway {
+		t.Fatalf("expected 502, got %d", recorder.Code)
+	}
+}
+
+func TestPageCrawlRejectsInternalRedirect(t *testing.T) {
+	log.SetOutput(io.Discard)
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+
+	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "http://127.0.0.1/secret", http.StatusFound)
+	}))
+	t.Cleanup(target.Close)
+
+	targetURL, err := url.Parse(target.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	server := testServer()
+	server.crawlClient.Transport = &crawlTestTransport{target: targetURL}
+
+	recorder := crawlPage(t, server, "http://example.com/article", "")
+	if recorder.Code != http.StatusBadGateway {
+		t.Fatalf("expected 502, got %d", recorder.Code)
 	}
 }
