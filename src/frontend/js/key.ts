@@ -2,12 +2,12 @@ export interface KeyActions {
   openItemLink: () => void;
   toggleReadability: () => void;
   toggleItemRead: () => void;
-  markAllRead: () => void;
   toggleItemStarred: () => void;
+  markAllRead: () => void;
   nextItem: () => void;
-  previousItem: () => void;
+  prevItem: () => void;
   nextFeed: () => void;
-  previousFeed: () => void;
+  prevFeed: () => void;
   closeItem: () => void;
   showShortcuts: () => void;
   showAll: () => void;
@@ -43,9 +43,9 @@ export function setupKeybindings(actionsRef: { current: KeyActions }) {
     toggleItemStarred: () => actionsRef.current.toggleItemStarred(),
     focusSearch,
     nextItem: () => actionsRef.current.nextItem(),
-    previousItem: () => actionsRef.current.previousItem(),
+    previousItem: () => actionsRef.current.prevItem(),
     nextFeed: () => actionsRef.current.nextFeed(),
-    previousFeed: () => actionsRef.current.previousFeed(),
+    previousFeed: () => actionsRef.current.prevFeed(),
     scrollForward: () => scrollContent(+1),
     scrollBackward: () => scrollContent(-1),
     closeItem: () => actionsRef.current.closeItem(),
