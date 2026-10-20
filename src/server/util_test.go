@@ -17,6 +17,7 @@ func TestIsInternalFromURL(t *testing.T) {
 		{"http://127.0.0.1:7000/secret", true},
 		{"http://169.254.0.5", true},
 		{"http://localhost", true}, // resolves to 127.0.0.1
+		{"http://0.0.0.0:80", true},
 		{"http://8.8.8.8", false},
 		{"http://google.com", false}, // resolves to public IPs
 		{"invalid-url", false},       // invalid format

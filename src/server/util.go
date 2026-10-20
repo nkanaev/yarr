@@ -49,5 +49,5 @@ func isInternalFromURL(urlStr string) bool {
 		return false
 	}
 
-	return ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast()
+	return ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsUnspecified()
 }
