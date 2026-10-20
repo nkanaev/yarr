@@ -729,6 +729,7 @@ export default function App() {
   // Keybindings
   const keyActionsRef = useRef<KeyActions>({} as KeyActions);
   keyActionsRef.current = {
+    enabled: () => showModal.value === "",
     openItemLink: () => {
       if (itemSelectedDetails.value?.link)
         window.open(itemSelectedDetails.value.link, "_blank", "noopener,noreferrer");
