@@ -32,6 +32,15 @@ func get(c *http.Client, url string) (*http.Response, error) {
 }
 
 func DiscoverFeed(c *http.Client, candidateUrl string) (*DiscoverResult, error) {
+	return discoverFeed(c, candidateUrl, make(map[string]struct{}))
+}
+
+func discoverFeed(c *http.Client, candidateUrl string, visited map[string]struct{}) (*DiscoverResult, error) {
+	if _, ok := visited[candidateUrl]; ok {
+		return nil, errors.New("recursion")
+	}
+	visited[candidateUrl] = struct{}{}
+
 	result := &DiscoverResult{}
 	// Query URL
 	res, err := get(c, candidateUrl)
@@ -71,10 +80,7 @@ func DiscoverFeed(c *http.Client, candidateUrl string) (*DiscoverResult, error) 
 	case len(sources) == 0:
 		return nil, errors.New("no feeds found at the given url")
 	case len(sources) == 1:
-		if sources[0].URL == candidateUrl {
-			return nil, errors.New("recursion")
-		}
-		return DiscoverFeed(c, sources[0].URL)
+		return discoverFeed(c, sources[0].URL, visited)
 	}
 
 	result.Sources = sources
