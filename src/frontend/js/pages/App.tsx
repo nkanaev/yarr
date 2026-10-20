@@ -739,10 +739,10 @@ export default function App() {
     markAllRead: () => filterSelected.value === "unread" && markItemsRead(),
     toggleItemStarred: () =>
       itemSelectedDetails.value && toggleItemStatus(itemSelectedDetails.value, "starred"),
-    nextItem: () => navigateToItem(1),
-    previousItem: () => navigateToItem(-1),
-    nextFeed: () => navigateToFeed(1),
-    previousFeed: () => navigateToFeed(-1),
+    nextItem: () => navigateToItem(+1),
+    prevItem: () => navigateToItem(-1),
+    nextFeed: () => navigateToFeed(+1),
+    prevFeed: () => navigateToFeed(-1),
     closeItem: () => (itemSelected.value = null),
     showShortcuts: () => (showModal.value = "shortcuts"),
     showAll: () => {
