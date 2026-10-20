@@ -1,4 +1,5 @@
 export interface KeyActions {
+  enabled: () => boolean;
   openItemLink: () => void;
   toggleReadability: () => void;
   toggleItemRead: () => void;
@@ -116,6 +117,7 @@ export function setupKeybindings(actionsRef: { current: KeyActions }) {
   }
 
   const handler = (event: KeyboardEvent) => {
+    if (!actionsRef.current.enabled()) return;
     if (isTextBox(event.target as Element) || event.metaKey || event.ctrlKey || event.altKey) {
       return;
     }
