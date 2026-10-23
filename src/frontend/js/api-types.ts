@@ -38,6 +38,7 @@ export interface Settings {
   filter: string;
   feed: string;
   feed_list_width: number;
+  feed_list_collapsed: boolean;
   item_list_width: number;
   sort_newest_first: boolean;
   theme_name: string;
@@ -133,6 +134,7 @@ export interface SettingsUpdateData {
   filter?: string;
   feed?: string;
   feed_list_width?: number;
+  feed_list_collapsed?: boolean;
   item_list_width?: number;
   sort_newest_first?: boolean;
   theme_name?: string;

@@ -9,10 +9,17 @@
     <div
       id="col-feed-list"
       class="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
+      :class="{ 'is-collapsed': feedListCollapsed }"
       :style="{ width: feedListWidth + 'px' }">
       <v-drag :width="feedListWidth" @resize="resizeFeedList"></v-drag>
-      <div class="px-2 py-1 d-flex align-items-center">
-        <v-icon class="mx-2" name="anchor" />
+      <div class="feed-list-header px-2 py-1 d-flex align-items-center">
+        <button
+          class="c-button-pill feed-list-toggle"
+          :aria-expanded="!feedListCollapsed"
+          :title="feedListCollapsed ? $t('expand_sidebar') : $t('collapse_sidebar')"
+          @click="feedListCollapsed = !feedListCollapsed">
+          <v-icon name="anchor" />
+        </button>
         <div class="flex-grow-1"></div>
         <button
           class="c-button-pill ms-1"
@@ -178,7 +185,7 @@
           @toggle-folder="toggleFolderExpanded" />
       </div>
       <div
-        class="px-2 py-1 d-flex align-items-center border-top flex-shrink-0"
+        class="feed-list-loading px-2 py-1 d-flex align-items-center border-top flex-shrink-0"
         v-if="loading.feeds">
         <span class="c-spinner mx-2"></span>
         <span class="text-truncate cursor-default user-select-none">{{
@@ -623,6 +630,7 @@ export default defineComponent({
       feeds: [] as Feed[],
       feedSelected: s.feed,
       feedListWidth: s.feed_list_width || 300,
+      feedListCollapsed: !!s.feed_list_collapsed,
       items: [] as Item[],
       itemsHasMore: true,
       itemSelected: null as number | null,
@@ -888,6 +896,9 @@ export default defineComponent({
         return;
       }
       this.refreshItems(false);
+    },
+    feedListCollapsed(newVal) {
+      api.settings.update({ feed_list_collapsed: newVal });
     },
     feedListWidth: debounce(function (newVal, oldVal) {
       if (oldVal === undefined) return; // do nothing, initial setup

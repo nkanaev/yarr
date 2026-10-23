@@ -39,6 +39,26 @@
     "zh": "设置",
     "ru": "Настройки"
   },
+  "collapse_sidebar": {
+    "en": "Collapse sidebar",
+    "de": "Seitenleiste einklappen",
+    "fr": "Réduire la barre latérale",
+    "es": "Contraer barra lateral",
+    "ja": "サイドバーを折りたたむ",
+    "pt": "Recolher barra lateral",
+    "zh": "收起侧边栏",
+    "ru": "Свернуть боковую панель"
+  },
+  "expand_sidebar": {
+    "en": "Expand sidebar",
+    "de": "Seitenleiste ausklappen",
+    "fr": "Développer la barre latérale",
+    "es": "Expandir barra lateral",
+    "ja": "サイドバーを展開",
+    "pt": "Expandir barra lateral",
+    "zh": "展开侧边栏",
+    "ru": "Развернуть боковую панель"
+  },
   "new_feed": {
     "en": "New Feed",
     "de": "Neuer Feed",

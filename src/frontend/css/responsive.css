@@ -77,3 +77,36 @@
     height: 2rem;
   }
 }
+
+/* collapsed feed list (desktop only) */
+
+@media (min-width: 992px) {
+  #app #col-feed-list.is-collapsed {
+    width: calc(3rem + 1px) !important;
+  }
+  #col-feed-list.is-collapsed .feed-list-header {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  #col-feed-list.is-collapsed .feed-list-header > .flex-grow-1 {
+    display: none;
+  }
+  #col-feed-list.is-collapsed .feed-list-header .c-button-pill {
+    margin: 0 !important;
+  }
+  #col-feed-list.is-collapsed .c-dropdown {
+    right: auto !important;
+    left: 0;
+  }
+  #col-feed-list.is-collapsed #feed-list-scroll > *,
+  #col-feed-list.is-collapsed .feed-list-loading > :not(.c-spinner),
+  #col-feed-list.is-collapsed .drag {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .feed-list-toggle {
+    pointer-events: none;
+  }
+}
