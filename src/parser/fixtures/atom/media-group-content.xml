@@ -1,0 +1,38 @@
+<!--
+Atom entry whose media:group groups alternative audio encodings of the same
+asset, mirroring the MRSS spec section 7 "Same song with multiple files at
+different bitrates and encodings" example. Atom has no enclosure fallback, so
+mediaLinks() is the only source of media for an entry; grouped media of any
+type was therefore lost entirely before the fix. Verifies group-nested
+media:content is emitted for atom, classified via both the type attribute
+(audio/mpeg) and the medium attribute (medium="audio"), carrying its
+description, and that a group-level media:thumbnail is still emitted
+afterwards.
+
+@ len(feed.Items) == 1
+@ len(feed.Items[0].MediaLinks) == 3
+@ feed.Items[0].MediaLinks[0].URL == "https://example.com/song-128.mp3"
+@ feed.Items[0].MediaLinks[0].Type == "audio"
+@ feed.Items[0].MediaLinks[0].Description == "128 kbps MP3"
+@ feed.Items[0].MediaLinks[1].URL == "https://example.com/song-256.mp3"
+@ feed.Items[0].MediaLinks[1].Type == "audio"
+@ feed.Items[0].MediaLinks[1].Description == "256 kbps"
+@ feed.Items[0].MediaLinks[2].URL == "https://example.com/cover.jpg"
+@ feed.Items[0].MediaLinks[2].Type == "image"
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+	<entry>
+		<id>urn:uuid:media-group-content</id>
+		<updated>2024-09-25T12:00:00Z</updated>
+		<media:group>
+			<media:content url="https://example.com/song-128.mp3" type="audio/mpeg">
+				<media:description type="plain">128 kbps MP3</media:description>
+			</media:content>
+			<media:content url="https://example.com/song-256.mp3" medium="audio">
+				<media:description type="plain">256 kbps</media:description>
+			</media:content>
+			<media:thumbnail url="https://example.com/cover.jpg"/>
+		</media:group>
+	</entry>
+</feed>

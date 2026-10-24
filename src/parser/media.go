@@ -46,49 +46,43 @@ func (m *media) firstMediaDescription() string {
 	return ""
 }
 
+func mediaContentLinks(content mediaContent, links []MediaLink) []MediaLink {
+	if content.MediaURL != "" {
+		url := content.MediaURL
+		description := content.MediaDescription.Text
+		if strings.HasPrefix(content.MediaType, "image/") {
+			links = append(links, MediaLink{URL: url, Type: "image", Description: description})
+		} else if strings.HasPrefix(content.MediaType, "audio/") {
+			links = append(links, MediaLink{URL: url, Type: "audio", Description: description})
+		} else if strings.HasPrefix(content.MediaType, "video/") {
+			links = append(links, MediaLink{URL: url, Type: "video", Description: description})
+		} else if content.MediaMedium == "image" || content.MediaMedium == "audio" || content.MediaMedium == "video" {
+			links = append(links, MediaLink{URL: url, Type: content.MediaMedium, Description: description})
+		} else if len(content.MediaThumbnails) > 0 {
+			links = append(links, MediaLink{URL: content.MediaThumbnails[0].URL, Type: "image"})
+		}
+	}
+	for _, thumbnail := range content.MediaThumbnails {
+		links = append(links, MediaLink{URL: thumbnail.URL, Type: "image"})
+	}
+	return links
+}
+
 func (m *media) mediaLinks() []MediaLink {
 	links := make([]MediaLink, 0)
 	for _, thumbnail := range m.MediaThumbnails {
 		links = append(links, MediaLink{URL: thumbnail.URL, Type: "image"})
 	}
 	for _, group := range m.MediaGroups {
+		for _, content := range group.MediaContent {
+			links = mediaContentLinks(content, links)
+		}
 		for _, thumbnail := range group.MediaThumbnails {
-			links = append(links, MediaLink{
-				URL:  thumbnail.URL,
-				Type: "image",
-			})
+			links = append(links, MediaLink{URL: thumbnail.URL, Type: "image"})
 		}
 	}
 	for _, content := range m.MediaContents {
-		if content.MediaURL != "" {
-			url := content.MediaURL
-			description := content.MediaDescription.Text
-			if strings.HasPrefix(content.MediaType, "image/") {
-				links = append(links, MediaLink{URL: url, Type: "image", Description: description})
-			} else if strings.HasPrefix(content.MediaType, "audio/") {
-				links = append(links, MediaLink{URL: url, Type: "audio", Description: description})
-			} else if strings.HasPrefix(content.MediaType, "video/") {
-				links = append(links, MediaLink{URL: url, Type: "video", Description: description})
-			} else if content.MediaMedium == "image" || content.MediaMedium == "audio" || content.MediaMedium == "video" {
-				links = append(
-					links,
-					MediaLink{URL: url, Type: content.MediaMedium, Description: description},
-				)
-			} else {
-				if len(content.MediaThumbnails) > 0 {
-					links = append(links, MediaLink{
-						URL:  content.MediaThumbnails[0].URL,
-						Type: "image",
-					})
-				}
-			}
-		}
-		for _, thumbnail := range content.MediaThumbnails {
-			links = append(links, MediaLink{
-				URL:  thumbnail.URL,
-				Type: "image",
-			})
-		}
+		links = mediaContentLinks(content, links)
 	}
 	if len(links) == 0 {
 		return nil

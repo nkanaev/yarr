@@ -1,0 +1,33 @@
+<!--
+RSS 2.0 item whose two video media:content elements are nested inside a
+media:group (the canonical MRSS way to group alternative encodings of one
+asset). Verifies each media:group > media:content url is emitted as a media
+link in document order, classified by its type attribute, carrying its
+description. Before the fix these urls were silently dropped because
+mediaLinks() never iterated group.MediaContent.
+
+@ len(feed.Items) == 1
+@ len(feed.Items[0].MediaLinks) == 2
+@ feed.Items[0].MediaLinks[0].URL == "https://example.com/path/to/video-720p.mp4"
+@ feed.Items[0].MediaLinks[0].Type == "video"
+@ feed.Items[0].MediaLinks[0].Description == "720p"
+@ feed.Items[0].MediaLinks[1].URL == "https://example.com/path/to/video-1080p.mp4"
+@ feed.Items[0].MediaLinks[1].Type == "video"
+@ feed.Items[0].MediaLinks[1].Description == "1080p"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<item>
+			<guid isPermaLink="true">http://example.com/posts/1</guid>
+			<media:group>
+				<media:content url="https://example.com/path/to/video-720p.mp4" type="video/mp4" medium="video">
+					<media:description type="plain">720p</media:description>
+				</media:content>
+				<media:content url="https://example.com/path/to/video-1080p.mp4" type="video/mp4" medium="video">
+					<media:description type="plain">1080p</media:description>
+				</media:content>
+			</media:group>
+		</item>
+	</channel>
+</rss>

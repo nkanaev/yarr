@@ -1,0 +1,31 @@
+<!--
+RSS 2.0 item with a media:group whose media:content carries its own
+media:thumbnail child, alongside a group-level media:thumbnail. Verifies
+that, for group-nested media:content, both the content url (classified by
+type) and the content's child media:thumbnail are extracted as image links,
+and that the group-level media:thumbnail is still emitted afterwards. Before
+the fix neither the content url nor its child thumbnail were emitted because
+mediaLinks() never iterated group.MediaContent.
+
+@ len(feed.Items[0].MediaLinks) == 3
+@ feed.Items[0].MediaLinks[0].URL == "https://example.com/pic.jpg"
+@ feed.Items[0].MediaLinks[0].Type == "image"
+@ feed.Items[0].MediaLinks[1].URL == "https://example.com/pic-thumb.jpg"
+@ feed.Items[0].MediaLinks[1].Type == "image"
+@ feed.Items[0].MediaLinks[2].URL == "https://example.com/group-thumb.jpg"
+@ feed.Items[0].MediaLinks[2].Type == "image"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<item>
+			<guid isPermaLink="true">http://example.com/posts/1</guid>
+			<media:group>
+				<media:content url="https://example.com/pic.jpg" type="image/jpeg">
+					<media:thumbnail url="https://example.com/pic-thumb.jpg"/>
+				</media:content>
+				<media:thumbnail url="https://example.com/group-thumb.jpg"/>
+			</media:group>
+		</item>
+	</channel>
+</rss>

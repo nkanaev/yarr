@@ -1,5 +1,6 @@
 # upcoming
 
+- (fix) parsing media links nested under media:group in MRSS feeds
 - (fix) parsing attachments in JSON feeds
 - (fix) filename extension for Windows CLI builds (thanks to @lux-liang and @junakavora)
 - (fix) article fallback fonts for CJK serif/monospace (thanks to @gengyue2468)
