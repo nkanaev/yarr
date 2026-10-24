@@ -1,6 +1,9 @@
 package parser
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // taken from github.com/mjibson/goread
 var dateFormats = []string{
@@ -205,10 +208,56 @@ var dateFormats = []string{
 
 var defaultTime = time.Time{}
 
+// namedZoneOffsets maps time zone abbreviations with a well-known offset to
+// their numeric UTC offset. Ambiguous abbreviations (CST, MST, BST, IST, GST)
+// are deliberately omitted.
+var namedZoneOffsets = map[string]string{
+	"EST":  "-0500",
+	"EDT":  "-0400",
+	"CDT":  "-0500",
+	"MDT":  "-0600",
+	"PST":  "-0800",
+	"PDT":  "-0700",
+	"AKST": "-0900",
+	"AKDT": "-0800",
+	"HST":  "-1000",
+	"WEST": "+0100",
+	"CET":  "+0100",
+	"CEST": "+0200",
+	"EET":  "+0200",
+	"EEST": "+0300",
+	"MSK":  "+0300",
+	"JST":  "+0900",
+	"KST":  "+0900",
+	"AWST": "+0800",
+	"ACST": "+0930",
+	"ACDT": "+1030",
+	"AEST": "+1000",
+	"AEDT": "+1100",
+	"NZST": "+1200",
+	"NZDT": "+1300",
+}
+
+// rewriteNamedZone replaces a trailing named time zone with a numeric offset.
+// time.Parse otherwise assigns an offset of zero to abbreviations unknown to
+// time.Local, which shifts the parsed instant.
+func rewriteNamedZone(line string) string {
+	i := strings.LastIndexByte(line, ' ')
+	if i < 0 {
+		return line
+	}
+	offset, ok := namedZoneOffsets[line[i+1:]]
+	if !ok {
+		return line
+	}
+	return line[:i+1] + offset
+}
+
 func dateParse(line string) time.Time {
 	if line == "" {
 		return defaultTime
 	}
+	line = rewriteNamedZone(line)
 	for _, layout := range dateFormats {
 		if t, err := time.Parse(layout, line); err == nil {
 			return t
