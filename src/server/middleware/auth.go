@@ -29,15 +29,17 @@ func Authenticate(rw http.ResponseWriter, username, password, basepath string) {
 		Path:     basepath,
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
+		HttpOnly: true,
 	})
 }
 
 func Logout(rw http.ResponseWriter, basepath string) {
 	http.SetCookie(rw, &http.Cookie{
-		Name:   "auth",
-		Value:  "",
-		MaxAge: -1,
-		Path:   basepath,
+		Name:     "auth",
+		Value:    "",
+		MaxAge:   -1,
+		Path:     basepath,
+		HttpOnly: true,
 	})
 }
 
