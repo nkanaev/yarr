@@ -266,7 +266,7 @@ func (s *Server) handleFeed(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		params := model.UpdateFeedParams{}
-		if title, ok := body["title"]; ok {
+		if title, ok := body["title"]; ok && title != nil {
 			if reflect.TypeOf(title).Kind() == reflect.String {
 				t := title.(string)
 				params.Title = &t
@@ -280,7 +280,7 @@ func (s *Server) handleFeed(w http.ResponseWriter, r *http.Request) {
 				params.FolderID = model.SetNullable(&folderId)
 			}
 		}
-		if link, ok := body["feed_link"]; ok {
+		if link, ok := body["feed_link"]; ok && link != nil {
 			if reflect.TypeOf(link).Kind() == reflect.String {
 				l := link.(string)
 				params.FeedLink = &l
