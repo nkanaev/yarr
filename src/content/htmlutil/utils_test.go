@@ -1,6 +1,9 @@
 package htmlutil
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestExtractText(t *testing.T) {
 	testcases := [][2]string{
@@ -41,4 +44,11 @@ func TestTruncateText(t *testing.T) {
 	if want != have {
 		t.Errorf("\nsize: %d\nwant: %#v\nhave: %#v", size, want, have)
 	}
+
+	input = strings.Repeat("这是一段没有任何空格的中文文本它将会一直持续超过一百四十个字符所以TruncateText应该截断它但是它会返回完整内容", 20)
+	have = TruncateText(input, 140)
+	if have == input {
+		t.Fatalf("BUG: returned full input (%d runes) instead of truncating", len([]rune(input)))
+	}
+
 }

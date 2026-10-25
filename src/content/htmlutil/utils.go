@@ -73,5 +73,5 @@ func TruncateText(input string, size int) string {
 			return string(runes[:i]) + " ..."
 		}
 	}
-	return input
+	return string(runes[:size]) + " ..."
 }
