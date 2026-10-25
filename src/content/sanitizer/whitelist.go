@@ -1,5 +1,7 @@
 package sanitizer
 
+import "strings"
+
 type set struct {
 	m map[string]bool
 }
@@ -13,7 +15,7 @@ func sset(vals []string) set {
 }
 
 func (s *set) has(val string) bool {
-	_, ok := s.m[val]
+	_, ok := s.m[strings.ToLower(val)]
 	return ok
 }
 
