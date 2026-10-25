@@ -223,7 +223,7 @@ func isValidAttribute(tagName, attributeName string) bool {
 	if attrs, ok := allowedAttrs[tagName]; ok {
 		return attrs.has(attributeName)
 	}
-	if allowedSvgTags.has(tagName) {
+	if allowedSvgTags.has(tagName) || allowedSvgFilters.has(tagName) {
 		return allowedSvgAttrs.has(attributeName)
 	}
 	return false
