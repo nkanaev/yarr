@@ -16,19 +16,18 @@ const NUM_WORKERS = 4
 type Worker struct {
 	db      storage.Storage
 	client  *http.Client
-	pending *int32
+	pending atomic.Int32
 	refresh *time.Ticker
 	reflock sync.Mutex
 	stopper chan bool
 }
 
 func NewWorker(db storage.Storage, client *http.Client) *Worker {
-	pending := int32(0)
-	return &Worker{db: db, client: client, pending: &pending}
+	return &Worker{db: db, client: client}
 }
 
 func (w *Worker) FeedsPending() int32 {
-	return *w.pending
+	return w.pending.Load()
 }
 
 func (w *Worker) StartFeedCleaner() {
@@ -86,7 +85,7 @@ func (w *Worker) RefreshFeeds() {
 	w.reflock.Lock()
 	defer w.reflock.Unlock()
 
-	if *w.pending > 0 {
+	if w.pending.Load() > 0 {
 		log.Print("Refreshing already in progress")
 		return
 	}
@@ -98,7 +97,7 @@ func (w *Worker) RefreshFeeds() {
 	}
 
 	log.Print("Refreshing feeds")
-	atomic.StoreInt32(w.pending, int32(len(feeds)))
+	w.pending.Store(int32(len(feeds)))
 	go w.refresher(feeds)
 }
 
@@ -120,7 +119,7 @@ func (w *Worker) refresher(feeds []model.Feed) {
 		if len(items) > 0 {
 			w.db.CreateItems(items)
 		}
-		atomic.AddInt32(w.pending, -1)
+		w.pending.Add(-1)
 	}
 	close(srcqueue)
 	close(dstqueue)
