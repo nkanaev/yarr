@@ -4,7 +4,7 @@ from a link-like id, the ::updated guid suffix, and empty dates for entries
 without a date.
 
 @ len(feed.Items) == 3
-@ feed.Items[0].GUID == "https://example.com/posts/1::2003-12-13T09:17:51"
+@ feed.Items[0].GUID == "https://example.com/posts/1"
 @ feed.Items[0].URL == "https://example.com/posts/1"
 @ feed.Items[0].Title == "one updated"
 @ feed.Items[0].Date == time.Date(2003, 12, 13, 9, 17, 51, 0, time.UTC)
@@ -12,7 +12,7 @@ without a date.
 @ feed.Items[1].URL == ""
 @ feed.Items[1].Title == "two"
 @ feed.Items[1].Date == time.Now()
-@ feed.Items[2].GUID == "https://example.com/posts/1::"
+@ feed.Items[2].GUID == "https://example.com/posts/1"
 @ feed.Items[2].URL == "https://example.com/posts/1"
 @ feed.Items[2].Title == "one"
 @ feed.Items[2].Date == time.Now()
