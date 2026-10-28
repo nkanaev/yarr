@@ -11,6 +11,7 @@ import (
 	"io"
 	"math"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/nkanaev/yarr/src/content/htmlutil"
@@ -41,7 +42,6 @@ var (
 
 type nodeScores map[*html.Node]float32
 
-// ExtractContent returns relevant content.
 func ExtractContent(page io.Reader) (string, error) {
 	root, err := html.Parse(page)
 	if err != nil {
@@ -79,17 +79,18 @@ func ExtractContent(page io.Reader) (string, error) {
 // Now that we have the top candidate, look through its siblings for content that might also be related.
 // Things like preambles, content split by ads that we removed, etc.
 func getArticle(best *html.Node, scores nodeScores) string {
-	output := bytes.NewBufferString("<div>")
+	output := bytes.NewBufferString("<div>\n")
 	siblingScoreThreshold := float32(math.Max(10, float64(scores[best]*.2)))
 
 	nodelist := make([]*html.Node, 0)
-	nodelist = append(nodelist, best)
 
-	// Get the candidate's siblings
-	for n := best.NextSibling; n != nil; n = n.NextSibling {
+	// Get the candidate's siblings, in document order
+	for n := best.PrevSibling; n != nil; n = n.PrevSibling {
 		nodelist = append(nodelist, n)
 	}
-	for n := best.PrevSibling; n != nil; n = n.PrevSibling {
+	slices.Reverse(nodelist)
+	nodelist = append(nodelist, best)
+	for n := best.NextSibling; n != nil; n = n.NextSibling {
 		nodelist = append(nodelist, n)
 	}
 
@@ -119,7 +120,7 @@ func getArticle(best *html.Node, scores nodeScores) string {
 			if isP {
 				tag = "p"
 			}
-			fmt.Fprintf(output, "<%s>%s</%s>", tag, htmlutil.InnerHTML(node), tag)
+			fmt.Fprintf(output, "<%s>%s</%s>\n", tag, strings.TrimSpace(htmlutil.InnerHTML(node)), tag)
 		}
 	}
 
