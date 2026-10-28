@@ -134,6 +134,10 @@ func removeUnlikelyCandidates(root *html.Node) {
 		return
 	}
 	for _, node := range htmlutil.Query(body[0], "*") {
+		if node == body[0] {
+			continue
+		}
+
 		str := htmlutil.Attr(node, "class") + htmlutil.Attr(node, "id")
 
 		if htmlutil.Closest(node, "table,code") != nil {
