@@ -9,6 +9,8 @@ import (
 	"io"
 	"path"
 	"strings"
+
+	"github.com/nkanaev/yarr/src/content/htmlutil"
 )
 
 type rssFeed struct {
@@ -88,7 +90,7 @@ func ParseRSS(r io.Reader) (*Feed, error) {
 		}
 
 		permalink := ""
-		if srcitem.GUID.IsPermaLink == "true" {
+		if srcitem.GUID.IsPermaLink != "false" && htmlutil.IsAPossibleLink(srcitem.GUID.GUID) {
 			permalink = srcitem.GUID.GUID
 		}
 

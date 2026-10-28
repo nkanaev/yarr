@@ -1,0 +1,37 @@
+<!--
+RSS 2.0 items using the guid as the item url whenever it looks like a link,
+regardless of the isPermaLink attribute. Verifies a non-link guid is not used
+as the url and an explicit link wins over a link-like guid.
+
+@ len(feed.Items) == 4
+@ feed.Items[0].GUID == "https://example.com/posts/1"
+@ feed.Items[0].URL == "https://example.com/posts/1"
+@ feed.Items[1].GUID == "https://example.com/posts/2"
+@ feed.Items[1].URL == ""
+@ feed.Items[2].GUID == "post-3"
+@ feed.Items[2].URL == ""
+@ feed.Items[3].GUID == "https://example.com/posts/4"
+@ feed.Items[3].URL == "https://example.com/explicit/4"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+	<channel>
+		<item>
+			<title>guid without isPermaLink</title>
+			<guid>https://example.com/posts/1</guid>
+		</item>
+		<item>
+			<title>guid with isPermaLink false</title>
+			<guid isPermaLink="false">https://example.com/posts/2</guid>
+		</item>
+		<item>
+			<title>non-link guid with isPermaLink true</title>
+			<guid isPermaLink="true">post-3</guid>
+		</item>
+		<item>
+			<title>explicit link wins</title>
+			<link>https://example.com/explicit/4</link>
+			<guid>https://example.com/posts/4</guid>
+		</item>
+	</channel>
+</rss>
