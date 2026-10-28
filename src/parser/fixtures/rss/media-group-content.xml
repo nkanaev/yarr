@@ -1,0 +1,78 @@
+<!--
+MRSS feed with media:content nested under media:group. Verifies grouped
+video content is emitted as a media link alongside the group thumbnail.
+
+Example source:
+https://docs.frequency.com/en/content-delivery-guidelines/mrss-ingestion.html
+https://static.frequency.com/studio/frequency/frequency-mrss-sample.xml
+
+@ len(feed.Items[0].MediaLinks) == 2
+@ feed.Items[0].MediaLinks[0].URL == "http://www.foo.com/keyframe.jpg"
+@ feed.Items[0].MediaLinks[0].Type == "image"
+@ feed.Items[0].MediaLinks[1].URL == "http://www.foo.com/movie.mp4"
+@ feed.Items[0].MediaLinks[1].Type == "video"
+@ len(feed.Items[1].MediaLinks) == 2
+@ feed.Items[1].MediaLinks[1].URL == "http://www.foo.com/movie.mp4"
+@ feed.Items[1].MediaLinks[1].Type == "video"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dcterms="http://purl.org/dc/terms/" xmlns:frequency="http://www.frequency.com/icd/namespace" xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
+   <channel>
+      <title>RSS Title</title>
+      <description>This is an example of an RSS feed</description>
+      <item>
+         <title>The Contest</title>
+         <description>George's mother throws her back out when she falls down after catching George performing a personal act; the gang partakes in a contest of self-denial. </description>
+         <pubDate>Wed, 18 Nov 1992 18:00:00 +0000</pubDate>
+         <guid isPermaLink="false">13o4hkhsf823</guid>
+         <media:group>
+            <media:content url="http://www.foo.com/movie.mp4" fileSize="12216320" type="video/mp4" medium="video" bitrate="2500" channels="2" duration="1380" height="720" width="1280" lang="en" />
+            <media:thumbnail url="http://www.foo.com/keyframe.jpg" width="1280" height="720" time="12:05:01.123" />
+                        <media:subTitle type="application/srt" lang="en" href="https://captions.srt"/>
+         </media:group>
+         <media:category scheme="http://www.frequency.com/icd/category_scheme">Comedy/Sitcom,TV/Comedy</media:category>
+         <media:keywords>Seinfeld,Jason Alexander,NBC</media:keywords>
+         <frequency:contentFormat>Show</frequency:contentFormat>
+         <frequency:contentType>Episode</frequency:contentType>
+         <frequency:country>us</frequency:country>
+         <media:rating scheme="urn:v-chip">TVPG</media:rating>
+         <dcterms:valid>
+          	start=2002-10-13T09:00+01:00;
+          	end=2002-10-17T17:00+01:00;
+          	scheme=W3C-DTF
+         </dcterms:valid>
+         <frequency:cuepoints>0,345000,1080000</frequency:cuepoints>
+         <frequency:cut>Full Length</frequency:cut>
+         <frequency:periodicity>Episodic</frequency:periodicity>
+         <frequency:seriesGuid>61455990483901</frequency:seriesGuid>
+         <frequency:seriesTitle>My New Series</frequency:seriesTitle>
+         <frequency:seriesDescription>A succinct one or two sentence description.</frequency:seriesDescription>
+         <frequency:seriesThumbnail url="https://your.host.net/635ae9845046ac65230a0367/1280/720" />
+         <frequency:season>1</frequency:season>
+         <frequency:episode>3</frequency:episode>
+         <frequency:custom>Any data is acceptable.</frequency:custom>
+      </item>
+      <item>
+         <title>Title of media2</title>
+         <description>Description of media</description>
+         <pubDate>Sun, 06 Sep 2009 16:20:00 +0000</pubDate>
+         <guid isPermaLink="false">13o4hkhsf923</guid>
+         <frequency:lastModified>Sun, 06 Sep 2009 16:20:00 +0000</frequency:lastModified>
+         <media:group>
+            <media:content url="http://www.foo.com/movie.mp4" fileSize="12216320" type="video/mp4" medium="video" isDefault="true" expression="full" bitrate="128" framerate="25" samplingrate="44.1" channels="2" duration="185" height="720" width="1280" lang="en" />
+            <media:thumbnail url="http://www.foo.com/keyframe.jpg" width="1280" height="720" />
+            <media:subTitle type="application/srt" lang="en" href="https://captions.srt"/>
+ </media:group>
+                 <frequency:periodicity>Daily</frequency:periodicity>
+         <frequency:cuepoints>0,345000,1080000</frequency:cuepoints>
+         <frequency:contentType>Stand Up</frequency:contentType>
+         <frequency:cut>Full Length</frequency:cut>
+         <frequency:country>us</frequency:country>
+         <media:rating scheme="urn:v-chip">TV-PG</media:rating>
+         <frequency:periodicity>Episodic</frequency:periodicity>
+         <frequency:contentFormat>Show</frequency:contentFormat>
+         <media:category scheme="http://www.frequency.com/icd/category_scheme">TV/Comedy</media:category>
+         <media:keywords>Jerry Seinfeld,George Costanza,</media:keywords>
+      </item>
+   </channel>
+</rss>

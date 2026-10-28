@@ -58,40 +58,49 @@ func (m *media) mediaLinks() []MediaLink {
 				Type: "image",
 			})
 		}
+		for _, content := range group.MediaContent {
+			links = append(links, content.mediaLinks()...)
+		}
 	}
 	for _, content := range m.MediaContents {
-		if content.MediaURL != "" {
-			url := content.MediaURL
-			description := content.MediaDescription.Text
-			if strings.HasPrefix(content.MediaType, "image/") {
-				links = append(links, MediaLink{URL: url, Type: "image", Description: description})
-			} else if strings.HasPrefix(content.MediaType, "audio/") {
-				links = append(links, MediaLink{URL: url, Type: "audio", Description: description})
-			} else if strings.HasPrefix(content.MediaType, "video/") {
-				links = append(links, MediaLink{URL: url, Type: "video", Description: description})
-			} else if content.MediaMedium == "image" || content.MediaMedium == "audio" || content.MediaMedium == "video" {
-				links = append(
-					links,
-					MediaLink{URL: url, Type: content.MediaMedium, Description: description},
-				)
-			} else {
-				if len(content.MediaThumbnails) > 0 {
-					links = append(links, MediaLink{
-						URL:  content.MediaThumbnails[0].URL,
-						Type: "image",
-					})
-				}
-			}
-		}
-		for _, thumbnail := range content.MediaThumbnails {
-			links = append(links, MediaLink{
-				URL:  thumbnail.URL,
-				Type: "image",
-			})
-		}
+		links = append(links, content.mediaLinks()...)
 	}
 	if len(links) == 0 {
 		return nil
+	}
+	return links
+}
+
+func (m mediaContent) mediaLinks() []MediaLink {
+	links := make([]MediaLink, 0)
+	if m.MediaURL != "" {
+		url := m.MediaURL
+		description := m.MediaDescription.Text
+		if strings.HasPrefix(m.MediaType, "image/") {
+			links = append(links, MediaLink{URL: url, Type: "image", Description: description})
+		} else if strings.HasPrefix(m.MediaType, "audio/") {
+			links = append(links, MediaLink{URL: url, Type: "audio", Description: description})
+		} else if strings.HasPrefix(m.MediaType, "video/") {
+			links = append(links, MediaLink{URL: url, Type: "video", Description: description})
+		} else if m.MediaMedium == "image" || m.MediaMedium == "audio" || m.MediaMedium == "video" {
+			links = append(
+				links,
+				MediaLink{URL: url, Type: m.MediaMedium, Description: description},
+			)
+		} else {
+			if len(m.MediaThumbnails) > 0 {
+				links = append(links, MediaLink{
+					URL:  m.MediaThumbnails[0].URL,
+					Type: "image",
+				})
+			}
+		}
+	}
+	for _, thumbnail := range m.MediaThumbnails {
+		links = append(links, MediaLink{
+			URL:  thumbnail.URL,
+			Type: "image",
+		})
 	}
 	return links
 }
