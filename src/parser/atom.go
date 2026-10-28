@@ -83,10 +83,8 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 	}
 	for _, srcitem := range srcfeed.Entries {
 		linkFromID := ""
-		guidFromID := ""
 		if htmlutil.IsAPossibleLink(srcitem.ID) {
 			linkFromID = srcitem.ID
-			guidFromID = srcitem.ID + "::" + srcitem.Updated
 		}
 
 		mediaLinks := srcitem.mediaLinks()
@@ -98,7 +96,7 @@ func ParseAtom(r io.Reader) (*Feed, error) {
 			linkFromID,
 		)
 		dstfeed.Items = append(dstfeed.Items, Item{
-			GUID:  firstNonEmpty(guidFromID, srcitem.ID, link),
+			GUID:  firstNonEmpty(srcitem.ID, link),
 			Date:  dateParse(firstNonEmpty(srcitem.Published, srcitem.Updated)),
 			URL:   link,
 			Title: srcitem.Title.Text(),
