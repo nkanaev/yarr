@@ -164,12 +164,12 @@ func (feed *Feed) TranslateURLs(base string) error {
 		return fmt.Errorf("failed to parse feed url: %#v", feed.SiteURL)
 	}
 	feed.SiteURL = baseUrl.ResolveReference(siteUrl).String()
-	for _, item := range feed.Items {
+	for idx, item := range feed.Items {
 		itemUrl, err := url.Parse(item.URL)
 		if err != nil {
 			return fmt.Errorf("failed to parse item url: %#v", item.URL)
 		}
-		item.URL = siteUrl.ResolveReference(itemUrl).String()
+		feed.Items[idx].URL = siteUrl.ResolveReference(itemUrl).String()
 	}
 	return nil
 }

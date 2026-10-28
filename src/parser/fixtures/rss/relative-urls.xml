@@ -1,0 +1,25 @@
+<!--
+RSS feed with relative item links. Verifies that each item url is resolved
+against the site url, including root-relative links.
+
+@ feed.SiteURL == "http://example.com/blog/"
+@ len(feed.Items) == 2
+@ feed.Items[0].URL == "http://example.com/blog/posts/1"
+@ feed.Items[1].URL == "http://example.com/posts/2"
+-->
+<?xml version="1.0"?>
+<rss version="2.0">
+<channel>
+	<title>Relative URLs</title>
+	<link>http://example.com/blog/</link>
+	<description>Relative item links</description>
+	<item>
+		<title>First</title>
+		<link>posts/1</link>
+	</item>
+	<item>
+		<title>Second</title>
+		<link>/posts/2</link>
+	</item>
+</channel>
+</rss>
