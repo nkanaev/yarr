@@ -773,7 +773,7 @@ export default function App() {
         className="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
         style={{ width: `${feedListWidth.value}px` }}>
         <Drag width={feedListWidth.value} onResize={resizeFeedList} />
-        <div className="px-2 py-1 d-flex align-items-center">
+        <div className="px-2 py-1 d-flex justify-content-between gap-2">
           <DropdownApp
             theme={theme.value.name}
             onThemeChange={th => {
@@ -798,48 +798,47 @@ export default function App() {
               else document.location.reload();
             }}
           />
-          <div className="flex-grow-1" />
-          <Tooltip label={t("unread")} className="ms-1">
-            <button
-              type="button"
-              className="c-button-pill"
-              aria-label={t("unread")}
-              aria-pressed={filterSelected.value === "unread"}
-              onClick={() => {
-                filterSelected.value = "unread";
-                updateSettings({ filter: "unread" });
-              }}>
-              <Icon name="circle-full" />
-            </button>
-          </Tooltip>
-          <Tooltip label={t("starred")} className="mx-1">
-            <button
-              type="button"
-              className="c-button-pill"
-              aria-label={t("starred")}
-              aria-pressed={filterSelected.value === "starred"}
-              onClick={() => {
-                filterSelected.value = "starred";
-                updateSettings({ filter: "starred" });
-              }}>
-              <Icon name="star-full" />
-            </button>
-          </Tooltip>
-          <Tooltip label={t("all")} className="me-1">
-            <button
-              type="button"
-              className="c-button-pill"
-              aria-label={t("all")}
-              aria-pressed={filterSelected.value === ""}
-              onClick={() => {
-                filterSelected.value = "";
-                updateSettings({ filter: "" });
-              }}>
-              <Icon name="assorted" />
-            </button>
-          </Tooltip>
-          <div className="flex-grow-1" />
-
+          <div class="d-flex flex-row gap-1">
+            <Tooltip label={t("unread")}>
+              <button
+                type="button"
+                className="c-button-pill"
+                aria-label={t("unread")}
+                aria-pressed={filterSelected.value === "unread"}
+                onClick={() => {
+                  filterSelected.value = "unread";
+                  updateSettings({ filter: "unread" });
+                }}>
+                <Icon name="circle-full" />
+              </button>
+            </Tooltip>
+            <Tooltip label={t("starred")}>
+              <button
+                type="button"
+                className="c-button-pill"
+                aria-label={t("starred")}
+                aria-pressed={filterSelected.value === "starred"}
+                onClick={() => {
+                  filterSelected.value = "starred";
+                  updateSettings({ filter: "starred" });
+                }}>
+                <Icon name="star-full" />
+              </button>
+            </Tooltip>
+            <Tooltip label={t("all")}>
+              <button
+                type="button"
+                className="c-button-pill"
+                aria-label={t("all")}
+                aria-pressed={filterSelected.value === ""}
+                onClick={() => {
+                  filterSelected.value = "";
+                  updateSettings({ filter: "" });
+                }}>
+                <Icon name="assorted" />
+              </button>
+            </Tooltip>
+          </div>
           <DropdownSettings
             dropdownRef={menuDropdownRef}
             refreshAvailable={refreshAvailable.value}
