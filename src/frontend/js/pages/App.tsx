@@ -958,9 +958,11 @@ export default function App() {
               onDelete={deleteFolder}
             />
           ) : (
-            <button type="button" className="c-button-link c-button-pill px-2" disabled>
-              <Icon name="more-horizontal" />
-            </button>
+            <Tooltip label={t("settings_selected")}>
+              <button type="button" className="c-button-link c-button-pill px-2" disabled>
+                <Icon name="more-horizontal" />
+              </button>
+            </Tooltip>
           )}
         </div>
 
