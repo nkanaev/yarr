@@ -29,15 +29,35 @@
     "zh": "全部",
     "ru": "Все"
   },
-  "settings": {
-    "en": "Settings",
-    "de": "Einstellungen",
-    "fr": "Paramètres",
-    "es": "Ajustes",
-    "ja": "設定",
-    "pt": "Configurações",
-    "zh": "设置",
-    "ru": "Настройки"
+  "settings_main": {
+    "en": "Main Settings",
+    "de": "Haupteinstellungen",
+    "fr": "Paramètres principaux",
+    "es": "Configuración principal",
+    "ja": "メイン設定",
+    "pt": "Configurações principais",
+    "zh": "主要设置",
+    "ru": "Основные настройки"
+  },
+  "settings_feeds": {
+    "en": "Feed Settings",
+    "de": "Feed-Einstellungen",
+    "fr": "Paramètres des flux",
+    "es": "Configuración de fuentes",
+    "ja": "フィード設定",
+    "pt": "Configurações de feeds",
+    "zh": "订阅设置",
+    "ru": "Настройки лент"
+  },
+  "settings_selected": {
+    "en": "Selected Feed/Folder Settings",
+    "de": "Einstellungen für ausgewählten Feed/Ordner",
+    "fr": "Paramètres du flux/dossier sélectionné",
+    "es": "Configuración de la fuente/carpeta seleccionada",
+    "ja": "選択したフィード/フォルダの設定",
+    "pt": "Configurações do feed/pasta selecionado",
+    "zh": "所选订阅/文件夹设置",
+    "ru": "Настройки выбранной ленты/папки"
   },
   "new_feed": {
     "en": "New Feed",
@@ -228,26 +248,6 @@
     "pt": "Marcar todos como lidos",
     "zh": "全部标记为已读",
     "ru": "Отметить все как прочитанные"
-  },
-  "feed_settings": {
-    "en": "Feed Settings",
-    "de": "Feed-Einstellungen",
-    "fr": "Paramètres du flux",
-    "es": "Ajustes de fuente",
-    "ja": "フィード設定",
-    "pt": "Configurações do feed",
-    "zh": "订阅设置",
-    "ru": "Настройки ленты"
-  },
-  "folder_settings": {
-    "en": "Folder Settings",
-    "de": "Ordner-Einstellungen",
-    "fr": "Paramètres du dossier",
-    "es": "Ajustes de carpeta",
-    "ja": "フォルダ設定",
-    "pt": "Configurações da pasta",
-    "zh": "文件夹设置",
-    "ru": "Настройки папки"
   },
   "website": {
     "en": "Website",

@@ -28,7 +28,7 @@ export default function DropdownFeed({
     <Dropdown
       toggleClass="c-button-link px-2"
       drop="end"
-      title={t("feed_settings")}
+      title={t("settings_selected")}
       button={<Icon name="more-horizontal" />}>
       <div className="c-dropdown-header text-break line-clamp-1" role="heading" aria-level={2}>
         {feed.title}

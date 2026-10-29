@@ -38,7 +38,7 @@ export default function DropdownSettings({
       ref={dropdownRef}
       toggleClass="c-button-link px-2"
       drop="end"
-      title={t("settings")}
+      title={t("settings_feeds")}
       button={<Icon name="more-horizontal" />}>
       <button
         type="button"

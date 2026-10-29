@@ -40,7 +40,7 @@ export default function DropdownApp({
   const { t } = useI18n();
 
   return (
-    <Dropdown toggleClass="" drop="start" title={t("theme")} button={<Icon name="anchor" />}>
+    <Dropdown toggleClass="" drop="start" title={t("settings_main")} button={<Icon name="anchor" />}>
       <div className="c-dropdown-header" role="heading" aria-level={2}>
         {t("theme")}
       </div>
