@@ -16,6 +16,13 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
+const (
+	// maxBodySize limits feed responses, discovery pages, and favicon scan pages.
+	maxBodySize = 10e6 // 10 MB
+	// maxIconSize limits downloaded favicon images.
+	maxIconSize = 1e6 // 1 MB
+)
+
 type DiscoverResult struct {
 	Feed     *parser.Feed
 	FeedLink string
@@ -44,7 +51,7 @@ func discoverFeed(c *http.Client, candidateUrl string, visited map[string]struct
 	}
 	cs := getCharset(res)
 
-	body, err := io.ReadAll(res.Body)
+	body, err := io.ReadAll(http.MaxBytesReader(nil, res.Body, maxBodySize))
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +107,7 @@ func findFavicon(c *http.Client, siteUrl, feedUrl string) (*model.Icon, error) {
 	if siteUrl != "" {
 		if res, err := c.Get(siteUrl); err == nil {
 			defer res.Body.Close()
-			if body, err := io.ReadAll(res.Body); err == nil {
+			if body, err := io.ReadAll(http.MaxBytesReader(nil, res.Body, maxBodySize)); err == nil {
 				urls = append(urls, scraper.FindIcons(string(body), siteUrl)...)
 				if c := favicon(siteUrl); c != "" {
 					urls = append(urls, c)
@@ -123,7 +130,7 @@ func findFavicon(c *http.Client, siteUrl, feedUrl string) (*model.Icon, error) {
 			continue
 		}
 
-		content, err := io.ReadAll(res.Body)
+		content, err := io.ReadAll(http.MaxBytesReader(nil, res.Body, maxIconSize))
 		if err != nil {
 			continue
 		}
@@ -181,7 +188,7 @@ func listItems(c *http.Client, f model.Feed) ([]model.Item, error) {
 		return nil, nil
 	}
 
-	feed, err := parser.ParseAndFix(res.Body, f.FeedLink, getCharset(res))
+	feed, err := parser.ParseAndFix(http.MaxBytesReader(nil, res.Body, maxBodySize), f.FeedLink, getCharset(res))
 	if err != nil {
 		return nil, err
 	}

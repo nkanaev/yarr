@@ -1,11 +1,16 @@
 package worker
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"sync/atomic"
 	"testing"
+	"time"
+
+	"github.com/nkanaev/yarr/src/storage/model"
 )
 
 func TestDiscoverFeedLinkCycle(t *testing.T) {
@@ -32,5 +37,37 @@ func TestDiscoverFeedLinkCycle(t *testing.T) {
 	}
 	if got := requests.Load(); got > 2 {
 		t.Fatalf("DiscoverFeed made %d requests; want cycle detected after 2", got)
+	}
+}
+
+func TestListItemsRejectsOversizedBody(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/rss+xml")
+		fmt.Fprint(w, `<?xml version="1.0"?><rss version="2.0"><channel>`)
+
+		chunk := bytes.Repeat([]byte(" "), 32*1024)
+		for {
+			if _, err := w.Write(chunk); err != nil {
+				return
+			}
+		}
+	}))
+	defer srv.Close()
+
+	errCh := make(chan error, 1)
+	go func() {
+		_, err := listItems(srv.Client(), model.Feed{FeedLink: srv.URL})
+		errCh <- err
+	}()
+
+	select {
+	case err := <-errCh:
+		var maxErr *http.MaxBytesError
+		if !errors.As(err, &maxErr) {
+			t.Fatalf("listItems error = %v; want *http.MaxBytesError", err)
+		}
+	case <-time.After(5 * time.Second):
+		srv.CloseClientConnections()
+		t.Fatal("listItems did not stop reading oversized response")
 	}
 }
