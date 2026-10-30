@@ -9,7 +9,6 @@ import (
 	"mime"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/nkanaev/yarr/src/content/scraper"
 	"github.com/nkanaev/yarr/src/parser"
@@ -200,29 +199,4 @@ func getCharset(res *http.Response) string {
 		}
 	}
 	return ""
-}
-
-func GetBody(c *http.Client, url string) (string, error) {
-	res, err := c.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer res.Body.Close()
-
-	var r io.Reader
-
-	ctype := res.Header.Get("Content-Type")
-	if strings.Contains(ctype, "charset") {
-		r, err = charset.NewReader(res.Body, ctype)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		r = res.Body
-	}
-	body, err := io.ReadAll(r)
-	if err != nil {
-		return "", err
-	}
-	return string(body), nil
 }
