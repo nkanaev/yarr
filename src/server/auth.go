@@ -27,7 +27,7 @@ func NewLocalAuthProvider(username, password, basepath string) AuthProvider {
 }
 
 func (a *localAuth) Middleware(next http.Handler) http.HandlerFunc {
-	return middleware.LocalAuth(next, a.Username, a.Password)
+	return middleware.LocalAuth(next, a.Username, a.Password, a.BasePath)
 }
 
 func (a *localAuth) IsAuthenticated(r *http.Request) bool {
