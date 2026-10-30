@@ -23,14 +23,6 @@ type DiscoverResult struct {
 	Sources  []scraper.FeedLink
 }
 
-func get(c *http.Client, url string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	return c.Do(req)
-}
-
 func DiscoverFeed(c *http.Client, candidateUrl string) (*DiscoverResult, error) {
 	return discoverFeed(c, candidateUrl, make(map[string]struct{}))
 }
@@ -43,7 +35,7 @@ func discoverFeed(c *http.Client, candidateUrl string, visited map[string]struct
 
 	result := &DiscoverResult{}
 	// Query URL
-	res, err := get(c, candidateUrl)
+	res, err := c.Get(candidateUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +99,7 @@ func findFavicon(c *http.Client, siteUrl, feedUrl string) (*model.Icon, error) {
 	}
 
 	if siteUrl != "" {
-		if res, err := get(c, siteUrl); err == nil {
+		if res, err := c.Get(siteUrl); err == nil {
 			defer res.Body.Close()
 			if body, err := io.ReadAll(res.Body); err == nil {
 				urls = append(urls, scraper.FindIcons(string(body), siteUrl)...)
@@ -123,7 +115,7 @@ func findFavicon(c *http.Client, siteUrl, feedUrl string) (*model.Icon, error) {
 	}
 
 	for _, u := range urls {
-		res, err := get(c, u)
+		res, err := c.Get(u)
 		if err != nil {
 			continue
 		}
@@ -211,7 +203,7 @@ func getCharset(res *http.Response) string {
 }
 
 func GetBody(c *http.Client, url string) (string, error) {
-	res, err := get(c, url)
+	res, err := c.Get(url)
 	if err != nil {
 		return "", err
 	}
