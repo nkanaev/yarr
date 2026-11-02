@@ -8,11 +8,18 @@ import type { Folder, Feed, FeedLink, FeedCreateData } from "../api-types";
 interface NewFeedProps {
   folders: Folder[];
   folderId: number | null;
+  onCancel: () => void;
   onCreated: (feed: Feed) => void;
   onFolderCreated: (folder: Folder) => void;
 }
 
-export default function NewFeed({ folders, folderId, onCreated, onFolderCreated }: NewFeedProps) {
+export default function NewFeed({
+  folders,
+  folderId,
+  onCancel,
+  onCreated,
+  onFolderCreated,
+}: NewFeedProps) {
   const { t } = useI18n();
   const [selectedFolder, setSelectedFolder] = useState<number | null>(folderId);
   const [feedNewChoice, setFeedNewChoice] = useState<FeedLink[]>([]);
@@ -91,19 +98,11 @@ export default function NewFeed({ folders, folderId, onCreated, onFolderCreated 
     setSelectedFolder(result.id);
   }
 
-  function resetFeedChoice() {
-    setFeedNewChoice([]);
-    setFeedNewChoiceSelected("");
-  }
-
   return (
     <div className="d-flex flex-column">
-      <p className="cursor-default mb-3">
-        <b>{t("new_feed")}</b>
-      </p>
       <form onSubmit={createFeed} className="d-flex flex-column">
         <label htmlFor="feed-url" className="mb-2">
-          {t("url")}
+          {t("new_feed_url")}
         </label>
         <input
           ref={inputRef}
@@ -113,8 +112,13 @@ export default function NewFeed({ folders, folderId, onCreated, onFolderCreated 
           className="c-input"
           required
           autoComplete="off"
-          readOnly={feedNewChoice.length > 0}
           placeholder="https://example.com/feed"
+          onInput={() => {
+            if (feedNewChoice.length > 0) {
+              setFeedNewChoice([]);
+              setFeedNewChoiceSelected("");
+            }
+          }}
         />
 
         <label htmlFor="feed-folder" className="mb-2 mt-3">
@@ -148,18 +152,7 @@ export default function NewFeed({ folders, folderId, onCreated, onFolderCreated 
 
         {feedNewChoice.length > 0 && (
           <div className="mt-3">
-            <p className="mb-2">
-              {t("multiple_feeds_found")}
-              <a
-                href="#"
-                className="float-end text-decoration-none"
-                onClick={e => {
-                  e.preventDefault();
-                  resetFeedChoice();
-                }}>
-                {t("cancel")}
-              </a>
-            </p>
+            <p className="mb-2">{t("multiple_feeds_found")}</p>
             <div className="d-flex flex-column gap-1">
               {feedNewChoice.map(choice => (
                 <div
@@ -178,9 +171,14 @@ export default function NewFeed({ folders, folderId, onCreated, onFolderCreated 
           </div>
         )}
 
-        <button className="c-button mt-3" disabled={loading} type="submit">
-          {loading ? <span className="c-spinner" /> : <span>{t("add")}</span>}
-        </button>
+        <div className="d-flex gap-2 mt-3">
+          <button type="button" className="c-button is-link w-50" onClick={onCancel}>
+            {t("cancel")}
+          </button>
+          <button type="submit" className="c-button w-50" disabled={loading}>
+            {loading ? <span className="c-spinner" /> : <span>{t("add")}</span>}
+          </button>
+        </div>
       </form>
     </div>
   );

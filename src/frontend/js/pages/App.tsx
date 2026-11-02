@@ -88,7 +88,8 @@ export default function App() {
   const itemSortNewestFirst = useSignal<boolean>(appSettings.sort_newest_first ?? true);
 
   // Status & modal
-  const showModal = useSignal<"" | "shortcuts" | "newfeed">("");
+  const showModal = useSignal<"" | "shortcuts">("");
+  const showNewFeed = useSignal(false);
   const refreshAvailable = useSignal(true);
   const loadingFeeds = useSignal(0);
   const loadingItems = useSignal(false);
@@ -850,11 +851,28 @@ export default function App() {
             onRefreshRateChange={changeRefreshRate}
             onFetchAllFeeds={fetchAllFeeds}
             onImportOPML={importOPML}
-            onShowNewFeed={() => (showModal.value = "newfeed")}
+            onShowNewFeed={() => (showNewFeed.value = true)}
           />
         </div>
+        <div class="d-flex flex-column overflow-auto border-top">
+        {showNewFeed.value && (
+          <div className="px-2 py-3 overflow-auto flex-grow-1 flex-shrink-0 border-bottom">
+            <NewFeed
+              folders={folders.value}
+              folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}
+              onCancel={() => (showNewFeed.value = false)}
+              onCreated={feed => {
+                refreshFeeds();
+                refreshStats();
+                showNewFeed.value = false;
+                feedSelected.value = "feed:" + feed.id;
+              }}
+              onFolderCreated={refreshFeeds}
+            />
+          </div>
+        )}
 
-        <div id="feed-list-scroll" className="p-2 overflow-auto border-top flex-grow-1">
+        <div id="feed-list-scroll" className="p-2 overflow-auto flex-shrink-1">
           <FeedTree
             tree={feedTree.value}
             value={feedSelected.value}
@@ -867,6 +885,8 @@ export default function App() {
             }}
             onToggleFolder={toggleFolderExpanded}
           />
+        </div>
+
         </div>
 
         {loadingFeeds.value > 0 && (
@@ -1058,19 +1078,6 @@ export default function App() {
           onClick={() => (showModal.value = "")}>
           <Icon name="x" />
         </button>
-        {showModal.value === "newfeed" && (
-          <NewFeed
-            folders={folders.value}
-            folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}
-            onCreated={feed => {
-              refreshFeeds();
-              refreshStats();
-              showModal.value = "";
-              feedSelected.value = "feed:" + feed.id;
-            }}
-            onFolderCreated={refreshFeeds}
-          />
-        )}
         {showModal.value === "shortcuts" && <Shortcuts />}
       </Modal>
 

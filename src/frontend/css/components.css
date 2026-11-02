@@ -56,6 +56,17 @@
     opacity: 0.6;
     pointer-events: none;
   }
+  &.is-link {
+    border-color: transparent;
+    background-color: transparent;
+    box-shadow: none;
+
+    &:active {
+      color: var(--v-active-bg);
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
 }
 
 .c-button-link {

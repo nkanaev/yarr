@@ -69,6 +69,16 @@
     "zh": "新建订阅",
     "ru": "Новая лента"
   },
+  "new_feed_url": {
+    "en": "New Feed URL",
+    "de": "URL des neuen Feeds",
+    "fr": "URL du nouveau flux",
+    "es": "URL de la nueva fuente",
+    "ja": "新規フィードのURL",
+    "pt": "URL do novo feed",
+    "zh": "新订阅网址",
+    "ru": "URL новой ленты"
+  },
   "refresh_feeds": {
     "en": "Refresh Feeds",
     "de": "Feeds aktualisieren",
@@ -510,14 +520,14 @@
     "ru": "Найдено несколько лент. Выберите одну:"
   },
   "cancel": {
-    "en": "cancel",
-    "de": "abbrechen",
-    "fr": "annuler",
-    "es": "cancelar",
+    "en": "Cancel",
+    "de": "Abbrechen",
+    "fr": "Annuler",
+    "es": "Cancelar",
     "ja": "キャンセル",
-    "pt": "cancelar",
+    "pt": "Cancelar",
     "zh": "取消",
-    "ru": "отмена"
+    "ru": "Отмена"
   },
   "kb_show_filters": {
     "en": "show unread / starred / all feeds",
