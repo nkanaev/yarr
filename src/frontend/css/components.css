@@ -35,7 +35,7 @@
 
   color: var(--v-fg);
   background-color: var(--v-bg);
-  box-shadow: 0 1px 2px hsl(from var(--v-fg) h s l / 0.1);
+  box-shadow: var(--v-shadow-md);
 
   text-decoration: none;
   outline-offset: -2px;
@@ -86,6 +86,7 @@
   &[aria-pressed="true"] {
     color: var(--v-active-fg);
     background-color: var(--v-active-bg);
+    box-shadow: var(--v-shadow-md);
   }
   &:disabled {
     opacity: 0.4;
@@ -101,7 +102,7 @@
   overflow: hidden;
   overflow-y: scroll;
   max-height: calc(100vh - 3rem);
-  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--v-shadow-lg);
   min-width: 12rem;
 }
 
@@ -161,6 +162,7 @@
   &[aria-checked="true"] {
     color: var(--v-active-fg);
     background-color: var(--v-active-bg);
+    box-shadow: var(--v-shadow-md);
   }
   /* TODO: implement ui states: default / hover / [aria-checked=true] */
 }
@@ -177,6 +179,7 @@
 
   background: var(--v-bg);
   color: var(--v-fg);
+  box-shadow: var(--v-shadow-lg);
 
   max-width: 32rem;
   width: 100%;

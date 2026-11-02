@@ -19,6 +19,10 @@
   --v-button-background-hover: oklch(from var(--v-button-background) calc(l - 0.02) c h);
   --v-button-background-active: oklch(from var(--v-button-background) calc(l - 0.05) c h);
 
+  --v-shadow-color: hsl(from var(--v-fg) h s l / 0.1);
+  --v-shadow-md: 0 1px 2px var(--v-shadow-color);
+  --v-shadow-lg: 0 2px 6px var(--v-shadow-color);
+
   --v-chrome-height: 1.6rem;
 
   /* bootstrap var overrides */
@@ -66,6 +70,8 @@
   &:root {
     color-scheme: dark;
 
+    --v-shadow-color: hsl(0 0% 0% / 0.5);
+
     --v-border-color: hsl(from var(--v-night-bg) h s 15%);
     --v-focus-color: hsl(from var(--v-night-bg) h s 30%);
 
@@ -104,6 +110,8 @@
   [data-theme="system"] {
     &:root {
       color-scheme: dark;
+
+      --v-shadow-color: hsl(0 0% 0% / 0.5);
 
       --v-border-color: hsl(from var(--v-night-bg) h s 15%);
       --v-focus-color: hsl(from var(--v-night-bg) h s 30%);
