@@ -90,7 +90,7 @@ func formHasValue(values url.Values, value string) bool {
 }
 
 func (s *Server) handleFever(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	r.ParseMultipartForm(1 << 20)
 	if !s.feverAuth(r) {
 		writeJSON(w, http.StatusOK, map[string]any{
 			"api_version":            3,

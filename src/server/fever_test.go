@@ -1,6 +1,8 @@
 package server
 
 import (
+	"bytes"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -268,5 +270,35 @@ func TestFeverMarkInvalidID(t *testing.T) {
 	}
 	if f.storage.markedRead != nil || f.storage.itemStatus != nil {
 		t.Fatal("rejected request had a side effect")
+	}
+}
+
+func TestFeverMultipartForm(t *testing.T) {
+	f := newFeverTest(t)
+
+	var body bytes.Buffer
+	mw := multipart.NewWriter(&body)
+	mw.WriteField("api_key", f.apiKey)
+	mw.WriteField("mark", "item")
+	mw.WriteField("as", "read")
+	mw.WriteField("id", "42")
+	mw.Close()
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/fever/?api", &body)
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	f.handler.ServeHTTP(rec, req)
+
+	if rec.Result().StatusCode != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rec.Result().StatusCode)
+	}
+	if f.storage.itemStatus == nil {
+		t.Fatal("expected UpdateItem to be invoked")
+	}
+	if f.storage.itemStatusID != 42 {
+		t.Fatalf("expected item id 42, got %d", f.storage.itemStatusID)
+	}
+	if *f.storage.itemStatus != model.READ {
+		t.Fatalf("expected status %v, got %v", model.READ, *f.storage.itemStatus)
 	}
 }
