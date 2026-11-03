@@ -616,6 +616,17 @@ export default function App() {
       );
   };
 
+  // Selecting a feed reveals it inside its folder
+  useEffect(() => {
+    const [type, guid] = (feedSelected.value || "").split(":", 2);
+    if (type !== "feed") return;
+    const folderId = feedsById.value[Number(guid)]?.folder_id;
+    if (folderId === null || folderId === undefined) return;
+    const folder = foldersById.value[folderId];
+    if (!folder || folder.is_expanded) return;
+    void toggleFolderExpanded(folder);
+  }, [feedSelected.value, feedsById.value]);
+
   const toggleReadability = async () => {
     if (itemSelectedReadability.value) {
       itemSelectedReadability.value = "";
