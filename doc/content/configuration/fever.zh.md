@@ -33,3 +33,4 @@ Fever API 规范不够精确，因此服务器和客户端实现之间可能存�
 | [Fluent Reader](https://github.com/yang991178/fluent-reader) | macOS, Windows | `http://127.0.0.1:7070/fever/` |
 | [Unread](https://www.goldenhillsoftware.com/unread/) | iOS | `http://127.0.0.1:7070/fever` |
 | [Fiery Feeds](https://voidstern.net/fiery-feeds) | macOS, iOS | `http://127.0.0.1:7070/fever` |
+| [Newsflash](https://gitlab.com/news-flash/news_flash_gtk) | Linux | `http://127.0.0.1:7070/fever/` |
