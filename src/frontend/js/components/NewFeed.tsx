@@ -3,33 +3,20 @@ import api, { NetworkError, HTTPError } from "../api";
 import { to } from "../utils";
 import { useI18n } from "../i18n";
 import { showToast } from "./Toast";
-import type { Folder, Feed, FeedLink, FeedCreateData } from "../api-types";
+import type { Feed, FeedLink, FeedCreateData } from "../api-types";
 
 interface NewFeedProps {
-  folders: Folder[];
   folderId: number | null;
   onCancel: () => void;
   onCreated: (feed: Feed) => void;
-  onFolderCreated: (folder: Folder) => void;
 }
 
-export default function NewFeed({
-  folders,
-  folderId,
-  onCancel,
-  onCreated,
-  onFolderCreated,
-}: NewFeedProps) {
+export default function NewFeed({ folderId, onCancel, onCreated }: NewFeedProps) {
   const { t } = useI18n();
-  const [selectedFolder, setSelectedFolder] = useState<number | null>(folderId);
   const [feedNewChoice, setFeedNewChoice] = useState<FeedLink[]>([]);
   const [feedNewChoiceSelected, setFeedNewChoiceSelected] = useState("");
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setSelectedFolder(folderId);
-  }, [folderId]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -50,7 +37,7 @@ export default function NewFeed({
     const data: FeedCreateData = {
       url: urlInput.value,
       title: "",
-      folder_id: selectedFolder,
+      folder_id: folderId,
     };
 
     if (feedNewChoiceSelected) {
@@ -81,23 +68,6 @@ export default function NewFeed({
     }
   }
 
-  async function createNewFeedFolder() {
-    const title = prompt(t("prompt_folder_name"));
-    if (!title) return;
-
-    const [folderErr, result] = await to(api.folders.create({ title }));
-    if (folderErr) {
-      showToast(
-        { title: t("fail_save_folder"), description: errDescription(folderErr) },
-        { level: "fail", closeable: false },
-      );
-      return;
-    }
-
-    onFolderCreated(result);
-    setSelectedFolder(result.id);
-  }
-
   return (
     <div className="d-flex flex-column">
       <form onSubmit={createFeed} className="d-flex flex-column">
@@ -120,35 +90,6 @@ export default function NewFeed({
             }
           }}
         />
-
-        <label htmlFor="feed-folder" className="mb-2 mt-3 user-select-none">
-          {t("folder")}
-          <a
-            href="#"
-            className="float-end text-decoration-none"
-            onClick={e => {
-              e.preventDefault();
-              createNewFeedFolder();
-            }}>
-            {t("new_folder")}
-          </a>
-        </label>
-        <select
-          className="c-input"
-          id="feed-folder"
-          name="folder_id"
-          value={selectedFolder === null ? "" : selectedFolder}
-          onChange={e => {
-            const v = (e.target as HTMLSelectElement).value;
-            setSelectedFolder(v === "" ? null : Number(v));
-          }}>
-          <option value="">---</option>
-          {folders.map(folder => (
-            <option key={folder.id} value={folder.id}>
-              {folder.title}
-            </option>
-          ))}
-        </select>
 
         {feedNewChoice.length > 0 && (
           <div className="mt-3">

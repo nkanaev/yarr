@@ -857,7 +857,6 @@ export default function App() {
         {showNewFeed.value && (
           <div className="px-2 py-3 overflow-auto flex-shrink-0 border-bottom">
             <NewFeed
-              folders={folders.value}
               folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}
               onCancel={() => (showNewFeed.value = false)}
               onCreated={feed => {
@@ -866,7 +865,6 @@ export default function App() {
                 showNewFeed.value = false;
                 feedSelected.value = "feed:" + feed.id;
               }}
-              onFolderCreated={refreshFeeds}
             />
           </div>
         )}
