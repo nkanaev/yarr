@@ -853,9 +853,9 @@ export default function App() {
             onShowNewFeed={() => (showNewFeed.value = true)}
           />
         </div>
-        <div class="d-flex flex-column overflow-auto border-top">
+        <div class="d-flex flex-column overflow-auto border-top flex-grow-1">
         {showNewFeed.value && (
-          <div className="px-2 py-3 overflow-auto flex-grow-1 flex-shrink-0 border-bottom">
+          <div className="px-2 py-3 overflow-auto flex-shrink-0 border-bottom">
             <NewFeed
               folders={folders.value}
               folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}

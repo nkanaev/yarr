@@ -101,7 +101,7 @@ export default function NewFeed({
   return (
     <div className="d-flex flex-column">
       <form onSubmit={createFeed} className="d-flex flex-column">
-        <label htmlFor="feed-url" className="mb-2">
+        <label htmlFor="feed-url" className="mb-2 user-select-none">
           {t("new_feed_url")}
         </label>
         <input
@@ -121,7 +121,7 @@ export default function NewFeed({
           }}
         />
 
-        <label htmlFor="feed-folder" className="mb-2 mt-3">
+        <label htmlFor="feed-folder" className="mb-2 mt-3 user-select-none">
           {t("folder")}
           <a
             href="#"

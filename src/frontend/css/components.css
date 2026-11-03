@@ -37,6 +37,7 @@
   background-color: var(--v-bg);
   box-shadow: var(--v-shadow-md);
 
+  user-select: none;
   text-decoration: none;
   outline-offset: -2px;
 
