@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo, useCallback } from "preact/hooks";
-import { useSignal, useComputed, signal } from "@preact/signals";
+import { useSignal, useComputed } from "@preact/signals";
 import type { Lang } from "../i18n";
 import { useI18n } from "../i18n";
 import api, { NetworkError, HTTPError } from "../api";
@@ -28,7 +28,6 @@ import type {
   FeedStat,
   ItemStatus,
   ItemListQuery,
-  ItemMarkQuery,
   Settings,
 } from "../api-types";
 
@@ -585,7 +584,7 @@ export default function App() {
         { level: "fail" },
       );
     else {
-      folders.value = [...folders.value.map(f => (f.id === folder.id ? { ...f, title } : f))].sort(
+      folders.value = folders.value.map(f => (f.id === folder.id ? { ...f, title } : f)).sort(
         (a, b) => a.title.localeCompare(b.title),
       );
     }

@@ -60,7 +60,7 @@ export default function Dropdown({
     return () => document.removeEventListener("click", clickHandler);
   }, [open, hide]);
 
-  const onButtonClick = (e: MouseEvent) => {
+  const onButtonClick = () => {
     if (!disabled) toggle();
   };
 
