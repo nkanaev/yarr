@@ -15,6 +15,9 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
+// maxLookup is how many bytes are read at most to detect the feed format.
+const maxLookup = 1 << 20
+
 var ErrUnknownFormat = errors.New("unknown feed format")
 
 type feedProbe struct {
@@ -75,19 +78,28 @@ func Parse(r io.Reader) (*Feed, error) {
 }
 
 func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
-	lookup := make([]byte, 2048)
-	n, err := io.ReadFull(r, lookup)
-	switch {
-	case err == io.ErrUnexpectedEOF:
-		lookup = lookup[:n]
-		r = bytes.NewReader(lookup)
-	case err != nil:
-		return nil, err
-	default:
-		r = io.MultiReader(bytes.NewReader(lookup), r)
+	// Read a small prefix first. If it holds no feed element yet (for example,
+	// a long <?xml-stylesheet?> instruction comes first), keep reading more,
+	// up to maxLookup bytes.
+	var lookup []byte
+	var out feedProbe
+	var err error
+	for size := 2048; ; size *= 2 {
+		buf := make([]byte, size-len(lookup))
+		var n int
+		n, err = io.ReadFull(r, buf)
+		lookup = append(lookup, buf[:n]...)
+		eof := err == io.EOF || err == io.ErrUnexpectedEOF
+		if err != nil && (!eof || len(lookup) == 0) {
+			return nil, err
+		}
+		out = sniff(string(lookup))
+		if out.feedType != "" || eof || size >= maxLookup {
+			break
+		}
 	}
+	r = io.MultiReader(bytes.NewReader(lookup), r)
 
-	out := sniff(string(lookup))
 	if out.feedType == "" {
 		return nil, ErrUnknownFormat
 	}
