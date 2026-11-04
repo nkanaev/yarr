@@ -158,6 +158,11 @@
   &:disabled:active {
     background-color: inherit;
   }
+
+  &.is-danger:active {
+    background-color: rgba(var(--bs-danger-rgb), var(--bs-text-opacity)) !important;
+    color: var(--v-bg) !important;
+  }
 }
 
 .c-dropdown-select {

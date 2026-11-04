@@ -107,7 +107,7 @@ export default function DropdownFeed({
       <div className="c-dropdown-divider" />
       <button
         type="button"
-        className="c-dropdown-item w-100 text-start text-danger d-flex gap-1"
+        className="c-dropdown-item is-danger w-100 text-start text-danger d-flex gap-1"
         onClick={() => onDelete(feed)}>
         <Icon className="me-1" name="trash" />
         {t("delete")}
