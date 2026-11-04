@@ -31,7 +31,7 @@ export default function DropdownFolder({ folder, onRename, onDelete }: DropdownF
       <div className="c-dropdown-divider" />
       <button
         type="button"
-        className="c-dropdown-item w-100 text-start text-danger d-flex gap-1"
+        className="c-dropdown-item w-100 text-start text-danger d-flex gap-1 is-danger"
         onClick={() => onDelete(folder)}>
         <Icon className="me-1" name="trash" />
         {t("delete")}
