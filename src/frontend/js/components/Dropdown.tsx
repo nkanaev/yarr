@@ -51,7 +51,7 @@ export default function Dropdown({
       const menu = menuRef.current;
       if (!menu || !menu.contains(target)) {
         hide();
-      } else if (target.closest(".c-dropdown-item") !== null) {
+      } else if (target.closest(".c-dropdown-item") !== null && target.closest("select") === null) {
         hide();
       }
     };

@@ -23,6 +23,7 @@ export default function DropdownFeed({
   onDelete,
 }: DropdownFeedProps) {
   const { t } = useI18n();
+  const selectedFolder = folders.find(f => f.id === feed.folder_id);
 
   return (
     <Dropdown
@@ -76,28 +77,26 @@ export default function DropdownFeed({
       <div className="c-dropdown-header" role="heading" aria-level={2}>
         {t("move_to")}
       </div>
-      {folders.map(
-        f =>
-          f.id !== feed.folder_id && (
-            <button
-              key={f.id}
-              type="button"
-              className="c-dropdown-item w-100 text-start d-flex gap-1"
-              onClick={() => onMove(feed, f.id)}>
-              <Icon className="me-1" name="folder" />
-              <span className="text-break line-clamp-1">{f.title}</span>
-            </button>
-          ),
-      )}
-      {feed.folder_id && (
-        <button
-          type="button"
-          className="c-dropdown-item w-100 text-start opacity-75 d-flex gap-1"
-          onClick={() => onMove(feed, null)}>
-          <Icon className="me-1" name="folder-minus" />
-          ──
-        </button>
-      )}
+      <div className="c-dropdown-item c-dropdown-select d-flex align-items-center gap-1">
+        <Icon className="me-1 flex-shrink-0" name="folder" />
+        <span className="flex-grow-1 text-break line-clamp-1">
+          {selectedFolder?.title ?? "──"}
+        </span>
+        <Icon className="flex-shrink-0" name="chevron-down" />
+        <select
+          value={feed.folder_id === null ? "" : feed.folder_id}
+          onChange={e => {
+            const v = (e.target as HTMLSelectElement).value;
+            onMove(feed, v === "" ? null : Number(v));
+          }}>
+          <option value="">──</option>
+          {folders.map(f => (
+            <option key={f.id} value={f.id}>
+              {f.title}
+            </option>
+          ))}
+        </select>
+      </div>
       <button
         type="button"
         className="c-dropdown-item w-100 text-start opacity-75 d-flex gap-1"

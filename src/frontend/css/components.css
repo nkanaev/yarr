@@ -148,6 +148,28 @@
   }
 }
 
+.c-dropdown-select {
+  position: relative;
+
+  &:focus-within {
+    outline: 2px solid var(--v-focus-color);
+    outline-offset: -2px;
+  }
+
+  & select {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    appearance: none;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
 .c-dropdown-header {
   margin: 0.375rem 0.75rem;
   opacity: 0.7;
