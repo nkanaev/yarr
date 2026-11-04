@@ -100,20 +100,20 @@ export default function DropdownSettings({
         {t("subscriptions")}
       </div>
       <form onSubmit={e => e.preventDefault()} tabIndex={-1}>
-        <input
-          ref={fileInputRef}
-          type="file"
-          id="opml-import"
-          onChange={onImportOPML}
-          name="opml"
-          style={{ opacity: 0, width: "1px", height: 0, position: "absolute", zIndex: -1 }}
-        />
         <label
           className="c-dropdown-item mb-0 cursor-pointer w-100 d-flex gap-1"
           htmlFor="opml-import"
           onClick={e => e.stopPropagation()}>
           <Icon className="me-1" name="download" />
           {t("import")}
+          <input
+            ref={fileInputRef}
+            type="file"
+            id="opml-import"
+            onChange={onImportOPML}
+            name="opml"
+            style={{ opacity: 0, width: "1px", height: 0, position: "absolute", zIndex: -1 }}
+          />
         </label>
       </form>
       <a

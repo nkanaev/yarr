@@ -116,6 +116,14 @@
   max-height: calc(100vh - 3rem);
   box-shadow: var(--v-shadow-lg);
   min-width: 12rem;
+
+  & > :first-child {
+    border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
+  }
+
+  & > :last-child {
+    border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
+  }
 }
 
 .c-dropdown-item {
@@ -129,6 +137,10 @@
   color: var(--v-fg);
   background-color: var(--v-bg);
 
+  &:focus-within {
+    outline: 2px solid var(--v-focus-color);
+    outline-offset: -2px;
+  }
   &:hover {
     color: var(--v-hover-fg);
     background-color: var(--v-hover-bg);
@@ -150,11 +162,6 @@
 
 .c-dropdown-select {
   position: relative;
-
-  &:focus-within {
-    outline: 2px solid var(--v-focus-color);
-    outline-offset: -2px;
-  }
 
   & select {
     position: absolute;
