@@ -310,14 +310,14 @@
     "ru": "Переместить в..."
   },
   "new_folder": {
-    "en": "new folder",
-    "de": "neuer Ordner",
-    "fr": "nouveau dossier",
-    "es": "nueva carpeta",
+    "en": "New Folder",
+    "de": "Neuer Ordner",
+    "fr": "Nouveau Dossier",
+    "es": "Nueva Carpeta",
     "ja": "新規フォルダ",
-    "pt": "nova pasta",
+    "pt": "Nova Pasta",
     "zh": "新建文件夹",
-    "ru": "новая папка"
+    "ru": "Новая Папка"
   },
   "delete": {
     "en": "Delete",
