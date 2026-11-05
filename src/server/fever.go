@@ -89,8 +89,11 @@ func formHasValue(values url.Values, value string) bool {
 	return false
 }
 
+const maxFeverBodySize = 1 << 10 // 1 KB
+
 func (s *Server) handleFever(w http.ResponseWriter, r *http.Request) {
-	r.ParseMultipartForm(1 << 20)
+	r.Body = http.MaxBytesReader(w, r.Body, maxFeverBodySize)
+	r.ParseMultipartForm(maxFeverBodySize)
 	if !s.feverAuth(r) {
 		writeJSON(w, http.StatusOK, map[string]any{
 			"api_version":            3,
