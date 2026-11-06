@@ -15,12 +15,21 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
+// lookupSize is how many bytes are read to detect the feed format.
+const lookupSize = 2048
+
 var ErrUnknownFormat = errors.New("unknown feed format")
 
 type feedProbe struct {
 	feedType string
 	callback func(r io.Reader) (*Feed, error)
 	encoding string
+}
+
+// hasStylesheetProlog reports whether lookup has both an XML declaration and
+// an <?xml-stylesheet?> instruction.
+func hasStylesheetProlog(lookup []byte) bool {
+	return bytes.Contains(lookup, []byte("<?xml ")) && bytes.Contains(lookup, []byte("<?xml-stylesheet"))
 }
 
 func sniff(lookup string) (out feedProbe) {
@@ -75,19 +84,40 @@ func Parse(r io.Reader) (*Feed, error) {
 }
 
 func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
-	lookup := make([]byte, 2048)
+	lookup := make([]byte, lookupSize)
 	n, err := io.ReadFull(r, lookup)
 	switch {
 	case err == io.ErrUnexpectedEOF:
 		lookup = lookup[:n]
-		r = bytes.NewReader(lookup)
 	case err != nil:
 		return nil, err
-	default:
-		r = io.MultiReader(bytes.NewReader(lookup), r)
 	}
+	more := err == nil
 
 	out := sniff(string(lookup))
+
+	// A long <?xml-stylesheet?> instruction (for example a base64 data: URI)
+	// can push the root element past the first lookup. Only then read one
+	// more lookup and sniff again.
+	if out.feedType == "" && more && hasStylesheetProlog(lookup) {
+		next := make([]byte, lookupSize)
+		n, err = io.ReadFull(r, next)
+		switch {
+		case err == io.EOF || err == io.ErrUnexpectedEOF:
+			more = false
+		case err != nil:
+			return nil, err
+		}
+		lookup = append(lookup, next[:n]...)
+		out = sniff(string(lookup))
+	}
+
+	if more {
+		r = io.MultiReader(bytes.NewReader(lookup), r)
+	} else {
+		r = bytes.NewReader(lookup)
+	}
+
 	if out.feedType == "" {
 		return nil, ErrUnknownFormat
 	}
