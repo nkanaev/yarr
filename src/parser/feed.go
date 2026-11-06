@@ -15,8 +15,8 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-// maxLookup is how many bytes are read at most to detect the feed format.
-const maxLookup = 1 << 20
+// lookupSize is how many bytes are read to detect the feed format.
+const lookupSize = 2048
 
 var ErrUnknownFormat = errors.New("unknown feed format")
 
@@ -24,6 +24,12 @@ type feedProbe struct {
 	feedType string
 	callback func(r io.Reader) (*Feed, error)
 	encoding string
+}
+
+// hasStylesheetProlog reports whether lookup has both an XML declaration and
+// an <?xml-stylesheet?> instruction.
+func hasStylesheetProlog(lookup []byte) bool {
+	return bytes.Contains(lookup, []byte("<?xml ")) && bytes.Contains(lookup, []byte("<?xml-stylesheet"))
 }
 
 func sniff(lookup string) (out feedProbe) {
@@ -78,27 +84,39 @@ func Parse(r io.Reader) (*Feed, error) {
 }
 
 func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
-	// Read a small prefix first. If it holds no feed element yet (for example,
-	// a long <?xml-stylesheet?> instruction comes first), keep reading more,
-	// up to maxLookup bytes.
-	var lookup []byte
-	var out feedProbe
-	var err error
-	for size := 2048; ; size *= 2 {
-		buf := make([]byte, size-len(lookup))
-		var n int
-		n, err = io.ReadFull(r, buf)
-		lookup = append(lookup, buf[:n]...)
-		eof := err == io.EOF || err == io.ErrUnexpectedEOF
-		if err != nil && (!eof || len(lookup) == 0) {
+	lookup := make([]byte, lookupSize)
+	n, err := io.ReadFull(r, lookup)
+	switch {
+	case err == io.ErrUnexpectedEOF:
+		lookup = lookup[:n]
+	case err != nil:
+		return nil, err
+	}
+	more := err == nil
+
+	out := sniff(string(lookup))
+
+	// A long <?xml-stylesheet?> instruction (for example a base64 data: URI)
+	// can push the root element past the first lookup. Only then read one
+	// more lookup and sniff again.
+	if out.feedType == "" && more && hasStylesheetProlog(lookup) {
+		next := make([]byte, lookupSize)
+		n, err = io.ReadFull(r, next)
+		switch {
+		case err == io.EOF || err == io.ErrUnexpectedEOF:
+			more = false
+		case err != nil:
 			return nil, err
 		}
+		lookup = append(lookup, next[:n]...)
 		out = sniff(string(lookup))
-		if out.feedType != "" || eof || size >= maxLookup {
-			break
-		}
 	}
-	r = io.MultiReader(bytes.NewReader(lookup), r)
+
+	if more {
+		r = io.MultiReader(bytes.NewReader(lookup), r)
+	} else {
+		r = bytes.NewReader(lookup)
+	}
 
 	if out.feedType == "" {
 		return nil, ErrUnknownFormat
