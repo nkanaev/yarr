@@ -1,0 +1,918 @@
+<!--
+Real RSS 2.0 feed from https://www.msys2.org/news.xml. Its root element is
+preceded by a long xml-stylesheet processing instruction with a base64 data
+URI, so the feed cannot be detected from the first 2 KB alone.
+
+@ feed.Title == "MSYS2 News"
+@ feed.SiteURL == "https://www.msys2.org/news/"
+@ len(feed.Items) == 70
+@ feed.Items[0].Title == "MINGW64 deprecation update"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="data:text/xsl;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHhzbDpzdHlsZXNoZWV0IHZlcnNpb249IjEuMCIgeG1sbnM6eHNsPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L1hTTC9UcmFuc2Zvcm0iPgogICAgPHhzbDpvdXRwdXQgbWV0aG9kPSJodG1sIiBlbmNvZGluZz0iVVRGLTgiIGluZGVudD0ieWVzIi8+CiAgICAKICAgIDx4c2w6dGVtcGxhdGUgbWF0Y2g9Ii9yc3MvY2hhbm5lbCI+CiAgICAgICAgPGh0bWw+CiAgICAgICAgICAgIDxoZWFkPgogICAgICAgICAgICAgICAgPHRpdGxlPjx4c2w6dmFsdWUtb2Ygc2VsZWN0PSJ0aXRsZSIvPjwvdGl0bGU+CiAgICAgICAgICAgICAgICA8c3R5bGU+CiAgICAgICAgICAgICAgICAgICAgYm9keSB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgbWF4LXdpZHRoOiA4MDBweDsgbWFyZ2luOiAwIGF1dG87IHBhZGRpbmc6IDIwcHg7IH0KICAgICAgICAgICAgICAgICAgICAucnNzLWluZm8geyBiYWNrZ3JvdW5kOiAjZjBmOGZmOyBib3JkZXI6IDFweCBzb2xpZCAjZDBlN2ZmOyBib3JkZXItcmFkaXVzOiA1cHg7IHBhZGRpbmc6IDE1cHg7IG1hcmdpbi1ib3R0b206IDI1cHg7IH0KICAgICAgICAgICAgICAgICAgICAucnNzLWluZm8gaDMgeyBtYXJnaW4tdG9wOiAwOyBjb2xvcjogIzAwNjZjYzsgfQogICAgICAgICAgICAgICAgICAgIC5yc3MtaW5mbyBwIHsgbWFyZ2luLWJvdHRvbTogOHB4OyB9CiAgICAgICAgICAgICAgICAgICAgLnJzcy11cmwgeyAKICAgICAgICAgICAgICAgICAgICAgICAgZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsgCiAgICAgICAgICAgICAgICAgICAgICAgIGZvbnQtc2l6ZTogMC45ZW07IAogICAgICAgICAgICAgICAgICAgICAgICBjb2xvcjogIzMzMzsgCiAgICAgICAgICAgICAgICAgICAgICAgIGJhY2tncm91bmQ6ICNmZmY7IAogICAgICAgICAgICAgICAgICAgICAgICBwYWRkaW5nOiA4cHg7IAogICAgICAgICAgICAgICAgICAgICAgICBib3JkZXI6IDFweCBzb2xpZCAjY2NjOyAKICAgICAgICAgICAgICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogM3B4OyAKICAgICAgICAgICAgICAgICAgICAgICAgd29yZC1icmVhazogYnJlYWstYWxsOyAKICAgICAgICAgICAgICAgICAgICAgICAgbWFyZ2luOiA1cHggMDsKICAgICAgICAgICAgICAgICAgICAgICAgZGlzcGxheTogYmxvY2s7CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGgxIHsgY29sb3I6ICMzMzM7IGJvcmRlci1ib3R0b206IDJweCBzb2xpZCAjZGRkOyB9CiAgICAgICAgICAgICAgICAgICAgLml0ZW0geyBtYXJnaW4tYm90dG9tOiAzMHB4OyBwYWRkaW5nLWJvdHRvbTogMjBweDsgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkICNlZWU7IH0KICAgICAgICAgICAgICAgICAgICAuaXRlbSBoMiB7IGNvbG9yOiAjMDA2NmNjOyB9CiAgICAgICAgICAgICAgICAgICAgLml0ZW0gaDIgYSB7IGNvbG9yOiAjMDA2NmNjOyB0ZXh0LWRlY29yYXRpb246IG5vbmU7IH0KICAgICAgICAgICAgICAgICAgICAuaXRlbSBoMiBhOmhvdmVyIHsgdGV4dC1kZWNvcmF0aW9uOiB1bmRlcmxpbmU7IH0KICAgICAgICAgICAgICAgICAgICAuZGF0ZSB7IGNvbG9yOiAjNjY2OyBmb250LXNpemU6IDAuOWVtOyBtYXJnaW4tYm90dG9tOiAxMHB4OyB9CiAgICAgICAgICAgICAgICAgICAgLmRlc2NyaXB0aW9uIHsgbGluZS1oZWlnaHQ6IDEuNjsgfQogICAgICAgICAgICAgICAgPC9zdHlsZT4KICAgICAgICAgICAgPC9oZWFkPgogICAgICAgICAgICA8Ym9keT4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJzcy1pbmZvIj4KICAgICAgICAgICAgICAgICAgICA8aDM+8J+ToSBSU1MgRmVlZDwvaDM+CiAgICAgICAgICAgICAgICAgICAgPHA+VGhpcyBpcyBhIHdlYiB2aWV3IG9mIGFuIFJTUyBmZWVkLiBUbyBzdWJzY3JpYmUgdG8gdXBkYXRlcyBpbiB5b3VyIFJTUyByZWFkZXIsIGNvcHkgdGhlIGN1cnJlbnQgcGFnZSBVUkwgZnJvbSB5b3VyIGJyb3dzZXIncyBhZGRyZXNzIGJhci48L3A+CiAgICAgICAgICAgICAgICA8L2Rpdj4KCiAgICAgICAgICAgICAgICA8aDE+PHhzbDp2YWx1ZS1vZiBzZWxlY3Q9InRpdGxlIi8+PC9oMT4KICAgICAgICAgICAgICAgIDxwPjx4c2w6dmFsdWUtb2Ygc2VsZWN0PSJkZXNjcmlwdGlvbiIvPjwvcD4KICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgPHhzbDpmb3ItZWFjaCBzZWxlY3Q9Iml0ZW0iPgogICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9Iml0ZW0iPgogICAgICAgICAgICAgICAgICAgICAgICA8aDI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8YSBocmVmPSJ7bGlua30iPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx4c2w6dmFsdWUtb2Ygc2VsZWN0PSJ0aXRsZSIvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9hPgogICAgICAgICAgICAgICAgICAgICAgICA8L2gyPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJkYXRlIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx4c2w6dmFsdWUtb2Ygc2VsZWN0PSJwdWJEYXRlIi8+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJkZXNjcmlwdGlvbiI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8eHNsOnZhbHVlLW9mIHNlbGVjdD0iZGVzY3JpcHRpb24iIGRpc2FibGUtb3V0cHV0LWVzY2FwaW5nPSJ5ZXMiLz4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L3hzbDpmb3ItZWFjaD4KICAgICAgICAgICAgPC9ib2R5PgogICAgICAgIDwvaHRtbD4KICAgIDwveHNsOnRlbXBsYXRlPgoKPC94c2w6c3R5bGVzaGVldD4="?>
+<rss version="2.0"><channel><title>MSYS2 News</title><link>https://www.msys2.org/news/</link><description>MSYS2 project news and updates</description><language>en-us</language><lastBuildDate>Fri, 06 Nov 2026 13:13:08 +0000</lastBuildDate><item><title>MINGW64 deprecation update</title><link>https://www.msys2.org/news/#2026-10-24-mingw64-deprecation-update</link><guid>https://www.msys2.org/news/#2026-10-24-mingw64-deprecation-update</guid><pubDate>Sat, 24 Oct 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Following our &lt;a href="https://www.msys2.org/news/#2026-03-15-deprecating-the-mingw64-environment"&gt;deprecation announcement&lt;/a&gt; on 2026-03-15, we've recently begun
+dropping MINGW64 builds from leaf packages as part of regular updates, rather
+than only when problems arise. If you're still using MINGW64, we recommend
+moving your workflows and local installations to UCRT64 or CLANG64.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;GitHub Actions:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;To update your GitHub Actions workflow to use UCRT64 instead of MINGW64, modify
+the &lt;code&gt;msystem&lt;/code&gt; and &lt;code&gt;install&lt;/code&gt; fields as shown below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="w"&gt; &lt;/span&gt;  - uses: msys2/setup-msys2@v2
+&lt;span class="w"&gt; &lt;/span&gt;    with:
+&lt;span class="gd"&gt;-      msystem: MINGW64&lt;/span&gt;
+&lt;span class="gd"&gt;-      install: mingw-w64-x86_64-gcc&lt;/span&gt;
+&lt;span class="gi"&gt;+      msystem: UCRT64&lt;/span&gt;
+&lt;span class="gi"&gt;+      install: mingw-w64-ucrt-x86_64-gcc&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Starting with the &lt;a href="https://github.com/msys2/setup-msys2/releases/tag/v2.33.0"&gt;v2.33.0
+release&lt;/a&gt;, the
+&lt;a href="https://github.com/msys2/setup-msys2"&gt;setup-msys2 action&lt;/a&gt; emits a deprecation
+warning if a deprecated environment is used.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Local installations:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Switching locally means installing the same packages for the new environment
+(UCRT64 or CLANG64) that you previously had for MINGW64, then using the new
+environment's shell going forward.&lt;/p&gt;
+&lt;p&gt;To automate this for UCRT64, you can use &lt;a href="https://gist.github.com/lazka/87606c36f40c6d69ccf40c50c903c963"&gt;this migration
+script&lt;/a&gt;. It
+replaces every installed &lt;code&gt;mingw-w64-x86_64-*&lt;/code&gt; package with its
+&lt;code&gt;mingw-w64-ucrt-x86_64-*&lt;/code&gt; counterpart:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;./migrate.sh
+&lt;span class="go"&gt;This will replace all installed mingw-w64-x86_64-* packages with their mingw-w64-ucrt-x86_64-* equivalents. Continue? [y/N] y&lt;/span&gt;
+&lt;span class="go"&gt;Gathering package information...&lt;/span&gt;
+&lt;span class="go"&gt;Install 19 packages (mingw-w64-ucrt-x86_64-)? [y/N] y&lt;/span&gt;
+&lt;span class="go"&gt;Installing...&lt;/span&gt;
+&lt;span class="go"&gt;Remove 19 migrated old packages (mingw-w64-x86_64-)? [y/N] y&lt;/span&gt;
+&lt;span class="go"&gt;Removing...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Once the migration is done, launch the UCRT64 shell instead of MINGW64, and
+update any scripts, IDE settings, or PATH entries that point to &lt;code&gt;/mingw64&lt;/code&gt; (e.g.
+&lt;code&gt;C:\msys64\mingw64\bin&lt;/code&gt; → &lt;code&gt;C:\msys64\ucrt64\bin&lt;/code&gt;).&lt;/p&gt;
+</description></item><item><title>MSYS2 installer is signed</title><link>https://www.msys2.org/news/#2026-10-16-msys2-installer-signed</link><guid>https://www.msys2.org/news/#2026-10-16-msys2-installer-signed</guid><pubDate>Fri, 16 Oct 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Belated news entry. Starting with the 2026-06-11 release, the MSYS2 installer is
+signed with a Windows code signing certificate. It took a while for the signing
+certificate to build up reputation with Microsoft SmartScreen, but you should no
+longer see the blue "Windows protected your PC" warning when running the
+installer.&lt;/p&gt;
+&lt;p&gt;We plan to also sign binaries in the MSYS2 packages in the future this way,
+which might help to reduce false positives with antivirus software.&lt;/p&gt;
+&lt;p&gt;If you want to know more about how we set up our signing process, see our &lt;a href="https://www.msys2.org/dev/code-signing/"&gt;code
+signing documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks to &lt;a href="https://github.com/dscho"&gt;@dscho&lt;/a&gt; for helping us get the "Azure
+Artifact Signing" access set up, and to &lt;a href="https://github.com/skeeto"&gt;@skeeto&lt;/a&gt; for
+developing &lt;a href="https://github.com/skeeto/aas-sign"&gt;aas-sign&lt;/a&gt;, which we use to sign
+our releases in GitHub Actions.&lt;/p&gt;
+</description></item><item><title>Server maintenance on 2026-10-03/04</title><link>https://www.msys2.org/news/#2026-09-30-server-maintenance-on-2026-10-0304</link><guid>https://www.msys2.org/news/#2026-09-30-server-maintenance-on-2026-10-0304</guid><pubDate>Wed, 30 Sep 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;There will be a short server maintenance around the weekend of 2026-10-03/04
+which will affect repo.msys2.org, mirror.msys2.org, packages.msys2.org, and some
+subdomain redirects of our website.&lt;/p&gt;
+&lt;p&gt;Update: all done now&lt;/p&gt;
+</description></item><item><title>Native Thread Local Storage (TLS) with GCC 16</title><link>https://www.msys2.org/news/#2026-05-11-native-thread-local-storage-tls-with-gcc-16</link><guid>https://www.msys2.org/news/#2026-05-11-native-thread-local-storage-tls-with-gcc-16</guid><pubDate>Mon, 11 May 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;GCC 16 gained support for native TLS, which we just enabled in MSYS2.&lt;/p&gt;
+&lt;p&gt;Native TLS provides superior performance compared to the emulated variant
+(emutls), which was used by GCC up until now. For example, certain micro
+benchmarks with CPython, which relies heavily on TLS, are now &lt;a href="https://github.com/msys2/MINGW-packages/issues/22917#issuecomment-4411966245"&gt;three times
+faster&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;All affected packages (~300) in the MSYS2 repository have been rebuilt to make
+use of it. Clang in our GCC environments was also switched to use native TLS.
+Our Clang environments have already been using native TLS, so no changes there.&lt;/p&gt;
+&lt;p&gt;Some things to watch out for in case you build/maintain binaries outside of
+MSYS2:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;libstdc++ lost some symbols (&lt;code&gt;__emutls_v._ZSt11__once_call&lt;/code&gt; and
+  &lt;code&gt;__emutls_v._ZSt15__once_callable&lt;/code&gt;), so existing binaries linking against
+  libstdc++ might fail to load after the update. Simply rebuilding your code
+  which links to libstdc++ with the newest GCC will fix this.&lt;/li&gt;
+&lt;li&gt;Binaries linking to libgcc using emutls (indicated by imports to
+  &lt;code&gt;__emutls_get_address&lt;/code&gt;) will continue to work, but to make use of native TLS
+  will also have to be rebuilt.&lt;/li&gt;
+&lt;li&gt;A limitation of native TLS compared to emutls (and Linux) is that TLS
+  variables cannot be accessed directly across DLLs boundaries and will now
+  result in linker errors. You can work around this by accessing TLS variables
+  via accessor functions, or static linking. Note that this limitation also
+  applies to MSVC and Clang on Windows, so cross platform code is very unlikely
+  to be affected.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;tl;dr: if your external binaries do any TLS related imports (&lt;code&gt;grep __emutls_
+*.exe *.dll *.a&lt;/code&gt;) it's recommended to rebuild them.&lt;/p&gt;
+</description></item><item><title>Deprecating the MINGW64 Environment</title><link>https://www.msys2.org/news/#2026-03-15-deprecating-the-mingw64-environment</link><guid>https://www.msys2.org/news/#2026-03-15-deprecating-the-mingw64-environment</guid><pubDate>Sun, 15 Mar 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;As support for Windows 8.1 has been dropped, there is no longer a need for
+non-UCRT environments such as MINGW64. Consequently, we are beginning to phase
+out the MINGW64 environment. To start, no new packages will be added to this
+environment, and existing leaf packages may be removed if issues arise. If you
+are currently relying on the MINGW64 environment, please consider switching to
+UCRT64 or CLANG64 instead.&lt;/p&gt;
+</description></item><item><title>Native Git Now Available in MSYS2</title><link>https://www.msys2.org/news/#2026-02-28-native-git-now-available-in-msys2</link><guid>https://www.msys2.org/news/#2026-02-28-native-git-now-available-in-msys2</guid><pubDate>Sat, 28 Feb 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We are pleased to announce that MSYS2 now includes a &lt;a href="https://packages.msys2.org/base/mingw-w64-git"&gt;native MinGW build of
+Git&lt;/a&gt; alongside the existing
+Cygwin-based version.&lt;/p&gt;
+&lt;p&gt;This is made possible thanks to the hard work of the &lt;a href="https://github.com/orgs/git-for-windows/people"&gt;'Git for Windows'
+team&lt;/a&gt;, who made various changes
+in both projects, to make it possible to package their MinGW port of git and
+easily keep it in sync going forward. If you encounter any issues, please report
+them to us first before contacting the 'Git for Windows' team.&lt;/p&gt;
+&lt;p&gt;For comparison, some quick and unscientific benchmarks for a local clone of the
+&lt;a href="https://gcc.gnu.org/git/gitweb.cgi?p=gcc.git"&gt;GCC repo&lt;/a&gt;:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Operation&lt;/th&gt;
+&lt;th&gt;Cygwin Git&lt;/th&gt;
+&lt;th&gt;MinGW Git&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;git status&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;~1 s&lt;/td&gt;
+&lt;td&gt;~0.5 s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;git switch&lt;/code&gt; (gcc 14↔15)&lt;/td&gt;
+&lt;td&gt;~14.0 s&lt;/td&gt;
+&lt;td&gt;~10.0 s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;git clone&lt;/code&gt; (local)&lt;/td&gt;
+&lt;td&gt;~45 s&lt;/td&gt;
+&lt;td&gt;~22 s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;git grep&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;~2.6 s&lt;/td&gt;
+&lt;td&gt;~0.55 s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;If you were using the &lt;a href="https://gitforwindows.org/install-inside-msys2-proper.html"&gt;hack to make 'Git for Windows' work in
+MSYS2&lt;/a&gt;, which
+involves adding 'Git for Windows' repositories to pacman, you might now be able
+to switch to just installing git from MSYS2's own repositories instead. This
+also allows you to install native git into environments other than MINGW64, such
+as UCRT64 or CLANG64. Please note that our package is not as fully integrated
+with Windows like the Git for Windows installer version, and lacks some features
+such as the credential manager. It's also not as widely tested yet. Please give
+it a try and let us know if you encounter any issues or missing features.&lt;/p&gt;
+</description></item><item><title>Dropping support for Windows 8.1</title><link>https://www.msys2.org/news/#2026-02-28-dropping-support-for-windows-81</link><guid>https://www.msys2.org/news/#2026-02-28-dropping-support-for-windows-81</guid><pubDate>Sat, 28 Feb 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;As Windows 8.1 has been end-of-life (EOL) for three years, Firefox has stopped
+supporting it as of today, and our download statistics show that only &amp;lt;0.05% of
+our users are on Windows 8.1, we have decided to drop support for Windows 8.1 in
+MSYS2. This does not mean that things will immediately stop working on Windows
+8.1, but we will no longer attempt to resolve issues specific to it.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 2026-07-06:&lt;/strong&gt; Firefox decided to push their EOL date for Windows 8.1 to
+at least 2026-08, see &lt;a href="https://whattrainisitnow.com/release/?version=esr"&gt;https://whattrainisitnow.com/release/?version=esr&lt;/a&gt; for
+details. This did not change our decision to drop support for Windows 8.1
+though.&lt;/p&gt;
+</description></item><item><title>Rust Cygwin packages update</title><link>https://www.msys2.org/news/#2026-02-01-rust-cygwin-packages-update</link><guid>https://www.msys2.org/news/#2026-02-01-rust-cygwin-packages-update</guid><pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Back in September we got our first Rust-based Cygwin package with fish shell v4,
+and the number of Rust-based packages has slowly increased since then. We now
+have the following packages in the repo:&lt;/p&gt;
+&lt;p&gt;breezy, cargo-c, cargo-edit, fish, git, just, maturin, python-cryptography,
+python-dulwich, python, fastbencode, python-patiencediff, python-uv-build,
+uutils-coreutils&lt;/p&gt;
+&lt;p&gt;Thank you to everyone in the Rust community who has contributed to, or merged
+Cygwin support into the relevant crates!&lt;/p&gt;
+</description></item><item><title>More strict "pip install" for local installations</title><link>https://www.msys2.org/news/#2026-01-31-more-strict-pip-install-for-local-installations</link><guid>https://www.msys2.org/news/#2026-01-31-more-strict-pip-install-for-local-installations</guid><pubDate>Sat, 31 Jan 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Our mingw pip has for some time now printed a warning if you've used it to
+install into the user/system site-packages, since it can break/conflict with
+MSYS2-provided packages. We have now made this check more strict by erroring out
+instead. This means that if you use "pip install" on your local machine outside
+of a venv, you must now pass "--break-system-packages" to pip for it to continue.&lt;/p&gt;
+&lt;p&gt;In case you are running in CI then it's still a warning, and there are currently
+no plans to change that. We check if the "CI" env var is set, which is the case
+with GitHub and GitLab by default for example. However, it's still a good idea
+to pass "--break-system-packages" even in CI to silence the warning and inform
+your future self that this might be a source of problems.&lt;/p&gt;
+</description></item><item><title>Python 3.14 Update</title><link>https://www.msys2.org/news/#2026-01-31-python-314-update</link><guid>https://www.msys2.org/news/#2026-01-31-python-314-update</guid><pubDate>Sat, 31 Jan 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We've now updated to 3.14, just a few weeks after the 3.13 update. Everything
+was still fresh in our minds and the rebase turned out to be easy. The rebuild
+was the smoothest Python rebuild so far, so there is a good chance you wont
+notice any issues either. However, please tell us if you find any.&lt;/p&gt;
+&lt;p&gt;As announced, we removed the cygpty patch, so if you are on systems without
+conpty, like Windows 8.1, it will no longer detect a tty in mintty and you'll
+have to pass "-i" explicitly to get an interactive Python shell.&lt;/p&gt;
+</description></item><item><title>Python 3.13 Update</title><link>https://www.msys2.org/news/#2026-01-10-python-313-update</link><guid>https://www.msys2.org/news/#2026-01-10-python-313-update</guid><pubDate>Sat, 10 Jan 2026 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We have now updated to Python 3.13. Please let us know if you encounter any
+issues.&lt;/p&gt;
+&lt;p&gt;Some notable smaller changes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;_wmi&lt;/code&gt; module, which is used by various functions in the &lt;code&gt;platform&lt;/code&gt;
+  module, and which was missing from our 3.12 build, is now included.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;SOABI&lt;/code&gt; sysconfig variable format now matches Unix builds, in that it is a
+  subset of &lt;code&gt;EXT_SUFFIX&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Various sysconfig fixes: &lt;code&gt;AR&lt;/code&gt; is now a Windows path and &lt;code&gt;prefix&lt;/code&gt; is now
+  relocated.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;python-config&lt;/code&gt; tool is now a Python script instead of a Bash script.&lt;/li&gt;
+&lt;li&gt;We plan to remove the isatty() patch for detecting Cygwin pipes as an
+  interactive terminal with the next update to 3.14. This should only affect
+  Windows 8.1 users or those with conpty disabled.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;During the package rebuilds, we encountered an issue due to a behavioral change
+in Python 3.13: &lt;code&gt;os.path.isabs()&lt;/code&gt; now returns False for paths beginning with
+'/'. This change exposed several dependencies on the previous behavior in build
+tools. Something to watch out for.&lt;/p&gt;
+&lt;p&gt;Thanks to &lt;a href="https://github.com/Alexpux"&gt;@Alexpux&lt;/a&gt; for helping with the
+rebase/update and to everyone who fixed packages during the rebuild.&lt;/p&gt;
+</description></item><item><title>Replacing x86_64-pc-msys with x86_64-pc-cygwin</title><link>https://www.msys2.org/news/#2025-06-20-replacing-x86_64-pc-msys-with-x86_64-pc-cygwin</link><guid>https://www.msys2.org/news/#2025-06-20-replacing-x86_64-pc-msys-with-x86_64-pc-cygwin</guid><pubDate>Fri, 20 Jun 2025 00:00:00 +0000</pubDate><description>
+&lt;p&gt;As part of our ongoing effort to move MSYS2 closer to Cygwin, we have now
+replaced the &lt;code&gt;x86_64-pc-msys&lt;/code&gt; triplet with &lt;code&gt;x86_64-pc-cygwin&lt;/code&gt; as the default
+host triplet for the MSYS environment.&lt;/p&gt;
+&lt;p&gt;This means:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;$MSYSTEM_CHOST&lt;/code&gt; environment variable will now report &lt;code&gt;x86_64-pc-cygwin&lt;/code&gt;
+  instead of &lt;code&gt;x86_64-pc-msys&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Autotools based configure scripts will default to &lt;code&gt;x86_64-pc-cygwin&lt;/code&gt; instead
+  of &lt;code&gt;x86_64-pc-msys&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;gcc -dumpmachine&lt;/code&gt; will report &lt;code&gt;x86_64-pc-cygwin&lt;/code&gt; instead of &lt;code&gt;x86_64-pc-msys&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Ideally this should not affect most users. If there are any issues with this
+change, please let us know.&lt;/p&gt;
+</description></item><item><title>Hosted Windows ARM64 Runners on GitHub Actions</title><link>https://www.msys2.org/news/#2025-04-18-hosted-windows-arm64-runners-on-github-actions</link><guid>https://www.msys2.org/news/#2025-04-18-hosted-windows-arm64-runners-on-github-actions</guid><pubDate>Fri, 18 Apr 2025 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Earlier this week, GitHub finally &lt;a href="https://github.blog/changelog/2025-04-14-windows-arm64-hosted-runners-now-available-in-public-preview/"&gt;added Windows ARM64 runners to GitHub Actions&lt;/a&gt;, which is great news and will help us a lot producing native ARM64 packages in MSYS2 in the future. Since many of our packages are already available for ARM64, you might be wondering how we managed to do this until now. Let's take a look back:&lt;/p&gt;
+&lt;p&gt;In early 2021, &lt;a href="https://github.com/jeremyd2019"&gt;Jeremy&lt;/a&gt; bootstrapped our CLANGARM64 environment from a Cygwin LLVM build and built our first CLANGARM64 packages. To automate our package builds, we needed GitHub Actions support, which Jeremy also took on himself, and set up a WoA machine with an ARM64 version of GitHub runner, which we integrated into msys2-autobuild in late 2021. The whole ecosystem was in a very early stage at the time, such as the Actions runner itself, ARM64 support for Node.js, ARM64 Windows itself, Windows x64 emulation, etc., so things were not easy. Hardware was also an issue, as emulation was very slow, real hardware was very underpowered, and there were no dev kits in the beginning, so the runner had to move hardware several times over its lifetime.&lt;/p&gt;
+&lt;p&gt;Another challenge was that the self-hosted runner builds were not isolated, which meant that we could only use them for final package builds, so as not to expose them to untrusted users. So no CI checks on random PRs or other repos that are exposed in any way. While this meant that ARM64-only issues were sometimes found very late in the process, fortunately there was always someone around to debug things on real hardware if needed.&lt;/p&gt;
+&lt;p&gt;Some stats on the last year of the self-hosted ARM64 runner:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It ran 1835 jobs&lt;/li&gt;
+&lt;li&gt;It built packages for 1593 hours&lt;/li&gt;
+&lt;li&gt;It built 9869 packages&lt;/li&gt;
+&lt;li&gt;It produced 52.4 GB worth of packages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After building for 3-4 years we now have ~93% of all MSYS2 packages available for ARM64.&lt;/p&gt;
+&lt;p&gt;Thanks to &lt;a href="https://github.com/jeremyd2019"&gt;Jeremy&lt;/a&gt; for maintaining the self-hosted runner for so long, setting it up, updating it, moving it, fixing it, scaling it up for large rebuilds, being very responsive when things got stuck or debugging ARM64-only build issues, and much more. Also thanks to &lt;a href="https://github.com/dennisameling"&gt;Dennis Ameling&lt;/a&gt; for funding the "QC710 Dev Kit" and &lt;a href="https://github.com/ZacWalk"&gt;Zac Walker @ Microsoft&lt;/a&gt; for providing us with a "Dev Kit 2023".&lt;/p&gt;
+&lt;p&gt;The future:&lt;/p&gt;
+&lt;p&gt;With the new hosted runners, we can now test with ARM64 in many more places, such as package updates before they are merged, for all our forks of external projects, our GitHub action, our installer, our integration test, and much more. We can also run more jobs in parallel, which will be helpful for large rebuilds like major Python updates. And it allows our community to debug ARM64 related issues even if they do not have ARM64 hardware available, even though debugging in CI is not much fun.&lt;/p&gt;
+&lt;p&gt;For users of our "setup-msys2" GitHub Action this means they can easily add ARM64 testing/building to their project:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;jobs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nt"&gt;msys2-clangarm64&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;runs-on&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;windows-11-arm&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;steps&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="p p-Indicator"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;actions/checkout@v4&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="p p-Indicator"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;msys2/setup-msys2@v2&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="nt"&gt;msystem&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;CLANGARM64&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="nt"&gt;update&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;true&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="p p-Indicator"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;CI-Build&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nt"&gt;shell&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;msys2 {0}&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nt"&gt;run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p p-Indicator"&gt;|&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="no"&gt;./ci-build.sh&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</description></item><item><title>Moving MSYS(2) closer to Cygwin</title><link>https://www.msys2.org/news/#2025-02-14-moving-msys2-closer-to-cygwin</link><guid>https://www.msys2.org/news/#2025-02-14-moving-msys2-closer-to-cygwin</guid><pubDate>Fri, 14 Feb 2025 00:00:00 +0000</pubDate><description>
+&lt;p&gt;In MSYS2, in addition to the native environments such as UCRT64/CLANG64, there is also the "MSYS" environment, which contains mostly Cygwin-based software. Since the start of the MSYS2 project, the Cygwin tools in MSYS have been modified to build for MSYS instead of Cygwin. This means that the languages and tools have been patched to report their platform as "msys", and for the build tools this means that we have our own MSYS specific target triplet (x86_64-pc-msys), and uname reports "MSYS" as well.&lt;/p&gt;
+&lt;p&gt;Whatever the motivation was back then, the reality today is that our Cygwin packages are 99% the same as Cygwin's, with only a few things needing tweaking. The downside of defining our own platform/system/triplet is that every build system has to be patched to treat us as Cygwin-like, which is tedious and error-prone when adding/updating packages, and also divides the community. Another drawback is that it's confusing to users, as the names of MSYS2, the project, and MSYS are too similar, and it's not clear that MSYS mostly just means Cygwin.&lt;/p&gt;
+&lt;p&gt;Some time ago we started to remove these differences by replacing "msys" with "cygwin" + patches where possible. So instead of MSYS being a fork of Cygwin, it would just be a slightly modified/extended variant of Cygwin. The goal is that any software that supports Cygwin should be buildable as is under MSYS2. The first change in this direction already happened some time ago, when CMake would define both CYGWIN and MSYS as true when building under MSYS. Since then, we have tweaked several more things to get closer to that goal:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;CMake has reported CYGWIN as true since 2021&lt;/li&gt;
+&lt;li&gt;Meson has reported to be running under Cygwin since we added it in 2018&lt;/li&gt;
+&lt;li&gt;Python has been changed to report "sys.platform" as "cygwin", and recently "sysconfig.get_platform()" has been changed to report "cygwin-x86_64" as well.&lt;/li&gt;
+&lt;li&gt;Perl has recently been changed to report "$^O" as "cygwin" instead of "msys".&lt;/li&gt;
+&lt;li&gt;Bash has recently been changed to report "$OSTYPE" as "cygwin" instead of "msys".&lt;/li&gt;
+&lt;li&gt;Almost all of our packages have been ported to build for the Cygwin triplet, except for the toolchain packages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The rule of thumb is that where possible, things will continue to identify as both Cygwin and MSYS, for example, CMake will set both MSYS and CYGWIN, C/C++ will define both &lt;code&gt;__MSYS__&lt;/code&gt; and &lt;code&gt;__CYGWIN__&lt;/code&gt;. Where this is not possible, things will simply identify as Cygwin, or we will have to find workarounds.&lt;/p&gt;
+&lt;p&gt;The next planned steps for this transition are currently:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Change the default host triplet from "x86_64-pc-msys" to "x86_64-pc-cygwin"&lt;/li&gt;
+&lt;li&gt;Change the runtime to be a superset of Cygwin in more places, e.g. make the CYGWIN env var work as a fallback if MSYS is not set. The goal is to make the Cygwin documentation mostly applicable to MSYS2 as well.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For MSYS2 users these changes should be mostly invisible, but if you are a developer targeting the MSYS environment there might be some fallout. Despite that, we hope these changes will lead to better compatibility and easier maintenance in the long run. Let us know if you experience any problems.&lt;/p&gt;
+</description></item><item><title>Server maintenance on 2025-02-15/16</title><link>https://www.msys2.org/news/#2025-02-13-server-maintenance-on-2025-02-1516</link><guid>https://www.msys2.org/news/#2025-02-13-server-maintenance-on-2025-02-1516</guid><pubDate>Thu, 13 Feb 2025 00:00:00 +0000</pubDate><description>
+&lt;p&gt;There will be a short server maintenance around the weekend of 2025-02-15/16 which will affect repo.msys2.org, mirror.msys2.org, packages.msys2.org, and some subdomain redirects of our website.&lt;/p&gt;
+&lt;p&gt;Update: all done now&lt;/p&gt;
+</description></item><item><title>Removal of the CLANG32 Environment</title><link>https://www.msys2.org/news/#2024-12-18-removal-of-the-clang32-environment</link><guid>https://www.msys2.org/news/#2024-12-18-removal-of-the-clang32-environment</guid><pubDate>Wed, 18 Dec 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The previously announced removal of the CLANG32 environment is now complete.
+This concludes the gradual phase-out process that began several months ago.&lt;/p&gt;
+</description></item><item><title>Python 3.12 Update</title><link>https://www.msys2.org/news/#2024-11-09-python-312-update</link><guid>https://www.msys2.org/news/#2024-11-09-python-312-update</guid><pubDate>Sat, 09 Nov 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Over the last week we finally moved from Python 3.11 to 3.12. Thanks to
+&lt;a href="https://github.com/naveen521kk"&gt;@naveen521kk&lt;/a&gt; for updating the fork, and
+everyone else who helped with rebuild issues. Also thanks to
+&lt;a href="https://github.com/jeremyd2019"&gt;@jeremyd2019&lt;/a&gt; for watching the external arm64
+runner while it rebuilt all those 940 packages and fixing arm64 related issues.&lt;/p&gt;
+&lt;p&gt;There are some minor things to watch out for with this update:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We've enabled &lt;a href="https://peps.python.org/pep-0668/"&gt;PEP 668&lt;/a&gt; by marking the
+  system site-packages directory as externally managed. To prevent this from
+  causing too many problems right away &lt;a href="https://github.com/msys2/MINGW-packages/commit/4447a7ba7971d3480e7bd24951ec8e51328d23c9"&gt;we have patched our version of
+  pip&lt;/a&gt;
+  to only give a warning instead of an error if you install outside of a venv.
+  However, we may change this back to a real error in the future. If this is
+  causing any problems or if there are any concerns with re-enabling the error
+  in the future let us know.&lt;/li&gt;
+&lt;li&gt;While not MSYS2 specific, 3.12 is the version that &lt;a href="https://peps.python.org/pep-0632"&gt;dropped the included
+  distutils package&lt;/a&gt; and distutils is now only
+  available as part of setuptools. While the current setuptools should handle
+  our Python out of the box, there may be slight differences. Make sure to
+  remove anything setting &lt;code&gt;SETUPTOOLS_USE_DISTUTILS=stdlib&lt;/code&gt; as that will lead to
+  distutils import errors.&lt;/li&gt;
+&lt;li&gt;As with every major Python update we had to drop a few packages that were
+  incompatible with the new version and for which no update or patch was
+  available. One notable package there is py2exe which does not support 3.12+
+  right now and there is also no patch available, see &lt;a href="https://github.com/py2exe/py2exe/issues/191"&gt;the upstream
+  issue&lt;/a&gt; for details.&lt;/li&gt;
+&lt;/ul&gt;
+</description></item><item><title>Disabling mingw-w64 wildcard support by default</title><link>https://www.msys2.org/news/#2024-11-03-disabling-mingw-w64-wildcard-support-by-default</link><guid>https://www.msys2.org/news/#2024-11-03-disabling-mingw-w64-wildcard-support-by-default</guid><pubDate>Sun, 03 Nov 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;For historical reasons MSYS2 enabled wildcard support in mingw-w64 at build
+time. This means that every built executable had wildcard support enabled by
+default, unless it explicitly opted out. Wildcard support in this case means
+that program arguments containing &lt;code&gt;?&lt;/code&gt;and &lt;code&gt;*&lt;/code&gt; can be expanded to one or more file
+paths if the pattern happens to match paths of files on disk. Note that this
+happens directly in the target program, not in a shell beforehand.&lt;/p&gt;
+&lt;p&gt;This expansion has several problems:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Behave differently than MSVC built executables&lt;/li&gt;
+&lt;li&gt;It's confusing to users when wildcard handling is accidentally triggered. For
+  example, passing a regex as an argument to a CLI tool that starts matching
+  random files, breaking the pattern.&lt;/li&gt;
+&lt;li&gt;It may have security implications if arguments to executables are forwarded
+  from user-controlled input, in which case an argument could expand to a
+  different string depending on the files present on the filesystem.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Given all this, we have decided to disable wildcard handling by default. This
+means that any package and executable that is built after this change will get
+the new default behavior.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;python&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;'import sys; print(sys.argv)'&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;'*a.txt'&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# before&lt;/span&gt;
+&lt;span class="go"&gt;['-c', 'a.txt', 'aaaa.txt', 'bla.txt']&lt;/span&gt;
+&lt;span class="gp"&gt;$ &lt;/span&gt;python&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;'import sys; print(sys.argv)'&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;'*a.txt'&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# after&lt;/span&gt;
+&lt;span class="go"&gt;['-c', '*a.txt']&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Our hope/assumption is that this will not affect many users, as most will rely
+on globbing at a higher level, be it bash, or build systems. If you experience
+any problems, please let us know. See also &lt;a href="https://www.msys2.org/docs/c/#expanding-wildcard-arguments"&gt;the
+documentation&lt;/a&gt; on how to force
+wildcard handling for your applications even after this change.&lt;/p&gt;
+</description></item><item><title>Starting to drop the CLANG32 environment</title><link>https://www.msys2.org/news/#2024-09-23-starting-to-drop-the-clang32-environment</link><guid>https://www.msys2.org/news/#2024-09-23-starting-to-drop-the-clang32-environment</guid><pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;9 months ago we started to reduce the number of packages for the 32-bit
+environments. Now we are starting to drop the CLANG32 environment. This means
+that we will no longer add new packages for this environment and will remove the
+existing ones over the next months. If this is affecting you, please let us
+know.&lt;/p&gt;
+&lt;p&gt;While CLANG32 has some unique features in the context of MSYS2, such as being
+the only environment to use UCRT for 32-bit and the LLVM toolchain, it has seen
+very little use in our download statistics, and we don't think it's worth
+supporting any longer.&lt;/p&gt;
+&lt;p&gt;If you are in need for a 32-bit LLVM toolchain, consider using &lt;a href="https://github.com/mstorsjo/llvm-mingw"&gt;LLVM
+MinGW&lt;/a&gt; instead.&lt;/p&gt;
+</description></item><item><title>MSYS2 support in setuptools v70.0.2</title><link>https://www.msys2.org/news/#2024-07-28-msys2-support-in-setuptools-v7002</link><guid>https://www.msys2.org/news/#2024-07-28-msys2-support-in-setuptools-v7002</guid><pubDate>Sun, 28 Jul 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Setuptools v70.0.2 now supports mingw Python and MSYS2 natively. This eliminates
+the need for SETUPTOOLS_USE_DISTUTILS=stdlib when building C extensions,
+enabling "pip install" to just work for most packages without extra steps.&lt;/p&gt;
+&lt;p&gt;With the stdlib distutils now no longer being required to build packages we can
+continue our work to update to Python 3.12.&lt;/p&gt;
+</description></item><item><title>File conflicts when updating python</title><link>https://www.msys2.org/news/#2024-07-08-file-conflicts-when-updating-python</link><guid>https://www.msys2.org/news/#2024-07-08-file-conflicts-when-updating-python</guid><pubDate>Mon, 08 Jul 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Due to the recent Python 3.12 update missing .pyc files, you might see file
+conflicts when updating:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="go"&gt;error: failed to commit transaction (conflicting files)&lt;/span&gt;
+&lt;span class="go"&gt;python: /usr/lib/python3.12/__pycache__/ast.cpython-312.pyc exists in filesystem&lt;/span&gt;
+&lt;span class="go"&gt;python: /usr/lib/python3.12/__pycache__/dis.cpython-312.pyc exists in filesystem&lt;/span&gt;
+&lt;span class="go"&gt;python: /usr/lib/python3.12/__pycache__/inspect.cpython-312.pyc exists in filesystem&lt;/span&gt;
+&lt;span class="go"&gt;python: /usr/lib/python3.12/__pycache__/opcode.cpython-312.pyc exists in filesystem&lt;/span&gt;
+&lt;span class="go"&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This can be fixed by running&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;--overwrite&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"/usr/lib/python3.12/*"&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-Suy
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Sorry for the inconvenience.&lt;/p&gt;
+</description></item><item><title>Server changes</title><link>https://www.msys2.org/news/#2024-06-21-server-changes</link><guid>https://www.msys2.org/news/#2024-06-21-server-changes</guid><pubDate>Fri, 21 Jun 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Over the past few weeks we've been experiencing various problems with our
+server, which also led to an extended downtime on 2024-06-12. It turned out that
+both disks were failing and instead of replacing them both we decided to simply
+move to a new server. This transition is now complete and everything should be
+back to normal.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Old IP: &lt;code&gt;178.63.98.68&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;New IP: &lt;code&gt;88.99.69.85&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Many thanks to &lt;a href="https://dakulov.com"&gt;Dmitriy Akulov&lt;/a&gt; of
+&lt;a href="https://www.jsdelivr.com/"&gt;jsDelivr&lt;/a&gt; and
+&lt;a href="https://www.jsdelivr.com/globalping"&gt;Globalping&lt;/a&gt; for helping us diagnose the
+problem and generously providing us with a new server.&lt;/p&gt;
+</description></item><item><title>GCC 14.1</title><link>https://www.msys2.org/news/#2024-05-10-gcc-141</link><guid>https://www.msys2.org/news/#2024-05-10-gcc-141</guid><pubDate>Fri, 10 May 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We have updated GCC to version 14.1. See the &lt;a href="https://gcc.gnu.org/gcc-14/changes.html"&gt;GCC 14.1 release
+notes&lt;/a&gt; for more information. Similar to
+recent Clang releases, GCC also got stricter and multiple warnings are now
+errors by default, see the &lt;a href="https://gcc.gnu.org/gcc-14/porting_to.html"&gt;GCC 14.1 porting
+guide&lt;/a&gt; for details.&lt;/p&gt;
+&lt;p&gt;To reduce the maintenance burden we have dropped Ada/Objective-C/libgccjit
+support from the 32-bit/mingw32 variant.&lt;/p&gt;
+</description></item><item><title>Update to Cygwin 3.5 on Unsupported Systems</title><link>https://www.msys2.org/news/#2024-05-03-update-to-cygwin-35-on-unsupported-systems</link><guid>https://www.msys2.org/news/#2024-05-03-update-to-cygwin-35-on-unsupported-systems</guid><pubDate>Fri, 03 May 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The update to Cygwin 3.5 means MSYS2 will no longer start on long unsupported
+systems like Windows 7 and 8.0.&lt;/p&gt;
+&lt;p&gt;To keep MSYS2 running for a bit longer on such systems you can switch to the
+legacy runtime using:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;--noconfirm&lt;span class="w"&gt; &lt;/span&gt;-Sy&lt;span class="w"&gt; &lt;/span&gt;msys2-runtime-3.4&lt;span class="w"&gt; &lt;/span&gt;msys2-runtime-3.4-devel
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In case you have already updated and can't start MSYS2 anymore, you can use the
+following steps to downgrade:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Get the &lt;a href="https://github.com/msys2/msys2-installer/releases/download/2024-01-13/msys2-base-x86_64-20240113.sfx.exe"&gt;last MSYS2 installer release&lt;/a&gt; and extract it&lt;/li&gt;
+&lt;li&gt;Copy the "msys64\usr\bin\msys-2.0.dll" from there to the same location in your existing MSYS2 installation&lt;/li&gt;
+&lt;li&gt;Start a MSYS2 terminal and switch to the legacy runtime using the command above&lt;/li&gt;
+&lt;/ul&gt;
+</description></item><item><title>MSYS2 on Linux (Experimental)</title><link>https://www.msys2.org/news/#2024-05-02-msys2-on-linux-experimental</link><guid>https://www.msys2.org/news/#2024-05-02-msys2-on-linux-experimental</guid><pubDate>Thu, 02 May 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We've created a Docker image including a Wine fork + Cygwin fixes + MSYS2, as an
+experiment, so you can run MSYS2 on Linux: &lt;a href="https://github.com/msys2/msys2-docker"&gt;https://github.com/msys2/msys2-docker&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Be warned, it's very slow and flaky, and signature verification is disabled for
+packages/repos, because otherwise things would be unacceptably slow. Don't
+use it for anything important.&lt;/p&gt;
+&lt;p&gt;Shout out to &lt;a href="https://github.com/pojntfx"&gt;@pojntfx (Felicitas Pojtinger)&lt;/a&gt; for
+the idea and initial Dockerfile and to &lt;a href="https://github.com/jhol"&gt;@jhol (Joel
+Holdsworth)&lt;/a&gt; for developing the wine fork.&lt;/p&gt;
+</description></item><item><title>TLS/SSL Support for the Repository Rsync Server</title><link>https://www.msys2.org/news/#2024-04-23-tlsssl-support-for-the-repository-rsync-server</link><guid>https://www.msys2.org/news/#2024-04-23-tlsssl-support-for-the-repository-rsync-server</guid><pubDate>Tue, 23 Apr 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We have added TLS/SSL support for the repository rsync server. This means that
+you can now use&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;rsync-ssl&lt;span class="w"&gt; &lt;/span&gt;rsync://repo.msys2.org/builds
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;to sync the repository over an encrypted connection.&lt;/p&gt;
+</description></item><item><title>Automated Vulnerability Reporting System</title><link>https://www.msys2.org/news/#2024-04-02-automated-vulnerability-reporting-system</link><guid>https://www.msys2.org/news/#2024-04-02-automated-vulnerability-reporting-system</guid><pubDate>Tue, 02 Apr 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The &lt;a href="https://packages.msys2.org/security"&gt;package index&lt;/a&gt; now has some
+rudimentary support for detecting and displaying
+&lt;a href="https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures"&gt;CVEs&lt;/a&gt; and
+other vulnerability reports for the packages included in MSYS2.&lt;/p&gt;
+&lt;p&gt;We piggyback on existing security scanner tools by using the metadata in the
+package recipes to create a dummy
+&lt;a href="https://www.ntia.gov/page/software-bill-materials"&gt;SBOM&lt;/a&gt; file and then feed the
+scan results to our website. This gives us some insight into which
+packages have potential vulnerabilities or which updates should be prioritized.
+For more information on the process see &lt;a href="https://www.msys2.org/dev/vulnerabilities/"&gt;Vulnerability
+Reporting&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Some caveats:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Only about half of our packages have the necessary metadata to be scanned at
+  all. This is mainly because packages that have never had a CVE assigned also
+  don't have a &lt;a href="https://nvd.nist.gov/products/cpe"&gt;CPE&lt;/a&gt; to link to, and partly
+  because it's just incomplete on our end.&lt;/li&gt;
+&lt;li&gt;The CVE system is currently &lt;a href="https://nvd.nist.gov/general/news/nvd-program-transition-announcement"&gt;not fully
+  operational&lt;/a&gt;,
+  and for the past few weeks most of the incoming CVEs have not been processed
+  at all. This means that newer CVEs are likely not linked to our packages.
+  Since we use &lt;a href="https://github.com/anchore/grype"&gt;grype&lt;/a&gt; for scanning we do get
+  some new data from their &lt;a href="https://github.com/anchore/nvd-data-overrides"&gt;nvd-data-overrides
+  effort&lt;/a&gt; though.&lt;/li&gt;
+&lt;li&gt;Note that we will not try to reduce the number of reported vulnerabilities to
+  zero. We will mainly use them to prioritize updates and be better informed
+  about the security status of our packages.&lt;/li&gt;
+&lt;/ul&gt;
+</description></item><item><title>xz-utils Backdoor</title><link>https://www.msys2.org/news/#2024-03-30-xz-utils-backdoor</link><guid>https://www.msys2.org/news/#2024-03-30-xz-utils-backdoor</guid><pubDate>Sat, 30 Mar 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;In response to the recent &lt;a href="https://en.wikipedia.org/wiki/XZ_Utils_backdoor"&gt;xz
+backdoor&lt;/a&gt; we have rebuilt the
+xz packages for &lt;a href="https://github.com/msys2/MSYS2-packages/pull/4475"&gt;msys&lt;/a&gt; and
+&lt;a href="https://github.com/msys2/MINGW-packages/pull/20479"&gt;mingw&lt;/a&gt; from the git source
+instead of the tarball, following what &lt;a href="https://gitlab.archlinux.org/archlinux/packaging/packages/xz/-/commits/main"&gt;Arch Linux
+did&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Although we have built and shipped the affected versions, there is no indication
+at this time that this issue has affected MSYS2 users.&lt;/p&gt;
+</description></item><item><title>Note to the remaining Windows 7 / 8.0 users</title><link>https://www.msys2.org/news/#2024-02-21-note-to-the-remaining-windows-7-80-users</link><guid>https://www.msys2.org/news/#2024-02-21-note-to-the-remaining-windows-7-80-users</guid><pubDate>Wed, 21 Feb 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Note to Windows 7 / 8.0 users: While we stopped supporting these systems over a year
+ago, many things in MSYS2 continued to work as before. With the upcoming update
+to Cygwin 3.5, this will change and MSYS2 will no longer start on these systems.
+We're trying to come up with a migration path, but it's not clear yet if and how
+this will work. We'll post here when we know more.&lt;/p&gt;
+</description></item><item><title>Removal of non C/C++ packages from the mingw-w64-toolchain group</title><link>https://www.msys2.org/news/#2024-02-19-removal-of-non-cc-packages-from-the-mingw-w64-toolchain-group</link><guid>https://www.msys2.org/news/#2024-02-19-removal-of-non-cc-packages-from-the-mingw-w64-toolchain-group</guid><pubDate>Mon, 19 Feb 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Unlike the LLVM variant, the GCC variant of the
+&lt;a href="https://packages.msys2.org/basegroups/mingw-w64-toolchain"&gt;mingw-w64-toolchain&lt;/a&gt;
+package group also contained non C/C++ toolchains, such as
+fortran/ada/objc/libgccjit due to the nature of them being built from the same
+source. Since this was never the intention of the group and was causing a lot of
+unnecessary downloads and bandwidth usage, we decided to clean this up now.&lt;/p&gt;
+&lt;p&gt;If this broke things for you, make sure you explicitly install &lt;a href="https://packages.msys2.org/base/mingw-w64-gcc"&gt;Fortran/Ada/ObjC
+packages&lt;/a&gt; if you depend on them.&lt;/p&gt;
+</description></item><item><title>mingw-w64-gettext converted to split package</title><link>https://www.msys2.org/news/#2024-02-01-mingw-w64-gettext-converted-to-split-package</link><guid>https://www.msys2.org/news/#2024-02-01-mingw-w64-gettext-converted-to-split-package</guid><pubDate>Thu, 01 Feb 2024 00:00:00 +0000</pubDate><description>
+&lt;p&gt;&lt;a href="https://packages.msys2.org/base/mingw-w64-gettext"&gt;mingw-w64-gettext&lt;/a&gt; has been
+split into "gettext-tools" and "gettext-runtime" subpackages. While this is a
+backwards compatible change, this means that the gettext tools, like msgmerge
+and msgfmt, are less likely to be installed as transitive dependencies via other
+packages, and may now be missing for you if you were implicitly depending on
+them.&lt;/p&gt;
+&lt;p&gt;If this broke things for you, make sure you explicitly install the &lt;a href="https://packages.msys2.org/base/mingw-w64-gettext"&gt;gettext
+tools&lt;/a&gt; if you depend on them.&lt;/p&gt;
+</description></item><item><title>Starting to drop some 32-bit Packages</title><link>https://www.msys2.org/news/#2023-12-13-starting-to-drop-some-32-bit-packages</link><guid>https://www.msys2.org/news/#2023-12-13-starting-to-drop-some-32-bit-packages</guid><pubDate>Wed, 13 Dec 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Three years ago we dropped 32-bit Windows support for running MSYS2 itself, now
+we are taking the next step and slowly starting to reduce the number of 32-bit
+packages, meaning the packages for the MINGW32 and CLANG32 environments. The
+goal of the phase-out is to reduce maintenance costs and server resources while
+not affecting most users. The focus will be on packages that aren't likely to
+see much use anyway, or where 64-bit alternatives are available and viable:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Packages which are likely not used outside of MSYS2 (re-packaged)&lt;/li&gt;
+&lt;li&gt;End-user applications which are likely not used outside of MSYS2 (GUI apps,
+  ...)&lt;/li&gt;
+&lt;li&gt;Packages for resource intensive work where most external users are likely
+  already on 64-bit (some scientific packages, ...)&lt;/li&gt;
+&lt;li&gt;Leaf packages with complex and resource intensive builds that are likely not used&lt;/li&gt;
+&lt;li&gt;New leaf packages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To find out if a package you have installed is affected you can run &lt;code&gt;pacman -Qm&lt;/code&gt;
+which lists all installed packages which are no longer available in the repo.
+Ideally not many people should notice these changes, but in case they affect
+you:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Switch your workflow to use 64-bit packages instead ;)&lt;/li&gt;
+&lt;li&gt;Tell us which packages that were removed you still need, so we can consider reinstating them. Please use the &lt;a href="https://github.com/msys2/MINGW-packages/issues/new?assignees=&amp;amp;labels=package-request&amp;amp;projects=&amp;amp;template=environment_request.yml&amp;amp;title=Build+%5Bpackage+name%5D+for+%5Benvironment%5D"&gt;issue template&lt;/a&gt; to file your request.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you are wondering if you should continue to support 32-bit Windows for your
+users, here are some relevant resources:&lt;/p&gt;
+&lt;p&gt;Usage stats:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam"&gt;https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam&lt;/a&gt;
+  32-bit Win8.1+ below the list threshold. Heavily biased towards newer hardware
+  though.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.pcbenchmarks.net/os-marketshare.html"&gt;https://www.pcbenchmarks.net/os-marketshare.html&lt;/a&gt; 32-bit users at ~0.1%.
+  Heavily biased towards newer hardware though.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://data.firefox.com/dashboard/hardware"&gt;https://data.firefox.com/dashboard/hardware&lt;/a&gt; 32-bit at ~14%, but this includes
+  ~11% Win7 and other operating systems which we don't support, so it's not
+  clear.&lt;/li&gt;
+&lt;li&gt;In MSYS2 32-bit packages made up ~3.95% of all downloads at the end of 2023,
+  and ~6.45% one year before (ignoring CI downloads)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some applications dropping 32-bit support:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://krita.org/"&gt;Krita&lt;/a&gt; dropped 32-bit support in 2021&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.qbittorrent.org/"&gt;qBittorrent&lt;/a&gt; dropped 32-bit support in 2022&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://keepassxc.org"&gt;KeePassXC&lt;/a&gt; dropped 32-bit support in 2022&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://scipy.org/"&gt;SciPy&lt;/a&gt; dropped 32-bit support in 2022&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There are of course lots of applications not planning to drop support and 32-bit
+Windows is still supported until at least October 2025, so we understand that 32-bit
+support is still required in various cases, and we will try to keep important
+packages around for as long as possible.&lt;/p&gt;
+</description></item><item><title>Package installation issues for very old/outdated installations</title><link>https://www.msys2.org/news/#2023-11-05-package-installation-issues-for-very-oldoutdated-installations</link><guid>https://www.msys2.org/news/#2023-11-05-package-installation-issues-for-very-oldoutdated-installations</guid><pubDate>Sun, 05 Nov 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;If you haven't updated pacman in 2.5 years or longer, but are installing
+new packages, you will see errors like this, due to a format change in the
+package database:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;error: mingw-w64-ucrt-x86_64-shared-mime-info: missing required signature
+error: mingw-w64-ucrt-x86_64-gtk3: missing required signature
+error: failed to commit transaction (package missing required signature)
+Errors occurred, no packages were upgraded.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This can be fixed by &lt;a href="https://www.msys2.org/docs/updating/"&gt;updating your installation&lt;/a&gt;.&lt;/p&gt;
+</description></item><item><title>Python: Changed behavior when loading DLL dependencies of extension modules</title><link>https://www.msys2.org/news/#2023-08-06-python-changed-behavior-when-loading-dll-dependencies-of-extension-modules</link><guid>https://www.msys2.org/news/#2023-08-06-python-changed-behavior-when-loading-dll-dependencies-of-extension-modules</guid><pubDate>Sun, 06 Aug 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Starting with CPython 3.8, upstream CPython changed their DLL lookup behavior to
+a safer default when loading extension modules, which meant no longer looking in
+PATH and the current working directory as a fallback, but requiring code to
+explicitly add directories containing dependencies via
+&lt;a href="https://docs.python.org/3/library/os.html#os.add_dll_directory"&gt;&lt;code&gt;os.add_dll_directory()&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Because many packages weren't ported yet back then, and this behavior interfered
+with our MinGW port build process we reverted this change and kept the old
+behavior. This had the downsides of being less secure and
+&lt;code&gt;os.add_dll_directory()&lt;/code&gt; not working.&lt;/p&gt;
+&lt;p&gt;We have now finally managed to fix this in our port, so that DLL loading works
+the same as with the official CPython distribution.&lt;/p&gt;
+&lt;p&gt;If this change is causing problems for you:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make sure to use &lt;code&gt;os.add_dll_directory()&lt;/code&gt; where needed, as recommended by
+  upstream, see &lt;a href="https://docs.python.org/3/library/os.html#os.add_dll_directory"&gt;https://docs.python.org/3/library/os.html#os.add_dll_directory&lt;/a&gt;
+  for details&lt;/li&gt;
+&lt;li&gt;To ease the transition we've temporarily added a
+  &lt;code&gt;PYTHONLEGACYWINDOWSDLLLOADING&lt;/code&gt; environment variable, which you can set to &lt;code&gt;1&lt;/code&gt;
+  to get back the old behavior. We will remove this workaround after some time,
+  so please let us know if there are any problems that can't be solved without
+  it.&lt;/li&gt;
+&lt;/ul&gt;
+</description></item><item><title>LLVM 16</title><link>https://www.msys2.org/news/#2023-04-01-llvm-16</link><guid>https://www.msys2.org/news/#2023-04-01-llvm-16</guid><pubDate>Sat, 01 Apr 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;LLVM/Clang has now been updated to v16, here are some things to look out for:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Stricter C compiler: Various previously warnings are now errors by default and
+  might make your build fail. See the following for more information:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The upstream changelog entry: &lt;a href="https://releases.llvm.org/16.0.0/tools/clang/docs/ReleaseNotes.html#potentially-breaking-changes"&gt;https://releases.llvm.org/16.0.0/tools/clang/docs/ReleaseNotes.html#potentially-breaking-changes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;The Gentoo guide for how to adjust your code for the new stricter defaults: &lt;a href="https://wiki.gentoo.org/wiki/Modern_C_porting"&gt;https://wiki.gentoo.org/wiki/Modern_C_porting&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;The Gentoo bug which tracks all related issues in Gentoo: &lt;a href="https://bugs.gentoo.org/870412"&gt;https://bugs.gentoo.org/870412&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;autoconf bugs: The stricter defaults in clang v16 exposed some autoconf bugs
+  which lead to some compiler checks returning the wrong results. We have
+  backported the respective fixes into all our autoconf versions (2.13, 2.69 and
+  2.71) and updated autoconf-archive, but this means you will have to run
+  autoreconf to get those fixes. There is also a chance that other checks in
+  configure.ac or m4 macros shipped with your project will need to be updated.
+  So watch out for changes in your configure results.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;fortran/flang: flang, the llvm based Fortran compiler, is now capable of
+  building some of our Fortran based packages. But despite that, it still has
+  known issues of generating wrong or broken code without warnings and should
+  not be used in production. The same is true for all Fortran based packages we
+  are building with it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Packages not compatible with llvm v16: So we don't have to wait for all
+  packages/projects to support the newest llvm version, we added new packages for
+  llvm v14 and v15 which only contain static builds and are now used by the
+  packages not supporting llvm v16. This currently affects python-llvmlite,
+  openshadinglanguage and include-what-you-use.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description></item><item><title>Server maintenance on 2023-02-18/19</title><link>https://www.msys2.org/news/#2023-02-10-server-maintenance-on-2023-02-1819</link><guid>https://www.msys2.org/news/#2023-02-10-server-maintenance-on-2023-02-1819</guid><pubDate>Fri, 10 Feb 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;There will be a short server maintenance around the weekend of 2023-02-18/19 which will affect repo.msys2.org, mirror.msys2.org, packages.msys2.org, and some subdomain redirects of our website.&lt;/p&gt;
+&lt;p&gt;Update: all done now&lt;/p&gt;
+</description></item><item><title>Dropping support for Windows 7 and 8.0</title><link>https://www.msys2.org/news/#2023-01-15-dropping-support-for-windows-7-and-80</link><guid>https://www.msys2.org/news/#2023-01-15-dropping-support-for-windows-7-and-80</guid><pubDate>Sun, 15 Jan 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;As announced last April we will no longer support Windows 7 / 8.0 from now on.&lt;/p&gt;
+</description></item><item><title>OpenSSL updated from 1.1.1 to 3.0.x</title><link>https://www.msys2.org/news/#2023-01-15-openssl-updated-from-111-to-30x</link><guid>https://www.msys2.org/news/#2023-01-15-openssl-updated-from-111-to-30x</guid><pubDate>Sun, 15 Jan 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;With v3.0 being out for more than a year and the EOL of v1.1.1 approaching this year we have moved both cygwin and mingw builds to v3.0.x now. If there are any issues let us know.&lt;/p&gt;
+&lt;p&gt;Note that the license of OpenSSL has changed to Apache-2.0 starting with v3.&lt;/p&gt;
+</description></item><item><title>Dropping 32bit support for Qt 6</title><link>https://www.msys2.org/news/#2023-01-05-dropping-32bit-support-for-qt-6</link><guid>https://www.msys2.org/news/#2023-01-05-dropping-32bit-support-for-qt-6</guid><pubDate>Thu, 05 Jan 2023 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Qt project dropped support for Windows version older than Windows 10 from Qt 6,
+see this official &lt;a href="https://www.qt.io/blog/qt6-development-hosts-and-targets"&gt;blog post&lt;/a&gt;.
+It was also added that we will not have 32 bit x86 Windows support available.
+With this above condition, we too have very few users who are using 32 bit x86
+Windows 10. So, we decided to remove 32 bit builds for Qt 6 and their dependencies.
+The remaining 32 bit x86 packages which depends on Qt will be linked with Qt 5.
+With this, our Qt 6 packages will be available for all official
+&lt;a href="https://doc.qt.io/qt-6/windows.html"&gt;Windows platforms&lt;/a&gt;.&lt;/p&gt;
+</description></item><item><title>Default _WIN32_WINNT bumped to Windows 8.1 for UCRT environments</title><link>https://www.msys2.org/news/#2022-12-26-default-_win32_winnt-bumped-to-windows-81-for-ucrt-environments</link><guid>https://www.msys2.org/news/#2022-12-26-default-_win32_winnt-bumped-to-windows-81-for-ucrt-environments</guid><pubDate>Mon, 26 Dec 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We have bumped the default &lt;code&gt;_WIN32_WINNT&lt;/code&gt; version defined in mingw-w64 from Windows 7 to Windows 8.1 for non-arm UCRT environments (CLANG32, CLANG64, UCRT64). For projects that don't define their own &lt;code&gt;_WIN32_WINNT&lt;/code&gt; and conditionally include features depending on the minimum supported Windows version this might mean that new builds will start depending on Windows 8.1. MINGW32/64 will default to Windows 7 for a bit longer to smooth over the transition.&lt;/p&gt;
+&lt;p&gt;This is part of our goal to phase out Windows 7 support and target newer Windows versions by default.&lt;/p&gt;
+</description></item><item><title>Dropping Windows 7 support for the MSYS2 installer</title><link>https://www.msys2.org/news/#2022-12-16-dropping-windows-7-support-for-the-msys2-installer</link><guid>https://www.msys2.org/news/#2022-12-16-dropping-windows-7-support-for-the-msys2-installer</guid><pubDate>Fri, 16 Dec 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The latest release of the MSYS2 installer (v2022-12-16) has dropped support for Windows 7. It will show an error message and abort if started on Windows 7.&lt;/p&gt;
+</description></item><item><title>Changing the default environment from MINGW64 to UCRT64</title><link>https://www.msys2.org/news/#2022-10-29-changing-the-default-environment-from-mingw64-to-ucrt64</link><guid>https://www.msys2.org/news/#2022-10-29-changing-the-default-environment-from-mingw64-to-ucrt64</guid><pubDate>Sat, 29 Oct 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;About 1.5 years ago we started adding a new variant of the MINGW64 environment called &lt;a href="https://www.msys2.org/docs/environments/"&gt;UCRT64&lt;/a&gt;, which uses the Universal CRT instead of
+the old msvcrt.dll. Now that all our packages are available in this new environment and a very large percentage of our users (~97%) are on a system that includes UCRT, we recommend it as the default environment instead of MINGW64.&lt;/p&gt;
+&lt;p&gt;The MINGW32/64 environments will continue to exist and there are no plans to remove them, but we will focus our attention more on UCRT64 and the other UCRT-using environments such as CLANG64 and CLANGARM64.&lt;/p&gt;
+</description></item><item><title>mingw packages now built with -D_FORTIFY_SOURCE=2 and -fstack-protector-strong</title><link>https://www.msys2.org/news/#2022-10-23-mingw-packages-now-built-with-d_fortify_source2-and-fstack-protector-strong</link><guid>https://www.msys2.org/news/#2022-10-23-mingw-packages-now-built-with-d_fortify_source2-and-fstack-protector-strong</guid><pubDate>Sun, 23 Oct 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Our mingw packages will be built with &lt;code&gt;-D_FORTIFY_SOURCE=2&lt;/code&gt; and &lt;code&gt;-fstack-protector-strong&lt;/code&gt; from now on.&lt;/p&gt;
+</description></item><item><title>New minimum hardware requirements (CPUs from ~2006/7+)</title><link>https://www.msys2.org/news/#2022-10-18-new-minimum-hardware-requirements-cpus-from-20067</link><guid>https://www.msys2.org/news/#2022-10-18-new-minimum-hardware-requirements-cpus-from-20067</guid><pubDate>Tue, 18 Oct 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;As a first step of phasing out support for Windows 7, we're raising the minimum hardware requirements to match Windows 8.1, which roughly equals Intel Core 2 / AMD Phenom, so anything after 2006/7 is fine.&lt;/p&gt;
+&lt;p&gt;In terms of GCC/Clang compiler flags this means going from &lt;code&gt;-march=x86-64&lt;/code&gt; to &lt;code&gt;-march=nocona -msahf&lt;/code&gt;. This only affects 64bit packages, and only those that use features only available in those newer CPUs, and only once they are updated or rebuilt.&lt;/p&gt;
+</description></item><item><title>libssp is no longer required</title><link>https://www.msys2.org/news/#2022-10-10-libssp-is-no-longer-required</link><guid>https://www.msys2.org/news/#2022-10-10-libssp-is-no-longer-required</guid><pubDate>Mon, 10 Oct 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Building with &lt;code&gt;_FORTIFY_SOURCE&lt;/code&gt; no longer requires explicitly linking with libssp (-lssp) and enabling stack protection no longer pulls in libssp. This brings things in line with other platforms. Thanks to &lt;a href="https://github.com/mstorsjo"&gt;Martin Storsjö&lt;/a&gt; for implementing this in mingw-w64. Once all our affected packages are rebuilt we will remove the libssp package from our repo.&lt;/p&gt;
+&lt;p&gt;2022-10-13: We have decided to keep just the libssp DLL around for some more time to avoid breaking existing users&lt;/p&gt;
+</description></item><item><title>Changed behavior for empty env vars</title><link>https://www.msys2.org/news/#2022-09-24-changed-behavior-for-empty-env-vars</link><guid>https://www.msys2.org/news/#2022-09-24-changed-behavior-for-empty-env-vars</guid><pubDate>Sat, 24 Sep 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Empty environment variables are no longer removed when starting a new non-cygwin process.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="nv"&gt;FOO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;python&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"import os; print('FOO' in os.environ)"&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# Old&lt;/span&gt;
+&lt;span class="go"&gt;False&lt;/span&gt;
+&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="nv"&gt;FOO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;python&lt;span class="w"&gt; &lt;/span&gt;-c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"import os; print('FOO' in os.environ)"&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# New&lt;/span&gt;
+&lt;span class="go"&gt;True&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;You can &lt;strong&gt;revert to the old behavior&lt;/strong&gt; by setting &lt;code&gt;MSYS=noemptyenvvalues&lt;/code&gt;. Please let us know if this is breaking anything that can't be solved by just unsetting the env var where needed.&lt;/p&gt;
+</description></item><item><title>ConPTY support enabled by default</title><link>https://www.msys2.org/news/#2022-09-24-conpty-support-enabled-by-default</link><guid>https://www.msys2.org/news/#2022-09-24-conpty-support-enabled-by-default</guid><pubDate>Sat, 24 Sep 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;ConPTY support in our cygwin fork is now enabled by default. This means any non-cygwin apps will now behave as if they are run in with a console attached and not redirected. This feature has been enabled in upstream cygwin for quite a while but we wanted to wait until there are no more known issues. We now feel that not enabling it causes more problems then enabling it.&lt;/p&gt;
+&lt;p&gt;You can &lt;strong&gt;disable it again&lt;/strong&gt; by setting &lt;code&gt;MSYS=disable_pcon&lt;/code&gt;.&lt;/p&gt;
+</description></item><item><title>Windows 7 / 8 support will be dropped late 2022 or early 2023</title><link>https://www.msys2.org/news/#2022-04-06-windows-7-8-support-will-be-dropped-late-2022-or-early-2023</link><guid>https://www.msys2.org/news/#2022-04-06-windows-7-8-support-will-be-dropped-late-2022-or-early-2023</guid><pubDate>Wed, 06 Apr 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Cygwin 3.5 will drop support for Windows &amp;lt;8.1, which means the new requirement will be "64 bit Windows 8.1 / Windows Server 2012 R2". We expect the update to Cygwin 3.5 to be around late 2022, early 2023. For more information, look &lt;a href="https://www.msys2.org/docs/windows_support/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A recent survey suggests that ~2-3% of our active users (excluding cloud servers and CI systems) are still using Windows &amp;lt;8.1. We recommend them stopping to update at the end of the year. We've enabled an inline warning message for them when they open a terminal.&lt;/p&gt;
+&lt;p&gt;For developers bundling our packages, we recommend simply pointing out the last version of their application that still worked with Windows 7 / 8 on their download page.&lt;/p&gt;
+</description></item><item><title>Sunsetting the SourceForge mirror in 30 days from now</title><link>https://www.msys2.org/news/#2022-03-04-sunsetting-the-sourceforge-mirror-in-30-days-from-now</link><guid>https://www.msys2.org/news/#2022-03-04-sunsetting-the-sourceforge-mirror-in-30-days-from-now</guid><pubDate>Fri, 04 Mar 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;&lt;em&gt;Note: This should only affect systems not updated in over a year, or users that actively switched to this mirror, which is unlikely.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Due to space constrains and our ever growing package archive we can no longer update the &lt;a href="https://sourceforge.net/projects/msys2/files/"&gt;SourceForge mirror&lt;/a&gt;. We already hit the space limit last year but worked around it by no longer syncing source packages. We have now hit the limit again, and decided that it is no longer worth it maintaining it.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;We will remove the SourceForge mirror on 2022-04-03&lt;/strong&gt;. We will delete the package databases as well to make DB syncs fail to avoid users using outdated software without them knowing it. After 4 more weeks we will delete the remaining packages and installers.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2022-05-07&lt;/strong&gt;: The mirror has now been removed.&lt;/p&gt;
+</description></item><item><title>repo.msys2.org only available via HTTPS/TLS</title><link>https://www.msys2.org/news/#2022-02-24-repomsys2org-only-available-via-httpstls</link><guid>https://www.msys2.org/news/#2022-02-24-repomsys2org-only-available-via-httpstls</guid><pubDate>Thu, 24 Feb 2022 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We have switched repo.msys2.org to always redirect to a secure connection. If
+for some reason you require HTTP you can use one of our &lt;a href="https://www.msys2.org/dev/mirrors/"&gt;tier 1
+mirrors&lt;/a&gt;.&lt;/p&gt;
+</description></item><item><title>Ongoing Cleanup of the base-devel Package Group</title><link>https://www.msys2.org/news/#2021-12-22-ongoing-cleanup-of-the-base-devel-package-group</link><guid>https://www.msys2.org/news/#2021-12-22-ongoing-cleanup-of-the-base-devel-package-group</guid><pubDate>Wed, 22 Dec 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The &lt;code&gt;base-devel&lt;/code&gt; package group is the set of packages required to be installed
+before running &lt;code&gt;makepkg&lt;/code&gt; / &lt;code&gt;makepkg-mingw&lt;/code&gt;. We have recently started to clean
+this group up and moved some of the packages to be explicit dependencies in the
+&lt;code&gt;PKGBUILD&lt;/code&gt; files instead.&lt;/p&gt;
+&lt;p&gt;One notable removal is various autotools related packages. There now exists an
+&lt;code&gt;autotools&lt;/code&gt; and a &lt;code&gt;${MINGW_PACKAGE_PREFIX}-autotools&lt;/code&gt; meta package which will
+pull in anything related to autotools which packages can add to their
+&lt;code&gt;makedepends&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Further more the group was replaced with a package of the same name, to make
+adding/removing packages easier. Note that pacman prefers packages over groups
+for the same name, so the set of included packages is now listed here
+&lt;a href="https://packages.msys2.org/package/base-devel"&gt;https://packages.msys2.org/package/base-devel&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This cleanup can lead to build errors in case your build setup assumes certain
+packages being installed with &lt;code&gt;base-devel&lt;/code&gt;. If that is the case make sure to
+install those missing packages explicitly instead.&lt;/p&gt;
+</description></item><item><title>Potential Incompatibilities with newer Python setuptools</title><link>https://www.msys2.org/news/#2021-12-21-potential-incompatibilities-with-newer-python-setuptools</link><guid>https://www.msys2.org/news/#2021-12-21-potential-incompatibilities-with-newer-python-setuptools</guid><pubDate>Tue, 21 Dec 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;&lt;strong&gt;tl;dr:&lt;/strong&gt; use &lt;code&gt;export SETUPTOOLS_USE_DISTUTILS=stdlib&lt;/code&gt; if you have problems
+building/installing packages with newer versions of setuptools from pypi.&lt;/p&gt;
+&lt;p&gt;The Python packaging ecosystem is currently in the transition of removing
+distutils from CPython and moving it into setuptools. Historically distutils is
+patched quite a bit by us to make it work with our directory layout and to build
+packages with gcc/clang instead of MSVC. With this move our patches are no
+longer used and setuptools will fail in various ways, or install things into
+wrong places.&lt;/p&gt;
+&lt;p&gt;We are working with upstream to include our patches, but this will take some
+more time. In the meantime you can force setuptools to use the (still patched)
+distutils from the CPython stdlib via &lt;code&gt;export SETUPTOOLS_USE_DISTUTILS=stdlib&lt;/code&gt;
+The setuptools version in our repo however will continue to use the patched
+distutils until all issues are resolved and is not affected.&lt;/p&gt;
+&lt;p&gt;🙏 Many thanks to the distutils and setuptools maintainers for considering our
+patches, despite Cygwin/MSYS2 not being officially supported by CPython.&lt;/p&gt;
+</description></item><item><title>OpenSSH 8.8 dropped support for old ssh-rsa keys using SHA-1</title><link>https://www.msys2.org/news/#2021-10-14-openssh-88-dropped-support-for-old-ssh-rsa-keys-using-sha-1</link><guid>https://www.msys2.org/news/#2021-10-14-openssh-88-dropped-support-for-old-ssh-rsa-keys-using-sha-1</guid><pubDate>Thu, 14 Oct 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The recent OpenSSH update disabled support for old ssh-rsa keys using SHA-1 by
+default. See &lt;a href="https://www.openssh.com/txt/release-8.8"&gt;https://www.openssh.com/txt/release-8.8&lt;/a&gt;
+"Potentially-incompatible changes" for details and possible workarounds.&lt;/p&gt;
+</description></item><item><title>Some Mirror/Server/Repository Changes</title><link>https://www.msys2.org/news/#2021-07-04-some-mirrorserverrepository-changes</link><guid>https://www.msys2.org/news/#2021-07-04-some-mirrorserverrepository-changes</guid><pubDate>Sun, 04 Jul 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;&lt;strong&gt;Primary Pacman Server&lt;/strong&gt;: We've switched the main server in the pacman config
+to &lt;a href="https://mirror.msys2.org"&gt;https://mirror.msys2.org&lt;/a&gt;. This server will redirect pacman to an up-to-date
+mirror &lt;a href="https://mirror.msys2.org/?mirrorstats"&gt;near you&lt;/a&gt; for each file. We hope
+this will improve the download speed for users further away from Europe. We also
+have a new overview of all mirrors &lt;a href="https://www.msys2.org/dev/mirrors/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Repo Path Renaming:&lt;/strong&gt; We've renamed &lt;code&gt;mingw/i686/&lt;/code&gt; to &lt;code&gt;mingw/mingw32/&lt;/code&gt; and
+&lt;code&gt;mingw/x86_86/&lt;/code&gt; to &lt;code&gt;mingw/mingw64/&lt;/code&gt; and added symlinks for the old paths. This
+means 100GB of resyncing for mirrors using rsync (sorry :/). Having the repo
+name in the directory path allows us to have one mirrorlist configuration for
+all repos in the future.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Sourceforge&lt;/strong&gt;: Due to space constraints we no longer host the source packages
+on Sourceforge. They are still available on our main server and on all mirrors.&lt;/p&gt;
+</description></item><item><title>R.I.P. mingwandroid</title><link>https://www.msys2.org/news/#2021-04-21-rip-mingwandroid</link><guid>https://www.msys2.org/news/#2021-04-21-rip-mingwandroid</guid><pubDate>Wed, 21 Apr 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Ray Donnelly is a co-founder and developer of MSYS2 and after a multi year fight
+with cancer passed away on 2021-04-20.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="ray" height="666" src="https://www.msys2.org/ray.jpg" style="max-width: 375px; width:100%; border: 2px solid #333; box-shadow: 0px 0px 3px #ccc;" width="999"/&gt;&lt;/p&gt;
+&lt;p&gt;If you want to know more about his life and work see his fundraiser
+descriptions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.gofundme.com/f/help-Ray-fund-a-hospice-bedroom"&gt;https://www.gofundme.com/f/help-Ray-fund-a-hospice-bedroom&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.gofundme.com/f/arku72-help-ray-fight-cancer"&gt;https://www.gofundme.com/f/arku72-help-ray-fight-cancer&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;He was always helpful, knowledgeable, and friendly, and he will be greatly missed.&lt;/p&gt;
+</description></item><item><title>Temporarily broken msys2-launcher package</title><link>https://www.msys2.org/news/#2021-03-25-temporarily-broken-msys2-launcher-package</link><guid>https://www.msys2.org/news/#2021-03-25-temporarily-broken-msys2-launcher-package</guid><pubDate>Thu, 25 Mar 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The repo contained a broken msys2-launcher package for a few hours today causing things like
+"msys2.exe" to just show an error dialog. You can get back to a working setup this way:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Start &lt;code&gt;C:/msys64/msys2_shell.cmd&lt;/code&gt; to get a shell&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;pacman -Suy&lt;/code&gt; to get all the fixed packages&lt;/li&gt;
+&lt;/ul&gt;
+</description></item><item><title>New server for repo.msys2.org and packages.msys2.org</title><link>https://www.msys2.org/news/#2021-02-27-new-server-for-repomsys2org-and-packagesmsys2org</link><guid>https://www.msys2.org/news/#2021-02-27-new-server-for-repomsys2org-and-packagesmsys2org</guid><pubDate>Sat, 27 Feb 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;We have moved repo.msys2.org (and package.msys2.org) to a new server.  There was
+a short downtime, but everything should be running great now.  Big thanks to
+&lt;del&gt;appfleet.com&lt;/del&gt; jsdelivr.com for sponsoring the new server.&lt;/p&gt;
+&lt;p&gt;New mirrorlists for Pacman will be published soon.  After you get them, your
+package installs and updates should be faster than before and without the
+404s and glitches.&lt;/p&gt;
+&lt;p&gt;With the migration, Christoph (@lazka) will now be updating and signing
+the Pacman databases more often.  This should go smoothly as the GPG keys are
+already in place and the process has been tested on the new server before it
+went live.&lt;/p&gt;
+&lt;p&gt;By the way, the redirect domain msys2.org (no www.) should work more
+reliably now and HTTPS is now available for it.&lt;/p&gt;
+</description></item><item><title>ASLR enabled by default</title><link>https://www.msys2.org/news/#2021-01-31-aslr-enabled-by-default</link><guid>https://www.msys2.org/news/#2021-01-31-aslr-enabled-by-default</guid><pubDate>Sun, 31 Jan 2021 00:00:00 +0000</pubDate><description>
+&lt;p&gt;About 5 months ago we started backporting patches to our binutils
+2.35 to allow enabling ASLR support via various flags. We also enabled these
+flags in our build system, so any package in our repo that was updated in the
+last 5 months has ASLR support enabled.&lt;/p&gt;
+&lt;p&gt;We've now updated to 2.36 which has ASLR enabled by default. Ideally you
+shouldn't notice any changes, but in case this leads to problems all of it can
+be disabled/reverted via linker flags:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;mingw64: &lt;code&gt;-Wl,--disable-dynamicbase,--disable-high-entropy-va,--default-image-base-low&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;mingw32: &lt;code&gt;-Wl,--disable-dynamicbase&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that this is only a temporary workaround and some of these flags will not
+be available forever, so you should either fix your code or file a bug in case
+you suspect a toolchain issue.&lt;/p&gt;
+&lt;p&gt;Thanks to the binutils developers for improving/fixing ASLR support and to
+everyone helping on the MSYS2 side of things, especially &lt;a href="https://github.com/jeremyd2019"&gt;Jeremy
+Drake&lt;/a&gt; for backporting, upstreaming and fixing
+bugs exposed by these changes.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Known issues:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;(Fixed now) &lt;del&gt;In case you are seeing errors such as &lt;code&gt;relocation truncated to fit:
+  IMAGE_REL_AMD64_REL32 against undefined symbol&lt;/code&gt; try building with
+  &lt;code&gt;-Wl,--default-image-base-low&lt;/code&gt;. Here is the upstream bug report:
+  &lt;a href="https://sourceware.org/bugzilla/show_bug.cgi?id=26659"&gt;https://sourceware.org/bugzilla/show_bug.cgi?id=26659&lt;/a&gt;&lt;/del&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description></item><item><title>Zstd exemption for core packages removed</title><link>https://www.msys2.org/news/#2020-12-26-zstd-exemption-for-core-packages-removed</link><guid>https://www.msys2.org/news/#2020-12-26-zstd-exemption-for-core-packages-removed</guid><pubDate>Sat, 26 Dec 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Given it's been months since we began the switch to Zstd for compressing
+packages, we've now started using it for core packages as well.  This means
+older installations without Zstd support won't be able to cleanly upgrade
+anymore.&lt;/p&gt;
+&lt;p&gt;@dmn-star compiled these commands that should update an older installation to
+support Zstd and unblock futher upgrades:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman --noconfirm -U "https://repo.msys2.org/msys/x86_64/libzstd-1.4.4-2-x86_64.pkg.tar.xz"
+pacman --noconfirm -U "https://repo.msys2.org/msys/x86_64/zstd-1.4.4-2-x86_64.pkg.tar.xz"
+pacman --noconfirm -U "https://repo.msys2.org/msys/x86_64/pacman-5.2.1-6-x86_64.pkg.tar.xz"
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</description></item><item><title>main repo pruned</title><link>https://www.msys2.org/news/#2020-10-08-main-repo-pruned</link><guid>https://www.msys2.org/news/#2020-10-08-main-repo-pruned</guid><pubDate>Thu, 08 Oct 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Due to limited space on the new server and SourceForge file hosting, we are
+starting to remove older unused packages from the archives.  There should still
+be a 1 year's worth of packages available for downgrades.  Mirrors are free to
+choose whether they want to keep everything or follow the lead.&lt;/p&gt;
+</description></item><item><title>server downtime</title><link>https://www.msys2.org/news/#2020-10-07-server-downtime</link><guid>https://www.msys2.org/news/#2020-10-07-server-downtime</guid><pubDate>Wed, 07 Oct 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;From Friday 2&lt;sup&gt;nd&lt;/sup&gt; to Wednesday 10&lt;sup&gt;th&lt;/sup&gt;, the main hosting at repo.msys2.org was down.
+The server unfortunately completely died and the hosting had to be moved
+elsewhere.  We thank Diablo-D3 for having provided the hardware and hosting.  If
+you notice anything wrong with repo.msys2.org since the move, please tell us.&lt;/p&gt;
+</description></item><item><title>new packagers</title><link>https://www.msys2.org/news/#2020-06-29-new-packagers</link><guid>https://www.msys2.org/news/#2020-06-29-new-packagers</guid><pubDate>Mon, 29 Jun 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Alexey is stepping down from his role as the main packager and two new packagers
+have been appointed in his place:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;David Macek with &lt;a href="https://keyserver.ubuntu.com/pks/lookup?search=0x87771331B3F1FF5263856A6D974C8BE49078F532&amp;amp;fingerprint=on&amp;amp;op=vindex"&gt;signing key 0x9078f532&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Christoph Reiter with &lt;a href="https://keyserver.ubuntu.com/pks/lookup?search=0x5F944B027F7FE2091985AA2EFA11531AA0AA7F57&amp;amp;fingerprint=on&amp;amp;op=vindex"&gt;signing key 0xa0aa7f57&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can see the keys in full without relying on keyservers in the &lt;a href="https://github.com/msys2/MSYS2-keyring/"&gt;msys2-keyring
+GitHub repository&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We have released a new &lt;em&gt;msys2-keyring&lt;/em&gt; package from that source (and a new
+installer that includes them) and we are waiting for a bit before uploading new
+databases and packages to give people time to update.  If you don't update the
+keyring in time, you'll see something like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;:: Synchronizing package databases...
+downloading mingw32.db...
+downloading mingw32.db.sig...
+error: mingw32: key "4A6129F4E4B84AE46ED7F635628F528CF3053E04" is unknown
+:: Import PGP key 4096R/87771331B3F1FF5263856A6D974C8BE49078F532, "David Macek &amp;lt;david.macek.0@gmail.com&amp;gt;", created: 2018-01-14? [Y/n]
+error: mingw32: signature from "David Macek &amp;lt;david.macek.0@gmail.com&amp;gt;" is marginal trust
+error: failed to update mingw32 (invalid or corrupted database (PGP signature))
+
+downloading mingw64.db...
+downloading mingw64.db.sig...
+error: mingw64: signature from "David Macek &amp;lt;david.macek.0@gmail.com&amp;gt;" is marginal trust
+error: failed to update mingw64 (invalid or corrupted database (PGP signature))
+
+downloading msys.db...
+downloading msys.db.sig...
+error: msys: signature from "David Macek &amp;lt;david.macek.0@gmail.com&amp;gt;" is marginal trust
+error: failed to update msys (invalid or corrupted database (PGP signature))
+error: failed to synchronize all databases
+
+error: mingw32: signature from "David Macek &amp;lt;david.macek.0@gmail.com&amp;gt;" is marginal trust
+error: mingw64: signature from "David Macek &amp;lt;david.macek.0@gmail.com&amp;gt;" is marginal trust
+error: msys: signature from "David Macek &amp;lt;david.macek.0@gmail.com&amp;gt;" is marginal trust
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We have prepared the following steps to verify and install the new keyring
+manually after which you should be able to use &lt;code&gt;pacman -Syu&lt;/code&gt; again:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
+$ curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
+
+$ pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
+==&amp;gt; Checking msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig... (detached)
+gpg: Signature made Mon Jun 29 07:36:14 2020 CEST
+gpg:                using DSA key AD351C50AE085775EB59333B5F92EFC1A47D45A1
+gpg: Good signature from "Alexey Pavlov (Alexpux) &amp;lt;alexpux@gmail.com&amp;gt;" [full]
+
+# pacman -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If you can't even import the key and the above command fails like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;error: msys: key "4A6129F4E4B84AE46ED7F635628F528CF3053E04" is unknown
+:: Import PGP key 4A6129F4E4B84AE46ED7F635628F528CF3053E04? [Y/n]
+[...]
+error: database 'msys' is not valid (invalid or corrupted database (PGP signature))
+loading packages...
+error: failed to prepare transaction (invalid or corrupted database)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;... you have to convince pacman to not care about those databases for a while,
+for example like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;# pacman -U --config &amp;lt;(echo) msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If you still see signature errors, resetting your pacman key store might help:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;# rm -r /etc/pacman.d/gnupg/
+# pacman-key --init
+# pacman-key --populate msys2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</description></item><item><title>New base metapackage; pacman-contrib is now separate</title><link>https://www.msys2.org/news/#2020-06-15-new-base-metapackage-pacman-contrib-is-now-separate</link><guid>https://www.msys2.org/news/#2020-06-15-new-base-metapackage-pacman-contrib-is-now-separate</guid><pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Following a similar change in Arch Linux, the &lt;code&gt;base&lt;/code&gt; group was replaced with
+a &lt;code&gt;base&lt;/code&gt; metapackage.  If you installed your MSYS2 using an installer older than
+2020-06-02, please run &lt;code&gt;pacman -S base&lt;/code&gt; to get up to date.&lt;/p&gt;
+&lt;p&gt;This also installs the &lt;code&gt;pacman-contrib&lt;/code&gt; package where &lt;code&gt;updpkgsums&lt;/code&gt;, &lt;code&gt;pactree&lt;/code&gt;
+etc. now live (previously included in the &lt;code&gt;pacman&lt;/code&gt; package).&lt;/p&gt;
+&lt;p&gt;Details at &lt;a href="https://github.com/msys2/MSYS2-packages/pull/1979"&gt;#1979&lt;/a&gt;,
+&lt;a href="https://github.com/msys2/MSYS2-packages/issues/1976"&gt;#1976&lt;/a&gt; and
+&lt;a href="https://github.com/msys2/MSYS2-packages/pull/1988"&gt;#1988&lt;/a&gt;.&lt;/p&gt;
+</description></item><item><title>Update may fail with "could not open file"</title><link>https://www.msys2.org/news/#2020-05-31-update-may-fail-with-could-not-open-file</link><guid>https://www.msys2.org/news/#2020-05-31-update-may-fail-with-could-not-open-file</guid><pubDate>Sun, 31 May 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;In case your update process errors out with something similar to&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;error: could not open file /var/cache/pacman/pkg/zstd-1.4.5-1-x86_64.pkg.tar.zst: Child process exited with status 127&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;update pacman separately first:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman -Sydd pacman
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This issue is caused by a pacman version that is too old and can't handle newer
+packages compressed with zstd. In case you are seeing this problem in CI
+consider using a newer base which contains a newer pacman which supports zstd:
+&lt;a href="https://github.com/msys2/msys2-installer/releases"&gt;https://github.com/msys2/msys2-installer/releases&lt;/a&gt;&lt;/p&gt;
+</description></item><item><title>MSYS2 may fail to start after a msys2-runtime upgrade</title><link>https://www.msys2.org/news/#2020-05-22-msys2-may-fail-to-start-after-a-msys2-runtime-upgrade</link><guid>https://www.msys2.org/news/#2020-05-22-msys2-may-fail-to-start-after-a-msys2-runtime-upgrade</guid><pubDate>Fri, 22 May 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;MSYS2 programs will fail to start if programs started before the update are
+still running in the background (especially sshd, dirmngr, gpg-agent, bash,
+pacman and mintty). You can stop them by running the following in a Windows
+terminal:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;taskkill /f /fi &lt;span class="s2"&gt;"MODULES eq msys-2.0.dll"&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If that fails, try a reboot.&lt;/p&gt;
+&lt;p&gt;We've improved our update process so this shouldn't happen again with future
+updates.&lt;/p&gt;
+</description></item><item><title>Pacman may fail to install packages with Unrecognized archive format</title><link>https://www.msys2.org/news/#2020-05-22-pacman-may-fail-to-install-packages-with-unrecognized-archive-format</link><guid>https://www.msys2.org/news/#2020-05-22-pacman-may-fail-to-install-packages-with-unrecognized-archive-format</guid><pubDate>Fri, 22 May 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;For a while, the core packages were prematurely packaged using zstd without
+giving users time to update to zstd-enabled pacman first.  This should be
+resolved now.&lt;/p&gt;
+</description></item><item><title>32-bit MSYS2 no longer actively supported</title><link>https://www.msys2.org/news/#2020-05-17-32-bit-msys2-no-longer-actively-supported</link><guid>https://www.msys2.org/news/#2020-05-17-32-bit-msys2-no-longer-actively-supported</guid><pubDate>Sun, 17 May 2020 00:00:00 +0000</pubDate><description>
+&lt;p&gt;32-bit mingw-w64 packages are still supported, this is about the POSIX emulation
+layer, i.e. the runtime, Bash, MinTTY...&lt;/p&gt;
+&lt;p&gt;After this date, we don't plan on building updated msys-i686 packages nor
+releasing i686 installers anymore.  This is due to increasingly frustrating
+difficulties with limited 32-bit address space, high penetration of 64-bit
+systems and Cygwin (our upstream) starting their way to drop 32-bit support as
+well.&lt;/p&gt;
+</description></item><item><title>mingw-w64 Ada and ObjC unsupported until further notice</title><link>https://www.msys2.org/news/#2019-06-03-mingw-w64-ada-and-objc-unsupported-until-further-notice</link><guid>https://www.msys2.org/news/#2019-06-03-mingw-w64-ada-and-objc-unsupported-until-further-notice</guid><pubDate>Mon, 03 Jun 2019 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Pacman may say this when updating:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;looking for conflicting packages...
+error: failed to prepare transaction (could not satisfy dependencies)
+:: installing mingw-w64-x86_64-gcc (9.1.0-1) breaks dependency 'mingw-w64-x86_64-gcc=8.3.0-2' required by mingw-w64-x86_64-gcc-ada
+:: installing mingw-w64-x86_64-gcc (9.1.0-1) breaks dependency 'mingw-w64-x86_64-gcc=8.3.0-2' required by mingw-w64-x86_64-gcc-objc
+:: installing mingw-w64-x86_64-gcc (9.1.0-1) breaks dependency 'mingw-w64-i686-gcc=8.3.0-2' required by mingw-w64-i686-gcc-ada
+:: installing mingw-w64-x86_64-gcc (9.1.0-1) breaks dependency 'mingw-w64-i686-gcc=8.3.0-2' required by mingw-w64-i686-gcc-objc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Ada and ObjC are currently unsupported in MSYS2 builds due to long-standing
+issues with the i686 variant.  Run
+&lt;code&gt;pacman -R mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-objc&lt;/code&gt; and/or
+&lt;code&gt;pacman -R mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-objc&lt;/code&gt;, then update.&lt;/p&gt;
+</description></item><item><title>Core update integrated into Pacman; update-core removed</title><link>https://www.msys2.org/news/#2016-07-15-core-update-integrated-into-pacman-update-core-removed</link><guid>https://www.msys2.org/news/#2016-07-15-core-update-integrated-into-pacman-update-core-removed</guid><pubDate>Fri, 15 Jul 2016 00:00:00 +0000</pubDate><description>
+&lt;p&gt;The function of &lt;code&gt;update-core&lt;/code&gt; is transferred to &lt;code&gt;pacman -Syuu&lt;/code&gt;.&lt;/p&gt;
+</description></item><item><title>Command window may linger after startup</title><link>https://www.msys2.org/news/#2016-04-05-command-window-may-linger-after-startup</link><guid>https://www.msys2.org/news/#2016-04-05-command-window-may-linger-after-startup</guid><pubDate>Tue, 05 Apr 2016 00:00:00 +0000</pubDate><description>
+&lt;p&gt;Change the argument &lt;code&gt;/K&lt;/code&gt; to &lt;code&gt;/C&lt;/code&gt; in all three Start menu shortcuts.&lt;/p&gt;
+</description></item></channel></rss>

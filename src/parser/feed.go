@@ -80,17 +80,37 @@ func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
 	switch {
 	case err == io.ErrUnexpectedEOF:
 		lookup = lookup[:n]
-		r = bytes.NewReader(lookup)
 	case err != nil:
 		return nil, err
-	default:
-		r = io.MultiReader(bytes.NewReader(lookup), r)
 	}
 
 	out := sniff(string(lookup))
+
+	// A feed may have a long prolog before the root element, for example a
+	// stylesheet with a base64-encoded data URI. In that case read one more
+	// chunk, since the root element may be just past the first lookup window.
+	if out.feedType == "" &&
+		bytes.Contains(lookup, []byte("<?xml")) &&
+		bytes.Contains(lookup, []byte("<?xml-stylesheet")) {
+		extra := make([]byte, 2048)
+		n, err := io.ReadFull(r, extra)
+		switch {
+		case err == io.ErrUnexpectedEOF:
+			extra = extra[:n]
+		case err == io.EOF:
+			extra = nil
+		case err != nil:
+			return nil, err
+		}
+		lookup = append(lookup, extra...)
+		out = sniff(string(lookup))
+	}
+
 	if out.feedType == "" {
 		return nil, ErrUnknownFormat
 	}
+
+	r = io.MultiReader(bytes.NewReader(lookup), r)
 
 	if out.encoding == "" && fallbackEncoding != "" {
 		r, err = charset.NewReaderLabel(fallbackEncoding, r)
