@@ -75,6 +75,7 @@ func Parse(r io.Reader) (*Feed, error) {
 }
 
 func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
+	rest := r
 	lookup := make([]byte, 2048)
 	n, err := io.ReadFull(r, lookup)
 	switch {
@@ -88,6 +89,19 @@ func ParseWithEncoding(r io.Reader, fallbackEncoding string) (*Feed, error) {
 	}
 
 	out := sniff(string(lookup))
+
+	// A long <?xml-stylesheet?> (e.g. a base64 data: URI) can push the root
+	// element past the first lookup. Read one more lookup in that case only.
+	if out.feedType == "" && err == nil &&
+		bytes.Contains(lookup, []byte("<?xml ")) &&
+		bytes.Contains(lookup, []byte("<?xml-stylesheet")) {
+		more := make([]byte, 2048)
+		n, _ = io.ReadFull(rest, more)
+		lookup = append(lookup, more[:n]...)
+		r = io.MultiReader(bytes.NewReader(lookup), rest)
+		out = sniff(string(lookup))
+	}
+
 	if out.feedType == "" {
 		return nil, ErrUnknownFormat
 	}
