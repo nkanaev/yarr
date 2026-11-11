@@ -1,6 +1,7 @@
 package sanitizer
 
 import (
+	"net/url"
 	"regexp"
 	"slices"
 	"strconv"
@@ -278,6 +279,16 @@ func isBlockedResource(src string) bool {
 }
 
 func isValidIframeSource(baseURL, src string) bool {
+	u, err := url.Parse(src)
+	if err != nil {
+		return false
+	}
+	switch strings.ToLower(u.Scheme) {
+	case "http", "https":
+	default:
+		return false
+	}
+
 	whitelist := []string{
 		"bandcamp.com",
 		"cdn.embedly.com",

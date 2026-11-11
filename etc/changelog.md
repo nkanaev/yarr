@@ -4,6 +4,7 @@
 - (fix) filename extension for Windows CLI builds (thanks to @lux-liang and @junakavora)
 - (fix) article fallback fonts for CJK serif/monospace (thanks to @gengyue2468)
 - (fix) Fever API authentication with multipart/form-data clients such as Newsflash (thanks to @dbodyas)
+- (fix) XSS injection in content sanitizer (thanks to Matthew Hogg for discovery)
 
 # v2.9 (2026-09-07)
 
