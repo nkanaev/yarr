@@ -1,18 +1,25 @@
 import { useRef } from "preact/hooks";
 import type { Ref } from "preact";
 import { useI18n } from "../i18n";
+import type { AppSettings } from "../models/settings";
 import type { DropdownHandle } from "./Dropdown";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
 
-export type Theme = "system" | "light" | "sepia" | "night";
+const REFRESH_RATE_OPTIONS = [
+  { title: "0", value: 0 },
+  { title: "10m", value: 10 },
+  { title: "30m", value: 30 },
+  { title: "1h", value: 60 },
+  { title: "2h", value: 120 },
+  { title: "4h", value: 240 },
+  { title: "12h", value: 720 },
+  { title: "24h", value: 1440 },
+];
 
 interface DropdownSettingsProps {
+  settings: AppSettings;
   refreshAvailable: boolean;
-  refreshRate: number;
-  refreshRateTitle: string;
-  maxRefreshRate: boolean;
-  onRefreshRateChange: (delta: number) => void;
   onFetchAllFeeds: () => void;
   onImportOPML: (e: Event) => void;
   onShowNewFeed: () => void;
@@ -20,11 +27,8 @@ interface DropdownSettingsProps {
 }
 
 export default function DropdownSettings({
+  settings,
   refreshAvailable,
-  refreshRate,
-  refreshRateTitle,
-  maxRefreshRate,
-  onRefreshRateChange,
   onFetchAllFeeds,
   onImportOPML,
   onShowNewFeed,
@@ -32,6 +36,19 @@ export default function DropdownSettings({
 }: DropdownSettingsProps) {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const refreshRate = settings.values.refresh_rate.value;
+  const refreshRateTitle =
+    REFRESH_RATE_OPTIONS.find(o => o.value === refreshRate)?.title || "0";
+  const maxRefreshRate =
+    refreshRate === REFRESH_RATE_OPTIONS[REFRESH_RATE_OPTIONS.length - 1].value;
+
+  const changeRefreshRate = (offset: number) => {
+    const curIdx = REFRESH_RATE_OPTIONS.findIndex(o => o.value === refreshRate);
+    if ((curIdx <= 0 && offset < 0) || (curIdx >= REFRESH_RATE_OPTIONS.length - 1 && offset > 0))
+      return;
+    settings.update({ refresh_rate: REFRESH_RATE_OPTIONS[curIdx + offset].value });
+  };
 
   return (
     <Dropdown
@@ -73,7 +90,7 @@ export default function DropdownSettings({
               className="c-dropdown-item col-4 px-0 d-flex gap-1 justify-content-center"
               onClick={e => {
                 e.stopPropagation();
-                onRefreshRateChange(-1);
+                changeRefreshRate(-1);
               }}
               disabled={!refreshRate}>
               <Icon name="chevron-down" />
@@ -86,7 +103,7 @@ export default function DropdownSettings({
               className="c-dropdown-item col-4 px-0 d-flex gap-1 justify-content-center"
               onClick={e => {
                 e.stopPropagation();
-                onRefreshRateChange(1);
+                changeRefreshRate(1);
               }}
               disabled={maxRefreshRate}>
               <Icon name="chevron-up" />

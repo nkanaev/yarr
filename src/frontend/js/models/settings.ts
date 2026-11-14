@@ -1,13 +1,13 @@
 import { signal, createModel } from "@preact/signals";
 import type { Signal } from "@preact/signals";
 import type { Lang } from "../i18n";
-import type { Theme } from "../components/DropdownSettings";
-import type { ThemeFont } from "../components/ArticleView";
 import type { Settings, SettingsUpdateData } from "../api-types";
 import { debounce } from "../utils";
 import api from "../api";
 
 export type Filter = "" | "starred" | "unread";
+export type Theme = "system" | "light" | "sepia" | "night";
+export type ThemeFont = "" | "serif" | "monospace";
 
 export const SettingsModel = createModel(
   (initial: Partial<Settings> = {}, onSaveError?: (err: unknown) => void) => {
@@ -55,3 +55,5 @@ export const SettingsModel = createModel(
     };
   },
 );
+
+export type AppSettings = InstanceType<typeof SettingsModel>;

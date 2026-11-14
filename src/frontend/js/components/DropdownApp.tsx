@@ -3,7 +3,7 @@ import type { Lang } from "../i18n";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
 import Tooltip from "./Tooltip";
-import type { Theme } from "./DropdownSettings";
+import type { AppSettings, Theme } from "../models/settings";
 
 const THEMES: Theme[] = ["light", "sepia", "night", "system"];
 
@@ -19,21 +19,15 @@ const LANGUAGES: { code: Lang; name: string }[] = [
 ];
 
 interface DropdownAppProps {
-  theme: Theme;
-  onThemeChange: (t: Theme) => void;
+  settings: AppSettings;
   onShowShortcuts: () => void;
-  language: Lang;
-  onLanguageChange: (lang: Lang) => void;
   requiresAuth: boolean;
   onLogout: () => void;
 }
 
 export default function DropdownApp({
-  theme,
-  onThemeChange,
+  settings,
   onShowShortcuts,
-  language,
-  onLanguageChange,
   requiresAuth,
   onLogout,
 }: DropdownAppProps) {
@@ -51,10 +45,10 @@ export default function DropdownApp({
               type="button"
               className={`c-button-link theme-swatch w-100 px-0 rounded-0 theme-${th}`}
               aria-label={th}
-              aria-pressed={theme === th}
+              aria-pressed={settings.values.theme_name.value === th}
               onClick={e => {
                 e.stopPropagation();
-                onThemeChange(th);
+                settings.update({ theme_name: th });
               }}
             />
           </Tooltip>
@@ -82,10 +76,10 @@ export default function DropdownApp({
                 type="button"
                 className="c-dropdown-item text-center w-100"
                 aria-label={lang.name}
-                aria-pressed={language === lang.code}
+                aria-pressed={settings.values.language.value === lang.code}
                 onClick={e => {
                   e.stopPropagation();
-                  onLanguageChange(lang.code);
+                  settings.update({ language: lang.code });
                 }}>
                 {lang.code}
               </button>

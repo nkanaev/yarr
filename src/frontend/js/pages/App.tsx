@@ -13,7 +13,7 @@ import Tooltip from "../components/Tooltip";
 import FeedTree from "../components/FeedTree";
 import NewFeed from "../components/NewFeed";
 import ToastContainer, { showToast } from "../components/Toast";
-import DropdownSettings, { Theme } from "../components/DropdownSettings";
+import DropdownSettings from "../components/DropdownSettings";
 import DropdownApp from "../components/DropdownApp";
 import DropdownFeed from "../components/DropdownFeed";
 import DropdownFolder from "../components/DropdownFolder";
@@ -21,6 +21,7 @@ import ArticleView from "../components/ArticleView";
 import type { FeedTreeNode, TreeFeedNode } from "../components/FeedTree";
 import { setupKeybindings, KeyActions } from "../key";
 import { SettingsModel } from "../models/settings";
+import type { Theme } from "../models/settings";
 import type { Feed, Folder, Item, FeedStat, ItemStatus, ItemListQuery } from "../api-types";
 
 type Stats = { unread: number; starred: number };
@@ -30,17 +31,6 @@ const THEME_COLORS: Record<string, string> = {
   sepia: "#f4f0e5",
   light: "#fff",
 };
-
-const REFRESH_RATE_OPTIONS = [
-  { title: "0", value: 0 },
-  { title: "10m", value: 10 },
-  { title: "30m", value: 30 },
-  { title: "1h", value: 60 },
-  { title: "2h", value: 120 },
-  { title: "4h", value: 240 },
-  { title: "12h", value: 720 },
-  { title: "24h", value: 1440 },
-];
 
 const TITLE = document.title;
 
@@ -118,6 +108,10 @@ export default function App() {
     return () => mql?.removeEventListener("change", handler);
   }, [settings.values.theme_name.value, updateMetaTheme]);
 
+  useEffect(() => {
+    setLang(settings.values.language.value);
+  }, [settings.values.language.value, setLang]);
+
   const resizeFeedList = (w: number) => {
     settings.update({ feed_list_width: Math.min(Math.max(200, w), 700) });
   };
@@ -172,12 +166,6 @@ export default function App() {
       statsTotal.starred += fStat.starred;
     }
     return { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
-  });
-
-  const refreshRateTitle = useComputed(() => {
-    return (
-      REFRESH_RATE_OPTIONS.find(o => o.value === settings.values.refresh_rate.value)?.title || "0"
-    );
   });
 
   // Keep document title in sync with unread count
@@ -633,16 +621,6 @@ export default function App() {
     }
   };
 
-  const changeRefreshRate = (offset: number) => {
-    const curIdx = REFRESH_RATE_OPTIONS.findIndex(
-      o => o.value === settings.values.refresh_rate.value,
-    );
-    if ((curIdx <= 0 && offset < 0) || (curIdx >= REFRESH_RATE_OPTIONS.length - 1 && offset > 0))
-      return;
-    const newRate = REFRESH_RATE_OPTIONS[curIdx + offset].value;
-    settings.update({ refresh_rate: newRate });
-  };
-
   // Keyboard navigation
   const navigateToItem = useCallback(
     (dir: number) => {
@@ -740,14 +718,8 @@ export default function App() {
         <Drag width={settings.values.feed_list_width.value} onResize={resizeFeedList} />
         <div className="px-2 py-1 d-flex justify-content-between gap-2">
           <DropdownApp
-            theme={settings.values.theme_name.value}
-            onThemeChange={th => settings.update({ theme_name: th })}
+            settings={settings}
             onShowShortcuts={() => (showModal.value = "shortcuts")}
-            language={settings.values.language.value}
-            onLanguageChange={code => {
-              setLang(code);
-              settings.update({ language: code });
-            }}
             requiresAuth={window.app?.requiresAuth}
             onLogout={async () => {
               const [err] = await to(api.logout());
@@ -793,14 +765,8 @@ export default function App() {
           </div>
           <DropdownSettings
             dropdownRef={menuDropdownRef}
+            settings={settings}
             refreshAvailable={refreshAvailable.value}
-            refreshRate={settings.values.refresh_rate.value}
-            refreshRateTitle={refreshRateTitle.value}
-            maxRefreshRate={
-              settings.values.refresh_rate.value ===
-              REFRESH_RATE_OPTIONS[REFRESH_RATE_OPTIONS.length - 1].value
-            }
-            onRefreshRateChange={changeRefreshRate}
             onFetchAllFeeds={fetchAllFeeds}
             onImportOPML={importOPML}
             onShowNewFeed={() => (showNewFeed.value = true)}
@@ -825,8 +791,8 @@ export default function App() {
           <div id="feed-list-scroll" className="p-2 overflow-auto flex-shrink-1">
             <FeedTree
               tree={feedTree.value}
-              value={settings.values.feed.value}
-              filterSelected={settings.values.filter.value}
+              feed={settings.values.feed}
+              filter={settings.values.filter}
               stats={stats.value}
               feedErrors={feedErrors.value}
               onSelect={val => settings.update({ feed: val })}
@@ -991,18 +957,12 @@ export default function App() {
           item={itemSelectedDetails.value}
           feedTitle={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""}
           feedId={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
-          theme={{ font: settings.values.theme_font.value, size: settings.values.theme_size.value }}
-          onFontChange={font => settings.update({ theme_font: font })}
-          onFontSizeChange={delta => {
-            const size = +(settings.values.theme_size.value + 0.1 * delta).toFixed(1);
-            settings.update({ theme_size: size });
-          }}
+          settings={settings}
           readabilityContent={itemSelectedReadability.value}
           loadingReadability={loadingReadability.value}
           onToggleReadability={toggleReadability}
           onToggleStarred={item => toggleItemStatus(item, "starred")}
           onToggleRead={item => toggleItemStatus(item, "unread")}
-          onSelectFeed={id => (settings.values.feed.value = `feed:${id}`)}
           onNavigate={navigateToItem}
           canPrev={Boolean(items.value.length && itemSelected.value !== items.value[0].id)}
           canNext={Boolean(
@@ -1012,7 +972,6 @@ export default function App() {
           onToggleFullscreen={() => (itemFullscreen.value = !itemFullscreen.value)}
           onClose={() => (itemSelected.value = null)}
           contentRef={contentRef}
-          language={settings.values.language.value}
         />
       </div>
 

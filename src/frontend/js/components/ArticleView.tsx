@@ -1,26 +1,22 @@
 import type { Ref } from "preact";
 import type { Item } from "../api-types";
 import { useI18n } from "../i18n";
+import type { AppSettings } from "../models/settings";
 import { dateTimeString } from "../utils";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
 import Tooltip from "./Tooltip";
 
-export type ThemeFont = "" | "serif" | "monospace";
-
 interface ArticleViewProps {
   item: Item | null;
   feedTitle: string;
   feedId?: number;
-  theme: { font: ThemeFont; size: number };
-  onFontChange: (font: ThemeFont) => void;
-  onFontSizeChange: (delta: number) => void;
+  settings: AppSettings;
   readabilityContent: string;
   loadingReadability: boolean;
   onToggleReadability: () => void;
   onToggleStarred: (item: Item) => void;
   onToggleRead: (item: Item) => void;
-  onSelectFeed: (feedId: number) => void;
   onNavigate: (dir: number) => void;
   canPrev: boolean;
   canNext: boolean;
@@ -28,22 +24,18 @@ interface ArticleViewProps {
   onToggleFullscreen: () => void;
   onClose: () => void;
   contentRef: Ref<HTMLDivElement>;
-  language: string;
 }
 
 export default function ArticleView({
   item,
   feedTitle,
   feedId,
-  theme,
-  onFontChange,
-  onFontSizeChange,
+  settings,
   readabilityContent,
   loadingReadability,
   onToggleReadability,
   onToggleStarred,
   onToggleRead,
-  onSelectFeed,
   onNavigate,
   canPrev,
   canNext,
@@ -51,11 +43,14 @@ export default function ArticleView({
   onToggleFullscreen,
   onClose,
   contentRef,
-  language,
 }: ArticleViewProps) {
   const { t } = useI18n();
 
   if (!item) return null;
+
+  const themeFont = settings.values.theme_font.value;
+  const themeSize = settings.values.theme_size.value;
+  const language = settings.values.language.value;
 
   const contentImages = (item.media_links || []).filter(l => l.type === "image");
   const contentAudios = (item.media_links || []).filter(l => l.type === "audio");
@@ -63,9 +58,9 @@ export default function ArticleView({
   const htmlContent = readabilityContent || item.content || "";
 
   const fontClass =
-    theme.font === ""
+    themeFont === ""
       ? "font-sans-serif"
-      : theme.font === "serif"
+      : themeFont === "serif"
         ? "font-serif"
         : "font-monospace";
 
@@ -99,30 +94,30 @@ export default function ArticleView({
           <button
             type="button"
             className="c-dropdown-item w-100 text-start font-sans-serif"
-            aria-pressed={theme.font === ""}
+            aria-pressed={themeFont === ""}
             onClick={e => {
               e.stopPropagation();
-              onFontChange("");
+              settings.update({ theme_font: "" });
             }}>
             {t("sans_serif")}
           </button>
           <button
             type="button"
             className="c-dropdown-item w-100 text-start font-serif"
-            aria-pressed={theme.font === "serif"}
+            aria-pressed={themeFont === "serif"}
             onClick={e => {
               e.stopPropagation();
-              onFontChange("serif");
+              settings.update({ theme_font: "serif" });
             }}>
             {t("serif")}
           </button>
           <button
             type="button"
             className="c-dropdown-item w-100 text-start font-monospace"
-            aria-pressed={theme.font === "monospace"}
+            aria-pressed={themeFont === "monospace"}
             onClick={e => {
               e.stopPropagation();
-              onFontChange("monospace");
+              settings.update({ theme_font: "monospace" });
             }}>
             {t("monospace")}
           </button>
@@ -133,7 +128,7 @@ export default function ArticleView({
               style={{ fontSize: "0.8rem" }}
               onClick={e => {
                 e.stopPropagation();
-                onFontSizeChange(-1);
+                settings.update({ theme_size: +(themeSize - 0.1).toFixed(1) });
               }}>
               A
             </button>
@@ -143,7 +138,7 @@ export default function ArticleView({
               style={{ fontSize: "1.2rem" }}
               onClick={e => {
                 e.stopPropagation();
-                onFontSizeChange(1);
+                settings.update({ theme_size: +(themeSize + 0.1).toFixed(1) });
               }}>
               A
             </button>
@@ -218,14 +213,16 @@ export default function ArticleView({
       <div
         ref={contentRef}
         className={`content px-4 pt-3 pb-5 border-top overflow-auto ${fontClass}`}
-        style={{ fontSize: `${theme.size}rem` }}>
+        style={{ fontSize: `${themeSize}rem` }}>
         <div className="content-wrapper">
           <h1>
             <b>{item.title || t("untitled")}</b>
           </h1>
           <div className="opacity-50">
             <div>
-              <span className="cursor-pointer" onClick={() => feedId && onSelectFeed(feedId)}>
+              <span
+                className="cursor-pointer"
+                onClick={() => feedId && settings.update({ feed: `feed:${feedId}` })}>
                 {feedTitle}
               </span>
             </div>

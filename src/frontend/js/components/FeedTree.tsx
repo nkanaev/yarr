@@ -1,5 +1,7 @@
+import type { Signal } from "@preact/signals";
 import type { Folder, Feed } from "../api-types";
 import { useI18n } from "../i18n";
+import type { Filter } from "../models/settings";
 import Icon from "./Icon";
 
 export interface TreeFeedNode {
@@ -17,8 +19,8 @@ export type FeedTreeNode = TreeFolderNode | TreeFeedNode;
 
 interface FeedTreeProps {
   tree: FeedTreeNode[];
-  value: string | null;
-  filterSelected: "" | "unread" | "starred";
+  feed: Signal<string | null>;
+  filter: Signal<Filter>;
   stats: {
     feeds: Record<number, { unread: number; starred: number }>;
     folders: Record<number, { unread: number; starred: number }>;
@@ -31,8 +33,8 @@ interface FeedTreeProps {
 
 export default function FeedTree({
   tree,
-  value,
-  filterSelected,
+  feed,
+  filter,
   stats,
   feedErrors,
   onSelect,
@@ -41,9 +43,9 @@ export default function FeedTree({
   const { t } = useI18n();
 
   const allTitle =
-    filterSelected === "unread"
+    filter.value === "unread"
       ? t("all_unread")
-      : filterSelected === "starred"
+      : filter.value === "starred"
         ? t("all_starred")
         : t("all_feeds");
 
@@ -52,15 +54,15 @@ export default function FeedTree({
       <div
         className="c-listitem d-flex user-select-none gap-2"
         role="radio"
-        aria-checked={value === ""}
+        aria-checked={feed.value === ""}
         onClick={() => onSelect("")}>
         <div className="flex-shrink-0 d-flex">
           <Icon name="layers" />
         </div>
         <div className="flex-grow-1 min-w-0 text-truncate">{allTitle}</div>
-        {filterSelected && (
+        {filter.value && (
           <div className="flex-shrink-0">
-            <span className="ps-2 text-end opacity-50">{stats.total[filterSelected]}</span>
+            <span className="ps-2 text-end opacity-50">{stats.total[filter.value]}</span>
           </div>
         )}
       </div>
@@ -68,7 +70,7 @@ export default function FeedTree({
       {tree.map(node => {
         if (node.type === "folder") {
           const folderKey = "folder:" + node.folder.id;
-          const isSelected = value === folderKey;
+          const isSelected = feed.value === folderKey;
           return (
             <div key={folderKey}>
               <div
@@ -87,10 +89,10 @@ export default function FeedTree({
                   </div>
                 </div>
                 <div className="flex-grow-1 min-w-0 text-truncate">{node.folder.title}</div>
-                {filterSelected && (
+                {filter.value && (
                   <div className="flex-shrink-0">
                     <span className="ps-2 text-end opacity-50">
-                      {stats.folders[node.folder.id]?.[filterSelected]}
+                      {stats.folders[node.folder.id]?.[filter.value]}
                     </span>
                   </div>
                 )}
@@ -104,7 +106,7 @@ export default function FeedTree({
                         key={feedKey}
                         className="c-listitem d-flex user-select-none gap-2"
                         role="radio"
-                        aria-checked={value === feedKey}
+                        aria-checked={feed.value === feedKey}
                         onClick={() => onSelect(feedKey)}>
                         <div className="flex-shrink-0 d-flex align-items-center">
                           {!feedNode.feed.icon ? (
@@ -119,12 +121,12 @@ export default function FeedTree({
                           {feedNode.feed.title}
                         </div>
                         <div className="flex-shrink-0 d-flex">
-                          {filterSelected && (
+                          {filter.value && (
                             <span className="ps-2 text-end opacity-50">
-                              {stats.feeds[feedNode.feed.id]?.[filterSelected]}
+                              {stats.feeds[feedNode.feed.id]?.[filter.value]}
                             </span>
                           )}
-                          {!filterSelected && feedErrors[feedNode.feed.id] && (
+                          {!filter.value && feedErrors[feedNode.feed.id] && (
                             <Icon
                               className="flex-shrink-0"
                               title={feedErrors[feedNode.feed.id]}
@@ -147,7 +149,7 @@ export default function FeedTree({
             key={feedKey}
             className="c-listitem d-flex user-select-none gap-2"
             role="radio"
-            aria-checked={value === feedKey}
+            aria-checked={feed.value === feedKey}
             onClick={() => onSelect(feedKey)}>
             <div className="flex-shrink-0 d-flex">
               {!node.feed.icon ? (
@@ -160,12 +162,12 @@ export default function FeedTree({
             </div>
             <div className="flex-grow-1 min-w-0 text-truncate">{node.feed.title}</div>
             <div className="flex-shrink-0 d-flex">
-              {filterSelected && (
+              {filter.value && (
                 <span className="ps-2 text-end opacity-50">
-                  {stats.feeds[node.feed.id]?.[filterSelected]}
+                  {stats.feeds[node.feed.id]?.[filter.value]}
                 </span>
               )}
-              {!filterSelected && feedErrors[node.feed.id] && (
+              {!filter.value && feedErrors[node.feed.id] && (
                 <Icon
                   className="flex-shrink-0"
                   title={feedErrors[node.feed.id]}
