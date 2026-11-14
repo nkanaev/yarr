@@ -1,6 +1,5 @@
 import { useEffect, useRef, useMemo, useCallback } from "preact/hooks";
-import { useSignal, useComputed } from "@preact/signals";
-import type { Lang } from "../i18n";
+import { useSignal, useComputed, useModel } from "@preact/signals";
 import { useI18n } from "../i18n";
 import api, { NetworkError, HTTPError } from "../api";
 import { scrollto, debounce, to } from "../utils";
@@ -18,20 +17,12 @@ import DropdownSettings, { Theme } from "../components/DropdownSettings";
 import DropdownApp from "../components/DropdownApp";
 import DropdownFeed from "../components/DropdownFeed";
 import DropdownFolder from "../components/DropdownFolder";
-import ArticleView, { ThemeFont } from "../components/ArticleView";
+import ArticleView from "../components/ArticleView";
 import type { FeedTreeNode, TreeFeedNode } from "../components/FeedTree";
 import { setupKeybindings, KeyActions } from "../key";
-import type {
-  Feed,
-  Folder,
-  Item,
-  FeedStat,
-  ItemStatus,
-  ItemListQuery,
-  Settings,
-} from "../api-types";
+import { SettingsModel } from "../models/settings";
+import type { Feed, Folder, Item, FeedStat, ItemStatus, ItemListQuery } from "../api-types";
 
-type Filter = "" | "starred" | "unread";
 type Stats = { unread: number; starred: number };
 
 const THEME_COLORS: Record<string, string> = {
@@ -57,26 +48,13 @@ export default function App() {
   const { t, setLang } = useI18n();
   const appSettings = window.app?.settings || {};
 
-  // Signals for state
-  const filterSelected = useSignal<Filter>((appSettings.filter as Filter) || "");
-  const theme = useSignal<{ name: Theme; font: ThemeFont; size: number }>({
-    name: (appSettings.theme_name as Theme) || "system",
-    font: (appSettings.theme_font as ThemeFont) || "",
-    size: (appSettings.theme_size as number) || 1,
-  });
-  const refreshRate = useSignal<number>(appSettings.refresh_rate || 0);
-  const language = useSignal<Lang>(appSettings.language || "en");
-
   // Feeds & folders
   const folders = useSignal<Folder[]>([]);
   const feeds = useSignal<Feed[]>([]);
-  const feedSelected = useSignal<string | null>(appSettings.feed ?? null);
-  const feedListWidth = useSignal<number>(appSettings.feed_list_width || 300);
   const feedErrors = useSignal<Record<number, string>>({});
   const feedStats = useSignal<Record<number, FeedStat>>({});
 
   // Items
-  const itemListWidth = useSignal<number>(appSettings.item_list_width || 300);
   const items = useSignal<Item[]>([]);
   const itemsHasMore = useSignal(true);
   const itemSelected = useSignal<number | null>(null);
@@ -84,7 +62,6 @@ export default function App() {
   const itemSelectedReadability = useSignal("");
   const itemFullscreen = useSignal(false);
   const itemSearch = useSignal("");
-  const itemSortNewestFirst = useSignal<boolean>(appSettings.sort_newest_first ?? true);
 
   // Status & modal
   const showModal = useSignal<"" | "shortcuts">("");
@@ -111,17 +88,14 @@ export default function App() {
     [t],
   );
 
-  // Consolidated settings update
-  const updateSettings = useCallback(
-    (partial: Partial<Settings>) => {
-      api.settings.update(partial).catch(err => {
+  const settings = useModel(
+    () =>
+      new SettingsModel(appSettings, err =>
         showToast(
           { title: t("fail_save_settings"), description: errDescription(err) },
           { level: "fail" },
-        );
-      });
-    },
-    [t, errDescription],
+        ),
+      ),
   );
 
   // Theme meta tag
@@ -137,33 +111,19 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    updateMetaTheme(theme.value.name);
+    updateMetaTheme(settings.values.theme_name.value);
     const mql = window.matchMedia?.("(prefers-color-scheme: dark)");
-    const handler = () => updateMetaTheme(theme.value.name);
+    const handler = () => updateMetaTheme(settings.values.theme_name.value);
     mql?.addEventListener("change", handler);
     return () => mql?.removeEventListener("change", handler);
-  }, [theme.value.name, updateMetaTheme]);
-
-  // Debounced width saving
-  const saveFeedListWidth = useMemo(
-    () => debounce((w: number) => updateSettings({ feed_list_width: w }), 1000),
-    [updateSettings],
-  );
-  const saveItemListWidth = useMemo(
-    () => debounce((w: number) => updateSettings({ item_list_width: w }), 1000),
-    [updateSettings],
-  );
+  }, [settings.values.theme_name.value, updateMetaTheme]);
 
   const resizeFeedList = (w: number) => {
-    const clamped = Math.min(Math.max(200, w), 700);
-    feedListWidth.value = clamped;
-    saveFeedListWidth(clamped);
+    settings.update({ feed_list_width: Math.min(Math.max(200, w), 700) });
   };
 
   const resizeItemList = (w: number) => {
-    const clamped = Math.min(Math.max(200, w), 700);
-    itemListWidth.value = clamped;
-    saveItemListWidth(clamped);
+    settings.update({ item_list_width: Math.min(Math.max(200, w), 700) });
   };
 
   // Computed signals
@@ -174,20 +134,20 @@ export default function App() {
     return folders.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Folder>);
   });
   const currentFeed = useComputed(() => {
-    const [type, guid] = (feedSelected.value || "").split(":", 2);
+    const [type, guid] = (settings.values.feed.value || "").split(":", 2);
     return type === "feed" ? feedsById.value[Number(guid)] || null : null;
   });
   const currentFolder = useComputed(() => {
-    const [type, guid] = (feedSelected.value || "").split(":", 2);
+    const [type, guid] = (settings.values.feed.value || "").split(":", 2);
     return type === "folder" ? foldersById.value[Number(guid)] || null : null;
   });
   const searchScope = useComputed(() => {
     return (
       currentFeed.value?.title ||
       currentFolder.value?.title ||
-      (filterSelected.value === "unread"
+      (settings.values.filter.value === "unread"
         ? t("all_unread")
-        : filterSelected.value === "starred"
+        : settings.values.filter.value === "starred"
           ? t("all_starred")
           : t("all_feeds"))
     );
@@ -215,7 +175,9 @@ export default function App() {
   });
 
   const refreshRateTitle = useComputed(() => {
-    return REFRESH_RATE_OPTIONS.find(o => o.value === refreshRate.value)?.title || "0";
+    return (
+      REFRESH_RATE_OPTIONS.find(o => o.value === settings.values.refresh_rate.value)?.title || "0"
+    );
   });
 
   // Keep document title in sync with unread count
@@ -273,18 +235,18 @@ export default function App() {
   // Feed tree
   const mustHideFolder = (folder: Folder) =>
     Boolean(
-      filterSelected.value &&
+      settings.values.filter.value &&
       currentFolder.value?.id !== folder.id &&
       currentFeed.value?.folder_id !== folder.id &&
-      !stats.value.folders[folder.id]?.[filterSelected.value] &&
+      !stats.value.folders[folder.id]?.[settings.values.filter.value] &&
       feedsById.value[itemSelectedDetails.value?.feed_id ?? -1]?.folder_id !== folder.id,
     );
 
   const mustHideFeed = (feed: Feed) =>
     Boolean(
-      filterSelected.value &&
+      settings.values.filter.value &&
       currentFeed.value?.id !== feed.id &&
-      !stats.value.feeds[feed.id]?.[filterSelected.value] &&
+      !stats.value.feeds[feed.id]?.[settings.values.filter.value] &&
       itemSelectedDetails.value?.feed_id !== feed.id,
     );
 
@@ -314,20 +276,20 @@ export default function App() {
   // Items query & refresh
   const getItemsQuery = useCallback((): ItemListQuery => {
     const query: ItemListQuery = {};
-    if (feedSelected.value) {
-      const [type, guid] = feedSelected.value.split(":", 2);
+    if (settings.values.feed.value) {
+      const [type, guid] = settings.values.feed.value.split(":", 2);
       if (type === "feed") query.feed_id = guid;
       else if (type === "folder") query.folder_id = guid;
     }
-    if (filterSelected.value) query.status = filterSelected.value;
+    if (settings.values.filter.value) query.status = settings.values.filter.value;
     if (itemSearch.value) query.search = itemSearch.value;
-    if (!itemSortNewestFirst.value) query.oldest_first = true;
+    if (!settings.values.sort_newest_first.value) query.oldest_first = true;
     return query;
   }, []);
 
   const refreshItems = useCallback(
     async (loadMore = false) => {
-      if (feedSelected.value === null) {
+      if (settings.values.feed.value === null) {
         items.value = [];
         itemsHasMore.value = false;
         loadingItems.value = false;
@@ -379,7 +341,11 @@ export default function App() {
   useEffect(() => {
     itemSelected.value = null;
     refreshItems(false);
-  }, [feedSelected.value, filterSelected.value, itemSortNewestFirst.value]);
+  }, [
+    settings.values.feed.value,
+    settings.values.filter.value,
+    settings.values.sort_newest_first.value,
+  ]);
 
   useEffect(() => {
     const timer = setTimeout(() => refreshItems(false), 500);
@@ -568,7 +534,7 @@ export default function App() {
         { level: "fail" },
       );
     else {
-      feedSelected.value = null;
+      settings.values.feed.value = null;
       refreshStats();
       refreshFeeds();
     }
@@ -584,9 +550,9 @@ export default function App() {
         { level: "fail" },
       );
     else {
-      folders.value = folders.value.map(f => (f.id === folder.id ? { ...f, title } : f)).sort(
-        (a, b) => a.title.localeCompare(b.title),
-      );
+      folders.value = folders.value
+        .map(f => (f.id === folder.id ? { ...f, title } : f))
+        .sort((a, b) => a.title.localeCompare(b.title));
     }
   };
 
@@ -599,7 +565,7 @@ export default function App() {
         { level: "fail" },
       );
     else {
-      feedSelected.value = null;
+      settings.values.feed.value = null;
       refreshStats();
       refreshFeeds();
     }
@@ -618,14 +584,14 @@ export default function App() {
 
   // Selecting a feed reveals it inside its folder
   useEffect(() => {
-    const [type, guid] = (feedSelected.value || "").split(":", 2);
+    const [type, guid] = (settings.values.feed.value || "").split(":", 2);
     if (type !== "feed") return;
     const folderId = feedsById.value[Number(guid)]?.folder_id;
     if (folderId === null || folderId === undefined) return;
     const folder = foldersById.value[folderId];
     if (!folder || folder.is_expanded) return;
     void toggleFolderExpanded(folder);
-  }, [feedSelected.value, feedsById.value]);
+  }, [settings.values.feed.value, feedsById.value]);
 
   const toggleReadability = async () => {
     if (itemSelectedReadability.value) {
@@ -668,12 +634,13 @@ export default function App() {
   };
 
   const changeRefreshRate = (offset: number) => {
-    const curIdx = REFRESH_RATE_OPTIONS.findIndex(o => o.value === refreshRate.value);
+    const curIdx = REFRESH_RATE_OPTIONS.findIndex(
+      o => o.value === settings.values.refresh_rate.value,
+    );
     if ((curIdx <= 0 && offset < 0) || (curIdx >= REFRESH_RATE_OPTIONS.length - 1 && offset > 0))
       return;
     const newRate = REFRESH_RATE_OPTIONS[curIdx + offset].value;
-    refreshRate.value = newRate;
-    updateSettings({ refresh_rate: newRate });
+    settings.update({ refresh_rate: newRate });
   };
 
   // Keyboard navigation
@@ -702,40 +669,36 @@ export default function App() {
     [loadMoreItems],
   );
 
-  const navigateToFeed = useCallback(
-    (dir: number) => {
-      const list: string[] = [""];
-      for (const node of feedTree.value) {
-        if (node.type === "folder") {
-          list.push("folder:" + node.folder.id);
-          if (node.folder.is_expanded) {
-            for (const f of node.feeds) list.push("feed:" + f.feed.id);
-          }
-        } else {
-          list.push("feed:" + node.feed.id);
+  const navigateToFeed = useCallback((dir: number) => {
+    const list: string[] = [""];
+    for (const node of feedTree.value) {
+      if (node.type === "folder") {
+        list.push("folder:" + node.folder.id);
+        if (node.folder.is_expanded) {
+          for (const f of node.feeds) list.push("feed:" + f.feed.id);
         }
+      } else {
+        list.push("feed:" + node.feed.id);
       }
+    }
 
-      const curIdx = list.indexOf(feedSelected.value || "");
-      if (curIdx === -1) {
-        feedSelected.value = "";
-        return;
-      }
-      const newIdx = curIdx + dir;
-      if (newIdx < 0 || newIdx >= list.length) return;
+    const curIdx = list.indexOf(settings.values.feed.value || "");
+    if (curIdx === -1) {
+      settings.values.feed.value = "";
+      return;
+    }
+    const newIdx = curIdx + dir;
+    if (newIdx < 0 || newIdx >= list.length) return;
 
-      const nextVal = list[newIdx];
-      feedSelected.value = nextVal;
-      updateSettings({ feed: nextVal });
+    const nextVal = list[newIdx];
+    settings.update({ feed: nextVal });
 
-      setTimeout(() => {
-        const scroll = document.querySelector("#feed-list-scroll");
-        const handle = scroll?.querySelector('[aria-checked="true"]');
-        if (handle && scroll) scrollto(handle, scroll);
-      }, 0);
-    },
-    [updateSettings],
-  );
+    setTimeout(() => {
+      const scroll = document.querySelector("#feed-list-scroll");
+      const handle = scroll?.querySelector('[aria-checked="true"]');
+      if (handle && scroll) scrollto(handle, scroll);
+    }, 0);
+  }, []);
 
   // Keybindings
   const keyActionsRef = useRef<KeyActions>({} as KeyActions);
@@ -748,7 +711,7 @@ export default function App() {
     toggleReadability,
     toggleItemRead: () =>
       itemSelectedDetails.value && toggleItemStatus(itemSelectedDetails.value, "unread"),
-    markAllRead: () => filterSelected.value === "unread" && markItemsRead(),
+    markAllRead: () => settings.values.filter.value === "unread" && markItemsRead(),
     toggleItemStarred: () =>
       itemSelectedDetails.value && toggleItemStatus(itemSelectedDetails.value, "starred"),
     nextItem: () => navigateToItem(+1),
@@ -757,46 +720,33 @@ export default function App() {
     prevFeed: () => navigateToFeed(-1),
     closeItem: () => (itemSelected.value = null),
     showShortcuts: () => (showModal.value = "shortcuts"),
-    showAll: () => {
-      filterSelected.value = "";
-      updateSettings({ filter: "" });
-    },
-    showUnread: () => {
-      filterSelected.value = "unread";
-      updateSettings({ filter: "unread" });
-    },
-    showStarred: () => {
-      filterSelected.value = "starred";
-      updateSettings({ filter: "starred" });
-    },
+    showAll: () => settings.update({ filter: "" }),
+    showUnread: () => settings.update({ filter: "unread" }),
+    showStarred: () => settings.update({ filter: "starred" }),
   };
 
   useEffect(() => setupKeybindings(keyActionsRef), []);
 
   return (
     <div
-      className={`d-flex ${feedSelected.value !== null ? "feed-selected" : ""} ${
+      className={`d-flex ${settings.values.feed.value !== null ? "feed-selected" : ""} ${
         itemSelected.value !== null ? "item-selected" : ""
       } ${itemFullscreen.value ? "item-fullscreen" : ""}`}>
       {/* Feed list column */}
       <div
         id="col-feed-list"
         className="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
-        style={{ width: `${feedListWidth.value}px` }}>
-        <Drag width={feedListWidth.value} onResize={resizeFeedList} />
+        style={{ width: `${settings.values.feed_list_width.value}px` }}>
+        <Drag width={settings.values.feed_list_width.value} onResize={resizeFeedList} />
         <div className="px-2 py-1 d-flex justify-content-between gap-2">
           <DropdownApp
-            theme={theme.value.name}
-            onThemeChange={th => {
-              theme.value = { ...theme.value, name: th };
-              updateSettings({ theme_name: th });
-            }}
+            theme={settings.values.theme_name.value}
+            onThemeChange={th => settings.update({ theme_name: th })}
             onShowShortcuts={() => (showModal.value = "shortcuts")}
-            language={language.value}
+            language={settings.values.language.value}
             onLanguageChange={code => {
               setLang(code);
-              language.value = code;
-              updateSettings({ language: code });
+              settings.update({ language: code });
             }}
             requiresAuth={window.app?.requiresAuth}
             onLogout={async () => {
@@ -815,11 +765,8 @@ export default function App() {
                 type="button"
                 className="c-button-pill"
                 aria-label={t("unread")}
-                aria-pressed={filterSelected.value === "unread"}
-                onClick={() => {
-                  filterSelected.value = "unread";
-                  updateSettings({ filter: "unread" });
-                }}>
+                aria-pressed={settings.values.filter.value === "unread"}
+                onClick={() => settings.update({ filter: "unread" })}>
                 <Icon name="circle-full" />
               </button>
             </Tooltip>
@@ -828,11 +775,8 @@ export default function App() {
                 type="button"
                 className="c-button-pill"
                 aria-label={t("starred")}
-                aria-pressed={filterSelected.value === "starred"}
-                onClick={() => {
-                  filterSelected.value = "starred";
-                  updateSettings({ filter: "starred" });
-                }}>
+                aria-pressed={settings.values.filter.value === "starred"}
+                onClick={() => settings.update({ filter: "starred" })}>
                 <Icon name="star-full" />
               </button>
             </Tooltip>
@@ -841,11 +785,8 @@ export default function App() {
                 type="button"
                 className="c-button-pill"
                 aria-label={t("all")}
-                aria-pressed={filterSelected.value === ""}
-                onClick={() => {
-                  filterSelected.value = "";
-                  updateSettings({ filter: "" });
-                }}>
+                aria-pressed={settings.values.filter.value === ""}
+                onClick={() => settings.update({ filter: "" })}>
                 <Icon name="assorted" />
               </button>
             </Tooltip>
@@ -853,10 +794,11 @@ export default function App() {
           <DropdownSettings
             dropdownRef={menuDropdownRef}
             refreshAvailable={refreshAvailable.value}
-            refreshRate={refreshRate.value}
+            refreshRate={settings.values.refresh_rate.value}
             refreshRateTitle={refreshRateTitle.value}
             maxRefreshRate={
-              refreshRate.value === REFRESH_RATE_OPTIONS[REFRESH_RATE_OPTIONS.length - 1].value
+              settings.values.refresh_rate.value ===
+              REFRESH_RATE_OPTIONS[REFRESH_RATE_OPTIONS.length - 1].value
             }
             onRefreshRateChange={changeRefreshRate}
             onFetchAllFeeds={fetchAllFeeds}
@@ -865,36 +807,32 @@ export default function App() {
           />
         </div>
         <div class="d-flex flex-column overflow-auto border-top flex-grow-1">
-        {showNewFeed.value && (
-          <div className="px-2 py-3 overflow-auto flex-shrink-0 border-bottom">
-            <NewFeed
-              folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}
-              onCancel={() => (showNewFeed.value = false)}
-              onCreated={feed => {
-                refreshFeeds();
-                refreshStats();
-                showNewFeed.value = false;
-                feedSelected.value = "feed:" + feed.id;
-              }}
+          {showNewFeed.value && (
+            <div className="px-2 py-3 overflow-auto flex-shrink-0 border-bottom">
+              <NewFeed
+                folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}
+                onCancel={() => (showNewFeed.value = false)}
+                onCreated={feed => {
+                  refreshFeeds();
+                  refreshStats();
+                  showNewFeed.value = false;
+                  settings.values.feed.value = "feed:" + feed.id;
+                }}
+              />
+            </div>
+          )}
+
+          <div id="feed-list-scroll" className="p-2 overflow-auto flex-shrink-1">
+            <FeedTree
+              tree={feedTree.value}
+              value={settings.values.feed.value}
+              filterSelected={settings.values.filter.value}
+              stats={stats.value}
+              feedErrors={feedErrors.value}
+              onSelect={val => settings.update({ feed: val })}
+              onToggleFolder={toggleFolderExpanded}
             />
           </div>
-        )}
-
-        <div id="feed-list-scroll" className="p-2 overflow-auto flex-shrink-1">
-          <FeedTree
-            tree={feedTree.value}
-            value={feedSelected.value}
-            filterSelected={filterSelected.value}
-            stats={stats.value}
-            feedErrors={feedErrors.value}
-            onSelect={val => {
-              feedSelected.value = val;
-              updateSettings({ feed: val });
-            }}
-            onToggleFolder={toggleFolderExpanded}
-          />
-        </div>
-
         </div>
 
         {loadingFeeds.value > 0 && (
@@ -911,29 +849,33 @@ export default function App() {
       <div
         id="col-item-list"
         className="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
-        style={{ width: `${itemListWidth.value}px` }}>
-        <Drag width={itemListWidth.value} onResize={resizeItemList} />
+        style={{ width: `${settings.values.item_list_width.value}px` }}>
+        <Drag width={settings.values.item_list_width.value} onResize={resizeItemList} />
         <div className="px-2 py-1 d-flex gap-1 align-items-center">
           <Tooltip label={t("show_feeds")}>
             <button
               type="button"
               className="c-button-pill d-md-none"
               aria-label={t("show_feeds")}
-              onClick={() => (feedSelected.value = null)}>
+              onClick={() => (settings.values.feed.value = null)}>
               <Icon name="chevron-left" />
             </button>
           </Tooltip>
-          <Tooltip label={`${t("show_first")}: ${itemSortNewestFirst.value ? t("new") : t("old")}`}>
+          <Tooltip
+            label={`${t("show_first")}: ${
+              settings.values.sort_newest_first.value ? t("new") : t("old")
+            }`}>
             <button
               type="button"
               className="c-button-pill"
               aria-label={t("show_first")}
               onClick={() => {
-                const next = !itemSortNewestFirst.value;
-                itemSortNewestFirst.value = next;
-                updateSettings({ sort_newest_first: next });
+                const next = !settings.values.sort_newest_first.value;
+                settings.update({ sort_newest_first: next });
               }}>
-              <Icon name={itemSortNewestFirst.value ? "sort-new-first" : "sort-old-first"} />
+              <Icon
+                name={settings.values.sort_newest_first.value ? "sort-new-first" : "sort-old-first"}
+              />
             </button>
           </Tooltip>
 
@@ -957,7 +899,7 @@ export default function App() {
             />
           </div>
 
-          {filterSelected.value === "unread" && (
+          {settings.values.filter.value === "unread" && (
             <Tooltip label={t("mark_all_read")}>
               <button
                 type="button"
@@ -1023,7 +965,7 @@ export default function App() {
                   {(feedsById.value[item.feed_id] || {}).title}
                 </small>
                 <small className="flex-shrink-0">
-                  <RelativeTime val={item.date} locale={language.value} />
+                  <RelativeTime val={item.date} locale={settings.values.language.value} />
                 </small>
               </div>
               <div className="text-break line-clamp-3">{item.title || t("untitled")}</div>
@@ -1049,22 +991,18 @@ export default function App() {
           item={itemSelectedDetails.value}
           feedTitle={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""}
           feedId={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
-          theme={theme.value}
-          onFontChange={font => {
-            theme.value = { ...theme.value, font };
-            updateSettings({ theme_font: font });
-          }}
+          theme={{ font: settings.values.theme_font.value, size: settings.values.theme_size.value }}
+          onFontChange={font => settings.update({ theme_font: font })}
           onFontSizeChange={delta => {
-            const size = +(theme.value.size + 0.1 * delta).toFixed(1);
-            theme.value = { ...theme.value, size };
-            updateSettings({ theme_size: size });
+            const size = +(settings.values.theme_size.value + 0.1 * delta).toFixed(1);
+            settings.update({ theme_size: size });
           }}
           readabilityContent={itemSelectedReadability.value}
           loadingReadability={loadingReadability.value}
           onToggleReadability={toggleReadability}
           onToggleStarred={item => toggleItemStatus(item, "starred")}
           onToggleRead={item => toggleItemStatus(item, "unread")}
-          onSelectFeed={id => (feedSelected.value = `feed:${id}`)}
+          onSelectFeed={id => (settings.values.feed.value = `feed:${id}`)}
           onNavigate={navigateToItem}
           canPrev={Boolean(items.value.length && itemSelected.value !== items.value[0].id)}
           canNext={Boolean(
@@ -1074,7 +1012,7 @@ export default function App() {
           onToggleFullscreen={() => (itemFullscreen.value = !itemFullscreen.value)}
           onClose={() => (itemSelected.value = null)}
           contentRef={contentRef}
-          language={language.value}
+          language={settings.values.language.value}
         />
       </div>
 
