@@ -15,5 +15,5 @@ func Templates() *template.Template {
 }
 
 func StaticFS() fs.FS {
-	return os.DirFS(rootDir + "/static")
+	return os.DirFS(rootDir + "/bundle")
 }

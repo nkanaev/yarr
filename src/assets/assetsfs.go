@@ -19,6 +19,6 @@ func Templates() *template.Template {
 }
 
 func StaticFS() fs.FS {
-	fs, _ := fs.Sub(static, "static")
+	fs, _ := fs.Sub(static, "bundle")
 	return fs
 }
