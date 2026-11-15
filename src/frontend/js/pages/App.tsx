@@ -670,12 +670,6 @@ export default function App() {
 
     const nextVal = list[newIdx];
     settings.update({ feed: nextVal });
-
-    setTimeout(() => {
-      const scroll = document.querySelector("#feed-list-scroll");
-      const handle = scroll?.querySelector('[aria-checked="true"]');
-      if (handle && scroll) scrollto(handle, scroll);
-    }, 0);
   }, []);
 
   // Keybindings

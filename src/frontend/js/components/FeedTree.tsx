@@ -1,7 +1,9 @@
+import { useEffect, useRef } from "preact/hooks";
 import type { Signal } from "@preact/signals";
 import type { Folder, Feed } from "../api-types";
 import { useI18n } from "../i18n";
 import type { Filter } from "../models/settings";
+import { scrollto } from "../utils";
 import Icon from "./Icon";
 
 export interface TreeFeedNode {
@@ -41,6 +43,14 @@ export default function FeedTree({
   onToggleFolder,
 }: FeedTreeProps) {
   const { t } = useI18n();
+  const refRoot = useRef<HTMLDivElement>(null);
+  const refFeed = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = refFeed.current;
+    const scroll = refRoot.current?.parentElement;
+    if (target && scroll) scrollto(target, scroll);
+  }, [feed.value, tree]);
 
   const allTitle =
     filter.value === "unread"
@@ -50,8 +60,9 @@ export default function FeedTree({
         : t("all_feeds");
 
   return (
-    <div className="d-flex flex-column gap-1">
+    <div ref={refRoot} className="d-flex flex-column gap-1">
       <div
+        ref={feed.value === "" ? refFeed : undefined}
         className="c-listitem d-flex user-select-none gap-2"
         role="radio"
         aria-checked={feed.value === ""}
@@ -74,6 +85,7 @@ export default function FeedTree({
           return (
             <div key={folderKey}>
               <div
+                ref={isSelected ? refFeed : undefined}
                 className="c-listitem d-flex user-select-none gap-2"
                 role="radio"
                 aria-checked={isSelected}
@@ -104,6 +116,7 @@ export default function FeedTree({
                     return (
                       <div
                         key={feedKey}
+                        ref={feed.value === feedKey ? refFeed : undefined}
                         className="c-listitem d-flex user-select-none gap-2"
                         role="radio"
                         aria-checked={feed.value === feedKey}
@@ -147,6 +160,7 @@ export default function FeedTree({
         return (
           <div
             key={feedKey}
+            ref={feed.value === feedKey ? refFeed : undefined}
             className="c-listitem d-flex user-select-none gap-2"
             role="radio"
             aria-checked={feed.value === feedKey}
