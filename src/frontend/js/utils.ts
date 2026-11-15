@@ -19,7 +19,7 @@ export function scrollto(target: Element, scroll: Element) {
   } else {
     newPos = absoluteOffset - scrollRect.height + targetRect.height + padding;
   }
-  scroll.scrollTop = Math.round(newPos);
+  scroll.scrollTo({ top: Math.round(newPos), behavior: "smooth" });
 }
 
 export function debounce<T extends (...args: any[]) => any>(fn: T, timeout: number) {
