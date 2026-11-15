@@ -1,7 +1,7 @@
 import { createContext } from "preact";
 import { useContext, useState, useMemo, useCallback } from "preact/hooks";
 import type { ComponentChildren } from "preact";
-import _translations from "./i18n-translations.json" with { type: "json" };
+import _translations from "./i18n.json" with { type: "json" };
 import { FluentResource, FluentBundle, FluentVariable } from "@fluent/bundle";
 import { Pattern } from "@fluent/bundle/esm/ast";
 
