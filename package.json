@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "build": "esbuild src/frontend/js/main.tsx src/frontend/css/app.css --bundle --outdir=src/assets/static --entry-names=bundle --jsx=automatic --jsx-import-source=preact --supported:nesting=false --target=es2020 --sourcemap",
+    "build": "esbuild src/assets/javascripts/main.tsx src/assets/stylesheets/app.css --bundle --outdir=src/assets/bundle --entry-names=bundle --jsx=automatic --jsx-import-source=preact --supported:nesting=false --target=es2020 --sourcemap",
     "typecheck": "tsc --noEmit"
   },
   "prettier": {
