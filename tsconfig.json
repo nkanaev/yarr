@@ -12,7 +12,7 @@
     "jsxImportSource": "preact"
   },
   "include": [
-    "src/frontend/js/**/*.ts",
-    "src/frontend/js/**/*.tsx"
+    "src/assets/javascripts/**/*.ts",
+    "src/assets/javascripts/**/*.tsx"
   ]
 }
