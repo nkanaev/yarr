@@ -12,7 +12,7 @@ import Tooltip from "../components/Tooltip";
 import ToastContainer, { showToast } from "../components/Toast";
 import DropdownFeed from "../components/DropdownFeed";
 import DropdownFolder from "../components/DropdownFolder";
-import ArticleView from "../components/ArticleView";
+import ColumnItem from "../components/ColumnItem";
 import ColumnFeeds from "../components/ColumnFeeds";
 import type { ColumnFeedsHandle } from "../components/ColumnFeeds";
 import { setupKeybindings, KeyActions } from "../key";
@@ -724,28 +724,26 @@ export default function App() {
       </div>
 
       {/* Item reader column */}
-      <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }}>
-        <ArticleView
-          item={itemSelectedDetails.value}
-          feedTitle={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""}
-          feedId={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
-          settings={settings}
-          readabilityContent={itemSelectedReadability.value}
-          loadingReadability={loadingReadability.value}
-          onToggleReadability={toggleReadability}
-          onToggleStarred={item => toggleItemStatus(item, "starred")}
-          onToggleRead={item => toggleItemStatus(item, "unread")}
-          onNavigate={navigateToItem}
-          canPrev={Boolean(items.value.length && itemSelected.value !== items.value[0].id)}
-          canNext={Boolean(
-            items.value.length && itemSelected.value !== items.value[items.value.length - 1].id,
-          )}
-          isFullscreen={itemFullscreen.value}
-          onToggleFullscreen={() => (itemFullscreen.value = !itemFullscreen.value)}
-          onClose={() => (itemSelected.value = null)}
-          contentRef={contentRef}
-        />
-      </div>
+      <ColumnItem
+        item={itemSelectedDetails.value}
+        feedTitle={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""}
+        feedId={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
+        settings={settings}
+        readabilityContent={itemSelectedReadability.value}
+        loadingReadability={loadingReadability.value}
+        onToggleReadability={toggleReadability}
+        onToggleStarred={item => toggleItemStatus(item, "starred")}
+        onToggleRead={item => toggleItemStatus(item, "unread")}
+        onNavigate={navigateToItem}
+        canPrev={Boolean(items.value.length && itemSelected.value !== items.value[0].id)}
+        canNext={Boolean(
+          items.value.length && itemSelected.value !== items.value[items.value.length - 1].id,
+        )}
+        isFullscreen={itemFullscreen.value}
+        onToggleFullscreen={() => (itemFullscreen.value = !itemFullscreen.value)}
+        onClose={() => (itemSelected.value = null)}
+        contentRef={contentRef}
+      />
 
       {/* Dialog modal */}
       <Modal open={showModal.value !== ""} onHide={() => (showModal.value = "")}>

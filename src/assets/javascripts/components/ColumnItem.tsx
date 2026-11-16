@@ -7,7 +7,7 @@ import Dropdown from "./Dropdown";
 import Icon from "./Icon";
 import Tooltip from "./Tooltip";
 
-interface ArticleViewProps {
+interface ColumnItemProps {
   item: Item | null;
   feedTitle: string;
   feedId?: number;
@@ -26,7 +26,7 @@ interface ArticleViewProps {
   contentRef: Ref<HTMLDivElement>;
 }
 
-export default function ArticleView({
+export default function ColumnItem({
   item,
   feedTitle,
   feedId,
@@ -43,10 +43,11 @@ export default function ArticleView({
   onToggleFullscreen,
   onClose,
   contentRef,
-}: ArticleViewProps) {
+}: ColumnItemProps) {
   const { t } = useI18n();
 
-  if (!item) return null;
+  if (!item)
+    return <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }} />;
 
   const themeFont = settings.values.theme_font.value;
   const themeSize = settings.values.theme_size.value;
@@ -65,7 +66,7 @@ export default function ArticleView({
         : "font-monospace";
 
   return (
-    <>
+    <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }}>
       <div className="px-2 py-1 d-flex gap-1 align-items-center">
         <Tooltip label={t("mark_starred")}>
           <button
@@ -252,6 +253,6 @@ export default function ArticleView({
           <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
