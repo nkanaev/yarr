@@ -17,7 +17,6 @@ import { showToast } from "./Toast";
 interface ColumnItemListProps {
   settings: AppSettings;
   registry: AppRegistry;
-  feedErrors: Record<number, string>;
   items: Signal<Item[]>;
   itemsHasMore: Signal<boolean>;
   loadingItems: boolean;
@@ -26,14 +25,12 @@ interface ColumnItemListProps {
   itemListRef: { current: HTMLDivElement | null };
   onScroll: () => void;
   onMarkAllRead: () => void;
-  refreshStats: () => Promise<void> | void;
   describeError: (err: unknown) => string | undefined;
 }
 
 export default function ColumnItemList({
   settings,
   registry,
-  feedErrors,
   items,
   itemsHasMore,
   loadingItems,
@@ -42,7 +39,6 @@ export default function ColumnItemList({
   itemListRef,
   onScroll,
   onMarkAllRead,
-  refreshStats,
   describeError,
 }: ColumnItemListProps) {
   const { t } = useI18n();
@@ -104,7 +100,7 @@ export default function ColumnItemList({
       registry.feeds.value = registry.feeds.value.map(f =>
         f.id === feed.id ? { ...f, folder_id } : f,
       );
-      refreshStats();
+      registry.refreshStats();
     }
   };
 
@@ -128,7 +124,7 @@ export default function ColumnItemList({
       return;
     }
     await registry.refresh();
-    refreshStats();
+    registry.refreshStats();
   };
 
   const deleteFeed = async (feed: Feed) => {
@@ -138,7 +134,7 @@ export default function ColumnItemList({
       showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
     else {
       settings.values.feed.value = null;
-      refreshStats();
+      registry.refreshStats();
       registry.refresh();
     }
   };
@@ -169,7 +165,7 @@ export default function ColumnItemList({
       );
     else {
       settings.values.feed.value = null;
-      refreshStats();
+      registry.refreshStats();
       registry.refresh();
     }
   };
@@ -307,9 +303,9 @@ export default function ColumnItemList({
         )}
       </div>
 
-      {currentFeed.value && feedErrors[currentFeed.value.id] && (
+      {currentFeed.value && registry.feedErrors.value[currentFeed.value.id] && (
         <div className="px-3 py-2 border-top text-danger text-break">
-          {feedErrors[currentFeed.value.id]}
+          {registry.feedErrors.value[currentFeed.value.id]}
         </div>
       )}
     </div>

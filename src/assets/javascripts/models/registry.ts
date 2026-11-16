@@ -1,7 +1,7 @@
-import { signal, computed, createModel } from "@preact/signals";
+import { signal, computed, effect, createModel } from "@preact/signals";
 import api from "../api";
 import { to } from "../utils";
-import type { Feed, Folder, FeedStat } from "../api-types";
+import type { Feed, Folder, FeedStat, ItemStatus } from "../api-types";
 
 export interface FeedStatSummary {
   unread: number;
@@ -18,6 +18,12 @@ export const RegistryModel = createModel((onError?: (err: unknown) => void) => {
   const feeds = signal<Feed[]>([]);
   const folders = signal<Folder[]>([]);
   const feedStats = signal<Record<number, FeedStat>>({});
+  const feedErrors = signal<Record<number, string>>({});
+  const loadingFeeds = signal(0);
+  const refreshAvailable = signal(true);
+
+  let statsTimer: ReturnType<typeof setTimeout> | undefined;
+  effect(() => () => clearTimeout(statsTimer));
 
   const feedsById = computed(() => {
     return feeds.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Feed>);
@@ -47,6 +53,23 @@ export const RegistryModel = createModel((onError?: (err: unknown) => void) => {
     return { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
   });
 
+  function adjustStats(feedId: number, from: ItemStatus, to: ItemStatus) {
+    const cur = feedStats.value[feedId];
+    if (!cur) return;
+
+    let unread = cur.unread || 0;
+    let starred = cur.starred || 0;
+    if (from === "unread") unread -= 1;
+    if (from === "starred") starred -= 1;
+    if (to === "unread") unread += 1;
+    if (to === "starred") starred += 1;
+
+    feedStats.value = {
+      ...feedStats.value,
+      [feedId]: { ...cur, unread: Math.max(0, unread), starred: Math.max(0, starred) },
+    };
+  }
+
   async function refresh() {
     const [err, values] = await to(Promise.all([api.folders.list(), api.feeds.list()]));
     if (err) {
@@ -57,7 +80,43 @@ export const RegistryModel = createModel((onError?: (err: unknown) => void) => {
     feeds.value = values[1];
   }
 
-  return { feeds, folders, feedStats, feedsById, foldersById, stats, refresh };
+  async function refreshStats() {
+    const [err, data] = await to(api.status());
+    if (err) {
+      onError?.(err);
+      return;
+    }
+
+    loadingFeeds.value = data.running;
+    refreshAvailable.value = data.refresh;
+    if (data.running) statsTimer = setTimeout(refreshStats, 500);
+
+    feedStats.value = data.stats.reduce(
+      (acc, stat) => ({ ...acc, [stat.feed_id]: stat }),
+      {} as Record<number, FeedStat>,
+    );
+
+    const [feedErr, errors] = await to(api.feeds.list_errors());
+    if (feedErr) {
+      onError?.(feedErr);
+      return;
+    }
+    feedErrors.value = errors;
+  }
+
+  return {
+    feeds,
+    folders,
+    feedErrors,
+    loadingFeeds,
+    refreshAvailable,
+    feedsById,
+    foldersById,
+    stats,
+    refresh,
+    refreshStats,
+    adjustStats,
+  };
 });
 
 export type AppRegistry = InstanceType<typeof RegistryModel>;

@@ -32,13 +32,9 @@ type FeedTreeNode = TreeFolderNode | TreeFeedNode;
 interface ColumnFeedListProps {
   settings: AppSettings;
   registry: AppRegistry;
-  feedErrors: Record<number, string>;
-  loadingFeeds: number;
-  refreshAvailable: boolean;
   selectedFeedId: Signal<number | null>;
   requiresAuth: boolean;
   handleRef: { current: ColumnFeedListHandle | null };
-  refreshStats: () => Promise<void> | void;
   describeError: (err: unknown) => string | undefined;
   onShowShortcuts: () => void;
 }
@@ -50,13 +46,9 @@ export interface ColumnFeedListHandle {
 export default function ColumnFeedList({
   settings,
   registry,
-  feedErrors,
-  loadingFeeds,
-  refreshAvailable,
   selectedFeedId,
   requiresAuth,
   handleRef,
-  refreshStats,
   describeError,
   onShowShortcuts,
 }: ColumnFeedListProps) {
@@ -159,11 +151,11 @@ export default function ColumnFeedList({
   }, [settings.values.feed.value, registry.feedsById.value, registry.foldersById.value]);
 
   const fetchAllFeeds = async () => {
-    if (loadingFeeds > 0) return;
+    if (registry.loadingFeeds.value > 0) return;
     const [err] = await to(api.feeds.refresh());
     if (err)
       showToast({ title: t("fail_refresh"), description: describeError(err) }, { level: "fail" });
-    else refreshStats();
+    else registry.refreshStats();
   };
 
   const importOPML = async (e: Event) => {
@@ -177,7 +169,7 @@ export default function ColumnFeedList({
     else {
       input.value = "";
       registry.refresh();
-      refreshStats();
+      registry.refreshStats();
     }
   };
 
@@ -267,7 +259,7 @@ export default function ColumnFeedList({
         <DropdownSettings
           dropdownRef={menuDropdownRef}
           settings={settings}
-          refreshAvailable={refreshAvailable}
+          refreshAvailable={registry.refreshAvailable.value}
           onFetchAllFeeds={fetchAllFeeds}
           onImportOPML={importOPML}
           onShowNewFeed={() => (showNewFeed.value = true)}
@@ -281,7 +273,7 @@ export default function ColumnFeedList({
               onCancel={() => (showNewFeed.value = false)}
               onCreated={feed => {
                 registry.refresh();
-                refreshStats();
+                registry.refreshStats();
                 showNewFeed.value = false;
                 settings.values.feed.value = "feed:" + feed.id;
               }}
@@ -371,10 +363,10 @@ export default function ColumnFeedList({
                                     {registry.stats.value.feeds[feedNode.feed.id]?.[filter.value]}
                                   </span>
                                 )}
-                                {!filter.value && feedErrors[feedNode.feed.id] && (
+                                {!filter.value && registry.feedErrors.value[feedNode.feed.id] && (
                                   <Icon
                                     className="flex-shrink-0"
-                                    title={feedErrors[feedNode.feed.id]}
+                                    title={registry.feedErrors.value[feedNode.feed.id]}
                                     name="alert-circle"
                                   />
                                 )}
@@ -413,10 +405,10 @@ export default function ColumnFeedList({
                         {registry.stats.value.feeds[node.feed.id]?.[filter.value]}
                       </span>
                     )}
-                    {!filter.value && feedErrors[node.feed.id] && (
+                    {!filter.value && registry.feedErrors.value[node.feed.id] && (
                       <Icon
                         className="flex-shrink-0"
-                        title={feedErrors[node.feed.id]}
+                        title={registry.feedErrors.value[node.feed.id]}
                         name="alert-circle"
                       />
                     )}
@@ -428,11 +420,11 @@ export default function ColumnFeedList({
         </div>
       </div>
 
-      {loadingFeeds > 0 && (
+      {registry.loadingFeeds.value > 0 && (
         <div className="px-2 py-1 d-flex align-items-center border-top flex-shrink-0">
           <span className="c-spinner mx-2" />
           <span className="text-truncate cursor-default user-select-none">
-            {t("refreshing_progress", { count: loadingFeeds })}
+            {t("refreshing_progress", { count: registry.loadingFeeds.value })}
           </span>
         </div>
       )}

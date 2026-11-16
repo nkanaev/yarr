@@ -15,7 +15,7 @@ import { setupKeybindings, KeyActions } from "../key";
 import { SettingsModel } from "../models/settings";
 import type { Theme } from "../models/settings";
 import { RegistryModel } from "../models/registry";
-import type { Item, FeedStat, ItemStatus, ItemListQuery } from "../api-types";
+import type { Item, ItemStatus, ItemListQuery } from "../api-types";
 
 const THEME_COLORS: Record<string, string> = {
   night: "#0e0e0e",
@@ -29,9 +29,6 @@ export default function App() {
   const { t, setLang } = useI18n();
   const appSettings = window.app?.settings || {};
 
-  // Feeds & folders
-  const feedErrors = useSignal<Record<number, string>>({});
-
   // Items
   const items = useSignal<Item[]>([]);
   const itemsHasMore = useSignal(true);
@@ -43,8 +40,6 @@ export default function App() {
 
   // Status & modal
   const showModal = useSignal<"" | "shortcuts">("");
-  const refreshAvailable = useSignal(true);
-  const loadingFeeds = useSignal(0);
   const loadingItems = useSignal(false);
   const loadingReadability = useSignal(false);
 
@@ -116,40 +111,10 @@ export default function App() {
   }, [registry.stats.value.total.unread]);
 
   // Refresh feeds & stats
-  const refreshStats = useCallback(
-    async (loopMode?: boolean) => {
-      const [err, data] = await to(api.status());
-      if (err) {
-        showToast({ title: t("fail_load"), description: errDescription(err) }, { level: "fail" });
-        return;
-      }
-
-      loadingFeeds.value = data.running;
-      refreshAvailable.value = data.refresh;
-      if (data.running) setTimeout(() => refreshStats(true), 500);
-
-      registry.feedStats.value = data.stats.reduce(
-        (acc, stat) => ({ ...acc, [stat.feed_id]: stat }),
-        {} as Record<number, FeedStat>,
-      );
-
-      const [feedErr, errors] = await to(api.feeds.list_errors());
-      if (feedErr) {
-        showToast(
-          { title: t("fail_load"), description: errDescription(feedErr) },
-          { level: "fail" },
-        );
-        return;
-      }
-      feedErrors.value = errors;
-    },
-    [t, errDescription],
-  );
-
   useEffect(() => {
-    refreshStats();
+    registry.refreshStats();
     registry.refresh();
-  }, [refreshStats, registry]);
+  }, [registry]);
 
   // Items query & refresh
   const getItemsQuery = useCallback((): ItemListQuery => {
@@ -278,13 +243,7 @@ export default function App() {
             );
             return;
           }
-          const cur = registry.feedStats.value[item.feed_id];
-          if (cur) {
-            registry.feedStats.value = {
-              ...registry.feedStats.value,
-              [item.feed_id]: { ...cur, unread: Math.max(0, (cur.unread || 1) - 1) },
-            };
-          }
+          registry.adjustStats(item.feed_id, "unread", "read");
           items.value = items.value.map(i => (i.id === item.id ? { ...i, status: "read" } : i));
           item.status = "read";
         });
@@ -306,19 +265,7 @@ export default function App() {
       return;
     }
 
-    const cur = registry.feedStats.value[item.feed_id];
-    if (cur) {
-      let unread = cur.unread || 0;
-      let starred = cur.starred || 0;
-      if (oldstatus === "unread") unread -= 1;
-      if (oldstatus === "starred") starred -= 1;
-      if (newstatus === "unread") unread += 1;
-      if (newstatus === "starred") starred += 1;
-      registry.feedStats.value = {
-        ...registry.feedStats.value,
-        [item.feed_id]: { ...cur, unread, starred },
-      };
-    }
+    registry.adjustStats(item.feed_id, oldstatus, newstatus);
 
     items.value = items.value.map(i => (i.id === item.id ? { ...i, status: newstatus } : i));
     item.status = newstatus;
@@ -342,7 +289,7 @@ export default function App() {
     items.value = [];
     itemSelected.value = null;
     itemsHasMore.value = false;
-    refreshStats();
+    registry.refreshStats();
   };
 
   const toggleReadability = async () => {
@@ -424,13 +371,9 @@ export default function App() {
       <ColumnFeedList
         settings={settings}
         registry={registry}
-        feedErrors={feedErrors.value}
-        loadingFeeds={loadingFeeds.value}
-        refreshAvailable={refreshAvailable.value}
         selectedFeedId={selectedFeedId}
         requiresAuth={Boolean(window.app?.requiresAuth)}
         handleRef={feedListRef}
-        refreshStats={refreshStats}
         describeError={errDescription}
         onShowShortcuts={() => (showModal.value = "shortcuts")}
       />
@@ -439,7 +382,6 @@ export default function App() {
       <ColumnItemList
         settings={settings}
         registry={registry}
-        feedErrors={feedErrors.value}
         items={items}
         itemsHasMore={itemsHasMore}
         loadingItems={loadingItems.value}
@@ -448,7 +390,6 @@ export default function App() {
         itemListRef={itemListRef}
         onScroll={onItemListScroll}
         onMarkAllRead={markItemsRead}
-        refreshStats={refreshStats}
         describeError={errDescription}
       />
 
