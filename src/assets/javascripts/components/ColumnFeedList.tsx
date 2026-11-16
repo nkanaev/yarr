@@ -5,6 +5,7 @@ import api from "../api";
 import { scrollto, to } from "../utils";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
+import type { AppRegistry } from "../models/registry";
 import type { DropdownHandle } from "./Dropdown";
 import type { Feed, Folder, FeedStat } from "../api-types";
 import Drag from "./Drag";
@@ -36,8 +37,7 @@ interface FeedTreeStats {
 
 interface ColumnFeedListProps {
   settings: AppSettings;
-  feeds: Signal<Feed[]>;
-  folders: Signal<Folder[]>;
+  registry: AppRegistry;
   feedStats: Signal<Record<number, FeedStat>>;
   feedErrors: Record<number, string>;
   loadingFeeds: number;
@@ -45,7 +45,6 @@ interface ColumnFeedListProps {
   selectedFeedId: Signal<number | null>;
   requiresAuth: boolean;
   handleRef: { current: ColumnFeedListHandle | null };
-  refreshFeeds: () => Promise<void>;
   refreshStats: () => Promise<void> | void;
   describeError: (err: unknown) => string | undefined;
   onShowShortcuts: () => void;
@@ -57,8 +56,7 @@ export interface ColumnFeedListHandle {
 
 export default function ColumnFeedList({
   settings,
-  feeds,
-  folders,
+  registry,
   feedStats,
   feedErrors,
   loadingFeeds,
@@ -66,7 +64,6 @@ export default function ColumnFeedList({
   selectedFeedId,
   requiresAuth,
   handleRef,
-  refreshFeeds,
   refreshStats,
   describeError,
   onShowShortcuts,
@@ -79,26 +76,20 @@ export default function ColumnFeedList({
   const refRoot = useRef<HTMLDivElement>(null);
   const refFeed = useRef<HTMLDivElement>(null);
 
-  const feedsById = useComputed(() => {
-    return feeds.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Feed>);
-  });
-  const foldersById = useComputed(() => {
-    return folders.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Folder>);
-  });
   const currentFeed = useComputed(() => {
     const [type, guid] = (settings.values.feed.value || "").split(":", 2);
-    return type === "feed" ? feedsById.value[Number(guid)] || null : null;
+    return type === "feed" ? registry.feedsById.value[Number(guid)] || null : null;
   });
   const currentFolder = useComputed(() => {
     const [type, guid] = (settings.values.feed.value || "").split(":", 2);
-    return type === "folder" ? foldersById.value[Number(guid)] || null : null;
+    return type === "folder" ? registry.foldersById.value[Number(guid)] || null : null;
   });
   const stats = useComputed((): FeedTreeStats => {
     const statsFeeds: Record<number, { unread: number; starred: number }> = {};
     const statsFolders: Record<number, { unread: number; starred: number }> = {};
     const statsTotal = { unread: 0, starred: 0 };
 
-    for (const feed of feeds.value) {
+    for (const feed of registry.feeds.value) {
       const n = feedStats.value[feed.id];
       if (!n) continue;
       const fStat = { unread: n.unread || 0, starred: n.starred || 0 };
@@ -125,7 +116,7 @@ export default function ColumnFeedList({
       currentFolder.value?.id !== folder.id &&
       currentFeed.value?.folder_id !== folder.id &&
       !stats.value.folders[folder.id]?.[settings.values.filter.value] &&
-      feedsById.value[selectedFeedId.value ?? -1]?.folder_id !== folder.id,
+      registry.feedsById.value[selectedFeedId.value ?? -1]?.folder_id !== folder.id,
     );
 
   const mustHideFeed = (feed: Feed) =>
@@ -137,7 +128,7 @@ export default function ColumnFeedList({
     );
 
   const feedTree = useComputed((): FeedTreeNode[] => {
-    const [rootFeeds, folderFeeds] = feeds.value.reduce(
+    const [rootFeeds, folderFeeds] = registry.feeds.value.reduce(
       (acc, f) => (acc[f.folder_id === null ? 0 : 1].push(f), acc),
       [[] as Feed[], [] as Feed[]],
     );
@@ -148,7 +139,7 @@ export default function ColumnFeedList({
     const feedNode = (feed: Feed): TreeFeedNode => ({ type: "feed", feed });
 
     return [
-      ...folders.value
+      ...registry.folders.value
         .filter(folder => !mustHideFolder(folder))
         .map(folder => ({
           type: "folder" as const,
@@ -174,7 +165,9 @@ export default function ColumnFeedList({
 
   const toggleFolderExpanded = async (folder: Folder) => {
     const is_expanded = !folder.is_expanded;
-    folders.value = folders.value.map(f => (f.id === folder.id ? { ...f, is_expanded } : f));
+    registry.folders.value = registry.folders.value.map(f =>
+      f.id === folder.id ? { ...f, is_expanded } : f,
+    );
     const [err] = await to(api.folders.update(folder.id, { is_expanded }));
     if (err)
       showToast(
@@ -187,12 +180,12 @@ export default function ColumnFeedList({
   useEffect(() => {
     const [type, guid] = (settings.values.feed.value || "").split(":", 2);
     if (type !== "feed") return;
-    const folderId = feedsById.value[Number(guid)]?.folder_id;
+    const folderId = registry.feedsById.value[Number(guid)]?.folder_id;
     if (folderId === null || folderId === undefined) return;
-    const folder = foldersById.value[folderId];
+    const folder = registry.foldersById.value[folderId];
     if (!folder || folder.is_expanded) return;
     void toggleFolderExpanded(folder);
-  }, [settings.values.feed.value, feedsById.value, foldersById.value]);
+  }, [settings.values.feed.value, registry.feedsById.value, registry.foldersById.value]);
 
   const fetchAllFeeds = async () => {
     if (loadingFeeds > 0) return;
@@ -212,7 +205,7 @@ export default function ColumnFeedList({
       showToast({ title: t("fail_import"), description: describeError(err) }, { level: "fail" });
     else {
       input.value = "";
-      refreshFeeds();
+      registry.refresh();
       refreshStats();
     }
   };
@@ -316,7 +309,7 @@ export default function ColumnFeedList({
               folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}
               onCancel={() => (showNewFeed.value = false)}
               onCreated={feed => {
-                refreshFeeds();
+                registry.refresh();
                 refreshStats();
                 showNewFeed.value = false;
                 settings.values.feed.value = "feed:" + feed.id;

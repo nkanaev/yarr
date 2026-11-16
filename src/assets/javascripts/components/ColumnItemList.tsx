@@ -4,6 +4,7 @@ import api from "../api";
 import { to } from "../utils";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
+import type { AppRegistry } from "../models/registry";
 import type { Feed, Folder, Item } from "../api-types";
 import Drag from "./Drag";
 import Icon from "./Icon";
@@ -15,8 +16,7 @@ import { showToast } from "./Toast";
 
 interface ColumnItemListProps {
   settings: AppSettings;
-  feeds: Signal<Feed[]>;
-  folders: Signal<Folder[]>;
+  registry: AppRegistry;
   feedErrors: Record<number, string>;
   items: Signal<Item[]>;
   itemsHasMore: Signal<boolean>;
@@ -26,15 +26,13 @@ interface ColumnItemListProps {
   itemListRef: { current: HTMLDivElement | null };
   onScroll: () => void;
   onMarkAllRead: () => void;
-  refreshFeeds: () => Promise<void>;
   refreshStats: () => Promise<void> | void;
   describeError: (err: unknown) => string | undefined;
 }
 
 export default function ColumnItemList({
   settings,
-  feeds,
-  folders,
+  registry,
   feedErrors,
   items,
   itemsHasMore,
@@ -44,25 +42,18 @@ export default function ColumnItemList({
   itemListRef,
   onScroll,
   onMarkAllRead,
-  refreshFeeds,
   refreshStats,
   describeError,
 }: ColumnItemListProps) {
   const { t } = useI18n();
 
-  const feedsById = useComputed(() => {
-    return feeds.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Feed>);
-  });
-  const foldersById = useComputed(() => {
-    return folders.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Folder>);
-  });
   const currentFeed = useComputed(() => {
     const [type, guid] = (settings.values.feed.value || "").split(":", 2);
-    return type === "feed" ? feedsById.value[Number(guid)] || null : null;
+    return type === "feed" ? registry.feedsById.value[Number(guid)] || null : null;
   });
   const currentFolder = useComputed(() => {
     const [type, guid] = (settings.values.feed.value || "").split(":", 2);
-    return type === "folder" ? foldersById.value[Number(guid)] || null : null;
+    return type === "folder" ? registry.foldersById.value[Number(guid)] || null : null;
   });
   const searchScope = useComputed(() => {
     return (
@@ -86,11 +77,11 @@ export default function ColumnItemList({
     if (!title) return;
     const [err] = await to(api.feeds.update(feed.id, { title }));
     if (err)
-      showToast(
-        { title: t("fail_save_feed"), description: describeError(err) },
-        { level: "fail" },
+      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
+    else
+      registry.feeds.value = registry.feeds.value.map(f =>
+        f.id === feed.id ? { ...f, title } : f,
       );
-    else feeds.value = feeds.value.map(f => (f.id === feed.id ? { ...f, title } : f));
   };
 
   const updateFeedLink = async (feed: Feed) => {
@@ -98,22 +89,21 @@ export default function ColumnItemList({
     if (feed_link === null) return;
     const [err] = await to(api.feeds.update(feed.id, { feed_link }));
     if (err)
-      showToast(
-        { title: t("fail_save_feed"), description: describeError(err) },
-        { level: "fail" },
+      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
+    else
+      registry.feeds.value = registry.feeds.value.map(f =>
+        f.id === feed.id ? { ...f, feed_link } : f,
       );
-    else feeds.value = feeds.value.map(f => (f.id === feed.id ? { ...f, feed_link } : f));
   };
 
   const moveFeed = async (feed: Feed, folder_id: number | null) => {
     const [err] = await to(api.feeds.update(feed.id, { folder_id }));
     if (err)
-      showToast(
-        { title: t("fail_save_feed"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
     else {
-      feeds.value = feeds.value.map(f => (f.id === feed.id ? { ...f, folder_id } : f));
+      registry.feeds.value = registry.feeds.value.map(f =>
+        f.id === feed.id ? { ...f, folder_id } : f,
+      );
       refreshStats();
     }
   };
@@ -137,7 +127,7 @@ export default function ColumnItemList({
       );
       return;
     }
-    await refreshFeeds();
+    await registry.refresh();
     refreshStats();
   };
 
@@ -145,14 +135,11 @@ export default function ColumnItemList({
     if (!confirm(t("confirm_delete", { name: feed.title }))) return;
     const [err] = await to(api.feeds.delete(feed.id));
     if (err)
-      showToast(
-        { title: t("fail_save_feed"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
     else {
       settings.values.feed.value = null;
       refreshStats();
-      refreshFeeds();
+      registry.refresh();
     }
   };
 
@@ -166,7 +153,7 @@ export default function ColumnItemList({
         { level: "fail" },
       );
     else {
-      folders.value = folders.value
+      registry.folders.value = registry.folders.value
         .map(f => (f.id === folder.id ? { ...f, title } : f))
         .sort((a, b) => a.title.localeCompare(b.title));
     }
@@ -183,7 +170,7 @@ export default function ColumnItemList({
     else {
       settings.values.feed.value = null;
       refreshStats();
-      refreshFeeds();
+      registry.refresh();
     }
   };
 
@@ -256,7 +243,7 @@ export default function ColumnItemList({
         {currentFeed.value ? (
           <DropdownFeed
             feed={currentFeed.value}
-            folders={folders.value}
+            folders={registry.folders.value}
             onRename={renameFeed}
             onUpdateLink={updateFeedLink}
             onMove={moveFeed}
@@ -304,7 +291,7 @@ export default function ColumnItemList({
                 className={`indicator me-1 ${item.status === "starred" ? "" : "is-hidden"}`}
               />
               <small className="flex-fill text-truncate me-1">
-                {(feedsById.value[item.feed_id] || {}).title}
+                {(registry.feedsById.value[item.feed_id] || {}).title}
               </small>
               <small className="flex-shrink-0">
                 <RelativeTime val={item.date} locale={settings.values.language.value} />

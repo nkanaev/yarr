@@ -14,7 +14,8 @@ import type { ColumnFeedListHandle } from "../components/ColumnFeedList";
 import { setupKeybindings, KeyActions } from "../key";
 import { SettingsModel } from "../models/settings";
 import type { Theme } from "../models/settings";
-import type { Feed, Folder, Item, FeedStat, ItemStatus, ItemListQuery } from "../api-types";
+import { RegistryModel } from "../models/registry";
+import type { Item, FeedStat, ItemStatus, ItemListQuery } from "../api-types";
 
 const THEME_COLORS: Record<string, string> = {
   night: "#0e0e0e",
@@ -29,8 +30,6 @@ export default function App() {
   const appSettings = window.app?.settings || {};
 
   // Feeds & folders
-  const folders = useSignal<Folder[]>([]);
-  const feeds = useSignal<Feed[]>([]);
   const feedErrors = useSignal<Record<number, string>>({});
   const feedStats = useSignal<Record<number, FeedStat>>({});
 
@@ -77,6 +76,13 @@ export default function App() {
       ),
   );
 
+  const registry = useModel(
+    () =>
+      new RegistryModel(err =>
+        showToast({ title: t("fail_load"), description: errDescription(err) }, { level: "fail" }),
+      ),
+  );
+
   // Theme meta tag
   const updateMetaTheme = useCallback((themeName: Theme) => {
     let active = themeName;
@@ -102,11 +108,11 @@ export default function App() {
   }, [settings.values.language.value, setLang]);
 
   // Computed signals
-  const feedsById = useComputed(() => {
-    return feeds.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Feed>);
-  });
   const totalUnread = useComputed(() => {
-    return feeds.value.reduce((n, feed) => n + (feedStats.value[feed.id]?.unread || 0), 0);
+    return registry.feeds.value.reduce(
+      (n, feed) => n + (feedStats.value[feed.id]?.unread || 0),
+      0,
+    );
   });
   const selectedFeedId = useComputed(() => itemSelectedDetails.value?.feed_id ?? null);
 
@@ -117,16 +123,6 @@ export default function App() {
   }, [totalUnread.value]);
 
   // Refresh feeds & stats
-  const refreshFeeds = useCallback(async () => {
-    const [err, values] = await to(Promise.all([api.folders.list(), api.feeds.list()]));
-    if (err) {
-      showToast({ title: t("fail_load"), description: errDescription(err) }, { level: "fail" });
-      return;
-    }
-    folders.value = values[0];
-    feeds.value = values[1];
-  }, [t, errDescription]);
-
   const refreshStats = useCallback(
     async (loopMode?: boolean) => {
       const [err, data] = await to(api.status());
@@ -159,8 +155,8 @@ export default function App() {
 
   useEffect(() => {
     refreshStats();
-    refreshFeeds();
-  }, [refreshStats, refreshFeeds]);
+    registry.refresh();
+  }, [refreshStats, registry]);
 
   // Items query & refresh
   const getItemsQuery = useCallback((): ItemListQuery => {
@@ -431,8 +427,7 @@ export default function App() {
       {/* Feed list column */}
       <ColumnFeedList
         settings={settings}
-        feeds={feeds}
-        folders={folders}
+        registry={registry}
         feedStats={feedStats}
         feedErrors={feedErrors.value}
         loadingFeeds={loadingFeeds.value}
@@ -440,7 +435,6 @@ export default function App() {
         selectedFeedId={selectedFeedId}
         requiresAuth={Boolean(window.app?.requiresAuth)}
         handleRef={feedListRef}
-        refreshFeeds={refreshFeeds}
         refreshStats={refreshStats}
         describeError={errDescription}
         onShowShortcuts={() => (showModal.value = "shortcuts")}
@@ -449,8 +443,7 @@ export default function App() {
       {/* Item list column */}
       <ColumnItemList
         settings={settings}
-        feeds={feeds}
-        folders={folders}
+        registry={registry}
         feedErrors={feedErrors.value}
         items={items}
         itemsHasMore={itemsHasMore}
@@ -460,7 +453,6 @@ export default function App() {
         itemListRef={itemListRef}
         onScroll={onItemListScroll}
         onMarkAllRead={markItemsRead}
-        refreshFeeds={refreshFeeds}
         refreshStats={refreshStats}
         describeError={errDescription}
       />
@@ -468,8 +460,10 @@ export default function App() {
       {/* Item reader column */}
       <ColumnItem
         item={itemSelectedDetails.value}
-        feedTitle={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""}
-        feedId={(feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
+        feedTitle={
+          (registry.feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""
+        }
+        feedId={(registry.feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
         settings={settings}
         readabilityContent={itemSelectedReadability.value}
         loadingReadability={loadingReadability.value}
