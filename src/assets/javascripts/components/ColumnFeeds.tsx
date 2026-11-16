@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from "preact/hooks";
 import type { Signal } from "@preact/signals";
 import { useSignal, useComputed } from "@preact/signals";
 import api from "../api";
-import { to } from "../utils";
+import { scrollto, to } from "../utils";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
 import type { DropdownHandle } from "./Dropdown";
@@ -10,12 +10,29 @@ import type { Feed, Folder, FeedStat } from "../api-types";
 import Drag from "./Drag";
 import Icon from "./Icon";
 import Tooltip from "./Tooltip";
-import FeedTree from "./FeedTree";
-import type { FeedTreeNode, TreeFeedNode, FeedTreeStats } from "./FeedTree";
 import NewFeed from "./NewFeed";
 import { showToast } from "./Toast";
 import DropdownSettings from "./DropdownSettings";
 import DropdownApp from "./DropdownApp";
+
+interface TreeFeedNode {
+  type: "feed";
+  feed: Feed;
+}
+
+interface TreeFolderNode {
+  type: "folder";
+  folder: Folder;
+  feeds: TreeFeedNode[];
+}
+
+type FeedTreeNode = TreeFolderNode | TreeFeedNode;
+
+interface FeedTreeStats {
+  feeds: Record<number, { unread: number; starred: number }>;
+  folders: Record<number, { unread: number; starred: number }>;
+  total: { unread: number; starred: number };
+}
 
 interface ColumnFeedsProps {
   settings: AppSettings;
@@ -55,8 +72,12 @@ export default function ColumnFeeds({
   onShowShortcuts,
 }: ColumnFeedsProps) {
   const { t } = useI18n();
+  const feed = settings.values.feed;
+  const filter = settings.values.filter;
   const showNewFeed = useSignal(false);
   const menuDropdownRef = useRef<DropdownHandle>(null);
+  const refRoot = useRef<HTMLDivElement>(null);
+  const refFeed = useRef<HTMLDivElement>(null);
 
   const feedsById = useComputed(() => {
     return feeds.value.reduce((acc, f) => ((acc[f.id] = f), acc), {} as Record<number, Feed>);
@@ -137,6 +158,19 @@ export default function ColumnFeeds({
       ...rootFeeds.filter(f => !mustHideFeed(f)).map(feedNode),
     ];
   });
+
+  useEffect(() => {
+    const target = refFeed.current;
+    const scroll = refRoot.current;
+    if (target && scroll) scrollto(target, scroll);
+  }, [feed.value, feedTree.value]);
+
+  const allTitle =
+    filter.value === "unread"
+      ? t("all_unread")
+      : filter.value === "starred"
+        ? t("all_starred")
+        : t("all_feeds");
 
   const toggleFolderExpanded = async (folder: Folder) => {
     const is_expanded = !folder.is_expanded;
@@ -300,16 +334,143 @@ export default function ColumnFeeds({
           </div>
         )}
 
-        <div id="feed-list-scroll" className="p-2 overflow-auto flex-shrink-1">
-          <FeedTree
-            tree={feedTree.value}
-            feed={settings.values.feed}
-            filter={settings.values.filter}
-            stats={stats.value}
-            feedErrors={feedErrors}
-            onSelect={val => settings.update({ feed: val })}
-            onToggleFolder={toggleFolderExpanded}
-          />
+        <div
+          id="feed-list-scroll"
+          ref={refRoot}
+          className="p-2 overflow-auto flex-shrink-1">
+          <div className="d-flex flex-column gap-1">
+            <div
+              ref={feed.value === "" ? refFeed : undefined}
+              className="c-listitem d-flex user-select-none gap-2"
+              role="radio"
+              aria-checked={feed.value === ""}
+              onClick={() => settings.update({ feed: "" })}>
+              <div className="flex-shrink-0 d-flex">
+                <Icon name="layers" />
+              </div>
+              <div className="flex-grow-1 min-w-0 text-truncate">{allTitle}</div>
+              {filter.value && (
+                <div className="flex-shrink-0">
+                  <span className="ps-2 text-end opacity-50">{stats.value.total[filter.value]}</span>
+                </div>
+              )}
+            </div>
+
+            {feedTree.value.map(node => {
+              if (node.type === "folder") {
+                const folderKey = "folder:" + node.folder.id;
+                const isSelected = feed.value === folderKey;
+                return (
+                  <div key={folderKey}>
+                    <div
+                      ref={isSelected ? refFeed : undefined}
+                      className="c-listitem d-flex user-select-none gap-2"
+                      role="radio"
+                      aria-checked={isSelected}
+                      onClick={() => settings.update({ feed: folderKey })}>
+                      <div className="flex-shrink-0 d-flex">
+                        <div
+                          onClick={e => {
+                            e.stopPropagation();
+                            toggleFolderExpanded(node.folder);
+                          }}
+                          className="p-2 m-n2 d-inline-flex">
+                          <Icon name={node.folder.is_expanded ? "chevron-down" : "chevron-right"} />
+                        </div>
+                      </div>
+                      <div className="flex-grow-1 min-w-0 text-truncate">{node.folder.title}</div>
+                      {filter.value && (
+                        <div className="flex-shrink-0">
+                          <span className="ps-2 text-end opacity-50">
+                            {stats.value.folders[node.folder.id]?.[filter.value]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {node.folder.is_expanded && node.feeds.length > 0 && (
+                      <div className="d-flex flex-column gap-1 ps-3 pt-1">
+                        {node.feeds.map(feedNode => {
+                          const feedKey = "feed:" + feedNode.feed.id;
+                          return (
+                            <div
+                              key={feedKey}
+                              ref={feed.value === feedKey ? refFeed : undefined}
+                              className="c-listitem d-flex user-select-none gap-2"
+                              role="radio"
+                              aria-checked={feed.value === feedKey}
+                              onClick={() => settings.update({ feed: feedKey })}>
+                              <div className="flex-shrink-0 d-flex align-items-center">
+                                {!feedNode.feed.icon ? (
+                                  <Icon className="flex-shrink-0" name="rss" />
+                                ) : (
+                                  <span className="c-icon">
+                                    <img src={feedNode.feed.icon} alt="" loading="lazy" />
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex-grow-1 min-w-0 text-truncate">
+                                {feedNode.feed.title}
+                              </div>
+                              <div className="flex-shrink-0 d-flex">
+                                {filter.value && (
+                                  <span className="ps-2 text-end opacity-50">
+                                    {stats.value.feeds[feedNode.feed.id]?.[filter.value]}
+                                  </span>
+                                )}
+                                {!filter.value && feedErrors[feedNode.feed.id] && (
+                                  <Icon
+                                    className="flex-shrink-0"
+                                    title={feedErrors[feedNode.feed.id]}
+                                    name="alert-circle"
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              const feedKey = "feed:" + node.feed.id;
+              return (
+                <div
+                  key={feedKey}
+                  ref={feed.value === feedKey ? refFeed : undefined}
+                  className="c-listitem d-flex user-select-none gap-2"
+                  role="radio"
+                  aria-checked={feed.value === feedKey}
+                  onClick={() => settings.update({ feed: feedKey })}>
+                  <div className="flex-shrink-0 d-flex">
+                    {!node.feed.icon ? (
+                      <Icon className="flex-shrink-0" name="rss" />
+                    ) : (
+                      <span className="c-icon">
+                        <img src={node.feed.icon} alt="" loading="lazy" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-grow-1 min-w-0 text-truncate">{node.feed.title}</div>
+                  <div className="flex-shrink-0 d-flex">
+                    {filter.value && (
+                      <span className="ps-2 text-end opacity-50">
+                        {stats.value.feeds[node.feed.id]?.[filter.value]}
+                      </span>
+                    )}
+                    {!filter.value && feedErrors[node.feed.id] && (
+                      <Icon
+                        className="flex-shrink-0"
+                        title={feedErrors[node.feed.id]}
+                        name="alert-circle"
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
