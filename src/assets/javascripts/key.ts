@@ -25,11 +25,7 @@ export function setupKeybindings(actionsRef: { current: KeyActions }) {
     const height = scroll.getBoundingClientRect().height;
     const newpos = scroll.scrollTop + (height - padding) * direction;
 
-    if (typeof scroll.scrollTo === "function") {
-      scroll.scrollTo({ top: newpos, left: 0, behavior: "smooth" });
-    } else {
-      scroll.scrollTop = newpos;
-    }
+    scroll.scrollTo({ top: newpos, left: 0, behavior: "smooth" });
   };
 
   const focusSearch = () => {
