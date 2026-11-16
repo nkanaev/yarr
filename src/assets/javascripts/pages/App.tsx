@@ -3,28 +3,22 @@ import { useSignal, useComputed, useModel } from "@preact/signals";
 import { useI18n } from "../i18n";
 import api, { NetworkError, HTTPError } from "../api";
 import { scrollto, debounce, to } from "../utils";
-import type { DropdownHandle } from "../components/Dropdown";
 import Drag from "../components/Drag";
 import Modal from "../components/Modal";
 import Shortcuts from "../components/Shortcuts";
 import RelativeTime from "../components/RelativeTime";
 import Icon from "../components/Icon";
 import Tooltip from "../components/Tooltip";
-import FeedTree from "../components/FeedTree";
-import NewFeed from "../components/NewFeed";
 import ToastContainer, { showToast } from "../components/Toast";
-import DropdownSettings from "../components/DropdownSettings";
-import DropdownApp from "../components/DropdownApp";
 import DropdownFeed from "../components/DropdownFeed";
 import DropdownFolder from "../components/DropdownFolder";
 import ArticleView from "../components/ArticleView";
-import type { FeedTreeNode, TreeFeedNode } from "../components/FeedTree";
+import ColumnFeeds from "../components/ColumnFeeds";
+import type { ColumnFeedsHandle } from "../components/ColumnFeeds";
 import { setupKeybindings, KeyActions } from "../key";
 import { SettingsModel } from "../models/settings";
 import type { Theme } from "../models/settings";
 import type { Feed, Folder, Item, FeedStat, ItemStatus, ItemListQuery } from "../api-types";
-
-type Stats = { unread: number; starred: number };
 
 const THEME_COLORS: Record<string, string> = {
   night: "#0e0e0e",
@@ -55,7 +49,6 @@ export default function App() {
 
   // Status & modal
   const showModal = useSignal<"" | "shortcuts">("");
-  const showNewFeed = useSignal(false);
   const refreshAvailable = useSignal(true);
   const loadingFeeds = useSignal(0);
   const loadingItems = useSignal(false);
@@ -64,7 +57,7 @@ export default function App() {
   // Element refs
   const itemListRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const menuDropdownRef = useRef<DropdownHandle>(null);
+  const feedListRef = useRef<ColumnFeedsHandle>(null);
   const activeReqIdRef = useRef(0);
 
   // Error helper
@@ -112,10 +105,6 @@ export default function App() {
     setLang(settings.values.language.value);
   }, [settings.values.language.value, setLang]);
 
-  const resizeFeedList = (w: number) => {
-    settings.update({ feed_list_width: Math.min(Math.max(200, w), 700) });
-  };
-
   const resizeItemList = (w: number) => {
     settings.update({ item_list_width: Math.min(Math.max(200, w), 700) });
   };
@@ -146,33 +135,16 @@ export default function App() {
           : t("all_feeds"))
     );
   });
-  const stats = useComputed(() => {
-    const statsFeeds: Record<number, Stats> = {};
-    const statsFolders: Record<number, Stats> = {};
-    const statsTotal: Stats = { unread: 0, starred: 0 };
-
-    for (const feed of feeds.value) {
-      const n = feedStats.value[feed.id];
-      if (!n) continue;
-      const fStat = { unread: n.unread || 0, starred: n.starred || 0 };
-      statsFeeds[feed.id] = fStat;
-
-      if (feed.folder_id !== null) {
-        if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = { unread: 0, starred: 0 };
-        statsFolders[feed.folder_id].unread += fStat.unread;
-        statsFolders[feed.folder_id].starred += fStat.starred;
-      }
-      statsTotal.unread += fStat.unread;
-      statsTotal.starred += fStat.starred;
-    }
-    return { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
+  const totalUnread = useComputed(() => {
+    return feeds.value.reduce((n, feed) => n + (feedStats.value[feed.id]?.unread || 0), 0);
   });
+  const selectedFeedId = useComputed(() => itemSelectedDetails.value?.feed_id ?? null);
 
   // Keep document title in sync with unread count
   useEffect(() => {
-    const unread = stats.value.total.unread;
+    const unread = totalUnread.value;
     document.title = TITLE + (unread ? ` (${unread})` : "");
-  }, [stats.value.total.unread]);
+  }, [totalUnread.value]);
 
   // Refresh feeds & stats
   const refreshFeeds = useCallback(async () => {
@@ -219,47 +191,6 @@ export default function App() {
     refreshStats();
     refreshFeeds();
   }, [refreshStats, refreshFeeds]);
-
-  // Feed tree
-  const mustHideFolder = (folder: Folder) =>
-    Boolean(
-      settings.values.filter.value &&
-      currentFolder.value?.id !== folder.id &&
-      currentFeed.value?.folder_id !== folder.id &&
-      !stats.value.folders[folder.id]?.[settings.values.filter.value] &&
-      feedsById.value[itemSelectedDetails.value?.feed_id ?? -1]?.folder_id !== folder.id,
-    );
-
-  const mustHideFeed = (feed: Feed) =>
-    Boolean(
-      settings.values.filter.value &&
-      currentFeed.value?.id !== feed.id &&
-      !stats.value.feeds[feed.id]?.[settings.values.filter.value] &&
-      itemSelectedDetails.value?.feed_id !== feed.id,
-    );
-
-  const feedTree = useComputed((): FeedTreeNode[] => {
-    const [rootFeeds, folderFeeds] = feeds.value.reduce(
-      (acc, f) => (acc[f.folder_id === null ? 0 : 1].push(f), acc),
-      [[] as Feed[], [] as Feed[]],
-    );
-    const byFolder: Record<number, Feed[]> = folderFeeds.reduce(
-      (acc, f) => ((acc[f.folder_id as number] ||= []).push(f), acc),
-      {} as Record<number, Feed[]>,
-    );
-    const feedNode = (feed: Feed): TreeFeedNode => ({ type: "feed", feed });
-
-    return [
-      ...folders.value
-        .filter(folder => !mustHideFolder(folder))
-        .map(folder => ({
-          type: "folder" as const,
-          folder,
-          feeds: (byFolder[folder.id] || []).filter(f => !mustHideFeed(f)).map(feedNode),
-        })),
-      ...rootFeeds.filter(f => !mustHideFeed(f)).map(feedNode),
-    ];
-  });
 
   // Items query & refresh
   const getItemsQuery = useCallback((): ItemListQuery => {
@@ -559,28 +490,6 @@ export default function App() {
     }
   };
 
-  const toggleFolderExpanded = async (folder: Folder) => {
-    const is_expanded = !folder.is_expanded;
-    folders.value = folders.value.map(f => (f.id === folder.id ? { ...f, is_expanded } : f));
-    const [err] = await to(api.folders.update(folder.id, { is_expanded }));
-    if (err)
-      showToast(
-        { title: t("fail_save_folder"), description: errDescription(err) },
-        { level: "fail" },
-      );
-  };
-
-  // Selecting a feed reveals it inside its folder
-  useEffect(() => {
-    const [type, guid] = (settings.values.feed.value || "").split(":", 2);
-    if (type !== "feed") return;
-    const folderId = feedsById.value[Number(guid)]?.folder_id;
-    if (folderId === null || folderId === undefined) return;
-    const folder = foldersById.value[folderId];
-    if (!folder || folder.is_expanded) return;
-    void toggleFolderExpanded(folder);
-  }, [settings.values.feed.value, feedsById.value]);
-
   const toggleReadability = async () => {
     if (itemSelectedReadability.value) {
       itemSelectedReadability.value = "";
@@ -596,29 +505,6 @@ export default function App() {
         { level: "fail" },
       );
     else itemSelectedReadability.value = data?.content || "";
-  };
-
-  const fetchAllFeeds = async () => {
-    if (loadingFeeds.value) return;
-    const [err] = await to(api.feeds.refresh());
-    if (err)
-      showToast({ title: t("fail_refresh"), description: errDescription(err) }, { level: "fail" });
-    else refreshStats();
-  };
-
-  const importOPML = async (e: Event) => {
-    const input = e.target as HTMLInputElement;
-    const form = input.form;
-    if (!form) return;
-    menuDropdownRef.current?.hide();
-    const [err] = await to(api.upload_opml(form));
-    if (err)
-      showToast({ title: t("fail_import"), description: errDescription(err) }, { level: "fail" });
-    else {
-      input.value = "";
-      refreshFeeds();
-      refreshStats();
-    }
   };
 
   // Keyboard navigation
@@ -647,31 +533,6 @@ export default function App() {
     [loadMoreItems],
   );
 
-  const navigateToFeed = useCallback((dir: number) => {
-    const list: string[] = [""];
-    for (const node of feedTree.value) {
-      if (node.type === "folder") {
-        list.push("folder:" + node.folder.id);
-        if (node.folder.is_expanded) {
-          for (const f of node.feeds) list.push("feed:" + f.feed.id);
-        }
-      } else {
-        list.push("feed:" + node.feed.id);
-      }
-    }
-
-    const curIdx = list.indexOf(settings.values.feed.value || "");
-    if (curIdx === -1) {
-      settings.values.feed.value = "";
-      return;
-    }
-    const newIdx = curIdx + dir;
-    if (newIdx < 0 || newIdx >= list.length) return;
-
-    const nextVal = list[newIdx];
-    settings.update({ feed: nextVal });
-  }, []);
-
   // Keybindings
   const keyActionsRef = useRef<KeyActions>({} as KeyActions);
   keyActionsRef.current = {
@@ -688,8 +549,8 @@ export default function App() {
       itemSelectedDetails.value && toggleItemStatus(itemSelectedDetails.value, "starred"),
     nextItem: () => navigateToItem(+1),
     prevItem: () => navigateToItem(-1),
-    nextFeed: () => navigateToFeed(+1),
-    prevFeed: () => navigateToFeed(-1),
+    nextFeed: () => feedListRef.current?.navigate(+1),
+    prevFeed: () => feedListRef.current?.navigate(-1),
     closeItem: () => (itemSelected.value = null),
     showShortcuts: () => (showModal.value = "shortcuts"),
     showAll: () => settings.update({ filter: "" }),
@@ -705,105 +566,22 @@ export default function App() {
         itemSelected.value !== null ? "item-selected" : ""
       } ${itemFullscreen.value ? "item-fullscreen" : ""}`}>
       {/* Feed list column */}
-      <div
-        id="col-feed-list"
-        className="vh-100 position-relative d-flex flex-column border-end flex-shrink-0"
-        style={{ width: `${settings.values.feed_list_width.value}px` }}>
-        <Drag width={settings.values.feed_list_width.value} onResize={resizeFeedList} />
-        <div className="px-2 py-1 d-flex justify-content-between gap-2">
-          <DropdownApp
-            settings={settings}
-            onShowShortcuts={() => (showModal.value = "shortcuts")}
-            requiresAuth={window.app?.requiresAuth}
-            onLogout={async () => {
-              const [err] = await to(api.logout());
-              if (err)
-                showToast(
-                  { title: t("fail_logout"), description: errDescription(err) },
-                  { level: "fail" },
-                );
-              else document.location.reload();
-            }}
-          />
-          <div class="d-flex flex-row gap-1">
-            <Tooltip label={t("unread")}>
-              <button
-                type="button"
-                className="c-button-pill"
-                aria-label={t("unread")}
-                aria-pressed={settings.values.filter.value === "unread"}
-                onClick={() => settings.update({ filter: "unread" })}>
-                <Icon name="circle-full" />
-              </button>
-            </Tooltip>
-            <Tooltip label={t("starred")}>
-              <button
-                type="button"
-                className="c-button-pill"
-                aria-label={t("starred")}
-                aria-pressed={settings.values.filter.value === "starred"}
-                onClick={() => settings.update({ filter: "starred" })}>
-                <Icon name="star-full" />
-              </button>
-            </Tooltip>
-            <Tooltip label={t("all")}>
-              <button
-                type="button"
-                className="c-button-pill"
-                aria-label={t("all")}
-                aria-pressed={settings.values.filter.value === ""}
-                onClick={() => settings.update({ filter: "" })}>
-                <Icon name="assorted" />
-              </button>
-            </Tooltip>
-          </div>
-          <DropdownSettings
-            dropdownRef={menuDropdownRef}
-            settings={settings}
-            refreshAvailable={refreshAvailable.value}
-            onFetchAllFeeds={fetchAllFeeds}
-            onImportOPML={importOPML}
-            onShowNewFeed={() => (showNewFeed.value = true)}
-          />
-        </div>
-        <div class="d-flex flex-column overflow-auto border-top flex-grow-1">
-          {showNewFeed.value && (
-            <div className="px-2 py-3 overflow-auto flex-shrink-0 border-bottom">
-              <NewFeed
-                folderId={currentFeed.value?.folder_id ?? currentFolder.value?.id ?? null}
-                onCancel={() => (showNewFeed.value = false)}
-                onCreated={feed => {
-                  refreshFeeds();
-                  refreshStats();
-                  showNewFeed.value = false;
-                  settings.values.feed.value = "feed:" + feed.id;
-                }}
-              />
-            </div>
-          )}
-
-          <div id="feed-list-scroll" className="p-2 overflow-auto flex-shrink-1">
-            <FeedTree
-              tree={feedTree.value}
-              feed={settings.values.feed}
-              filter={settings.values.filter}
-              stats={stats.value}
-              feedErrors={feedErrors.value}
-              onSelect={val => settings.update({ feed: val })}
-              onToggleFolder={toggleFolderExpanded}
-            />
-          </div>
-        </div>
-
-        {loadingFeeds.value > 0 && (
-          <div className="px-2 py-1 d-flex align-items-center border-top flex-shrink-0">
-            <span className="c-spinner mx-2" />
-            <span className="text-truncate cursor-default user-select-none">
-              {t("refreshing_progress", { count: loadingFeeds.value })}
-            </span>
-          </div>
-        )}
-      </div>
+      <ColumnFeeds
+        settings={settings}
+        feeds={feeds}
+        folders={folders}
+        feedStats={feedStats}
+        feedErrors={feedErrors.value}
+        loadingFeeds={loadingFeeds.value}
+        refreshAvailable={refreshAvailable.value}
+        selectedFeedId={selectedFeedId}
+        requiresAuth={Boolean(window.app?.requiresAuth)}
+        handleRef={feedListRef}
+        refreshFeeds={refreshFeeds}
+        refreshStats={refreshStats}
+        describeError={errDescription}
+        onShowShortcuts={() => (showModal.value = "shortcuts")}
+      />
 
       {/* Item list column */}
       <div

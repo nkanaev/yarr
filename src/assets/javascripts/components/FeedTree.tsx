@@ -19,15 +19,17 @@ export interface TreeFolderNode {
 
 export type FeedTreeNode = TreeFolderNode | TreeFeedNode;
 
+export interface FeedTreeStats {
+  feeds: Record<number, { unread: number; starred: number }>;
+  folders: Record<number, { unread: number; starred: number }>;
+  total: { unread: number; starred: number };
+}
+
 interface FeedTreeProps {
   tree: FeedTreeNode[];
   feed: Signal<string | null>;
   filter: Signal<Filter>;
-  stats: {
-    feeds: Record<number, { unread: number; starred: number }>;
-    folders: Record<number, { unread: number; starred: number }>;
-    total: { unread: number; starred: number };
-  };
+  stats: FeedTreeStats;
   feedErrors: Record<number, string>;
   onSelect: (val: string) => void;
   onToggleFolder: (folder: Folder) => void;
