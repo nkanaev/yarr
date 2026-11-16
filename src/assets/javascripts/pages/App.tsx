@@ -13,8 +13,8 @@ import ToastContainer, { showToast } from "../components/Toast";
 import DropdownFeed from "../components/DropdownFeed";
 import DropdownFolder from "../components/DropdownFolder";
 import ColumnItem from "../components/ColumnItem";
-import ColumnFeeds from "../components/ColumnFeeds";
-import type { ColumnFeedsHandle } from "../components/ColumnFeeds";
+import ColumnFeedList from "../components/ColumnFeedList";
+import type { ColumnFeedListHandle } from "../components/ColumnFeedList";
 import { setupKeybindings, KeyActions } from "../key";
 import { SettingsModel } from "../models/settings";
 import type { Theme } from "../models/settings";
@@ -57,7 +57,7 @@ export default function App() {
   // Element refs
   const itemListRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const feedListRef = useRef<ColumnFeedsHandle>(null);
+  const feedListRef = useRef<ColumnFeedListHandle>(null);
   const activeReqIdRef = useRef(0);
 
   // Error helper
@@ -566,7 +566,7 @@ export default function App() {
         itemSelected.value !== null ? "item-selected" : ""
       } ${itemFullscreen.value ? "item-fullscreen" : ""}`}>
       {/* Feed list column */}
-      <ColumnFeeds
+      <ColumnFeedList
         settings={settings}
         feeds={feeds}
         folders={folders}

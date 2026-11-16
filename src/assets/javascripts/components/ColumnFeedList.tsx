@@ -34,7 +34,7 @@ interface FeedTreeStats {
   total: { unread: number; starred: number };
 }
 
-interface ColumnFeedsProps {
+interface ColumnFeedListProps {
   settings: AppSettings;
   feeds: Signal<Feed[]>;
   folders: Signal<Folder[]>;
@@ -44,18 +44,18 @@ interface ColumnFeedsProps {
   refreshAvailable: boolean;
   selectedFeedId: Signal<number | null>;
   requiresAuth: boolean;
-  handleRef: { current: ColumnFeedsHandle | null };
+  handleRef: { current: ColumnFeedListHandle | null };
   refreshFeeds: () => Promise<void>;
   refreshStats: () => Promise<void> | void;
   describeError: (err: unknown) => string | undefined;
   onShowShortcuts: () => void;
 }
 
-export interface ColumnFeedsHandle {
+export interface ColumnFeedListHandle {
   navigate: (dir: number) => void;
 }
 
-export default function ColumnFeeds({
+export default function ColumnFeedList({
   settings,
   feeds,
   folders,
@@ -70,7 +70,7 @@ export default function ColumnFeeds({
   refreshStats,
   describeError,
   onShowShortcuts,
-}: ColumnFeedsProps) {
+}: ColumnFeedListProps) {
   const { t } = useI18n();
   const feed = settings.values.feed;
   const filter = settings.values.filter;
