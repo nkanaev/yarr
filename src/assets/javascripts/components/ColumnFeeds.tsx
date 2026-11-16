@@ -198,10 +198,7 @@ export default function ColumnFeeds({
     if (loadingFeeds > 0) return;
     const [err] = await to(api.feeds.refresh());
     if (err)
-      showToast(
-        { title: t("fail_refresh"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: t("fail_refresh"), description: describeError(err) }, { level: "fail" });
     else refreshStats();
   };
 
@@ -212,10 +209,7 @@ export default function ColumnFeeds({
     menuDropdownRef.current?.hide();
     const [err] = await to(api.upload_opml(form));
     if (err)
-      showToast(
-        { title: t("fail_import"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: t("fail_import"), description: describeError(err) }, { level: "fail" });
     else {
       input.value = "";
       refreshFeeds();
@@ -226,10 +220,7 @@ export default function ColumnFeeds({
   const logout = async () => {
     const [err] = await to(api.logout());
     if (err)
-      showToast(
-        { title: t("fail_logout"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: t("fail_logout"), description: describeError(err) }, { level: "fail" });
     else document.location.reload();
   };
 
@@ -334,10 +325,7 @@ export default function ColumnFeeds({
           </div>
         )}
 
-        <div
-          id="feed-list-scroll"
-          ref={refRoot}
-          className="p-2 overflow-auto flex-shrink-1">
+        <div id="feed-list-scroll" ref={refRoot} className="p-2 overflow-auto flex-shrink-1">
           <div className="d-flex flex-column gap-1">
             <div
               ref={feed.value === "" ? refFeed : undefined}
@@ -351,7 +339,9 @@ export default function ColumnFeeds({
               <div className="flex-grow-1 min-w-0 text-truncate">{allTitle}</div>
               {filter.value && (
                 <div className="flex-shrink-0">
-                  <span className="ps-2 text-end opacity-50">{stats.value.total[filter.value]}</span>
+                  <span className="ps-2 text-end opacity-50">
+                    {stats.value.total[filter.value]}
+                  </span>
                 </div>
               )}
             </div>
