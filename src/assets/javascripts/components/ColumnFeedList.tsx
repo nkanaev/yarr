@@ -7,7 +7,7 @@ import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
 import type { AppRegistry } from "../models/registry";
 import type { DropdownHandle } from "./Dropdown";
-import type { Feed, Folder, FeedStat } from "../api-types";
+import type { Feed, Folder } from "../api-types";
 import Drag from "./Drag";
 import Icon from "./Icon";
 import Tooltip from "./Tooltip";
@@ -29,16 +29,9 @@ interface TreeFolderNode {
 
 type FeedTreeNode = TreeFolderNode | TreeFeedNode;
 
-interface FeedTreeStats {
-  feeds: Record<number, { unread: number; starred: number }>;
-  folders: Record<number, { unread: number; starred: number }>;
-  total: { unread: number; starred: number };
-}
-
 interface ColumnFeedListProps {
   settings: AppSettings;
   registry: AppRegistry;
-  feedStats: Signal<Record<number, FeedStat>>;
   feedErrors: Record<number, string>;
   loadingFeeds: number;
   refreshAvailable: boolean;
@@ -57,7 +50,6 @@ export interface ColumnFeedListHandle {
 export default function ColumnFeedList({
   settings,
   registry,
-  feedStats,
   feedErrors,
   loadingFeeds,
   refreshAvailable,
@@ -84,27 +76,6 @@ export default function ColumnFeedList({
     const [type, guid] = (settings.values.feed.value || "").split(":", 2);
     return type === "folder" ? registry.foldersById.value[Number(guid)] || null : null;
   });
-  const stats = useComputed((): FeedTreeStats => {
-    const statsFeeds: Record<number, { unread: number; starred: number }> = {};
-    const statsFolders: Record<number, { unread: number; starred: number }> = {};
-    const statsTotal = { unread: 0, starred: 0 };
-
-    for (const feed of registry.feeds.value) {
-      const n = feedStats.value[feed.id];
-      if (!n) continue;
-      const fStat = { unread: n.unread || 0, starred: n.starred || 0 };
-      statsFeeds[feed.id] = fStat;
-
-      if (feed.folder_id !== null) {
-        if (!statsFolders[feed.folder_id]) statsFolders[feed.folder_id] = { unread: 0, starred: 0 };
-        statsFolders[feed.folder_id].unread += fStat.unread;
-        statsFolders[feed.folder_id].starred += fStat.starred;
-      }
-      statsTotal.unread += fStat.unread;
-      statsTotal.starred += fStat.starred;
-    }
-    return { feeds: statsFeeds, folders: statsFolders, total: statsTotal };
-  });
 
   const resizeFeedList = (w: number) => {
     settings.update({ feed_list_width: Math.min(Math.max(200, w), 700) });
@@ -115,7 +86,7 @@ export default function ColumnFeedList({
       settings.values.filter.value &&
       currentFolder.value?.id !== folder.id &&
       currentFeed.value?.folder_id !== folder.id &&
-      !stats.value.folders[folder.id]?.[settings.values.filter.value] &&
+      !registry.stats.value.folders[folder.id]?.[settings.values.filter.value] &&
       registry.feedsById.value[selectedFeedId.value ?? -1]?.folder_id !== folder.id,
     );
 
@@ -123,7 +94,7 @@ export default function ColumnFeedList({
     Boolean(
       settings.values.filter.value &&
       currentFeed.value?.id !== feed.id &&
-      !stats.value.feeds[feed.id]?.[settings.values.filter.value] &&
+      !registry.stats.value.feeds[feed.id]?.[settings.values.filter.value] &&
       selectedFeedId.value !== feed.id,
     );
 
@@ -333,7 +304,7 @@ export default function ColumnFeedList({
               {filter.value && (
                 <div className="flex-shrink-0">
                   <span className="ps-2 text-end opacity-50">
-                    {stats.value.total[filter.value]}
+                    {registry.stats.value.total[filter.value]}
                   </span>
                 </div>
               )}
@@ -365,7 +336,7 @@ export default function ColumnFeedList({
                       {filter.value && (
                         <div className="flex-shrink-0">
                           <span className="ps-2 text-end opacity-50">
-                            {stats.value.folders[node.folder.id]?.[filter.value]}
+                            {registry.stats.value.folders[node.folder.id]?.[filter.value]}
                           </span>
                         </div>
                       )}
@@ -397,7 +368,7 @@ export default function ColumnFeedList({
                               <div className="flex-shrink-0 d-flex">
                                 {filter.value && (
                                   <span className="ps-2 text-end opacity-50">
-                                    {stats.value.feeds[feedNode.feed.id]?.[filter.value]}
+                                    {registry.stats.value.feeds[feedNode.feed.id]?.[filter.value]}
                                   </span>
                                 )}
                                 {!filter.value && feedErrors[feedNode.feed.id] && (
@@ -439,7 +410,7 @@ export default function ColumnFeedList({
                   <div className="flex-shrink-0 d-flex">
                     {filter.value && (
                       <span className="ps-2 text-end opacity-50">
-                        {stats.value.feeds[node.feed.id]?.[filter.value]}
+                        {registry.stats.value.feeds[node.feed.id]?.[filter.value]}
                       </span>
                     )}
                     {!filter.value && feedErrors[node.feed.id] && (

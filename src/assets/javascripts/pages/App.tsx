@@ -31,7 +31,6 @@ export default function App() {
 
   // Feeds & folders
   const feedErrors = useSignal<Record<number, string>>({});
-  const feedStats = useSignal<Record<number, FeedStat>>({});
 
   // Items
   const items = useSignal<Item[]>([]);
@@ -108,19 +107,13 @@ export default function App() {
   }, [settings.values.language.value, setLang]);
 
   // Computed signals
-  const totalUnread = useComputed(() => {
-    return registry.feeds.value.reduce(
-      (n, feed) => n + (feedStats.value[feed.id]?.unread || 0),
-      0,
-    );
-  });
   const selectedFeedId = useComputed(() => itemSelectedDetails.value?.feed_id ?? null);
 
   // Keep document title in sync with unread count
   useEffect(() => {
-    const unread = totalUnread.value;
+    const unread = registry.stats.value.total.unread;
     document.title = TITLE + (unread ? ` (${unread})` : "");
-  }, [totalUnread.value]);
+  }, [registry.stats.value.total.unread]);
 
   // Refresh feeds & stats
   const refreshStats = useCallback(
@@ -135,7 +128,7 @@ export default function App() {
       refreshAvailable.value = data.refresh;
       if (data.running) setTimeout(() => refreshStats(true), 500);
 
-      feedStats.value = data.stats.reduce(
+      registry.feedStats.value = data.stats.reduce(
         (acc, stat) => ({ ...acc, [stat.feed_id]: stat }),
         {} as Record<number, FeedStat>,
       );
@@ -285,10 +278,10 @@ export default function App() {
             );
             return;
           }
-          const cur = feedStats.value[item.feed_id];
+          const cur = registry.feedStats.value[item.feed_id];
           if (cur) {
-            feedStats.value = {
-              ...feedStats.value,
+            registry.feedStats.value = {
+              ...registry.feedStats.value,
               [item.feed_id]: { ...cur, unread: Math.max(0, (cur.unread || 1) - 1) },
             };
           }
@@ -313,7 +306,7 @@ export default function App() {
       return;
     }
 
-    const cur = feedStats.value[item.feed_id];
+    const cur = registry.feedStats.value[item.feed_id];
     if (cur) {
       let unread = cur.unread || 0;
       let starred = cur.starred || 0;
@@ -321,7 +314,10 @@ export default function App() {
       if (oldstatus === "starred") starred -= 1;
       if (newstatus === "unread") unread += 1;
       if (newstatus === "starred") starred += 1;
-      feedStats.value = { ...feedStats.value, [item.feed_id]: { ...cur, unread, starred } };
+      registry.feedStats.value = {
+        ...registry.feedStats.value,
+        [item.feed_id]: { ...cur, unread, starred },
+      };
     }
 
     items.value = items.value.map(i => (i.id === item.id ? { ...i, status: newstatus } : i));
@@ -428,7 +424,6 @@ export default function App() {
       <ColumnFeedList
         settings={settings}
         registry={registry}
-        feedStats={feedStats}
         feedErrors={feedErrors.value}
         loadingFeeds={loadingFeeds.value}
         refreshAvailable={refreshAvailable.value}
