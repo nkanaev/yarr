@@ -26,7 +26,7 @@ interface ColumnItemProps {
   contentRef: Ref<HTMLDivElement>;
 }
 
-export default function ColumnItem({
+export default function ColumnItemView({
   item,
   feedTitle,
   feedId,

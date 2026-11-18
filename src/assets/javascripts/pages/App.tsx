@@ -7,7 +7,7 @@ import Modal from "../components/Modal";
 import Shortcuts from "../components/Shortcuts";
 import Icon from "../components/Icon";
 import ToastContainer, { showToast } from "../components/Toast";
-import ColumnItem from "../components/ColumnItemView";
+import ColumnItemView from "../components/ColumnItemView";
 import ColumnItemList from "../components/ColumnItemList";
 import ColumnFeedList from "../components/ColumnFeedList";
 import type { ColumnFeedListHandle } from "../components/ColumnFeedList";
@@ -394,7 +394,7 @@ export default function App() {
       />
 
       {/* Item reader column */}
-      <ColumnItem
+      <ColumnItemView
         item={itemSelectedDetails.value}
         feedTitle={
           (registry.feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""
