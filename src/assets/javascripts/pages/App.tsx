@@ -7,7 +7,7 @@ import Modal from "../components/Modal";
 import Shortcuts from "../components/Shortcuts";
 import Icon from "../components/Icon";
 import ToastContainer, { showToast } from "../components/Toast";
-import ColumnItem from "../components/ColumnItem";
+import ColumnItem from "../components/ColumnItemView";
 import ColumnItemList from "../components/ColumnItemList";
 import ColumnFeedList from "../components/ColumnFeedList";
 import type { ColumnFeedListHandle } from "../components/ColumnFeedList";
