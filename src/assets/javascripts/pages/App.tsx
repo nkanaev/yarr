@@ -15,7 +15,8 @@ import { setupKeybindings, KeyActions } from "../key";
 import { SettingsModel } from "../models/settings";
 import type { Theme } from "../models/settings";
 import { RegistryModel } from "../models/registry";
-import type { Item, ItemStatus, ItemListQuery } from "../api-types";
+import { ItemListModel } from "../models/itemlist";
+import type { Item, ItemStatus } from "../api-types";
 
 const THEME_COLORS: Record<string, string> = {
   night: "#0e0e0e",
@@ -30,24 +31,19 @@ export default function App() {
   const appSettings = window.app?.settings || {};
 
   // Items
-  const items = useSignal<Item[]>([]);
-  const itemsHasMore = useSignal(true);
   const itemSelected = useSignal<number | null>(null);
   const itemSelectedDetails = useSignal<Item | null>(null);
   const itemSelectedReadability = useSignal("");
   const itemFullscreen = useSignal(false);
-  const itemSearch = useSignal("");
 
   // Status & modal
   const showModal = useSignal<"" | "shortcuts">("");
-  const loadingItems = useSignal(false);
   const loadingReadability = useSignal(false);
 
   // Element refs
   const itemListRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const feedListRef = useRef<ColumnFeedListHandle>(null);
-  const activeReqIdRef = useRef(0);
 
   // Error helper
   const errDescription = useCallback(
@@ -69,11 +65,16 @@ export default function App() {
         ),
       ),
   );
-
   const registry = useModel(
     () =>
       new RegistryModel(err =>
         showToast({ title: t("fail_load"), description: errDescription(err) }, { level: "fail" }),
+      ),
+  );
+  const itemList = useModel(
+    () =>
+      new ItemListModel(settings, registry, (err, key) =>
+        showToast({ title: t(key), description: errDescription(err) }, { level: "fail" }),
       ),
   );
 
@@ -116,100 +117,41 @@ export default function App() {
     registry.refresh();
   }, [registry]);
 
-  // Items query & refresh
-  const getItemsQuery = useCallback((): ItemListQuery => {
-    const query: ItemListQuery = {};
-    if (settings.values.feed.value) {
-      const [type, guid] = settings.values.feed.value.split(":", 2);
-      if (type === "feed") query.feed_id = guid;
-      else if (type === "folder") query.folder_id = guid;
-    }
-    if (settings.values.filter.value) query.status = settings.values.filter.value;
-    if (itemSearch.value) query.search = itemSearch.value;
-    if (!settings.values.sort_newest_first.value) query.oldest_first = true;
-    return query;
-  }, []);
-
-  const refreshItems = useCallback(
-    async (loadMore = false) => {
-      if (settings.values.feed.value === null) {
-        items.value = [];
-        itemsHasMore.value = false;
-        loadingItems.value = false;
-        return;
-      }
-
-      const reqId = ++activeReqIdRef.current;
-
-      if (!loadMore) {
-        items.value = [];
-        itemsHasMore.value = true;
-        if (itemListRef.current) itemListRef.current.scrollTop = 0;
-      }
-
-      const query = getItemsQuery();
-      if (loadMore && items.value.length > 0) {
-        query.after = items.value[items.value.length - 1].id;
-      }
-
-      loadingItems.value = true;
-      const [err, data] = await to(api.items.list(query));
-
-      if (reqId !== activeReqIdRef.current) return;
-      loadingItems.value = false;
-
-      if (err) {
-        showToast({ title: t("fail_load"), description: errDescription(err) }, { level: "fail" });
-        return;
-      }
-
-      items.value = loadMore ? items.value.concat(data.list) : data.list;
-      itemsHasMore.value = data.has_more;
-
-      if (data.has_more && !loadMore) {
-        setTimeout(() => {
-          const el = itemListRef.current;
-          if (!el || el.scrollHeight === 0) return;
-          const scale =
-            (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
-          if (el.scrollHeight - el.scrollTop - el.offsetHeight < 70 * scale) {
-            refreshItems(true);
-          }
-        }, 0);
-      }
-    },
-    [getItemsQuery, t, errDescription],
-  );
-
+  // Reset selection when the item query changes
   useEffect(() => {
     itemSelected.value = null;
-    refreshItems(false);
+    if (itemListRef.current) itemListRef.current.scrollTop = 0;
   }, [
     settings.values.feed.value,
     settings.values.filter.value,
     settings.values.sort_newest_first.value,
   ]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => refreshItems(false), 500);
-    return () => clearTimeout(timer);
-  }, [itemSearch.value]);
-
   const loadMoreItems = useCallback(() => {
-    if (!itemsHasMore.value || loadingItems.value) return;
+    if (!itemList.hasMore.value || itemList.loading.value) return;
     const el = itemListRef.current;
     if (!el || el.scrollHeight === 0) return;
     const scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
     const closeToBottom = el.scrollHeight - el.scrollTop - el.offsetHeight < 70 * scale;
-    if (
-      closeToBottom ||
-      (itemSelected.value &&
-        items.value.length &&
-        itemSelected.value === items.value[items.value.length - 1].id)
-    ) {
-      refreshItems(true);
+    const lastItem = itemList.items.value[itemList.items.value.length - 1];
+    if (closeToBottom || (itemSelected.value !== null && lastItem?.id === itemSelected.value)) {
+      itemList.loadMore();
     }
-  }, [refreshItems]);
+  }, [itemList]);
+
+  // Fill the viewport after the first page loads
+  useEffect(() => {
+    if (itemList.resetCount.value === 0 || !itemList.hasMore.value) return;
+    const timer = setTimeout(() => {
+      const el = itemListRef.current;
+      if (!el || el.scrollHeight === 0) return;
+      const scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
+      if (el.scrollHeight - el.scrollTop - el.offsetHeight < 70 * scale) {
+        itemList.loadMore();
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [itemList.resetCount.value]);
 
   const onItemListScroll = useMemo(() => debounce(loadMoreItems, 200), [loadMoreItems]);
 
@@ -244,7 +186,7 @@ export default function App() {
             return;
           }
           registry.adjustStats(item.feed_id, "unread", "read");
-          items.value = items.value.map(i => (i.id === item.id ? { ...i, status: "read" } : i));
+          itemList.setStatus(item.id, "read");
           item.status = "read";
         });
       }
@@ -267,7 +209,7 @@ export default function App() {
 
     registry.adjustStats(item.feed_id, oldstatus, newstatus);
 
-    items.value = items.value.map(i => (i.id === item.id ? { ...i, status: newstatus } : i));
+    itemList.setStatus(item.id, newstatus);
     item.status = newstatus;
     if (itemSelectedDetails.value?.id === item.id) {
       itemSelectedDetails.value = { ...itemSelectedDetails.value, status: newstatus };
@@ -275,21 +217,8 @@ export default function App() {
   };
 
   const markItemsRead = async () => {
-    const markQuery = getItemsQuery();
-    const [err] = await to(
-      api.items.mark_read({ folder_id: markQuery.folder_id, feed_id: markQuery.feed_id }),
-    );
-    if (err) {
-      showToast(
-        { title: t("fail_update_article"), description: errDescription(err) },
-        { level: "fail" },
-      );
-      return;
-    }
-    items.value = [];
-    itemSelected.value = null;
-    itemsHasMore.value = false;
-    registry.refreshStats();
+    const ok = await itemList.markAllRead();
+    if (ok) itemSelected.value = null;
   };
 
   const toggleReadability = async () => {
@@ -312,18 +241,19 @@ export default function App() {
   // Keyboard navigation
   const navigateToItem = useCallback(
     (dir: number) => {
+      const list = itemList.items.value;
       if (itemSelected.value === null) {
-        if (items.value.length) itemSelected.value = items.value[0].id;
+        if (list.length) itemSelected.value = list[0].id;
         return;
       }
-      const curIdx = items.value.findIndex(x => x.id === itemSelected.value);
+      const curIdx = list.findIndex(x => x.id === itemSelected.value);
       if (curIdx === -1) {
-        if (items.value.length) itemSelected.value = items.value[0].id;
+        if (list.length) itemSelected.value = list[0].id;
         return;
       }
       const newIdx = curIdx + dir;
-      if (newIdx < 0 || newIdx >= items.value.length) return;
-      itemSelected.value = items.value[newIdx].id;
+      if (newIdx < 0 || newIdx >= list.length) return;
+      itemSelected.value = list[newIdx].id;
 
       setTimeout(() => {
         const scroll = document.querySelector("#item-list-scroll");
@@ -332,7 +262,7 @@ export default function App() {
         loadMoreItems();
       }, 0);
     },
-    [loadMoreItems],
+    [itemList, loadMoreItems],
   );
 
   // Keybindings
@@ -382,11 +312,8 @@ export default function App() {
       <ColumnItemList
         settings={settings}
         registry={registry}
-        items={items}
-        itemsHasMore={itemsHasMore}
-        loadingItems={loadingItems.value}
+        itemList={itemList}
         itemSelected={itemSelected}
-        itemSearch={itemSearch}
         itemListRef={itemListRef}
         onScroll={onItemListScroll}
         onMarkAllRead={markItemsRead}
@@ -407,9 +334,12 @@ export default function App() {
         onToggleStarred={item => toggleItemStatus(item, "starred")}
         onToggleRead={item => toggleItemStatus(item, "unread")}
         onNavigate={navigateToItem}
-        canPrev={Boolean(items.value.length && itemSelected.value !== items.value[0].id)}
+        canPrev={Boolean(
+          itemList.items.value.length && itemSelected.value !== itemList.items.value[0].id,
+        )}
         canNext={Boolean(
-          items.value.length && itemSelected.value !== items.value[items.value.length - 1].id,
+          itemList.items.value.length &&
+          itemSelected.value !== itemList.items.value[itemList.items.value.length - 1].id,
         )}
         isFullscreen={itemFullscreen.value}
         onToggleFullscreen={() => (itemFullscreen.value = !itemFullscreen.value)}

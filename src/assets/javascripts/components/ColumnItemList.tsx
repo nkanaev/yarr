@@ -5,7 +5,8 @@ import { to } from "../utils";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
 import type { AppRegistry } from "../models/registry";
-import type { Feed, Folder, Item } from "../api-types";
+import type { AppItemList } from "../models/itemlist";
+import type { Feed, Folder } from "../api-types";
 import Drag from "./Drag";
 import Icon from "./Icon";
 import Tooltip from "./Tooltip";
@@ -17,11 +18,8 @@ import { showToast } from "./Toast";
 interface ColumnItemListProps {
   settings: AppSettings;
   registry: AppRegistry;
-  items: Signal<Item[]>;
-  itemsHasMore: Signal<boolean>;
-  loadingItems: boolean;
+  itemList: AppItemList;
   itemSelected: Signal<number | null>;
-  itemSearch: Signal<string>;
   itemListRef: { current: HTMLDivElement | null };
   onScroll: () => void;
   onMarkAllRead: () => void;
@@ -31,11 +29,8 @@ interface ColumnItemListProps {
 export default function ColumnItemList({
   settings,
   registry,
-  items,
-  itemsHasMore,
-  loadingItems,
+  itemList,
   itemSelected,
-  itemSearch,
   itemListRef,
   onScroll,
   onMarkAllRead,
@@ -210,14 +205,14 @@ export default function ColumnItemList({
             id="searchbar"
             type="search"
             className="d-block"
-            value={itemSearch}
+            value={itemList.search}
             placeholder={t("search_placeholder", { scope: searchScope.value })}
-            onInput={e => (itemSearch.value = (e.target as HTMLInputElement).value)}
+            onInput={e => (itemList.search.value = (e.target as HTMLInputElement).value)}
             onKeyDown={e => {
               e.stopPropagation();
               if (e.key === "Enter") (e.target as HTMLInputElement).blur();
               if (e.key === "Escape") {
-                itemSearch.value = "";
+                itemList.search.value = "";
                 (e.target as HTMLInputElement).blur();
               }
             }}
@@ -266,7 +261,7 @@ export default function ColumnItemList({
         ref={itemListRef}
         className="d-flex flex-column p-2 overflow-auto border-top flex-grow-1 gap-1"
         onScroll={onScroll}>
-        {items.value.map(item => (
+        {itemList.items.value.map(item => (
           <div
             key={item.id}
             className="c-listitem d-flex flex-column user-select-none"
@@ -296,8 +291,8 @@ export default function ColumnItemList({
             <div className="text-break line-clamp-3">{item.title || t("untitled")}</div>
           </div>
         ))}
-        {(itemsHasMore.value || loadingItems) && (
-          <div className={`text-center my-3 ${items.value.length === 0 ? "show-delayed" : ""}`}>
+        {(itemList.hasMore.value || itemList.loading.value) && (
+          <div className={`text-center my-3 ${!itemList.items.value.length ? "show-delayed" : ""}`}>
             <span className="c-spinner" />
           </div>
         )}
