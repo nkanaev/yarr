@@ -35,7 +35,6 @@ interface ColumnFeedListProps {
   selectedFeedId: Signal<number | null>;
   requiresAuth: boolean;
   handleRef: { current: ColumnFeedListHandle | null };
-  describeError: (err: unknown) => string | undefined;
   onShowShortcuts: () => void;
 }
 
@@ -49,7 +48,6 @@ export default function ColumnFeedList({
   selectedFeedId,
   requiresAuth,
   handleRef,
-  describeError,
   onShowShortcuts,
 }: ColumnFeedListProps) {
   const { t } = useI18n();
@@ -126,10 +124,7 @@ export default function ColumnFeedList({
     );
     const [err] = await to(api.folders.update(folder.id, { is_expanded }));
     if (err)
-      showToast(
-        { title: t("fail_save_folder"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: "fail_save_folder", description: err }, { level: "fail" });
   };
 
   // Selecting a feed reveals it inside its folder
@@ -163,7 +158,7 @@ export default function ColumnFeedList({
     if (registry.loadingFeeds.value > 0) return;
     const [err] = await to(api.feeds.refresh());
     if (err)
-      showToast({ title: t("fail_refresh"), description: describeError(err) }, { level: "fail" });
+      showToast({ title: "fail_refresh", description: err }, { level: "fail" });
     else registry.refreshStats();
   };
 
@@ -174,7 +169,7 @@ export default function ColumnFeedList({
     menuDropdownRef.current?.hide();
     const [err] = await to(api.upload_opml(form));
     if (err)
-      showToast({ title: t("fail_import"), description: describeError(err) }, { level: "fail" });
+      showToast({ title: "fail_import", description: err }, { level: "fail" });
     else {
       input.value = "";
       registry.refresh();
@@ -185,7 +180,7 @@ export default function ColumnFeedList({
   const logout = async () => {
     const [err] = await to(api.logout());
     if (err)
-      showToast({ title: t("fail_logout"), description: describeError(err) }, { level: "fail" });
+      showToast({ title: "fail_logout", description: err }, { level: "fail" });
     else document.location.reload();
   };
 

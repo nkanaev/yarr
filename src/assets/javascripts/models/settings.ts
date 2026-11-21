@@ -1,6 +1,6 @@
 import { signal, createModel } from "@preact/signals";
 import type { Signal } from "@preact/signals";
-import type { Lang } from "../i18n";
+import type { Lang, TranslationKey } from "../i18n";
 import type { Settings, SettingsUpdateData } from "../api-types";
 import { debounce } from "../utils";
 import api from "../api";
@@ -10,7 +10,7 @@ export type Theme = "system" | "light" | "sepia" | "night";
 export type ThemeFont = "" | "serif" | "monospace";
 
 export const SettingsModel = createModel(
-  (initial: Partial<Settings> = {}, onSaveError?: (err: unknown) => void) => {
+  (initial: Partial<Settings> = {}, onError?: (err: Error, key: TranslationKey) => void) => {
     const values = {
       filter: signal<Filter>((initial.filter as Filter) || ""),
       feed: signal<string | null>(initial.feed ?? null),
@@ -26,7 +26,7 @@ export const SettingsModel = createModel(
 
     const save = (data: SettingsUpdateData) => {
       api.settings.update(data).catch(err => {
-        onSaveError?.(err);
+        onError?.(err, "fail_save_settings");
       });
     };
 

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useMemo, useCallback } from "preact/hooks";
 import { useSignal, useComputed, useModel } from "@preact/signals";
 import { useI18n } from "../i18n";
-import api, { NetworkError, HTTPError } from "../api";
+import type { TranslationKey } from "../i18n";
+import api from "../api";
 import { scrollto, debounce, to } from "../utils";
 import Modal from "../components/Modal";
 import Shortcuts from "../components/Shortcuts";
@@ -27,7 +28,7 @@ const THEME_COLORS: Record<string, string> = {
 const TITLE = document.title;
 
 export default function App() {
-  const { t, setLang } = useI18n();
+  const { setLang } = useI18n();
   const appSettings = window.app?.settings || {};
 
   // Items
@@ -45,38 +46,12 @@ export default function App() {
   const contentRef = useRef<HTMLDivElement>(null);
   const feedListRef = useRef<ColumnFeedListHandle>(null);
 
-  // Error helper
-  const errDescription = useCallback(
-    (err: unknown): string | undefined => {
-      if (err instanceof HTTPError)
-        return t("error_server", { code: err.status, text: err.statusText });
-      if (err instanceof NetworkError) return t("error_network");
-      return undefined;
-    },
-    [t],
-  );
+  const showErrorToast = (err: Error, key: TranslationKey) =>
+    showToast({ title: key, description: err }, { level: "fail" });
 
-  const settings = useModel(
-    () =>
-      new SettingsModel(appSettings, err =>
-        showToast(
-          { title: t("fail_save_settings"), description: errDescription(err) },
-          { level: "fail" },
-        ),
-      ),
-  );
-  const registry = useModel(
-    () =>
-      new RegistryModel(err =>
-        showToast({ title: t("fail_load"), description: errDescription(err) }, { level: "fail" }),
-      ),
-  );
-  const itemList = useModel(
-    () =>
-      new ItemListModel(settings, registry, (err, key) =>
-        showToast({ title: t(key), description: errDescription(err) }, { level: "fail" }),
-      ),
-  );
+  const settings = useModel(() => new SettingsModel(appSettings, showErrorToast));
+  const registry = useModel(() => new RegistryModel(showErrorToast));
+  const itemList = useModel(() => new ItemListModel(settings, registry, showErrorToast));
 
   // Theme meta tag
   const updateMetaTheme = useCallback((themeName: Theme) => {
@@ -168,10 +143,7 @@ export default function App() {
 
     to(api.items.get(itemSelected.value)).then(([itemErr, item]) => {
       if (itemErr) {
-        showToast(
-          { title: t("fail_load"), description: errDescription(itemErr) },
-          { level: "fail" },
-        );
+        showToast({ title: "fail_load", description: itemErr }, { level: "fail" });
         return;
       }
       itemSelectedDetails.value = item;
@@ -179,10 +151,7 @@ export default function App() {
       if (item.status === "unread") {
         to(api.items.update(item.id, { status: "read" })).then(([updateErr]) => {
           if (updateErr) {
-            showToast(
-              { title: t("fail_update_article"), description: errDescription(updateErr) },
-              { level: "fail" },
-            );
+            showToast({ title: "fail_update_article", description: updateErr }, { level: "fail" });
             return;
           }
           registry.adjustStats(item.feed_id, "unread", "read");
@@ -191,7 +160,7 @@ export default function App() {
         });
       }
     });
-  }, [itemSelected.value, t, errDescription]);
+  }, [itemSelected.value]);
 
   // Status toggle
   const toggleItemStatus = async (item: Item, targetstatus: ItemStatus) => {
@@ -200,10 +169,7 @@ export default function App() {
 
     const [err] = await to(api.items.update(item.id, { status: newstatus }));
     if (err) {
-      showToast(
-        { title: t("fail_update_article"), description: errDescription(err) },
-        { level: "fail" },
-      );
+      showToast({ title: "fail_update_article", description: err }, { level: "fail" });
       return;
     }
 
@@ -230,11 +196,7 @@ export default function App() {
     loadingReadability.value = true;
     const [err, data] = await to(api.crawl(itemSelectedDetails.value.link));
     loadingReadability.value = false;
-    if (err)
-      showToast(
-        { title: t("fail_readability"), description: errDescription(err) },
-        { level: "fail" },
-      );
+    if (err) showToast({ title: "fail_readability", description: err }, { level: "fail" });
     else itemSelectedReadability.value = data?.content || "";
   };
 
@@ -304,7 +266,6 @@ export default function App() {
         selectedFeedId={selectedFeedId}
         requiresAuth={Boolean(window.app?.requiresAuth)}
         handleRef={feedListRef}
-        describeError={errDescription}
         onShowShortcuts={() => (showModal.value = "shortcuts")}
       />
 
@@ -317,7 +278,6 @@ export default function App() {
         itemListRef={itemListRef}
         onScroll={onItemListScroll}
         onMarkAllRead={markItemsRead}
-        describeError={errDescription}
       />
 
       {/* Item reader column */}

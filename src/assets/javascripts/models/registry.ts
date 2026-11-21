@@ -2,6 +2,7 @@ import { signal, computed, effect, createModel } from "@preact/signals";
 import api from "../api";
 import { to } from "../utils";
 import type { Feed, Folder, FeedStat, ItemStatus } from "../api-types";
+import type { TranslationKey } from "../i18n";
 
 export interface FeedStatSummary {
   unread: number;
@@ -14,7 +15,7 @@ export interface FeedTreeStats {
   total: FeedStatSummary;
 }
 
-export const RegistryModel = createModel((onError?: (err: unknown) => void) => {
+export const RegistryModel = createModel((onError?: (err: Error, key: TranslationKey) => void) => {
   const feeds = signal<Feed[]>([]);
   const folders = signal<Folder[]>([]);
   const feedStats = signal<Record<number, FeedStat>>({});
@@ -73,7 +74,7 @@ export const RegistryModel = createModel((onError?: (err: unknown) => void) => {
   async function refresh() {
     const [err, values] = await to(Promise.all([api.folders.list(), api.feeds.list()]));
     if (err) {
-      onError?.(err);
+      onError?.(err, "fail_load");
       return;
     }
     folders.value = values[0];
@@ -83,7 +84,7 @@ export const RegistryModel = createModel((onError?: (err: unknown) => void) => {
   async function refreshStats() {
     const [err, data] = await to(api.status());
     if (err) {
-      onError?.(err);
+      onError?.(err, "fail_load");
       return;
     }
 
@@ -98,7 +99,7 @@ export const RegistryModel = createModel((onError?: (err: unknown) => void) => {
 
     const [feedErr, errors] = await to(api.feeds.list_errors());
     if (feedErr) {
-      onError?.(feedErr);
+      onError?.(feedErr, "fail_load");
       return;
     }
     feedErrors.value = errors;

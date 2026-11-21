@@ -23,7 +23,6 @@ interface ColumnItemListProps {
   itemListRef: { current: HTMLDivElement | null };
   onScroll: () => void;
   onMarkAllRead: () => void;
-  describeError: (err: unknown) => string | undefined;
 }
 
 export default function ColumnItemList({
@@ -34,7 +33,6 @@ export default function ColumnItemList({
   itemListRef,
   onScroll,
   onMarkAllRead,
-  describeError,
 }: ColumnItemListProps) {
   const { t } = useI18n();
 
@@ -68,7 +66,7 @@ export default function ColumnItemList({
     if (!title) return;
     const [err] = await to(api.feeds.update(feed.id, { title }));
     if (err)
-      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
+      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else
       registry.feeds.value = registry.feeds.value.map(f =>
         f.id === feed.id ? { ...f, title } : f,
@@ -80,7 +78,7 @@ export default function ColumnItemList({
     if (feed_link === null) return;
     const [err] = await to(api.feeds.update(feed.id, { feed_link }));
     if (err)
-      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
+      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else
       registry.feeds.value = registry.feeds.value.map(f =>
         f.id === feed.id ? { ...f, feed_link } : f,
@@ -90,7 +88,7 @@ export default function ColumnItemList({
   const moveFeed = async (feed: Feed, folder_id: number | null) => {
     const [err] = await to(api.feeds.update(feed.id, { folder_id }));
     if (err)
-      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
+      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else {
       registry.feeds.value = registry.feeds.value.map(f =>
         f.id === feed.id ? { ...f, folder_id } : f,
@@ -104,18 +102,12 @@ export default function ColumnItemList({
     if (!title) return;
     const [folderErr, folder] = await to(api.folders.create({ title }));
     if (folderErr) {
-      showToast(
-        { title: t("fail_save_folder"), description: describeError(folderErr) },
-        { level: "fail" },
-      );
+      showToast({ title: "fail_save_folder", description: folderErr }, { level: "fail" });
       return;
     }
     const [updateErr] = await to(api.feeds.update(feed.id, { folder_id: folder.id }));
     if (updateErr) {
-      showToast(
-        { title: t("fail_save_feed"), description: describeError(updateErr) },
-        { level: "fail" },
-      );
+      showToast({ title: "fail_save_feed", description: updateErr }, { level: "fail" });
       return;
     }
     await registry.refresh();
@@ -126,7 +118,7 @@ export default function ColumnItemList({
     if (!confirm(t("confirm_delete", { name: feed.title }))) return;
     const [err] = await to(api.feeds.delete(feed.id));
     if (err)
-      showToast({ title: t("fail_save_feed"), description: describeError(err) }, { level: "fail" });
+      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else {
       settings.values.feed.value = null;
       registry.refreshStats();
@@ -139,10 +131,7 @@ export default function ColumnItemList({
     if (!title) return;
     const [err] = await to(api.folders.update(folder.id, { title }));
     if (err)
-      showToast(
-        { title: t("fail_save_folder"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: "fail_save_folder", description: err }, { level: "fail" });
     else {
       registry.folders.value = registry.folders.value
         .map(f => (f.id === folder.id ? { ...f, title } : f))
@@ -154,10 +143,7 @@ export default function ColumnItemList({
     if (!confirm(t("confirm_delete", { name: folder.title }))) return;
     const [err] = await to(api.folders.delete(folder.id));
     if (err)
-      showToast(
-        { title: t("fail_save_folder"), description: describeError(err) },
-        { level: "fail" },
-      );
+      showToast({ title: "fail_save_folder", description: err }, { level: "fail" });
     else {
       settings.values.feed.value = null;
       registry.refreshStats();

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "preact/hooks";
-import api, { NetworkError, HTTPError } from "../api";
+import api from "../api";
 import { to } from "../utils";
 import { useI18n } from "../i18n";
 import { showToast } from "./Toast";
@@ -21,13 +21,6 @@ export default function NewFeed({ folderId, onCancel, onCreated }: NewFeedProps)
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
-
-  function errDescription(err: unknown): string | undefined {
-    if (err instanceof HTTPError)
-      return t("error_server", { code: err.status, text: err.statusText });
-    if (err instanceof NetworkError) return t("error_network");
-    return undefined;
-  }
 
   async function createFeed(event: Event) {
     event.preventDefault();
@@ -51,10 +44,7 @@ export default function NewFeed({ folderId, onCancel, onCreated }: NewFeedProps)
     setLoading(false);
 
     if (err) {
-      showToast(
-        { title: t("fail_save_feed"), description: errDescription(err) },
-        { level: "fail", closeable: false },
-      );
+      showToast({ title: "fail_save_feed", description: err }, { level: "fail", closeable: false });
       return;
     }
 

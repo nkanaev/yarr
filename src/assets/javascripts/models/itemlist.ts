@@ -10,7 +10,7 @@ export const ItemListModel = createModel(
   (
     settings: AppSettings,
     registry: AppRegistry,
-    onError?: (err: unknown, key: TranslationKey) => void,
+    onError?: (err: Error, key: TranslationKey) => void,
   ) => {
     const items = signal<Item[]>([]);
     const hasMore = signal(true);

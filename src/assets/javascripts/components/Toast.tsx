@@ -1,4 +1,7 @@
 import { useState, useEffect } from "preact/hooks";
+import { useI18n } from "../i18n";
+import type { TranslationKey, TranslateFn } from "../i18n";
+import { NetworkError, HTTPError } from "../api";
 import Icon from "./Icon";
 
 export type ToastLevel = "info" | "fail";
@@ -10,8 +13,8 @@ export interface ToastOptions {
 }
 
 export interface ToastMessage {
-  title: string;
-  description?: string;
+  title: TranslationKey;
+  description?: TranslationKey | Error;
 }
 
 export interface ToastItem {
@@ -43,7 +46,16 @@ export function removeToast(id: string) {
   notify();
 }
 
+function describeToast(description: ToastMessage["description"], t: TranslateFn) {
+  if (typeof description === "string") return t(description);
+  if (description instanceof HTTPError)
+    return t("error_server", { code: description.status, text: description.statusText });
+  if (description instanceof NetworkError) return t("error_network");
+  return undefined;
+}
+
 export default function ToastContainer() {
+  const { t } = useI18n();
   const [list, setList] = useState<ToastItem[]>(toasts);
 
   useEffect(() => {
@@ -55,24 +67,27 @@ export default function ToastContainer() {
 
   return (
     <div className="position-fixed bottom-0 end-0 pb-3 pe-3 d-flex flex-column align-items-end gap-2 z-4 pe-none">
-      {list.map(t => (
-        <div
-          key={t.id}
-          className={`c-toast d-flex align-items-start gap-2 ${
-            t.opts?.level === "fail" ? "text-bg-danger text-light" : ""
-          }`}>
-          {t.opts?.level === "fail" && <Icon name="alert-circle" />}
-          <div className="flex-grow-1">
-            <div>{t.message.title}</div>
-            {t.message.description && <div className="opacity-50">{t.message.description}</div>}
+      {list.map(toast => {
+        const description = describeToast(toast.message.description, t);
+        return (
+          <div
+            key={toast.id}
+            className={`c-toast d-flex align-items-start gap-2 ${
+              toast.opts?.level === "fail" ? "text-bg-danger text-light" : ""
+            }`}>
+            {toast.opts?.level === "fail" && <Icon name="alert-circle" />}
+            <div className="flex-grow-1">
+              <div>{t(toast.message.title)}</div>
+              {description && <div className="opacity-50">{description}</div>}
+            </div>
+            {toast.opts?.closeable === true && (
+              <button type="button" className="c-button-link" onClick={() => removeToast(toast.id)}>
+                <Icon name="x" />
+              </button>
+            )}
           </div>
-          {t.opts?.closeable === true && (
-            <button type="button" className="c-button-link" onClick={() => removeToast(t.id)}>
-              <Icon name="x" />
-            </button>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
