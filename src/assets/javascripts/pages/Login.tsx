@@ -1,6 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useI18n } from "../i18n";
-import icons from "../icons";
+import Icon from "../components/Icon";
 
 interface LoginProps {
   onLogin: () => void;
@@ -25,10 +25,9 @@ export default function Login({ onLogin }: LoginProps) {
   return (
     <div className="mx-auto my-2 p-3" style={{ maxWidth: "20rem" }}>
       <form onSubmit={handleSubmit} className="d-flex flex-column">
-        <div
-          className="login-logo my-5 d-flex justify-content-center"
-          dangerouslySetInnerHTML={{ __html: icons.anchor }}
-        />
+        <div className="login-logo my-5 d-flex justify-content-center">
+          <Icon name="anchor" />
+        </div>
         <label htmlFor="username" className="mb-2">
           {t("username")}
         </label>

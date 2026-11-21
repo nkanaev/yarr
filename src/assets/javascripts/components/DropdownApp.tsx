@@ -91,7 +91,7 @@ export default function DropdownApp({
       {requiresAuth && (
         <>
           <div className="c-dropdown-divider" />
-          <button type="button" className="c-dropdown-item w-100 text-start" onClick={onLogout}>
+          <button type="button" className="c-dropdown-item w-100 text-start d-flex gap-1" onClick={onLogout}>
             <Icon className="me-1" name="log-out" />
             {t("log_out")}
           </button>

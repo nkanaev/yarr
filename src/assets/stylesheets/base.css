@@ -13,20 +13,8 @@ body {
   background-color: var(--v-bg);
 }
 
-/* animation */
-.indicator {
-  width: 0.6rem;
-  transition: width 0.3s;
-}
-
-.indicator.is-hidden {
-  width: 0;
-  opacity: 0;
-  margin: 0 !important;
-}
-
 /* login icon */
-.login-logo svg {
+.login-logo .c-icon {
   width: 4rem;
   height: auto;
 }

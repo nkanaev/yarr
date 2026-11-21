@@ -349,9 +349,12 @@ export default function ColumnFeedList({
                                 {!feedNode.feed.icon ? (
                                   <Icon className="flex-shrink-0" name="rss" />
                                 ) : (
-                                  <span className="c-icon">
-                                    <img src={feedNode.feed.icon} alt="" loading="lazy" />
-                                  </span>
+                                  <img
+                                    className="c-icon flex-shrink-0"
+                                    src={feedNode.feed.icon}
+                                    alt=""
+                                    loading="lazy"
+                                  />
                                 )}
                               </div>
                               <div className="flex-grow-1 min-w-0 text-truncate">
@@ -391,9 +394,12 @@ export default function ColumnFeedList({
                     {!node.feed.icon ? (
                       <Icon className="flex-shrink-0" name="rss" />
                     ) : (
-                      <span className="c-icon">
-                        <img src={node.feed.icon} alt="" loading="lazy" />
-                      </span>
+                      <img
+                        className="c-icon flex-shrink-0"
+                        src={node.feed.icon}
+                        alt=""
+                        loading="lazy"
+                      />
                     )}
                   </div>
                   <div className="flex-grow-1 min-w-0 text-truncate">{node.feed.title}</div>
