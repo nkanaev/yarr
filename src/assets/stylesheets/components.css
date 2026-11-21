@@ -147,9 +147,9 @@
   }
   &[aria-pressed="true"],
   &:active {
-    /* TODO: color states for menu */
     color: var(--v-active-fg);
     background-color: var(--v-active-bg);
+    outline: none;
   }
   &:disabled {
     opacity: 0.7;
