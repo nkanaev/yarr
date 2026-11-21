@@ -364,11 +364,9 @@ export default function ColumnFeedList({
                                   </span>
                                 )}
                                 {!filter.value && registry.feedErrors.value[feedNode.feed.id] && (
-                                  <Icon
-                                    className="flex-shrink-0"
-                                    title={registry.feedErrors.value[feedNode.feed.id]}
-                                    name="alert-circle"
-                                  />
+                                  <Tooltip label={registry.feedErrors.value[feedNode.feed.id]}>
+                                    <Icon className="flex-shrink-0" name="alert-circle" />
+                                  </Tooltip>
                                 )}
                               </div>
                             </div>
@@ -406,11 +404,9 @@ export default function ColumnFeedList({
                       </span>
                     )}
                     {!filter.value && registry.feedErrors.value[node.feed.id] && (
-                      <Icon
-                        className="flex-shrink-0"
-                        title={registry.feedErrors.value[node.feed.id]}
-                        name="alert-circle"
-                      />
+                      <Tooltip label={registry.feedErrors.value[node.feed.id]}>
+                        <Icon className="flex-shrink-0" name="alert-circle" />
+                      </Tooltip>
                     )}
                   </div>
                 </div>
