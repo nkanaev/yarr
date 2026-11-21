@@ -53,8 +53,7 @@ export default function ColumnFeedList({
   onShowShortcuts,
 }: ColumnFeedListProps) {
   const { t } = useI18n();
-  const feed = settings.values.feed;
-  const filter = settings.values.filter;
+  const { feed, filter } = settings.values;
   const showNewFeed = useSignal(false);
   const menuDropdownRef = useRef<DropdownHandle>(null);
   const refRoot = useRef<HTMLDivElement>(null);
@@ -113,12 +112,6 @@ export default function ColumnFeedList({
     ];
   });
 
-  useEffect(() => {
-    const target = refFeed.current;
-    const scroll = refRoot.current;
-    if (target && scroll) scrollto(target, scroll);
-  }, [feed.value, feedTree.value]);
-
   const allTitle =
     filter.value === "unread"
       ? t("all_unread")
@@ -141,14 +134,30 @@ export default function ColumnFeedList({
 
   // Selecting a feed reveals it inside its folder
   useEffect(() => {
-    const [type, guid] = (settings.values.feed.value || "").split(":", 2);
+    const [type, guid] = (feed.value || "").split(":", 2);
     if (type !== "feed") return;
     const folderId = registry.feedsById.value[Number(guid)]?.folder_id;
     if (folderId === null || folderId === undefined) return;
     const folder = registry.foldersById.value[folderId];
     if (!folder || folder.is_expanded) return;
     void toggleFolderExpanded(folder);
-  }, [settings.values.feed.value, registry.feedsById.value, registry.foldersById.value]);
+  }, [settings.values.feed.value]);
+
+  // Scroll the selected node into view, retrying until it has been rendered
+  const scrolledFor = useRef<string | null>(null);
+  useEffect(() => {
+    const key = feed.value || "";
+    if (scrolledFor.current === key) return;
+
+    const frame = requestAnimationFrame(() => {
+      const target = refFeed.current;
+      const scroll = refRoot.current;
+      if (!target || !scroll) return;
+      scrolledFor.current = key;
+      scrollto(target, scroll);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [feed.value, registry.feeds.value]);
 
   const fetchAllFeeds = async () => {
     if (registry.loadingFeeds.value > 0) return;
