@@ -1,9 +1,9 @@
-import { useEffect, useRef, useMemo, useCallback } from "preact/hooks";
+import { useEffect, useRef, useCallback } from "preact/hooks";
 import { useSignal, useComputed, useModel } from "@preact/signals";
 import { useI18n } from "../i18n";
 import type { TranslationKey } from "../i18n";
 import api from "../api";
-import { scrollto, debounce, to } from "../utils";
+import { to } from "../utils";
 import Modal from "../components/Modal";
 import Shortcuts from "../components/Shortcuts";
 import Icon from "../components/Icon";
@@ -40,7 +40,6 @@ export default function App() {
   const showModal = useSignal<"" | "shortcuts">("");
 
   // Element refs
-  const itemListRef = useRef<HTMLDivElement>(null);
   const feedListRef = useRef<ColumnFeedListHandle>(null);
   const itemViewRef = useRef<ColumnItemViewHandle>(null);
 
@@ -93,40 +92,11 @@ export default function App() {
   // Reset selection when the item query changes
   useEffect(() => {
     itemSelected.value = null;
-    if (itemListRef.current) itemListRef.current.scrollTop = 0;
   }, [
     settings.values.feed.value,
     settings.values.filter.value,
     settings.values.sort_newest_first.value,
   ]);
-
-  const loadMoreItems = useCallback(() => {
-    if (!itemList.hasMore.value || itemList.loading.value) return;
-    const el = itemListRef.current;
-    if (!el || el.scrollHeight === 0) return;
-    const scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
-    const closeToBottom = el.scrollHeight - el.scrollTop - el.offsetHeight < 70 * scale;
-    const lastItem = itemList.items.value[itemList.items.value.length - 1];
-    if (closeToBottom || (itemSelected.value !== null && lastItem?.id === itemSelected.value)) {
-      itemList.loadMore();
-    }
-  }, [itemList]);
-
-  // Fill the viewport after the first page loads
-  useEffect(() => {
-    if (itemList.resetCount.value === 0 || !itemList.hasMore.value) return;
-    const timer = setTimeout(() => {
-      const el = itemListRef.current;
-      if (!el || el.scrollHeight === 0) return;
-      const scale = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
-      if (el.scrollHeight - el.scrollTop - el.offsetHeight < 70 * scale) {
-        itemList.loadMore();
-      }
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [itemList.resetCount.value]);
-
-  const onItemListScroll = useMemo(() => debounce(loadMoreItems, 200), [loadMoreItems]);
 
   // Item details & auto-read
   useEffect(() => {
@@ -197,15 +167,8 @@ export default function App() {
       const newIdx = curIdx + dir;
       if (newIdx < 0 || newIdx >= list.length) return;
       itemSelected.value = list[newIdx].id;
-
-      setTimeout(() => {
-        const scroll = document.querySelector("#item-list-scroll");
-        const handle = scroll?.querySelector('[aria-checked="true"]');
-        if (handle && scroll) scrollto(handle, scroll);
-        loadMoreItems();
-      }, 0);
     },
-    [itemList, loadMoreItems],
+    [itemList],
   );
 
   // Keybindings
@@ -256,8 +219,6 @@ export default function App() {
         registry={registry}
         itemList={itemList}
         itemSelected={itemSelected}
-        itemListRef={itemListRef}
-        onScroll={onItemListScroll}
         onMarkAllRead={markItemsRead}
       />
 

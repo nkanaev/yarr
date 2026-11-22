@@ -1,7 +1,8 @@
 import type { Signal } from "@preact/signals";
 import { useComputed } from "@preact/signals";
+import { useEffect, useRef } from "preact/hooks";
 import api from "../api";
-import { to } from "../utils";
+import { scrollto, to } from "../utils";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
 import type { AppRegistry } from "../models/registry";
@@ -20,8 +21,6 @@ interface ColumnItemListProps {
   registry: AppRegistry;
   itemList: AppItemList;
   itemSelected: Signal<number | null>;
-  itemListRef: { current: HTMLDivElement | null };
-  onScroll: () => void;
   onMarkAllRead: () => void;
 }
 
@@ -30,8 +29,6 @@ export default function ColumnItemList({
   registry,
   itemList,
   itemSelected,
-  itemListRef,
-  onScroll,
   onMarkAllRead,
 }: ColumnItemListProps) {
   const { t } = useI18n();
@@ -60,13 +57,50 @@ export default function ColumnItemList({
     settings.update({ item_list_width: Math.min(Math.max(200, w), 700) });
   };
 
+  const itemListRef = useRef<HTMLDivElement>(null);
+  const spinnerRef = useRef<HTMLDivElement>(null);
+
+  // Load the next page when the loading indicator enters the viewport.
+  // Re-runs after each page so short lists keep filling the column.
+  useEffect(() => {
+    const scroll = itemListRef.current;
+    const target = spinnerRef.current;
+    if (!scroll || !target) return;
+    const io = new IntersectionObserver(
+      entries => entries.some(e => e.isIntersecting) && itemList.loadMore(),
+      { root: scroll, rootMargin: "0px 0px 100px 0px" },
+    );
+    io.observe(target);
+    return () => io.disconnect();
+  }, [itemList, itemList.items.value.length, itemList.loading.value]);
+
+  // Reveal the selected item
+  useEffect(() => {
+    if (itemSelected.value === null) return;
+    const timer = setTimeout(() => {
+      const el = itemListRef.current;
+      if (!el) return;
+      const selected = el.querySelector('[aria-checked="true"]');
+      if (selected) scrollto(selected, el);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [itemSelected.value]);
+
+  // Reset scroll when the item query changes
+  useEffect(() => {
+    if (itemListRef.current) itemListRef.current.scrollTop = 0;
+  }, [
+    settings.values.feed.value,
+    settings.values.filter.value,
+    settings.values.sort_newest_first.value,
+  ]);
+
   // Feed & folder actions
   const renameFeed = async (feed: Feed) => {
     const title = prompt(t("prompt_new_title"), feed.title);
     if (!title) return;
     const [err] = await to(api.feeds.update(feed.id, { title }));
-    if (err)
-      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
+    if (err) showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else
       registry.feeds.value = registry.feeds.value.map(f =>
         f.id === feed.id ? { ...f, title } : f,
@@ -77,8 +111,7 @@ export default function ColumnItemList({
     const feed_link = prompt(t("prompt_feed_link"), feed.feed_link);
     if (feed_link === null) return;
     const [err] = await to(api.feeds.update(feed.id, { feed_link }));
-    if (err)
-      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
+    if (err) showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else
       registry.feeds.value = registry.feeds.value.map(f =>
         f.id === feed.id ? { ...f, feed_link } : f,
@@ -87,8 +120,7 @@ export default function ColumnItemList({
 
   const moveFeed = async (feed: Feed, folder_id: number | null) => {
     const [err] = await to(api.feeds.update(feed.id, { folder_id }));
-    if (err)
-      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
+    if (err) showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else {
       registry.feeds.value = registry.feeds.value.map(f =>
         f.id === feed.id ? { ...f, folder_id } : f,
@@ -117,8 +149,7 @@ export default function ColumnItemList({
   const deleteFeed = async (feed: Feed) => {
     if (!confirm(t("confirm_delete", { name: feed.title }))) return;
     const [err] = await to(api.feeds.delete(feed.id));
-    if (err)
-      showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
+    if (err) showToast({ title: "fail_save_feed", description: err }, { level: "fail" });
     else {
       settings.values.feed.value = null;
       registry.refreshStats();
@@ -130,8 +161,7 @@ export default function ColumnItemList({
     const title = prompt(t("prompt_new_title"), folder.title);
     if (!title) return;
     const [err] = await to(api.folders.update(folder.id, { title }));
-    if (err)
-      showToast({ title: "fail_save_folder", description: err }, { level: "fail" });
+    if (err) showToast({ title: "fail_save_folder", description: err }, { level: "fail" });
     else {
       registry.folders.value = registry.folders.value
         .map(f => (f.id === folder.id ? { ...f, title } : f))
@@ -142,8 +172,7 @@ export default function ColumnItemList({
   const deleteFolder = async (folder: Folder) => {
     if (!confirm(t("confirm_delete", { name: folder.title }))) return;
     const [err] = await to(api.folders.delete(folder.id));
-    if (err)
-      showToast({ title: "fail_save_folder", description: err }, { level: "fail" });
+    if (err) showToast({ title: "fail_save_folder", description: err }, { level: "fail" });
     else {
       settings.values.feed.value = null;
       registry.refreshStats();
@@ -245,8 +274,7 @@ export default function ColumnItemList({
       <div
         id="item-list-scroll"
         ref={itemListRef}
-        className="d-flex flex-column p-2 overflow-auto border-top flex-grow-1 gap-1"
-        onScroll={onScroll}>
+        className="d-flex flex-column p-2 overflow-auto border-top flex-grow-1 gap-1">
         {itemList.items.value.map(item => (
           <div
             key={item.id}
@@ -278,7 +306,9 @@ export default function ColumnItemList({
           </div>
         ))}
         {(itemList.hasMore.value || itemList.loading.value) && (
-          <div className={`text-center my-3 ${!itemList.items.value.length ? "show-delayed" : ""}`}>
+          <div
+            ref={spinnerRef}
+            className={`text-center my-3 ${!itemList.items.value.length ? "show-delayed" : ""}`}>
             <span className="c-spinner" />
           </div>
         )}
