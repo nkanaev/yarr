@@ -287,13 +287,8 @@ export default function ColumnItemList({
               className="d-flex align-items-center">
               <Icon
                 small
-                name="circle-full"
-                className={`indicator me-1 ${item.status === "unread" ? "" : "is-hidden"}`}
-              />
-              <Icon
-                small
-                name="star-full"
-                className={`indicator me-1 ${item.status === "starred" ? "" : "is-hidden"}`}
+                name={item.status === "starred" ? "star-full" : "circle-full"}
+                className={`indicator me-1 ${item.status === "read" ? "is-hidden" : ""}`}
               />
               <small className="flex-fill text-truncate me-1">
                 {(registry.feedsById.value[item.feed_id] || {}).title}
