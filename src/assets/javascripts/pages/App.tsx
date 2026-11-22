@@ -224,10 +224,7 @@ export default function App() {
       />
       <ColumnItemView
         item={itemSelectedDetails.value}
-        feedTitle={
-          (registry.feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).title || ""
-        }
-        feedId={(registry.feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
+        registry={registry}
         settings={settings}
         handleRef={itemViewRef}
         onToggleStarred={item => toggleItemStatus(item, "starred")}

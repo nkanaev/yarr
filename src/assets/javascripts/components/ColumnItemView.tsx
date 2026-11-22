@@ -1,10 +1,10 @@
-
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { useSignal } from "@preact/signals";
 import type { Item } from "../api-types";
 import api from "../api";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
+import type { AppRegistry } from "../models/registry";
 import { dateTimeString, to } from "../utils";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
@@ -17,8 +17,7 @@ export interface ColumnItemViewHandle {
 
 interface ColumnItemProps {
   item: Item | null;
-  feedTitle: string;
-  feedId?: number;
+  registry: AppRegistry;
   settings: AppSettings;
   handleRef: { current: ColumnItemViewHandle | null };
   onToggleStarred: (item: Item) => void;
@@ -31,8 +30,7 @@ interface ColumnItemProps {
 
 export default function ColumnItemView({
   item,
-  feedTitle,
-  feedId,
+  registry,
   settings,
   handleRef,
   onToggleStarred,
@@ -94,6 +92,9 @@ export default function ColumnItemView({
     return (
       <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }} />
     );
+
+  const feedId = item.feed_id;
+  const feedTitle = registry.feedsById.value[feedId]?.title || "";
 
   const themeFont = settings.values.theme_font.value;
   const themeSize = settings.values.theme_size.value;
