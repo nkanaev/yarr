@@ -9,6 +9,7 @@ import Shortcuts from "../components/Shortcuts";
 import Icon from "../components/Icon";
 import ToastContainer, { showToast } from "../components/Toast";
 import ColumnItemView from "../components/ColumnItemView";
+import type { ColumnItemViewHandle } from "../components/ColumnItemView";
 import ColumnItemList from "../components/ColumnItemList";
 import ColumnFeedList from "../components/ColumnFeedList";
 import type { ColumnFeedListHandle } from "../components/ColumnFeedList";
@@ -34,16 +35,15 @@ export default function App() {
   // Items
   const itemSelected = useSignal<number | null>(null);
   const itemSelectedDetails = useSignal<Item | null>(null);
-  const itemSelectedReadability = useSignal("");
 
   // Status & modal
   const showModal = useSignal<"" | "shortcuts">("");
-  const loadingReadability = useSignal(false);
 
   // Element refs
   const itemListRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const feedListRef = useRef<ColumnFeedListHandle>(null);
+  const itemViewRef = useRef<ColumnItemViewHandle>(null);
 
   const showErrorToast = (err: Error, key: TranslationKey) =>
     showToast({ title: key, description: err }, { level: "fail" });
@@ -131,7 +131,6 @@ export default function App() {
 
   // Item details & auto-read
   useEffect(() => {
-    itemSelectedReadability.value = "";
     if (itemSelected.value === null) {
       itemSelectedDetails.value = null;
       return;
@@ -185,19 +184,6 @@ export default function App() {
     if (ok) itemSelected.value = null;
   };
 
-  const toggleReadability = async () => {
-    if (itemSelectedReadability.value) {
-      itemSelectedReadability.value = "";
-      return;
-    }
-    if (!itemSelectedDetails.value?.link) return;
-    loadingReadability.value = true;
-    const [err, data] = await to(api.crawl(itemSelectedDetails.value.link));
-    loadingReadability.value = false;
-    if (err) showToast({ title: "fail_readability", description: err }, { level: "fail" });
-    else itemSelectedReadability.value = data?.content || "";
-  };
-
   // Keyboard navigation
   const navigateToItem = useCallback(
     (dir: number) => {
@@ -233,7 +219,7 @@ export default function App() {
       if (itemSelectedDetails.value?.link)
         window.open(itemSelectedDetails.value.link, "_blank", "noopener,noreferrer");
     },
-    toggleReadability,
+    toggleReadability: () => itemViewRef.current?.toggleReadability(),
     toggleItemRead: () =>
       itemSelectedDetails.value && toggleItemStatus(itemSelectedDetails.value, "unread"),
     markAllRead: () => settings.values.filter.value === "unread" && markItemsRead(),
@@ -286,9 +272,7 @@ export default function App() {
         }
         feedId={(registry.feedsById.value[itemSelectedDetails.value?.feed_id ?? -1] || {}).id}
         settings={settings}
-        readabilityContent={itemSelectedReadability.value}
-        loadingReadability={loadingReadability.value}
-        onToggleReadability={toggleReadability}
+        handleRef={itemViewRef}
         onToggleStarred={item => toggleItemStatus(item, "starred")}
         onToggleRead={item => toggleItemStatus(item, "unread")}
         onNavigate={navigateToItem}

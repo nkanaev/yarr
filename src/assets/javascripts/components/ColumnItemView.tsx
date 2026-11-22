@@ -1,22 +1,26 @@
 import type { Ref } from "preact";
-import { useEffect } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useSignal } from "@preact/signals";
 import type { Item } from "../api-types";
+import api from "../api";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
-import { dateTimeString } from "../utils";
+import { dateTimeString, to } from "../utils";
 import Dropdown from "./Dropdown";
 import Icon from "./Icon";
+import { showToast } from "./Toast";
 import Tooltip from "./Tooltip";
+
+export interface ColumnItemViewHandle {
+  toggleReadability: () => void;
+}
 
 interface ColumnItemProps {
   item: Item | null;
   feedTitle: string;
   feedId?: number;
   settings: AppSettings;
-  readabilityContent: string;
-  loadingReadability: boolean;
-  onToggleReadability: () => void;
+  handleRef: { current: ColumnItemViewHandle | null };
   onToggleStarred: (item: Item) => void;
   onToggleRead: (item: Item) => void;
   onNavigate: (dir: number) => void;
@@ -31,9 +35,7 @@ export default function ColumnItemView({
   feedTitle,
   feedId,
   settings,
-  readabilityContent,
-  loadingReadability,
-  onToggleReadability,
+  handleRef,
   onToggleStarred,
   onToggleRead,
   onNavigate,
@@ -44,14 +46,50 @@ export default function ColumnItemView({
 }: ColumnItemProps) {
   const { t } = useI18n();
   const isFullscreen = useSignal(false);
+  const readabilityContent = useSignal("");
+  const loadingReadability = useSignal(false);
+
+  // latest article id, used to drop stale readability responses
+  const itemIdRef = useRef<number | null>(null);
+  itemIdRef.current = item?.id ?? null;
 
   // reset on close; survives article-to-article navigation like before
   useEffect(() => {
     if (!item) isFullscreen.value = false;
   }, [item]);
 
+  // clear readability when the article changes; same id keeps content on star toggle
+  useEffect(() => {
+    readabilityContent.value = "";
+    loadingReadability.value = false;
+  }, [item?.id]);
+
+  const toggleReadability = useCallback(async () => {
+    if (readabilityContent.value) {
+      readabilityContent.value = "";
+      return;
+    }
+    if (!item?.link) return;
+    const targetId = item.id;
+    loadingReadability.value = true;
+    const [err, data] = await to(api.crawl(item.link));
+    if (itemIdRef.current !== targetId) return;
+    loadingReadability.value = false;
+    if (err) showToast({ title: "fail_readability", description: err }, { level: "fail" });
+    else readabilityContent.value = data?.content || "";
+  }, [item]);
+
+  useEffect(() => {
+    handleRef.current = { toggleReadability };
+    return () => {
+      handleRef.current = null;
+    };
+  }, [handleRef, toggleReadability]);
+
   if (!item)
-    return <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }} />;
+    return (
+      <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }} />
+    );
 
   const themeFont = settings.values.theme_font.value;
   const themeSize = settings.values.theme_size.value;
@@ -60,14 +98,10 @@ export default function ColumnItemView({
   const contentImages = (item.media_links || []).filter(l => l.type === "image");
   const contentAudios = (item.media_links || []).filter(l => l.type === "audio");
   const contentVideos = (item.media_links || []).filter(l => l.type === "video");
-  const htmlContent = readabilityContent || item.content || "";
+  const htmlContent = readabilityContent.value || item.content || "";
 
   const fontClass =
-    themeFont === ""
-      ? "font-sans-serif"
-      : themeFont === "serif"
-        ? "font-serif"
-        : "font-monospace";
+    themeFont === "" ? "font-sans-serif" : themeFont === "serif" ? "font-serif" : "font-monospace";
 
   return (
     <div
@@ -158,9 +192,9 @@ export default function ColumnItemView({
             type="button"
             className="c-button-pill"
             aria-label={t("read_here")}
-            aria-pressed={!!readabilityContent}
-            onClick={onToggleReadability}>
-            <Icon className={loadingReadability ? "is-loading" : ""} name="book-open" />
+            aria-pressed={!!readabilityContent.value}
+            onClick={toggleReadability}>
+            <Icon className={loadingReadability.value ? "is-loading" : ""} name="book-open" />
           </button>
         </Tooltip>
 
