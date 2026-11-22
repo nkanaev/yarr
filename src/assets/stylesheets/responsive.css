@@ -78,12 +78,10 @@
   }
 }
 
-/* fullscreen article view: hide the feed & item lists, expand the article */
-#app .item-fullscreen #col-feed-list,
-#app .item-fullscreen #col-item-list {
-  display: none !important;
-}
-#app .item-fullscreen #col-item {
-  display: flex !important;
-  width: 100% !important;
+/* fullscreen article view: overlay the article above the columns */
+#app #col-item.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: var(--v-bg);
 }

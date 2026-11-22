@@ -1,4 +1,6 @@
 import type { Ref } from "preact";
+import { useEffect } from "preact/hooks";
+import { useSignal } from "@preact/signals";
 import type { Item } from "../api-types";
 import { useI18n } from "../i18n";
 import type { AppSettings } from "../models/settings";
@@ -20,8 +22,6 @@ interface ColumnItemProps {
   onNavigate: (dir: number) => void;
   canPrev: boolean;
   canNext: boolean;
-  isFullscreen: boolean;
-  onToggleFullscreen: () => void;
   onClose: () => void;
   contentRef: Ref<HTMLDivElement>;
 }
@@ -39,12 +39,16 @@ export default function ColumnItemView({
   onNavigate,
   canPrev,
   canNext,
-  isFullscreen,
-  onToggleFullscreen,
   onClose,
   contentRef,
 }: ColumnItemProps) {
   const { t } = useI18n();
+  const isFullscreen = useSignal(false);
+
+  // reset on close; survives article-to-article navigation like before
+  useEffect(() => {
+    if (!item) isFullscreen.value = false;
+  }, [item]);
 
   if (!item)
     return <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }} />;
@@ -66,7 +70,10 @@ export default function ColumnItemView({
         : "font-monospace";
 
   return (
-    <div id="col-item" className="vh-100 d-flex flex-column w-100" style={{ minWidth: 0 }}>
+    <div
+      id="col-item"
+      className={`vh-100 d-flex flex-column w-100 ${isFullscreen.value ? "is-fullscreen" : ""}`}
+      style={{ minWidth: 0 }}>
       <div className="px-2 py-1 d-flex gap-1 align-items-center">
         <Tooltip label={t("mark_starred")}>
           <button
@@ -191,13 +198,13 @@ export default function ColumnItemView({
             <Icon name="chevron-right" />
           </button>
         </Tooltip>
-        <Tooltip label={isFullscreen ? t("fullscreen_leave") : t("fullscreen_enter")}>
+        <Tooltip label={isFullscreen.value ? t("fullscreen_leave") : t("fullscreen_enter")}>
           <button
             type="button"
             className="c-button-pill d-none d-lg-flex"
-            aria-label={isFullscreen ? t("fullscreen_leave") : t("fullscreen_enter")}
-            onClick={onToggleFullscreen}>
-            <Icon name={isFullscreen ? "fullscreen-exit" : "fullscreen"} />
+            aria-label={isFullscreen.value ? t("fullscreen_leave") : t("fullscreen_enter")}
+            onClick={() => (isFullscreen.value = !isFullscreen.value)}>
+            <Icon name={isFullscreen.value ? "fullscreen-exit" : "fullscreen"} />
           </button>
         </Tooltip>
         <Tooltip label={t("close_article")}>

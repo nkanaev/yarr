@@ -35,7 +35,6 @@ export default function App() {
   const itemSelected = useSignal<number | null>(null);
   const itemSelectedDetails = useSignal<Item | null>(null);
   const itemSelectedReadability = useSignal("");
-  const itemFullscreen = useSignal(false);
 
   // Status & modal
   const showModal = useSignal<"" | "shortcuts">("");
@@ -135,7 +134,6 @@ export default function App() {
     itemSelectedReadability.value = "";
     if (itemSelected.value === null) {
       itemSelectedDetails.value = null;
-      itemFullscreen.value = false;
       return;
     }
 
@@ -258,7 +256,7 @@ export default function App() {
     <div
       className={`d-flex ${settings.values.feed.value !== null ? "feed-selected" : ""} ${
         itemSelected.value !== null ? "item-selected" : ""
-      } ${itemFullscreen.value ? "item-fullscreen" : ""}`}>
+      }`}>
       {/* Feed list column */}
       <ColumnFeedList
         settings={settings}
@@ -301,8 +299,6 @@ export default function App() {
           itemList.items.value.length &&
           itemSelected.value !== itemList.items.value[itemList.items.value.length - 1].id,
         )}
-        isFullscreen={itemFullscreen.value}
-        onToggleFullscreen={() => (itemFullscreen.value = !itemFullscreen.value)}
         onClose={() => (itemSelected.value = null)}
         contentRef={contentRef}
       />
