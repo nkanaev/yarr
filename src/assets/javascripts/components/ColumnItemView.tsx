@@ -1,5 +1,5 @@
-import type { Ref } from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
+
+import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { useSignal } from "@preact/signals";
 import type { Item } from "../api-types";
 import api from "../api";
@@ -27,7 +27,6 @@ interface ColumnItemProps {
   canPrev: boolean;
   canNext: boolean;
   onClose: () => void;
-  contentRef: Ref<HTMLDivElement>;
 }
 
 export default function ColumnItemView({
@@ -42,12 +41,12 @@ export default function ColumnItemView({
   canPrev,
   canNext,
   onClose,
-  contentRef,
 }: ColumnItemProps) {
   const { t } = useI18n();
   const isFullscreen = useSignal(false);
   const readabilityContent = useSignal("");
   const loadingReadability = useSignal(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // latest article id, used to drop stale readability responses
   const itemIdRef = useRef<number | null>(null);
@@ -62,6 +61,11 @@ export default function ColumnItemView({
   useEffect(() => {
     readabilityContent.value = "";
     loadingReadability.value = false;
+  }, [item?.id]);
+
+  // start each article at the top
+  useLayoutEffect(() => {
+    if (contentRef.current) contentRef.current.scrollTop = 0;
   }, [item?.id]);
 
   const toggleReadability = useCallback(async () => {

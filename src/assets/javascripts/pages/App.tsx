@@ -41,7 +41,6 @@ export default function App() {
 
   // Element refs
   const itemListRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const feedListRef = useRef<ColumnFeedListHandle>(null);
   const itemViewRef = useRef<ColumnItemViewHandle>(null);
 
@@ -135,8 +134,6 @@ export default function App() {
       itemSelectedDetails.value = null;
       return;
     }
-
-    if (contentRef.current) contentRef.current.scrollTop = 0;
 
     to(api.items.get(itemSelected.value)).then(([itemErr, item]) => {
       if (itemErr) {
@@ -284,7 +281,6 @@ export default function App() {
           itemSelected.value !== itemList.items.value[itemList.items.value.length - 1].id,
         )}
         onClose={() => (itemSelected.value = null)}
-        contentRef={contentRef}
       />
 
       {/* Dialog modal */}
