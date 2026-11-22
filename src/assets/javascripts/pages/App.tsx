@@ -203,7 +203,6 @@ export default function App() {
       className={`d-flex ${settings.values.feed.value !== null ? "feed-selected" : ""} ${
         itemSelected.value !== null ? "item-selected" : ""
       }`}>
-      {/* Feed list column */}
       <ColumnFeedList
         settings={settings}
         registry={registry}
@@ -212,8 +211,6 @@ export default function App() {
         handleRef={feedListRef}
         onShowShortcuts={() => (showModal.value = "shortcuts")}
       />
-
-      {/* Item list column */}
       <ColumnItemList
         settings={settings}
         registry={registry}
@@ -221,8 +218,6 @@ export default function App() {
         itemSelected={itemSelected}
         onMarkAllRead={markItemsRead}
       />
-
-      {/* Item reader column */}
       <ColumnItemView
         item={itemSelectedDetails.value}
         feedTitle={
@@ -243,8 +238,6 @@ export default function App() {
         )}
         onClose={() => (itemSelected.value = null)}
       />
-
-      {/* Dialog modal */}
       <Modal open={showModal.value !== ""} onHide={() => (showModal.value = "")}>
         <button
           type="button"
@@ -255,7 +248,6 @@ export default function App() {
         </button>
         {showModal.value === "shortcuts" && <Shortcuts />}
       </Modal>
-
       <ToastContainer />
     </div>
   );
