@@ -198,6 +198,10 @@ export default function App() {
 
   useEffect(() => setupKeybindings(keyActionsRef), []);
 
+  const items = itemList.items.value;
+  const canPrev = Boolean(items.length && itemSelected.value !== items[0].id);
+  const canNext = Boolean(items.length && itemSelected.value !== items[items.length - 1].id);
+
   return (
     <div
       className={`d-flex ${settings.values.feed.value !== null ? "feed-selected" : ""} ${
@@ -229,13 +233,8 @@ export default function App() {
         onToggleStarred={item => toggleItemStatus(item, "starred")}
         onToggleRead={item => toggleItemStatus(item, "unread")}
         onNavigate={navigateToItem}
-        canPrev={Boolean(
-          itemList.items.value.length && itemSelected.value !== itemList.items.value[0].id,
-        )}
-        canNext={Boolean(
-          itemList.items.value.length &&
-          itemSelected.value !== itemList.items.value[itemList.items.value.length - 1].id,
-        )}
+        canPrev={canPrev}
+        canNext={canNext}
         onClose={() => (itemSelected.value = null)}
       />
       <Modal open={showModal.value !== ""} onHide={() => (showModal.value = "")}>
