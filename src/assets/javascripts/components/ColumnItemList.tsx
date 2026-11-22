@@ -187,10 +187,10 @@ export default function ColumnItemList({
       style={{ width: `${settings.values.item_list_width.value}px` }}>
       <Drag width={settings.values.item_list_width.value} onResize={resizeItemList} />
       <div className="px-2 py-1 d-flex gap-1 align-items-center">
-        <Tooltip label={t("show_feeds")}>
+        <Tooltip label={t("show_feeds")} className="d-md-none">
           <button
             type="button"
-            className="c-button-pill d-md-none"
+            className="c-button-pill"
             aria-label={t("show_feeds")}
             onClick={() => (settings.values.feed.value = null)}>
             <Icon name="chevron-left" />
